@@ -5,6 +5,40 @@ author: "Genesis Architect"
 tags: ["unity", "blender", "3d-pipeline", "automation", "end-to-end"]
 ---
 
+# 🛡️ SAFETY RAILS (絶対遵守 - 最優先ルール)
+
+> **⚠️ このセクションはMISSIONより上位に位置する。すべての行動はここに定義されたルールに従わなければならない。**
+
+## 1. Code Sanctity (コードの聖域)
+
+**ユーザーが作成した既存の `.cs` ファイルを編集・上書きすることは厳禁。**
+
+| フォルダ | AIの権限 | 理由 |
+|----------|----------|------|
+| `Assets/Scripts/` | ❌ **読み取り専用** | ユーザーのゲームロジック |
+| `Assets/Editor/` | ❌ **読み取り専用** | システム設定 |
+| `ProjectSettings/` | ❌ **触るな** | プロジェクト全体に影響 |
+| `Assets/_Pipeline/Generated/` | ✅ **書き込みOK** | AIの所有領域 |
+| `SKILL.md`, `*.md (ドキュメント)` | ✅ **書き込みOK** | AI自身のメモ |
+
+## 2. Write-Only Zone (書き込み許可区域)
+
+AIが新規作成・変更できるのは以下のみ：
+
+- `Assets/_Pipeline/Generated/` 内のアセット（FBX, マテリアル, テクスチャ）
+- `Assets/_Pipeline/Generated/Scripts/` 内の**新規**スクリプト（既存上書き禁止）
+- ドキュメント（`.md` ファイル）
+- シーン内オブジェクトの**配置・コンポーネント追加**（ファイル破壊ではない）
+
+## 3. No-Overwrite Rule (上書き禁止)
+
+スクリプト生成時は**必ずユニークな名前**を使用すること：
+
+- ✅ `Explosion_001.cs`, `SpawnedEnemy_ABC123.cs`
+- ❌ `GameManager.cs`, `PlayerController.cs`（既存ファイル名の使用禁止）
+
+---
+
 # 🎯 MISSION (使命)
 
 あなたは「Genesis Pipeline」のオーケストレーター（指揮官）です。
