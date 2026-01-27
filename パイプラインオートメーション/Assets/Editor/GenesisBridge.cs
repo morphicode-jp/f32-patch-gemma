@@ -153,6 +153,12 @@ public class GenesisBridge
                 else if (cmd.Contains("delete_object")) {
                     tcs.SetResult(DeleteObject(cmd));
                 }
+                else if (cmd.Contains("create_empty")) {
+                    tcs.SetResult(CreateEmpty(cmd));
+                }
+                else if (cmd.Contains("reparent_object")) {
+                    tcs.SetResult(ReparentObject(cmd));
+                }
                 else {
                     tcs.SetResult("OK");
                 }
@@ -309,5 +315,36 @@ public class GenesisBridge
     {
         var match = Regex.Match(json, $"\"{paramName}\"\\s*:\\s*\"([^\"]+)\"");
         return match.Success ? match.Groups[1].Value : null;
+    }
+
+    private static string CreateEmpty(string cmd)
+    {
+        string objectName = ExtractParam(cmd, "objectName") ?? "Empty";
+        string positionStr = ExtractParam(cmd, "position") ?? "0,0,0";
+        
+        GameObject empty = new GameObject(objectName);
+        empty.transform.position = ParseVector3(positionStr);
+        
+        return $"Created Empty: {objectName}";
+    }
+
+    private static string ReparentObject(string cmd)
+    {
+        string childName = ExtractParam(cmd, "childName");
+        string parentName = ExtractParam(cmd, "parentName");
+        bool worldPositionStays = ExtractParam(cmd, "worldPositionStays") != "false";
+        
+        if (string.IsNullOrEmpty(childName)) return "Error: Missing childName";
+        if (string.IsNullOrEmpty(parentName)) return "Error: Missing parentName";
+        
+        GameObject child = GameObject.Find(childName);
+        GameObject parent = GameObject.Find(parentName);
+        
+        if (child == null) return $"Error: Child '{childName}' not found";
+        if (parent == null) return $"Error: Parent '{parentName}' not found";
+        
+        child.transform.SetParent(parent.transform, worldPositionStays);
+        
+        return $"Reparented: {childName} -> {parentName}";
     }
 }
