@@ -59,6 +59,35 @@ async function gitCommit(message: string): Promise<string> {
     }
 }
 
+// Git操作: Diff確認（自己診断用）
+async function gitDiff(): Promise<string> {
+    try {
+        const { stdout } = await execAsync("git diff --stat", { cwd: PROJECT_ROOT });
+        if (!stdout.trim()) {
+            return "No uncommitted changes";
+        }
+        // 詳細なdiffも取得（最初の500文字まで）
+        const { stdout: detailed } = await execAsync("git diff", { cwd: PROJECT_ROOT });
+        const truncated = detailed.length > 500 ? detailed.substring(0, 500) + "\n... (truncated)" : detailed;
+        return `Changes Summary:\n${stdout}\n\nDetails:\n${truncated}`;
+    } catch (error: any) {
+        return `Diff Error: ${error.message}`;
+    }
+}
+
+// Git操作: ステータス確認
+async function gitStatus(): Promise<string> {
+    try {
+        const { stdout } = await execAsync("git status --short", { cwd: PROJECT_ROOT });
+        if (!stdout.trim()) {
+            return "Working tree clean - no changes";
+        }
+        return `Modified files:\n${stdout}`;
+    } catch (error: any) {
+        return `Status Error: ${error.message}`;
+    }
+}
+
 // ツール定義
 server.setRequestHandler(ListToolsRequestSchema, async () => {
     return {
@@ -89,6 +118,16 @@ server.setRequestHandler(ListToolsRequestSchema, async () => {
                     },
                     required: ["message"]
                 }
+            },
+            {
+                name: "git_diff",
+                description: "Shows uncommitted changes in the working directory. Use this for self-verification after making changes - helps catch accidental deletions or modifications.",
+                inputSchema: { type: "object", properties: {} }
+            },
+            {
+                name: "git_status",
+                description: "Shows which files have been modified, added, or deleted. Quick overview before committing.",
+                inputSchema: { type: "object", properties: {} }
             }
         ]
     };
@@ -101,6 +140,14 @@ server.setRequestHandler(CallToolRequestSchema, async (request) => {
         if (request.params.name === "git_commit") {
             const args = request.params.arguments as { message: string };
             const result = await gitCommit(args.message);
+            return { content: [{ type: "text", text: result }] };
+        }
+        if (request.params.name === "git_diff") {
+            const result = await gitDiff();
+            return { content: [{ type: "text", text: result }] };
+        }
+        if (request.params.name === "git_status") {
+            const result = await gitStatus();
             return { content: [{ type: "text", text: result }] };
         }
 
