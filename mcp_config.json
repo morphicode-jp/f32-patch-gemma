@@ -1,0 +1,27 @@
+{
+  "mcpServers": {
+    "blender": {
+      "command": "uvx",
+      "args": [
+        "blender-mcp"
+      ],
+      "env": {
+        "BLENDER_PATH": "C:\\Program Files\\Blender Foundation\\Blender 5.0\\blender.exe"
+      },
+      "disabled": false,
+      "autoApprove": []
+    },
+    "unity": {
+      "command": "node",
+      "args": [
+        "C:\\Users\\mukic\\OneDrive\\デスクトップ\\パイプラインオートメーション\\unity-bridge\\build\\index.js"
+      ],
+      "env": {
+        "UNITY_HOST": "127.0.0.1",
+        "UNITY_PORT": "8091"
+      },
+      "disabled": false,
+      "autoApprove": []
+    }
+  }
+}
