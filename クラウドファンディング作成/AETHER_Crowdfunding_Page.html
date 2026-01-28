@@ -1,0 +1,563 @@
+<!DOCTYPE html>
+<html lang="ja">
+
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>AETHER: The AI Creation Engine - Crowdfunding</title>
+    <meta property="og:title" content="AETHER: The AI Creation Engine" />
+    <meta property="og:description" content="UnityとBlenderを『直結』するAIパイプライン。言葉ひとつで世界は動く。" />
+    <meta property="og:image" content="assets/hero_banner.png" />
+    <meta name="twitter:card" content="summary_large_image" />
+    <link rel="preconnect" href="https://fonts.googleapis.com">
+    <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+    <link href="https://fonts.googleapis.com/css2?family=Inter:wght@400;700;900&display=swap" rel="stylesheet">
+    <style>
+        :root {
+            --ks-green: #05ce78;
+            --ks-green-hover: #04b369;
+            --text-color: #2b2b2b;
+            --bg-color: #ffffff;
+            --gray-light: #fbfbfb;
+            --border-color: #dedede;
+        }
+
+        body {
+            font-family: 'Inter', 'Helvetica Neue', Helvetica, Arial, sans-serif;
+            color: var(--text-color);
+            line-height: 1.6;
+            margin: 0;
+            padding: 0;
+            background: var(--bg-color);
+        }
+
+        h1,
+        h2,
+        h3 {
+            font-weight: 700;
+            margin-bottom: 1rem;
+        }
+
+        a {
+            color: #009E74;
+            text-decoration: none;
+        }
+
+        /* Nav */
+        nav {
+            border-bottom: 1px solid var(--border-color);
+            padding: 1rem 2rem;
+            display: flex;
+            justify-content: space-between;
+            align-items: center;
+        }
+
+        .logo {
+            font-weight: 900;
+            font-size: 1.2rem;
+            letter-spacing: -0.5px;
+        }
+
+        /* Hero Section */
+        .hero {
+            text-align: center;
+            padding: 2rem 0;
+            max-width: 100%;
+            overflow: hidden;
+        }
+
+        .hero h1 {
+            font-size: 2.5rem;
+            margin-bottom: 0.5rem;
+        }
+
+        .hero p.subtitle {
+            font-size: 1.2rem;
+            color: #656969;
+            max-width: 800px;
+            margin: 0 auto 2rem;
+        }
+
+        .hero-image {
+            width: 100%;
+            max-width: 1000px;
+            margin: 0 auto;
+            position: relative;
+        }
+
+        .hero-image img {
+            width: 100%;
+            height: auto;
+            display: block;
+        }
+
+        .play-button {
+            position: absolute;
+            top: 50%;
+            left: 50%;
+            transform: translate(-50%, -50%);
+            width: 80px;
+            height: 80px;
+            background: rgba(0, 0, 0, 0.7);
+            border-radius: 50%;
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            color: white;
+            font-size: 2rem;
+            cursor: pointer;
+        }
+
+        /* Stats Bar */
+        .stats-bar {
+            border-top: 1px solid var(--border-color);
+            border-bottom: 1px solid var(--border-color);
+            padding: 1.5rem 0;
+            margin-top: 2rem;
+        }
+
+        .container {
+            max-width: 1040px;
+            margin: 0 auto;
+            padding: 0 20px;
+            display: grid;
+            grid-template-columns: 2fr 1fr;
+            gap: 40px;
+        }
+
+        .stats-content {
+            display: flex;
+            flex-direction: column;
+            justify-content: center;
+        }
+
+        .progress-bar {
+            height: 4px;
+            background: #e6e6e6;
+            width: 100%;
+            margin-bottom: 10px;
+            position: relative;
+        }
+
+        .progress-fill {
+            height: 100%;
+            background: var(--ks-green);
+            width: 80%;
+            /* Demo value */
+        }
+
+        .stat-item {
+            display: inline-block;
+            margin-right: 30px;
+        }
+
+        .stat-val {
+            font-size: 1.5rem;
+            font-weight: 700;
+            color: var(--ks-green);
+            display: block;
+        }
+
+        .stat-label {
+            font-size: 0.9rem;
+            color: #656969;
+        }
+
+        .back-btn-large {
+            background: var(--ks-green);
+            color: white;
+            padding: 15px 30px;
+            font-size: 1.1rem;
+            font-weight: 700;
+            border: none;
+            cursor: pointer;
+            width: 100%;
+            text-align: center;
+            transition: background 0.2s;
+        }
+
+        .back-btn-large:hover {
+            background: var(--ks-green-hover);
+        }
+
+        /* Main Grid */
+        .main-grid {
+            margin-top: 3rem;
+            margin-bottom: 5rem;
+        }
+
+        .left-col {
+            border-right: 1px solid transparent;
+        }
+
+        .right-col {
+            padding-left: 20px;
+        }
+
+        /* Story Content */
+        .story-section {
+            font-size: 1.1rem;
+            color: #2a2a2a;
+        }
+
+        .story-section h2 {
+            font-size: 1.8rem;
+            margin-top: 3rem;
+            border-bottom: 2px solid #e6e6e6;
+            padding-bottom: 0.5rem;
+        }
+
+        .story-section h3 {
+            font-size: 1.4rem;
+            margin-top: 2rem;
+            color: #333;
+        }
+
+        .story-section p {
+            margin-bottom: 1.5rem;
+        }
+
+        .story-section img {
+            max-width: 100%;
+            height: auto;
+            margin: 2rem 0;
+            border-radius: 4px;
+            box-shadow: 0 2px 10px rgba(0, 0, 0, 0.1);
+        }
+
+        .caption {
+            font-size: 0.9rem;
+            color: #656969;
+            text-align: center;
+            font-style: italic;
+            margin-top: -1.5rem;
+            margin-bottom: 2rem;
+            display: block;
+        }
+
+        .highlight-box {
+            background: #f3f3f3;
+            padding: 2rem;
+            border-left: 5px solid var(--ks-green);
+            margin: 2rem 0;
+        }
+
+        /* Sidebar Rewards */
+        .reward-card {
+            border: 1px solid var(--border-color);
+            padding: 20px;
+            margin-bottom: 20px;
+            transition: box-shadow 0.2s;
+        }
+
+        .reward-card:hover {
+            box-shadow: 0 5px 15px rgba(0, 0, 0, 0.1);
+            border-color: #a6a6a6;
+        }
+
+        .pledge-amount {
+            font-size: 1.2rem;
+            font-weight: 700;
+            margin-bottom: 5px;
+        }
+
+        .reward-title {
+            font-size: 1.1rem;
+            font-weight: 700;
+            margin-bottom: 1rem;
+        }
+
+        .reward-desc {
+            font-size: 0.95rem;
+            color: #656969;
+            margin-bottom: 1rem;
+        }
+
+        .reward-includes {
+            font-size: 0.9rem;
+            font-weight: 700;
+            margin-bottom: 0.5rem;
+        }
+
+        .include-list {
+            list-style: none;
+            padding: 0;
+            margin-bottom: 1.5rem;
+            font-size: 0.9rem;
+        }
+
+        .include-list li::before {
+            content: "• ";
+            color: var(--ks-green);
+        }
+
+        .pledge-btn {
+            background: #2b2b2b;
+            color: white;
+            width: 100%;
+            padding: 10px;
+            border: none;
+            font-weight: 700;
+            cursor: pointer;
+        }
+
+        .pledge-btn:hover {
+            background: #404040;
+        }
+
+        .sticky-sidebar {
+            position: sticky;
+            top: 20px;
+        }
+
+        /* Specific for Demo */
+        .logo-text {
+            font-family: 'Courier New', Courier, monospace;
+        }
+    </style>
+</head>
+
+<body>
+
+    <nav>
+        <div class="logo">KICKSTARTER <span style="font-weight:400; color:#656969; font-size:0.9rem;">(Mockup)</span>
+        </div>
+        <div>
+            <a href="#">Search</a> &nbsp;
+            <a href="#">Log in</a>
+        </div>
+    </nav>
+
+    <div class="hero">
+        <h1>AETHER: The AI Creation Engine</h1>
+        <p class="subtitle">『思考』と『創造』の境界を溶かす。UnityとBlenderを『直結』する第五元素。<br>言葉ひとつで、世界は動く。</p>
+
+        <div class="hero-image">
+            <img src="assets/hero_banner.png" alt="AETHER Hero Banner">
+            <div class="play-button">▶</div>
+        </div>
+    </div>
+
+    <div class="stats-bar">
+        <div class="container">
+            <div class="stats-content">
+                <div class="progress-bar">
+                    <div class="progress-fill"></div>
+                </div>
+                <div>
+                    <div class="stat-item">
+                        <span class="stat-val">¥3,520,000</span>
+                        <span class="stat-label">pledged of ¥1,000,000 goal</span>
+                    </div>
+                    <div class="stat-item">
+                        <span class="stat-val">482</span>
+                        <span class="stat-label">backers</span>
+                    </div>
+                    <div class="stat-item">
+                        <span class="stat-val">28</span>
+                        <span class="stat-label">days to go</span>
+                    </div>
+                </div>
+            </div>
+            <div>
+                <button class="back-btn-large">Back this project</button>
+            </div>
+        </div>
+    </div>
+
+    <div class="container main-grid">
+        <!-- LEFT COLUMN: STORY -->
+        <div class="left-col story-section">
+            <div style="border-bottom:1px solid #ddd; margin-bottom:20px; padding-bottom:10px;">
+                <strong>Campaign</strong> | FAQ | Updates | Comments
+            </div>
+
+            <h2>第1章：The Hook（掴み）</h2>
+            <h3>あなたはクリエイターですか？ それとも「デバッグ係」ですか？</h3>
+            <p>週末の金曜日、深夜25時。あなたはベッドの中で、世界を変えるような**「最高のゲームアイデア」**を思いつきました。</p>
+            <p>胸が高鳴り、眠気なんて吹き飛んでしまう。すぐにデスクに向かい、PCを立ち上げる。「この世界観を、このキャラクターを、今すぐ形にしたい！」</p>
+            <p>しかし、現実はどうでしょう？</p>
+            <p>モニターに映し出されるのは、冒険の世界ではありません。Blenderの複雑怪奇なエクスポート設定画面。Unityにインポートした瞬間、マテリアルが剥がれて不気味なピンク色になった世界。そして、勇ましく立っているはずのキャラクターは、なぜか地面に顔を埋めて（-90度回転して）死んでいる。
+            </p>
+
+            <div class="highlight-box">
+                <strong>「僕たちは、インポート設定をするためにゲームを作っているんじゃない。」</strong>
+            </div>
+
+            <p>あなたの貴重な「創造の熱量（パッション）」は、無意味なクリックとパラメーター調整に吸い取られていきます。クリエイターであるはずのあなたが、いつの間にかツールの機嫌を取る「デバッグ係」になってしまっている。そんな絶望的な夜を、もう終わりにしませんか？
+            </p>
+
+            <img src="assets/pain_point.png" alt="Expectation vs Reality">
+            <span class="caption">絶望的な「軸ズレ」。もう見たくない光景。</span>
+
+            <h2>第2章：The Solution（解決策）</h2>
+            <h3>AETHERへようこそ。ここは、息をするように創造できる場所です</h3>
+            <p>想像してください。面倒な設定も、ファイルのドラッグ＆ドロップも、軸の計算も必要ない世界を。</p>
+            <p><strong>AETHER（エーテル）</strong>は、単なる効率化ツールではありません。あなたの開発環境を満たす「空気」のように、あなたと一体化するAIパートナーです。</p>
+            <p>使い方は、魔法のようにシンプルです。あなたは、チャット欄にただ一言、こう命じるだけ。</p>
+
+            <h3 style="text-align:center; font-size: 2rem;">「剣の雨を降らせて」</h3>
+
+            <p>たったこれだけで、世界は動き始めます。裏側では、Google AntiGravityと最新の**MCP（Model Context
+                Protocol）**が、BlenderとUnityという二つの巨人を完全に制御。あなたの言葉を理解し、モデルを生み出し、物理法則を与え、あなたの目の前のスクリーンに「現実」として出現させます。</p>
+
+            <div
+                style="background:#eee; height:300px; display:flex; align-items:center; justify-content:center; margin:2rem 0;">
+                <p style="color:#888;">[GIF Placeholder: Sword Rain Animation]</p>
+            </div>
+            <span class="caption">言葉が、物理（モノ）になる瞬間。</span>
+
+            <p>もう、Z-upかY-upかで悩む必要はありません。AETHERは、各アプリケーションの座標系を熟知しています。Blenderで生まれた命は、Unityの世界でもそのままの姿で、大地にしっかりと足をつけます。
+            </p>
+
+            <h2>第3章：The Origin Story（開発秘話）</h2>
+            <h3>〜2年間の敗北と、48時間の不眠不休〜</h3>
+
+            <h4>■ 私は、天才エンジニアではありません</h4>
+            <p>正直に告白します。私はこれまで、数えきれないほどの「失敗」を重ねてきました。</p>
+            <p>2年前、AI（LLM）の可能性に魅せられて以来、私は1日も欠かさず最新技術を追い続けてきました。「AIを使えば、個人でもすごいゲームが作れるはずだ」そう信じて、Unityの便利ツール開発に挑んではエラーで頓挫し、3Dモデリングに挑んでは歪なポリゴンしか作れず、ゲーム制作そのものを投げ出したことも一度や二度ではありません。
+            </p>
+            <p>私のPCの中には、作りかけで放置されたプロジェクトの「墓場」があります。あなたと同じです。私も、自分の技術不足とツールの複雑さに、何度も膝をついてきました。</p>
+
+            <h4>■ 48時間の「雪辱戦」</h4>
+            <p>しかし、今回Google AntiGravityとMCPという技術に出会った時、直感しました。「これなら、あの『断絶』を埋められる」</p>
+            <p>そこからの<strong>48時間</strong>は、私にとっての「雪辱戦」であり、記憶が飛ぶほどの熱狂でした。土曜の朝、PCの前に座り、気づけば月曜の朝になっていました。食事をとるのも忘れ、眠気すら感じないほど、私はディスプレイに噛り付いていました。
+            </p>
+            <ul>
+                <li><strong>深夜のデバッグ:</strong> AIが書いたコードがUnityをクラッシュさせる。そのたびに「まだだ、まだ終われない」と再起動する。</li>
+                <li><strong>対話と闘争:</strong> 疲労で思考が鈍る私を、AIエージェントが「次の修正案があります」と励まし続ける。</li>
+            </ul>
+            <p>それは人間とAIが限界を超えて協力した、密度の濃い2日間でした。</p>
+
+            <h4>■ 月曜の朝、世界が変わった</h4>
+            <p>意識が朦朧としてきた48時間目の朝。私は震える指で、最後のコマンドを入力しました。</p>
+            <p><strong>「剣を生成して」</strong></p>
+            <p>画面の中で、物理演算を持った剣がカランと音を立てて落ちた時。窓の外は明るくなっていましたが、私の中にあったのは疲労感ではなく、「ついに勝った」という震えるような達成感でした。</p>
+
+            <h4>■ あなたに手渡すのは、その「極限の結晶」です</h4>
+            <p>AETHERは、AIが勝手に作ったのではありません。<strong>「何度も失敗し、それでも作ることを諦めきれなかった一人の開発者」が、48時間の命を削って生み出した結晶</strong>です。</p>
+            <p>私が2年間悩み、48時間かけて踏み抜いた地雷原は、もう安全な道に変えておきました。だから、あなたはもう苦しまなくていい。さあ、今すぐ「創造」を始めましょう。</p>
+
+            <div
+                style="background:#222; color:#fff; padding:20px; text-align:center; border-radius:5px; margin:20px 0;">
+                <h3>🖼️ The 48-Hour Timeline</h3>
+                <p>[Day 1 (Sat) 09:00 着想] -> [Day 2 (Sun) 不眠不休] -> [Day 3 (Mon) 06:00 夜明け・完成]</p>
+                <p>48時間の熱狂。AIと人間が、限界を超えて駆け抜けた記録。</p>
+            </div>
+
+            <h2>第4章：The Technology</h2>
+            <p>「魔法のように見える」と言いましたが、これは決してハリボテではありません。強固な技術的裏付けがあります。</p>
+            <p>AETHERは違います。<strong>「MCP (Model Context Protocol)」</strong>という最新技術を採用することで、アプリケーションの「脳（メモリ）」と直接会話します。</p>
+
+            <img src="assets/architecture.png" alt="System Architecture">
+            <span class="caption">MCPによる完全統合システム</span>
+
+            <img src="assets/architecture.png" alt="System Architecture">
+            <span class="caption">MCPによる完全統合システム</span>
+
+
+
+            <!-- ROADMAP SECTION -->
+            <div class="roadmap-container">
+                <h2>The Roadmap: Seed & Harvest</h2>
+                <h3>「まずは道具を配る。次に経済圏を作る。」</h3>
+                <div class="roadmap-item">
+                    <div class="roadmap-icon">1</div>
+                    <div class="roadmap-content">
+                        <h4>Phase 1: AETHER V1 (CF終了後すぐ)</h4>
+                        <p>まずは「ツール」として使い倒してください。手元に「資産（プロンプト）」を貯める期間です。</p>
+                    </div>
+                </div>
+                <div class="roadmap-item">
+                    <div class="roadmap-icon">2</div>
+                    <div class="roadmap-content">
+                        <h4>Phase 2: Mac版リリース (3〜4ヶ月後)</h4>
+                        <p>ストレッチゴール達成時。より多くのクリエイターを巻き込み、「出品者」を増やします。</p>
+                    </div>
+                </div>
+                <div class="roadmap-item">
+                    <div class="roadmap-icon">3</div>
+                    <div class="roadmap-content">
+                        <h4>Phase 3: Skill Store Beta (半年〜1年後)</h4>
+                        <p><strong>収穫の時です。</strong>蓄積したプロンプトを「商品」として出品し、収益化を開始します。</p>
+                    </div>
+                </div>
+            </div>
+
+            <!-- USE OF FUNDS SECTION -->
+            <div class="use-of-funds-container">
+                <h2>Use of Funds</h2>
+                <p>Investments will be allocated to both AETHER software development and the construction of the Skill
+                    Store platform.</p>
+            </div>
+
+            <!-- REWARDS SECTION -->
+            <div class="rewards-container">
+                <h2>Rewards: Tool vs Platform Rights</h2>
+                <p>「ツールが欲しいだけの人」と「経済圏に参加したい人」でプランを分けました。</p>
+                <div class="right-col-inner-rewards">
+                    <!-- STANDRAD -->
+                    <div class="reward-card">
+                        <div class="pledge-amount">Pledge ¥5,000</div>
+                        <div class="reward-title">Early Adopter (Tool Only)</div>
+                        <p class="reward-desc">【先行利用権】<br>AETHER V1 (Standard)
+                            即時DL。<br>純粋に「魔法の杖」を安く手に入れたい方向けです。<br><span
+                                style="font-size:0.8em; color:#666;">※将来のストア出品権は含まれません。</span></p>
+                        <div class="reward-includes">INCLUDES:</div>
+                        <ul class="include-list">
+                            <li>AETHER V1 Access</li>
+                            <li>Personal Use OK</li>
+                            <li>No Store Rights</li>
+                        </ul>
+                        <div class="pledge-desc" style="font-size:0.8rem; color:#888; margin-bottom:10px;">
+                            ESTIMATED DELIVERY<br> Feb 2026
+                        </div>
+                        <button class="pledge-btn">Select this reward</button>
+                    </div>
+
+                    <!-- PRO -->
+                    <div class="reward-card" style="border: 2px solid var(--ks-green);">
+                        <div
+                            style="background:var(--ks-green); color:white; padding:2px 10px; font-size:0.8rem; display:inline-block; margin-bottom:10px;">
+                            RECOMMENDED</div>
+                        <div class="pledge-amount">Pledge ¥15,000</div>
+                        <div class="reward-title">Platform Builder</div>
+                        <p class="reward-desc">【経済圏へのパスポート】<br>V1 + Alpha版先行アクセスに加え、<strong>将来の「Skill Store Developer
+                                ID（出品権）」</strong>が付与されます。</p>
+                        <div class="reward-includes">INCLUDES:</div>
+                        <ul class="include-list">
+                            <li>AETHER Pro License</li>
+                            <li><strong>Skill Store Developer ID</strong></li>
+                            <li>Discord Co-Dev Access</li>
+                            <li>Verified Builder Badge</li>
+                        </ul>
+                        <div class="pledge-desc" style="font-size:0.8rem; color:#888; margin-bottom:10px;">
+                            ESTIMATED DELIVERY<br> Feb 2026
+                        </div>
+                        <button class="pledge-btn">Select this reward</button>
+                    </div>
+
+                    <!-- GOD -->
+                    <div class="reward-card" style="border: 2px solid gold; background:#fffbe6;">
+                        <div class="pledge-amount">Pledge ¥100,000</div>
+                        <div class="reward-title">Legendary Patron</div>
+                        <p class="reward-desc">【名誉スポンサー】<br>公式サイトへのロゴ掲載と、開発者との直接ホットライン。歴史に名を刻むプラン。</p>
+                        <div class="reward-includes">INCLUDES:</div>
+                        <ul class="include-list">
+                            <li>AETHER Pro Lifetime License</li>
+                            <li>Sponsor Logo Credit</li>
+                            <li>VIP Direct Line</li>
+                            <li><strong>Skill Store Tax Free (0%)</strong></li>
+                        </ul>
+                        <div class="pledge-desc" style="font-size:0.8rem; color:#888; margin-bottom:10px;">
+                            ESTIMATED DELIVERY<br> Feb 2026
+                        </div>
+                        <button class="pledge-btn">Select this reward</button>
+                    </div>
+                </div>
+            </div>
+        </div>
+
+</body>
+
+</html>
