@@ -1,0 +1,30 @@
+{
+  "_comment": "パイプライン実行パラメータ。optimize()で進化可能。全タイムアウトもLaD化済み。",
+  "prewarm": {
+    "enabled": true,
+    "prefetch_task_files": true,
+    "precompute_signatures": true,
+    "result_timeout": 30.0
+  },
+  "incremental_diagnosis": {
+    "enabled": true,
+    "partial_interval": 16,
+    "min_tasks_before_start": 5,
+    "poll_interval": 2.0,
+    "stop_timeout": 5.0
+  },
+  "early_exit": {
+    "enabled": true,
+    "probe_count": 8,
+    "regression_threshold": 5.0,
+    "min_sample_size": 18
+  },
+  "surrogate_warmup": {
+    "enabled": true,
+    "feed_immediately": true,
+    "wait_timeout": 5.0
+  },
+  "cleanup": {
+    "surrogate_timeout": 2.0
+  }
+}

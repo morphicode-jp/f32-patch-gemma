@@ -73,13 +73,21 @@ Nous() constructor:
 | `experience_id='task1'` | Cross-session learning. dead_dims + warm_start carry-over | Repeating the same problem |
 | `policy_type="linear"` | Linear: `argmax(W@obs+b)`. Fast, few params | Default. Simple environments |
 | `policy_type="kathara"` | Kathara(12,{1,4,6}): `obs→W_in→tanh→Kathara_propagate→tanh→W_out→action`. Non-linear | Complex environments needing non-linear policy |
+| `policy_type="auto"` | 10回ずつlinear/kathara試行 → 勝者で継続 | どちらが良いか不明な時 |
+| `envs=[env1,env2,...]` | 全環境の平均スコアで評価。汎化圧力 | マルチ環境で過学習防止 |
+| `memory_len=3` | 過去N stepのobsを結合。時間パターン学習 | 部分観測・時系列依存の環境 |
+| `curiosity=True` | proxy不確実性×距離で未探索領域優先 (FOCUS phase) | 広い探索空間、局所解が多い |
+| `n_workers=6` | Circulant(N,{1,⌊N/2⌋})で並列探索→知見共有 | 並列計算で高速化 |
 
-Nous.run():
+Nous.run(): `time_budget=300` (seconds, default 300), `verbose=True` (phase transitions log).
 
-| Option | Effect | When to use |
-|--------|--------|-------------|
-| `time_budget=300` | Total time limit (seconds). Default 300 | Control runtime |
-| `verbose=True` | Print phase transitions + structure updates | Debugging/monitoring |
+Nous.meta_optimize() — LaD究極形: Nous自身の内部定数をowl()で最適化:
+
+```python
+# Nous自身のフェーズ閾値・バッチサイズ等23パラメータを自動最適化
+Nous.meta_optimize(env_factory=BalanceEnv, time_budget=300)
+# → configs/nous_params.json に最適値を保存。以降の全Nous実行に反映
+```
 
 owl() options:
 
@@ -122,32 +130,20 @@ With autonomous=True: 3 stagnations → MS re-analysis + range perturbation → 
 
 ### Nous 4-phase loop
 
-3-layer architecture (RL + LaD + Owl):
-- **RL layer**: Environment protocol (reset/step), linear policy (W@obs + b), episode runner
-- **LaD layer**: Auto-converts actions/rewards to `{"params": policy_weights, "score": avg_reward}`
-- **Owl layer**: MirrorScan for importance/dead_dims, owl() for final optimization
+3-layer: **RL** (env→episode) → **LaD** (episode→`{params, score}`) → **Owl** (MS + proxy + optimize)
 
 ```
-EXPLORE (0-20%)  → Random sampling. Whole-space survey.
-                   Exit: dead_dims stable 2 rounds, or 20% time
-FOCUS   (20-40%) → Importance-proportional sampling. Dead dims pinned at best.
-                   Exit: proxy R² >= 0.7, or 40% time
-DEEPEN  (40-60%) → Interaction-pair targeted sampling. Top pairs full sweeps.
-                   Exit: 60% time
-EXPLOIT (60-100%)→ Proxy-screened: 100 candidates → top 5 real-evaluated.
-                   Final: owl() with all accumulated measurements.
+EXPLORE (0-20%)  → Random, whole-space. Exit: dead_dims stable
+FOCUS   (20-40%) → Importance-guided, dead pinned. Exit: R²≥0.7
+DEEPEN  (40-60%) → Interaction-pair targeted sweeps
+EXPLOIT (60-100%)→ Proxy-screened (100→5) + final owl()
 ```
 
-RL mode auto-construction:
-1. Policy dims = `n_actions × obs_size + n_actions` (W matrix + bias)
-2. `param_ranges = [(-2.0, 2.0)]` for all policy weights
-3. `eval_fn(params) = mean(run_episode(params) for 3 episodes)`
+RL auto-construction: dims = `n_actions × obs_size × (1+memory_len) + n_actions`, ranges=(-2,2), eval=mean(3 episodes).
 
 ### R² confidence
 
-- >= 0.7 → "high". Trustworthy
-- 0.3–0.7 → "low". Usable with caution
-- < 0.3 → "insufficient". Add measurements
+R² >= 0.7 → "high" (trustworthy) | 0.3–0.7 → "low" (caution) | < 0.3 → "insufficient" (add data)
 
 ## 5 readings from 1 computation
 
@@ -246,16 +242,19 @@ class MyEnv(Environment):
         reward = ...                      # float (higher = better)
         done = ...                        # bool (episode ended?)
         return obs, reward, done
+
+# For continuous actions, override these:
+    @property
+    def action_type(self): return "continuous"  # default: "discrete"
+    @property
+    def action_dim(self): return 2              # number of continuous action dims
+    @property
+    def action_range(self): return (-1.0, 1.0)  # (low, high) per dimension
+    # step() receives np.array instead of int
 ```
 
-Built-in environments:
-- `BalanceEnv` — CartPole-v1 equivalent (obs=4D, actions=2, max 200 steps). Proven: 200/200 perfect
-- `FlyWorldEnv` — 2D insect navigation (obs=12D, actions=9 (3×3 turn×speed), max 60 steps). Proven: 93.58/100
-No gym dependency. No external packages required.
-
-**Any system with observe→act→reward loop is an Environment:**
-game AI (screen→move→score), trading (price→buy/sell→PnL), robot control (sensors→torque→distance),
-manufacturing (temp/pressure→valve→quality), LLM tuning (scales→adjust→-PPL).
+Built-in: `BalanceEnv`(4D/2act, 200/200), `SwingUpEnv`(3D/1cont), `FlyWorldEnv`(12D/9act, 108/110). No gym dependency.
+**Any observe→act→reward loop is an Environment**: game AI, trading, robotics, manufacturing, LLM tuning.
 
 ## API & Server
 
@@ -280,101 +279,47 @@ python twelve/agent/api.py --port 8282               # internal full toolset
 x_i ← best( perturb(x_i), share(neighbors_i) )
 ```
 
-"Change yourself, compare with neighbors, keep the better one."
-This is the operating principle. DNA, galaxies, neurons — all follow this.
-
-Owl applies this principle: measurements = perturb results, proxy = share structure, optimize = keep the best.
-Nous extends this: act in environment = perturb, understand structure = share, improve policy = keep the best.
+"Change yourself, compare with neighbors, keep the better one." DNA, galaxies, neurons — all follow this.
+Owl: measurements=perturb, proxy=share, optimize=keep. Nous: act=perturb, understand=share, improve=keep.
 
 ## Why data alone gives answers
 
-Hidden structure exists in measurement data. MirrorScan extracts it in 3 layers using the Zenron-derived importance formula.
+MirrorScan extracts hidden structure from measurements in 3 layers:
 
-### Layer 1: truth (individual power)
-
-Correlation between each parameter and score. "Does changing this parameter affect the score?"
+### Layer 1-3: Importance formula
 
 ```
-truth[i] = |corr(param_i, scores)|
+truth[i]        = |corr(param_i, scores)|              # does this param affect score?
+connectivity[i] = mean(|corr(param_i, param_j)|) j≠i   # does it move with others?
+importance[i]   = (truth × max(connectivity, floor))^exp  # multiplication kills noise
 ```
 
-truth alone is not used. It picks up accidental correlations.
-
-### Layer 2: connectivity (linkage)
-
-Correlation between parameters. "Does this parameter move with others?"
-
-```
-connectivity[i] = mean(|corr(param_i, param_j)|) for j≠i
-```
-
-Parameters that move together = the system has structure.
-
-### Layer 3: Importance formula (multiplication eliminates noise)
-
-```
-importance[i] = (truth[i] × max(connectivity[i], floor)) ^ exp
-
-Hardcode default: exp=0.5, floor=0.01  (mirror_agent.py)
-JSON-optimized:   floor=0.078 (configs/ma_meta_params.json)
-_mp() resolves: JSON exists → JSON wins, else hardcode.
-exp=0.5 fixed. exp depends on eval_fn weighting (R²→0.46, equal→0.54, F1→0.40).
-0.5 ≈ equal-weight optimum. Universal safe default. No "correct exp" exists.
-```
+exp=0.5 (universal default), floor: 0.01 (hardcode) / 0.078 (JSON-optimized).
+`_mp()` resolves: JSON exists → JSON wins, else hardcode.
 
 | truth | connectivity | importance | meaning |
 |-------|-------------|------------|---------|
-| high | high | **high** | real structure. optimize this |
-| high | low | low | accidental correlation. overfitting risk |
-| low | high | low | co-moves but no effect |
-| low | low | ≈0 | dead dim. safe to ignore |
+| high | high | **high** | real structure |
+| high | low | low | accidental correlation |
+| low | high | low | co-moves, no effect |
+| low | low | ≈0 | dead dim |
 
-**Multiplication kills noise.** This is the core of the importance formula.
+### Layer 4: Interaction (pair extension)
 
-### Layer 4: Interaction importance (pair extension)
-
-Same formula applied to parameter PAIRS:
-
-```
-pair_connectivity[i,j] = |corr(param_i, param_j)|
-pair_truth[i,j]        = |corr(param_i × param_j, scores)|
-interaction_imp[i,j]   = (pair_truth[i,j] × max(pair_connectivity[i,j], floor)) ^ exp
-```
-
-Only pairs with high interaction_importance get interaction terms (x_i × x_j) in the proxy.
-Same double-filter. Same noise elimination. Natural extension of the zenron formula.
-
-**Proven:** R²=0.38 (linear only) → R²=0.79 (with interactions) on same 53 measurements.
+Same formula on pairs: `interaction_imp[i,j] = (|corr(x_i×x_j, scores)| × max(|corr(x_i,x_j)|, floor))^exp`
+High-importance pairs get interaction terms (x_i × x_j) in proxy. R² 0.38→0.79 on same 53 measurements.
 
 ### Proxy generation
 
-3-6 candidates auto-selected:
-
 ```
-{zenron, zenron_interact, linear} × {raw, log} = max 6 candidates → best R² wins
-(log is only available when all scores have same sign. Otherwise 3 candidates)
-
-zenron:          importance-weighted linear
-zenron_interact: + connectivity-guided interaction terms (x_i × x_j)
-linear:          plain linear regression
-
-raw: linear systems (direct proportion)
-log: multiplicative systems (PPL, neural nets, chemical reactions)
+{zenron, zenron_interact, linear} × {raw, log} = max 6 → best R² wins
+zenron: importance-weighted | zenron_interact: + pair terms (x_i×x_j) | linear: plain
+raw: linear systems | log: multiplicative (PPL, neural nets). Log requires same-sign scores
 ```
 
-### Why 100K optimizations don't break it
+Proxy extracts structure, not noise → stable under 100K+ optimizations. Extrapolation not guaranteed → use verify_fn.
 
-Proxy extracts structure only. Individual data noise is excluded.
-Stable within data range no matter how many times called.
-
-Extrapolation (outside data range) is not guaranteed → use verify_fn.
-
-### Power of dead dims
-
-```
-Measured: 206 dims → MS reduces to 21 dims
-        = search space 10^206 → 10^21 (10^185x reduction)
-```
+Dead dims compress search: 206D → 21D = 10^185x reduction.
 
 ---
 # Part 3: Reference
@@ -383,56 +328,25 @@ Measured: 206 dims → MS reduces to 21 dims
 ## Architecture
 
 ```
-Nous: eval_fn/env → 4-phase autonomous loop → owl() → result
-  RL mode: env → auto-construct policy eval_fn
-    policy_type="linear": argmax(W@obs+b). dims = n_actions × obs_size + n_actions
-    policy_type="kathara": obs→W_in→tanh→Kathara(12,{1,4,6})→tanh→W_out→action
-      dims = obs×12 + 30(edges) + 12×actions + actions
-    eval_fn(params) = mean(run_episode(params) × 3 episodes)
-  Built-in envs: BalanceEnv (4D/2act), FlyWorldEnv (12D/9act)
-  eval_fn mode: direct eval_fn (backward compatible with MirrorAgent)
-  EXPLORE: random sampling (whole-space survey)
-  FOCUS:   importance-guided sampling (dead_dims pinned at best)
-  DEEPEN:  interaction-pair targeted sampling (top pairs full-range)
-  EXPLOIT: proxy-screened (100→5) + final owl() with all measurements
-  Phase transitions: dead_dims stability → R² threshold → time budget %
-  Uses MirrorScan.from_measurements() directly for continuous structure updates
+Nous → 4-phase loop (EXPLORE/FOCUS/DEEPEN/EXPLOIT) → owl() → result
+  RL: env → policy eval_fn auto-construct. eval_fn: → same Owl pipeline
+  LaD config: configs/nous_params.json (JSON > hardcode, _cfg(section, key))
+  meta_optimize(): owl()でNous自身の23パラメータを自動最適化
 
-Owl: owl() → MS.from_measurements() → build_proxy(3-6 candidates) → optimize()
-  with verify_fn → auto-growth loop (5 rounds)
-  with autonomous=True → stagnation detect + range perturb + neighbor sampling
-  Proxy optimization only. Does not use categories/meta/Phase3
+Owl: owl() → MS.from_measurements() → build_proxy(3-6) → optimize()
+  verify_fn → 5-round auto-growth | autonomous → stagnation detect + range perturb
 
-MirrorAgent: eval_fn → initial measurements → owl(autonomous) → result
-  Internals fully delegated to owl()
+MirrorAgent: eval_fn → random measurements → owl() → result
 
-AT (EvolutionAgent): diagnose → prescribe → owl() → verify → evolve
-  Uses owl() internally for MS Proxy + optimize (Dual Accel implicit)
-  AT-specific: categories/Phase3/prescription table/AutoSurrogate/compose_eval_fn
-  Fallback: when MS history < 5, calls optimize() directly
+AT: diagnose → prescribe → owl() → verify → evolve
+  AT-specific: categories/Phase3/prescription table/AutoSurrogate
 
-Internal engine:
+Internal:
   MS (MirrorScan) → importance formula → dead_dims → proxy auto-gen
-  TL (optimize)   → Phase1(TwelveParallel) + Phase2(KatharaParamOptimizer) + Phase3(meta)
-    Phase1: per-category HC + Kathara search
-    Phase2: 12-candidate precision search
-    Phase3: K7-K12 meta-evolution (AT: only when meta=True)
-    categories: parameter group names. 2+ groups enable Phase1 parallelization
-
-Dead dims: importance < max(global_max × ratio, floor)
-  Hardcode: ratio=0.1, floor=0.05
-  JSON-optimized: ratio=0.233, floor=0.131 (configs/ma_meta_params.json)
-
-K² mode: owl(kathara="auto") — verify_fn + budget≥120s で自動6ノード並列。
-  Circulant(6,{1,3}): 6ノード, 3隣接, 直径2。各ノードがowl()でproxy加速。
-
-Cross-session: UnifiedExperience(experience_id)
-  → dead_dims hint, warm_start, best_params carry-over
-
-Hierarchical Kathara: n_clusters × Kathara(12) feedforward pipeline
-  Cluster 0: sensors. Cluster c: proj(cluster[c-1]). Motor: last cluster
-  396 params (vs fetal 1248). Proven: 4×12=94.00. Skip/fb hurt.
-  Principle: preserve Kathara topology at each cluster = scaling success
+  TL (optimize) → Phase1(Twelve) + Phase2(Kathara) + Phase3(meta-evolution)
+  Dead dims: importance < max(global_max × 0.233, 0.131)  [ma_meta_params.json]
+  K²: owl(kathara="auto") — 6-node Circulant parallel, auto when verify_fn + budget≥120s
+  Experience: UnifiedExperience(id) → dead_dims hint + warm_start carry-over
 ```
 
 ## Rules
@@ -449,42 +363,23 @@ Hierarchical Kathara: n_clusters × Kathara(12) feedforward pipeline
 | 6 | Discontinuous parameters → proxy collapse. Convert to continuous via LaD |
 | 7 | scale=0 forbidden. Never include 0 in parameter ranges |
 | 8 | RL environment = eval_fn auto-generator. Same Owl machinery, no modification needed |
-| 9 | Topology preservation > feature addition. Scale by preserving Kathara, not adding bio features |
 
 ## Proven results
 
 | Date | Technique | Result |
 |---|---|---|
-| 2026-04-10 | **ISS proxy + V3 bench** | **96.0% (Reasoning 93.3%, +33pts)** |
-| | *(ISS=Intelligence Structure Score, V3=ARC-Challenge v3)* | |
-| 2026-04-10 | ISS proxy workflow | **6 min (world: GPU256 × 3 weeks)** |
-| 2026-04-10 | **Owl** | **R²=0.998 (self-proxy), 320K eval/2.6s** |
-| 2026-04-11 | **MixQ Gemma4 31B** | **8.7GB, 93.3% (+6.6pt vs Q2_K 12GB)** |
-| 2026-04-11 | MixQ cross-arch | Qwen/Gemma both +6.6pt. Universal principle |
-| 2026-04-12 | **F32 scale calibration** | **PPL 1554→23.9, 21KB change (98.5%)** |
-| 2026-04-12 | **Interaction proxy** | **R² 0.38→0.79, same data, zenron pair extension** |
-| 2026-04-12 | **Owl self-optimize** | dead_dims F1: 0.22→0.56 (+155%), connectivity_floor 8x |
-| 2026-04-12 | **MA→owl() delegation** | 352→60 lines. Same results, zero duplication |
-| 2026-04-12 | **Dual acceleration** | 1114x proxy speedup, 20x effective. Now implicit via owl() |
-| 2026-04-12 | **Experience carry-over** | 2nd run +33%, verified_score 979→1304 |
-| 2026-04-13 | **AT→owl() delegation** | -159 lines. AT uses owl() internally. K² deprecated |
-| 2026-04-13 | **exp depends on eval_fn** | R²→0.46, equal→0.54, F1→0.40. No "correct exp". 0.5≈equal default |
-| 2026-04-14 | **Fragility (death-side)** | √(truth×isolation). 306 LLM: hidden_size most fragile despite highest connectivity |
-| 2026-04-14 | **Multi-observer Owl** | 6 observers × 306 LLM: 4 stable_active, 1 stable_dead, 3 observer_dependent |
-| 2026-04-15 | **Nous v1 (FlyWorld)** | **93.58/100, food到達, 91D自律探索 (351 evals, 4 phases)** |
-| 2026-04-15 | **kathara_brain_sim v4→v8** | **94.37% (12N), 94.00% (48N hier 4×12). Kathara = neural scaling law** |
-| 2026-04-16 | **Nous v2 (BalanceEnv)** | **200/200 perfect, 8/10 dead_dims, textbook-optimal policy auto-discovered, 60s** |
-| | *RL + LaD + Owl unified* | *angular_velocity→action = only relevant connection (physics textbook rediscovered)* |
-| 2026-04-16 | **Hierarchical Kathara 4×12** | **48N=94.00 (12N=94.37, gap=0.37). Topology preservation > biology** |
-| 2026-04-16 | v8 ablation (6 conditions) | inhib/skip/fb全て中立〜有害. baseline hier4最適. 396 params (68% reduction) |
-| **Failures** | *(reflected in Rule 6, 7)* | |
-| MixQ type mixing | PPL 2x worse | Discontinuous → proxy collapse (Rule 6) |
-| Layer zero-out | PPL=262144 | scale=0 → catastrophic (Rule 7) |
-| Proxy hallucination | proxy=3907, real=-17 | Caught by verify_fn + autonomous |
-
-## LLM surgery & F32 calibration
-
-Details in `@docs/HANDBOOK.md`. Key commands and architecture findings documented there.
+| 04-10 | **ISS proxy + V3 bench** | **96.0% (Reasoning +33pts), 6 min vs GPU256×3wks** |
+| 04-10 | **Owl** | **R²=0.998, 320K eval/2.6s** |
+| 04-11 | **MixQ Gemma4 31B** | **8.7GB, +6.6pt. Cross-arch universal** |
+| 04-12 | **F32 calibration** | **PPL 1554→23.9, 21KB (98.5%)** |
+| 04-12 | **Interaction proxy** | **R² 0.38→0.79, same data** |
+| 04-12 | **Owl self-optimize** | dead_dims F1 +155%, experience +33% |
+| 04-14 | **Fragility + Multi-observer** | √(truth×isolation). 6obs×306LLM: 4 stable, 1 dead, 3 dependent |
+| 04-15 | **Nous v1 (FlyWorld)** | **108/110, 117D自律探索** |
+| 04-16 | **Nous v2 (BalanceEnv)** | **200/200, angular_velocity→action自動発見 (物理教科書再発見)** |
+| 04-16 | **Nous v3 (全機能)** | **continuous/memory/curiosity/auto/K²/multi-env. 1800行** |
+| 04-16 | **Nous LaD** | **23定数→JSON + meta_optimize(). Rastrigin +54%** |
+| **Failures** | Rule 6: MixQ type→PPL 2x | Rule 7: scale=0→PPL=262144 | verify_fn catches proxy hallucination |
 
 ## Hardware & Safety
 
@@ -499,7 +394,7 @@ Details in `@docs/HANDBOOK.md`. Key commands and architecture findings documente
 |---|---|
 | Theory | `@docs/全論.md` |
 | Oracle | `@twelve/ORACLE.md` |
-| Techniques | `@docs/HANDBOOK.md` (tech catalog, specs, results) |
+| Techniques / LLM surgery | `@docs/HANDBOOK.md` (tech catalog, specs, F32 calibration) |
 | Experiments | `@docs/LAB_NOTES.md` (experiment log, chronological) |
 | Kathara math | `@docs/KATHARA_NOTE.md` |
 | Engine API | `@twelve/TWELVE_API.md` (optimize/AT/surrogate design) |
