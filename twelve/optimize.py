@@ -1982,22 +1982,41 @@ def owl(
                     for lo, hi in ranges
                 ]
 
-            # 近傍3点サンプリング → データ追加
+            # 近傍3点サンプリング → データ追加（並列評価）
             if best_params is not None:
                 _rng2 = random.Random(round_i * 1000 + 7)
                 _ranges = param_ranges if param_ranges is not None else ms.param_ranges
+
+                # 3サンプルを事前生成
+                _neighbor_samples = []
                 for _si in range(3):
-                    try:
-                        sample = [
-                            v + _rng2.gauss(0, 0.05 * (hi - lo))
-                            for v, (lo, hi) in zip(best_params, _ranges)
-                        ]
-                        sample = [max(lo, min(hi, v)) for v, (lo, hi) in zip(sample, _ranges)]
-                        if verify_fn is not None:
-                            s_score = float(verify_fn(sample))
-                        elif proxy_fn is not None:
-                            s_score = float(proxy_fn(sample))
-                        else:
+                    sample = [
+                        v + _rng2.gauss(0, 0.05 * (hi - lo))
+                        for v, (lo, hi) in zip(best_params, _ranges)
+                    ]
+                    sample = [max(lo, min(hi, v)) for v, (lo, hi) in zip(sample, _ranges)]
+                    _neighbor_samples.append(sample)
+
+                # 評価関数を決定して実行
+                _eval_target = verify_fn if verify_fn is not None else proxy_fn
+                if _eval_target is not None:
+                    def _eval_sample(s):
+                        try:
+                            return float(_eval_target(s))
+                        except Exception:
+                            return None
+
+                    if verify_fn is not None:
+                        # verify_fnはユーザー実装→スレッド安全性不明→逐次実行
+                        _scores = [_eval_sample(s) for s in _neighbor_samples]
+                    else:
+                        # proxy_fnは内部生成の純粋関数→並列安全
+                        from concurrent.futures import ThreadPoolExecutor
+                        with ThreadPoolExecutor(max_workers=3) as _pool:
+                            _scores = list(_pool.map(_eval_sample, _neighbor_samples))
+
+                    for sample, s_score in zip(_neighbor_samples, _scores):
+                        if s_score is None:
                             continue
                         if is_dict:
                             growing_data.append({"params": {n: v for n, v in zip(names, sample)},
@@ -2009,8 +2028,6 @@ def owl(
                             best_params = sample
                             if verify_fn is not None:
                                 verified_score = s_score
-                    except Exception:
-                        pass
 
         # listをdictに戻す（元がdictの場合）
         if is_dict and best_params is not None:
