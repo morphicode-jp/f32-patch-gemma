@@ -1,0 +1,42 @@
+{
+  "midpoint": {
+    "lambda": 0.03,
+    "iss": 22.4,
+    "hybrid": 0.87,
+    "unseen_mean": 3.64,
+    "unseen_std": 2.49,
+    "reach_rate": 0.0
+  },
+  "uniform_k1": {
+    "lambda": 96.47,
+    "iss": 52.28,
+    "hybrid": 71.02,
+    "unseen_mean": 29.72,
+    "unseen_std": 22.23,
+    "reach_rate": 0.45
+  },
+  "iss_opt": {
+    "lambda": 0.14,
+    "iss": 42.21,
+    "hybrid": 2.41,
+    "unseen_mean": 61.86,
+    "unseen_std": 32.62,
+    "reach_rate": 0.75
+  },
+  "lambda_opt": {
+    "lambda": 100.0,
+    "iss": 55.59,
+    "hybrid": 74.56,
+    "unseen_mean": 23.88,
+    "unseen_std": 19.94,
+    "reach_rate": 0.25
+  },
+  "hybrid_opt": {
+    "lambda": 100.0,
+    "iss": 93.22,
+    "hybrid": 96.55,
+    "unseen_mean": 24.61,
+    "unseen_std": 20.45,
+    "reach_rate": 0.3
+  }
+}
