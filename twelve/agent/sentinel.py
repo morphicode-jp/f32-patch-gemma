@@ -32,7 +32,8 @@ class Sentinel:
 
     def __init__(self, eval_fn, guard_fn, param_ranges,
                  param_names=None, experience_id=None,
-                 initial_params=None, learn=False, min_r_squared=0.3):
+                 initial_params=None, learn=False, min_r_squared=0.3,
+                 meta=False, meta_config=None):
         self.eval_fn = eval_fn
         self.guard_fn = guard_fn
         self.param_ranges = param_ranges
@@ -42,6 +43,11 @@ class Sentinel:
         self.initial_params = initial_params
         self.learn = learn
         self.min_r_squared = min_r_squared
+        # Phase3 meta-evolution (K7-K12). Only applies to optimize() fallback path.
+        # Use for long budgets (>1hr) or repeated runs where meta-evolving the
+        # optimizer itself pays off.
+        self.meta = meta
+        self.meta_config = meta_config
         self.baseline_params = [(lo + hi) / 2 for lo, hi in param_ranges]
         # seed for search ≠ baseline for guard comparison
         self.seed_params = (list(initial_params)
@@ -211,6 +217,8 @@ class Sentinel:
             initial_params=warm,
             learn=self.learn,
             experience_id=self.experience_id,
+            meta=self.meta,
+            meta_config=self.meta_config,
             verbose=verbose,
         )
 
@@ -315,6 +323,8 @@ class Sentinel:
                 initial_params=warm,
                 learn=self.learn,
                 experience_id=exp_pivot,
+                meta=self.meta,
+                meta_config=self.meta_config,
                 verbose=verbose,
             )
             score = float(bs) if bs is not None else 0.0

@@ -168,6 +168,20 @@ class TestSentinelDiscrete:
         ).run(time_budget=5, verbose=False)
         assert r["verdict"] in ("approved", "pivoted", "failed")
 
+    def test_meta_flag_accepted(self):
+        """meta=True does not break Sentinel (only affects optimize fallback)."""
+        def fn(p):
+            return -sum((x - 2) ** 2 for x in p)
+
+        r = Sentinel(
+            eval_fn=fn, guard_fn=fn,
+            param_ranges=[(-5, 5)] * 3,
+            meta=True,
+            learn=True,
+            experience_id="test_meta",
+        ).run(time_budget=5, verbose=False)
+        assert r["verdict"] in ("approved", "pivoted", "failed")
+
 
 if __name__ == "__main__":
     pytest.main([__file__, "-v", "--tb=short", "-x"])
