@@ -268,11 +268,17 @@ def save_result(result, mode_name, out_dir="."):
         "mode": mode_name,
         "verdict": result["verdict"],
         "eval_score": round(float(result["eval_score"]), 2),
+        "best_ever_score": round(float(result.get("best_ever_score", result["eval_score"])), 2),
         "guard_score": round(float(result["guard_score"]), 2),
         "baseline_guard": round(float(result["baseline_guard"]), 2),
         "proxy_r2": round(float(result["proxy_r2"]), 3),
+        "optimization_mode": result.get("optimization_mode", "owl"),
         "elapsed_s": float(result["elapsed_s"]),
         "best_params": [round(float(p), 4) for p in result["best_params"]],
+        "best_ever_params": (
+            [round(float(p), 4) for p in result["best_ever_params"]]
+            if result.get("best_ever_params") else None
+        ),
         "safe_dims": result.get("safe_dims"),
         "conflict_dims": result.get("conflict_dims"),
     }
