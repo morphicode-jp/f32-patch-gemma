@@ -168,6 +168,20 @@ class TestSentinelDiscrete:
         ).run(time_budget=5, verbose=False)
         assert r["verdict"] in ("approved", "pivoted", "failed")
 
+    def test_best_ever_tracked(self):
+        """best_ever_score >= eval_score always (it's the max across all evals)."""
+        def fn(p):
+            return -sum((x - 2) ** 2 for x in p)
+
+        r = Sentinel(eval_fn=fn, guard_fn=fn,
+                     param_ranges=[(-5, 5)] * 3).run(time_budget=5, verbose=False)
+        assert "best_ever_score" in r
+        assert "best_ever_params" in r
+        assert r["best_ever_score"] >= r["eval_score"], \
+            f"best_ever ({r['best_ever_score']}) should be >= last ({r['eval_score']})"
+        assert r["best_ever_params"] is not None
+        assert len(r["best_ever_params"]) == 3
+
     def test_meta_flag_accepted(self):
         """meta=True does not break Sentinel (only affects optimize fallback)."""
         def fn(p):

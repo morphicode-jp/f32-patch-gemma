@@ -81,6 +81,20 @@ class Sentinel:
 
         opt_score = opt_result.get("verified_score") or opt_result.get("best_score") or 0.0
 
+        # Track best-across-all-measurements (any eval_fn call during the run)
+        # measurements + best_params from optimizer = all points evaluated.
+        best_ever_score = float("-inf")
+        best_ever_params = None
+        for m in measurements:
+            s = float(m.get("score", float("-inf")))
+            if s > best_ever_score:
+                best_ever_score = s
+                best_ever_params = list(m["params"])
+        # Include the optimizer's verified best
+        if opt_score > best_ever_score:
+            best_ever_score = float(opt_score)
+            best_ever_params = list(best_params) if best_params is not None else None
+
         # Step 2: guard_fnで見張り
         baseline_guard = float(self.guard_fn(self.baseline_params))
         best_guard = float(self.guard_fn(best_params))
@@ -96,7 +110,9 @@ class Sentinel:
                 best_params, opt_score, best_guard, baseline_guard,
                 verdict="approved", elapsed=time.time() - t0,
                 proxy_r2=opt_result.get("proxy_r2", 0),
-                optimization_mode=opt_result.get("confidence", "owl"))
+                optimization_mode=opt_result.get("confidence", "owl"),
+                best_ever_params=best_ever_params,
+                best_ever_score=best_ever_score)
 
         # Step 3: NG → 診断 → 自動修正
         if verbose:
@@ -121,11 +137,18 @@ class Sentinel:
             print(f"  [Pivot] safe={len(safe)}, conflict={len(conflict)}")
             print(f"  [Verdict] {verdict.upper()}")
 
+        # Update best_ever to include pivot result too
+        if pivot_score > best_ever_score:
+            best_ever_score = float(pivot_score)
+            best_ever_params = list(pivot_params) if pivot_params is not None else None
+
         return self._build_result(
             pivot_params, pivot_score, pivot_guard, baseline_guard,
             verdict=verdict, elapsed=time.time() - t0,
             proxy_r2=opt_result.get("proxy_r2", 0),
             optimization_mode=opt_result.get("confidence", "owl"),
+            best_ever_params=best_ever_params,
+            best_ever_score=best_ever_score,
             mo_result=mo_result)
 
     def _collect(self, n_samples, verbose=False):
@@ -345,7 +368,14 @@ class Sentinel:
 
     def _build_result(self, best_params, eval_score, guard_score,
                       baseline_guard, verdict, elapsed, proxy_r2,
-                      optimization_mode="owl", mo_result=None):
+                      optimization_mode="owl", mo_result=None,
+                      best_ever_params=None, best_ever_score=None):
+        # best_ever = max over (all measurements, optimizer result, pivot result)
+        # If None (shouldn't happen), fall back to returned best_params/eval_score
+        if best_ever_score is None:
+            best_ever_score = float(eval_score)
+            best_ever_params = list(best_params) if best_params is not None else None
+
         r = {
             "verdict": verdict,
             "best_params": best_params,
@@ -355,6 +385,9 @@ class Sentinel:
             "proxy_r2": float(proxy_r2),
             "optimization_mode": optimization_mode,
             "elapsed_s": round(elapsed, 1),
+            # best across every eval_fn call in this run (catches the real peak)
+            "best_ever_score": float(best_ever_score),
+            "best_ever_params": best_ever_params,
             "safe_dims": None,
             "conflict_dims": None,
             "multi_observer": None,
