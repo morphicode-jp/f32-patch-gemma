@@ -1,4 +1,4 @@
-# CLAUDE.md — Operational Rules
+# CLAUDE.md -- Operational Rules
 
 All responses in Japanese.
 
@@ -6,107 +6,162 @@ All responses in Japanese.
 # Part 1: Usage
 ---
 
-## Basics: 3 Levels
+## The Stack
 
-**Nous** = environment → autonomous data collection → structure discovery → optimal policy.
-Owl is the brain (give it data). Nous is brain + body + learning loop (it acts, collects, learns).
+```
+Sentinel  →  "Optimize X, protect Y. Auto-pivot on failure."
+               Auto-picks tool: owl (continuous) or optimize (discrete)
+  owl()   →  "Find structure in data. Build proxy. Optimize." Continuous only.
+  optimize() → Phase1(TwelveParallel) + Phase2(KatharaParamOptimizer). Direct search, discrete OK.
+```
 
 ```python
-from twelve.agent.nous import Nous
+# 1. Two metrics (default — safe optimization)
+from twelve.agent.sentinel import Sentinel
+result = Sentinel(
+    eval_fn=fast_metric,         # optimize with this (fast, cheap)
+    guard_fn=important_metric,   # protect this (what actually matters)
+    param_ranges=[(0.5, 1.5)] * 61,
+).run(time_budget=900)
+# → verdict: "approved" / "pivoted" / "failed"
 
-# 1. Have environment (RL) or eval_fn → Nous (recommended)
-#    Autonomous: explores → understands structure → optimizes. 4-phase adaptive.
-
-# RL mode: pass an environment. Nous auto-constructs policy + eval_fn.
-from twelve.agent.nous import BalanceEnv
-result = Nous(env=BalanceEnv()).run(time_budget=60)
-
-# eval_fn mode: pass a function + ranges (backward compatible)
-result = Nous(eval_fn=my_eval, param_ranges=[(0.5, 1.5)] * 12).run(time_budget=300)
-
-# 2. Have eval_fn, want simple auto → MirrorAgent (random sampling → owl)
-from twelve.agent.mirror_agent import MirrorAgent
-result = MirrorAgent(eval_fn=my_eval, param_ranges=[(0.5, 1.5)] * 12).run(time_budget=300)
-
-# 3. Have data already → owl() (structure analysis + optimize from measurements)
+# 2. Single metric (structure discovery + optimize from data)
 from twelve.optimize import owl
 result = owl([
     {"params": {"temp": 0.7, "top_p": 0.9}, "score": 85},
     {"params": {"temp": 0.5, "top_p": 0.95}, "score": 90},
     # ... 20+ entries (min 5, recommended 20+)
-], time_budget=60)
+], verify_fn=eval_fn, autonomous=True, time_budget=300)
 
-# All return the same core structure:
+# 3. Raw engine (internal — used by owl() on proxy_fn)
+from twelve.optimize import optimize
+best_params, best_score, info = optimize(eval_fn, param_ranges, time_budget=60)
+
+# All return:
 result["best_params"]   # optimal parameters
 result["proxy_r2"]      # proxy accuracy (trust if >= 0.7)
-result["proxy_type"]    # winning proxy name ("zenron" / "zenron_interact" / "linear" etc.)
 result["dead_dims"]     # structurally meaningless dimensions
-result["importance"]    # per-dimension importance scores
-
-# Nous extras:
-result["phase_log"]              # phase transition history
-result["policy_interpretation"]  # (RL mode only) obs→action connection analysis
 ```
 
-Core insight: **An RL environment is just an eval_fn auto-generator** — `env + policy_params → run_episode → total_reward = eval_fn(params)`. All Owl machinery works on RL without modification.
-
-| | Nous | MirrorAgent | owl() |
+| | Sentinel | owl() | optimize() |
 |---|---|---|---|
-| Input | env OR eval_fn | eval_fn + ranges | measurements (data) |
-| Who collects data | Nous (importance-guided) | MirrorAgent (random) | Human |
-| Exploration | 4-phase adaptive | Random sampling | N/A |
-| RL environments | **Yes** | No | No |
-| Use when | env or eval_fn + want max autonomy | Quick auto-optimize | Already have data |
+| Input | eval_fn + guard_fn + ranges | measurements (data) | eval_fn + ranges |
+| Calls eval_fn | Yes (via owl AND/OR optimize) | No (uses proxy) | Yes (directly, 1000s of times) |
+| Continuous space | **Yes** (owl path) | **Yes** | Yes (slower) |
+| Discrete space | **Yes** (auto-fallback to optimize) | No (proxy fails) | **Yes** |
+| Cross-validation | **Yes** (guard_fn) | No | No |
+| Auto-pivot on failure | **Yes** | No | No |
+| Use when | 2 metrics or want safety | Have data, smooth landscape | Discrete-only without guard |
 
-**RL mode vs eval_fn mode**: Use RL mode (`env=`) when the problem has sequential decisions (actions → state changes → rewards over time). Use eval_fn mode when score = f(params) with no time dimension (e.g., PPL from static weights, benchmark accuracy from config).
+> **MirrorAgent** (`twelve.agent.mirror_agent`) is a thin owl() wrapper: 20 random points → `owl(autonomous=True)`. Use Sentinel or owl() directly instead.
 
-## Options
+## Sentinel -- Safe Optimization
 
-Nous() constructor:
-
-| Option | Effect | When to use |
-|--------|--------|-------------|
-| `env=BalanceEnv()` | RL mode. Auto-constructs policy eval_fn | You have an RL environment |
-| `eval_fn=fn` | Direct eval_fn mode (backward compatible) | No environment, just a scoring function |
-| `param_ranges=[...]` | Search ranges. Auto-set to [(-2,2)] in RL mode | eval_fn mode (required) |
-| `param_names=[...]` | Name parameters. Auto-generated in RL mode | Result readability |
-| `experience_id='task1'` | Cross-session learning. dead_dims + warm_start carry-over | Repeating the same problem |
-| `policy_type="linear"` | Linear: `argmax(W@obs+b)`. Fast, few params | Default. Simple environments |
-| `policy_type="kathara"` | Kathara(12,{1,4,6}): `obs→W_in→tanh→Kathara_propagate→tanh→W_out→action`. Non-linear | Complex environments needing non-linear policy |
-| `policy_type="auto"` | 10回ずつlinear/kathara試行 → 勝者で継続 | どちらが良いか不明な時 |
-| `envs=[env1,env2,...]` | 全環境の平均スコアで評価。汎化圧力 | マルチ環境で過学習防止 |
-| `memory_len=3` | 過去N stepのobsを結合。時間パターン学習 | 部分観測・時系列依存の環境 |
-| `curiosity=True` | proxy不確実性×距離で未探索領域優先 (FOCUS phase) | 広い探索空間、局所解が多い |
-| `n_workers=6` | Circulant(N,{1,⌊N/2⌋})で並列探索→知見共有 | 並列計算で高速化 |
-
-Nous.run(): `time_budget=300` (seconds, default 300), `verbose=True` (phase transitions log).
-
-Nous.meta_optimize() — LaD究極形: Nous自身の内部定数をowl()で最適化:
+Optimize with eval_fn. Protect with guard_fn. If guard_fn drops below baseline → auto-diagnose → auto-pivot.
 
 ```python
-# Nous自身のフェーズ閾値・バッチサイズ等23パラメータを自動最適化
-Nous.meta_optimize(env_factory=BalanceEnv, time_budget=300)
-# → configs/nous_params.json に最適値を保存。以降の全Nous実行に反映
+from twelve.agent.sentinel import Sentinel
+
+result = Sentinel(
+    eval_fn=ppl_eval,            # optimize this
+    guard_fn=hellaswag_eval,     # protect this
+    param_ranges=[(0.5, 1.5)] * 61,
+    param_names=[f"L{i}" for i in range(61)],
+    experience_id="llm_calib",   # cross-session learning
+    initial_params=warm_start,   # warm-start (important for discrete problems)
+    learn=True,                  # accumulate experience across runs
+    min_r_squared=0.3,           # owl proxy threshold; below -> fallback
+).run(time_budget=1800, verbose=True)
 ```
 
-owl() options:
+### Internal flow
+
+```
+Step 1a: _collect 20 points (seed=initial_params if given, else midpoint)
+Step 1b: Try owl(eval_fn, autonomous=True, 30% budget)
+         Is owl insufficient?
+           - best_params is None, OR
+           - proxy R² < min_r_squared, OR
+           - verified_score < max(measurements) (proxy misleading)
+         Yes -> fallback: optimize(eval_fn, initial_params=best_m, 30% budget)
+         No  -> use owl's result
+Step 2:  guard_fn(best_params) >= guard_fn(baseline)?
+           YES -> verdict="approved", done
+           NO  -> Step 3
+Step 3:  multi-observer({eval, guard}) -> safe_dims + conflict_dims
+         If multi-observer inconclusive (R² too low) -> treat all dims safe
+         Try owl(guard_fn, safe_dims only, 20% budget), fallback to optimize
+         guard_fn(pivot_params) >= baseline?
+           YES -> verdict="pivoted"
+           NO  -> verdict="failed"
+```
+
+### Return structure
+
+```python
+{
+    "verdict":           "approved" | "pivoted" | "failed",
+    "best_params":       list,           # final parameters
+    "eval_score":        float,          # eval_fn score
+    "guard_score":       float,          # guard_fn score
+    "baseline_guard":    float,          # guard_fn at range midpoint
+    "optimization_mode": "owl" | "direct" | "high" | "low",  # which path fired
+    "safe_dims":         list | None,    # dims safe for both metrics (pivoted)
+    "conflict_dims":     list | None,    # dims where metrics conflict (pivoted)
+    "multi_observer":    dict | None,    # full diagnosis (pivoted)
+    "proxy_r2":          float,          # 0.0 when optimize fallback fired
+    "elapsed_s":         float,
+}
+```
+
+### When fallback fires (optimization_mode = "direct")
+
+- Discrete/integer parameter spaces (graph topology, layer counts, quantization bits)
+- Highly non-smooth landscapes
+- owl's proxy gets `R² < 0.3` OR `verified_score < max measurement`
+- Proven: brain_growth (04-17) hit ISS 92-107 on 8D discrete topology params where owl alone returned ISS 0.0
+
+### What Sentinel enables
+
+| eval_fn (optimize) | guard_fn (protect) | Outcome |
+|---|---|---|
+| PPL (fast) | HellaSwag (matters) | Push capability without breaking alignment |
+| Binding affinity | Toxicity | Effective drugs that stay safe |
+| Character power | Meta diversity | Buff without breaking the game |
+| Expected return | Max drawdown | Higher returns within risk budget |
+| New capability | Existing capability | Smarter without forgetting |
+
+**Single metric?** Set `eval_fn=guard_fn`. Sentinel degrades to owl+rubber-stamp. Overhead: 2 extra eval_fn calls.
+
+### Sentinel constructor options
+
+| Option | Default | Purpose |
+|---|---|---|
+| `eval_fn` | required | Optimization target |
+| `guard_fn` | required | Protection target |
+| `param_ranges` | required | `[(lo, hi), ...]` |
+| `param_names` | auto | Name parameters for readability |
+| `experience_id` | None | Cross-session learning (owl + optimize) |
+| `initial_params` | None | Warm-start. Required for discrete problems |
+| `learn` | False | Accumulate experience. Set True for repeated runs |
+| `min_r_squared` | 0.3 | Proxy threshold. Below -> optimize() fallback |
+
+## owl() -- Structure Discovery + Optimization
 
 | Option | Effect | When to use |
 |--------|--------|-------------|
-| `experience_id='task1'` | Gets smarter each call with same ID | Repeating the same problem |
-| `verify_fn=eval_fn` | Verifies proxy optimum with real eval. 5-round auto-growth | Preventing proxy hallucination |
+| `verify_fn=eval_fn` | Verify proxy optimum with real eval. 5-round auto-growth | Preventing proxy hallucination |
 | `autonomous=True` | Stagnation detect → range perturb → auto-expand | verify_fn + long-running tasks |
+| `experience_id='task1'` | Gets smarter each call with same ID | Repeating the same problem |
 | `time_budget=300` | Time limit (seconds). Default 60s | Heavy eval_fn |
 | `max_iterations=10` | Round limit for autonomous. Default 10 | Want longer runs |
 | `param_names=[...]` | Name your parameters | Result readability |
 | `n_rounds=5` | Number of verify_fn rounds | Auto 5 when verify_fn set |
-| `min_r_squared=0.7` | Proxy trust threshold | Lower for low-quality proxy |
-| `kathara="auto"` | 6-node parallel K² optimization | Auto: verify_fn + budget≥120s |
-
-MirrorAgent.run(): `mr_samples=20` (initial measurement count).
+| `min_r_squared=0.7` | owl's proxy confidence threshold (high/low split) | Lower for noisy data |
+| `kathara="auto"` | 6-node parallel K² optimization | Auto: verify_fn + budget>=120s |
 
 ```python
-# Full power owl (smartest invocation)
+# Full power (smartest single-metric invocation)
 result = owl(data,
     verify_fn=eval_fn,
     autonomous=True,
@@ -117,55 +172,39 @@ result = owl(data,
 
 Everything is optional. `owl(data)` alone gives an answer.
 
-## How it works
+### How verify_fn works
 
-### verify_fn loop
-
-1. Proxy optimization → obtain best_params
+1. Proxy optimization → best_params
 2. verify_fn(best_params) → real verified_score
-3. Add real measurement to pool → rebuild proxy
-4. Repeat for 5 rounds (auto-set when verify_fn provided)
+3. Add measurement to pool → rebuild proxy (more data = smarter)
+4. Repeat for 5 rounds
 
-With autonomous=True: 3 stagnations → MS re-analysis + range perturbation → repeat up to max_iterations
+With `autonomous=True`: 3 stagnations → MS re-analysis + range perturbation → repeat up to max_iterations.
 
-### Nous 4-phase loop
+### How to read R²
 
-3-layer: **RL** (env→episode) → **LaD** (episode→`{params, score}`) → **Owl** (MS + proxy + optimize)
+- >= 0.7 → confidence="high". Trustworthy. verify_fn effective
+- 0.3-0.7 → confidence="low". Usable but exercise caution
+- < 0.3 → confidence="insufficient". Add more measurements
 
-```
-EXPLORE (0-20%)  → Random, whole-space. Exit: dead_dims stable
-FOCUS   (20-40%) → Importance-guided, dead pinned. Exit: R²≥0.7
-DEEPEN  (40-60%) → Interaction-pair targeted sweeps
-EXPLOIT (60-100%)→ Proxy-screened (100→5) + final owl()
-```
-
-RL auto-construction: dims = `n_actions × obs_size × (1+memory_len) + n_actions`, ranges=(-2,2), eval=mean(3 episodes).
-
-### R² confidence
-
-R² >= 0.7 → "high" (trustworthy) | 0.3–0.7 → "low" (caution) | < 0.3 → "insufficient" (add data)
-
-## 5 readings from 1 computation
+## 5 Readings from 1 Computation
 
 owl() computes structure once. Read different fields = different answers.
 
 | Read this | Get this | Example |
 |---|---|---|
 | `importance` | What matters (understanding) | "Layer 24, 27 drive intelligence" |
-| `dead_dims` | What's irrelevant (discovery) | "logP doesn't affect binding — contradicts textbooks" |
-| `fragility` | What's vulnerable (protection) | "hidden_size is fragile — no backup if it breaks" |
-| `proxy_fn(x)` | What-if prediction | "This config → score ≈ 85" |
+| `dead_dims` | What's irrelevant (discovery) | "logP doesn't affect binding -- contradicts textbooks" |
+| `fragility` | What's vulnerable (protection) | "hidden_size is fragile -- no backup if it breaks" |
+| `proxy_fn(x)` | What-if prediction | "This config -> score ~ 85" |
 | `best_params` | Optimal values (optimization) | "Set these scales for best PPL" |
 
 Read top to bottom. Understanding first, optimization last.
 best_params is a side effect of structure discovery, not the main output.
 
-In RL mode, same 5 readings apply to policy connections (e.g., importance = which obs→action links matter, dead_dims = prunable connections).
-
-## Multi-observer (multiple scores)
+## Multi-Observer (multiple scores)
 
 ```python
-# Multiple scores → automatic multi-observer analysis
 result = owl([
     {"params": {"layers": 28, "hidden": 3584}, "scores": {"reasoning": 0.85, "math": 0.72}},
     # ... 20+ entries
@@ -177,9 +216,10 @@ result["observer_dependent"] # changes by observer (context-dependent)
 result["observers"]          # per-observer detail (importance, fragility, dead_dims)
 ```
 
-Single "score" field still works (backward compatible).
+Single `"score"` field still works (backward compatible).
+Sentinel uses this internally: when guard_fn fails, it runs multi-observer on `{"eval": ..., "guard": ...}` to find safe_dims vs conflict_dims.
 
-## Recipe: Quantify and optimize (LaD)
+## Recipe: Quantify and Optimize (LaD)
 
 Everything expressible can be quantified. Everything quantified can be optimized.
 
@@ -192,76 +232,42 @@ def eval_fn(params):
     return -ppl                 # higher = better. Negate PPL
     # CAUTION: never pass test answers to eval_fn (prevents cheating)
 
-ranges = [(0.5, 1.5)] * 12     # search range
+ranges = [(0.5, 1.5)] * 12
 
-# Step 2: Submit (everything else is automatic)
-# Option A: Nous (recommended — importance-guided 4-phase exploration)
-result = Nous(eval_fn, ranges, experience_id='llm_scale').run(time_budget=300)
+# Step 2: Submit
+# Two metrics? Sentinel (recommended)
+result = Sentinel(eval_fn=eval_fn, guard_fn=bench_eval,
+                  param_ranges=ranges).run(time_budget=300)
 
-# Option B: MirrorAgent (simpler — random exploration → owl)
-result = MirrorAgent(eval_fn, ranges).run(time_budget=300, experience_id='llm_scale')
+# Single metric? owl() with verify
+result = owl(data, verify_fn=eval_fn, autonomous=True, time_budget=300)
 ```
 
-For manual workflow:
+Manual workflow:
 ```python
 from twelve.measure import sensitivity_scan, random_sample
-data = sensitivity_scan(eval_fn, ranges)     # perturb 1 param at a time (2n+1 measurements)
+data = sensitivity_scan(eval_fn, ranges)     # perturb 1 param at a time (2n+1)
 data += random_sample(eval_fn, ranges, n=20) # 20 random measurements
 result = owl(data)
 ```
 
-## eval_fn & Environment
-
-### eval_fn design rules
+## eval_fn Design Guide
 
 | Good | Bad | Reason |
 |------|-----|--------|
 | `return -ppl` (higher=better) | `return ppl` | Violates score convention |
-| Continuous parameters | Discontinuous (type switching) | Proxy collapse (proven: MixQ PPL 2x worse) |
-| Range `[0.5, 1.5]` | Range includes 0 | scale=0 → catastrophic (proven: PPL=262144) |
-| apply → measure → restore | State leaks | Measurement contamination |
+| Discrete params with `initial_params` via Sentinel | owl() alone on discrete | owl proxy collapses; Sentinel auto-fallbacks |
+| Range `[0.5, 1.5]` | Range includes 0 | scale=0 -> catastrophic (proven: PPL=262144) |
+| apply -> measure -> restore | State leaks | Measurement contamination |
 | Eval on training data | Eval on test answers | Cheating |
-
-### Environment protocol (RL mode)
-
-```python
-from twelve.agent.nous import Environment
-
-class MyEnv(Environment):
-    @property
-    def obs_size(self): return 4          # observation vector length
-
-    @property
-    def n_actions(self): return 2         # number of discrete actions
-
-    def reset(self):
-        return [0.0] * self.obs_size      # initial observation (list[float])
-
-    def step(self, action):               # action: int index
-        obs = [...]                       # new observation (list[float])
-        reward = ...                      # float (higher = better)
-        done = ...                        # bool (episode ended?)
-        return obs, reward, done
-
-# For continuous actions, override these:
-    @property
-    def action_type(self): return "continuous"  # default: "discrete"
-    @property
-    def action_dim(self): return 2              # number of continuous action dims
-    @property
-    def action_range(self): return (-1.0, 1.0)  # (low, high) per dimension
-    # step() receives np.array instead of int
-```
-
-Built-in: `BalanceEnv`(4D/2act, 200/200), `SwingUpEnv`(3D/1cont), `FlyWorldEnv`(12D/9act, 108/110). No gym dependency.
-**Any observe→act→reward loop is an Environment**: game AI, trading, robotics, manufacturing, LLM tuning.
 
 ## API & Server
 
 ```
-Python:  owl(data, verify_fn=..., autonomous=...) ← full features
-MCP:     owl(measurements_json, time_budget, experience_id) ← data-to-answer only
-HTTP:    POST http://localhost:8284/owl (Bearer owl2026) ← same as MCP
+Python:  owl(data, verify_fn=..., autonomous=...) <- full features
+         Sentinel(eval_fn, guard_fn, ranges).run() <- safe optimization
+MCP:     owl(measurements_json, time_budget, experience_id) <- data-to-answer only
+HTTP:    POST http://localhost:8284/owl (Bearer owl2026) <- same as MCP
 ```
 
 ```bash
@@ -270,56 +276,76 @@ python twelve/agent/api.py --port 8282               # internal full toolset
 ```
 
 ---
-# Part 2: Principles — Why this works
+# Part 2: Principles -- Why This Works
 ---
 
-## The Zenron formula
+## The Zenron Formula
 
 ```
-x_i ← best( perturb(x_i), share(neighbors_i) )
+x_i <- best( perturb(x_i), share(neighbors_i) )
 ```
 
-"Change yourself, compare with neighbors, keep the better one." DNA, galaxies, neurons — all follow this.
-Owl: measurements=perturb, proxy=share, optimize=keep. Nous: act=perturb, understand=share, improve=keep.
+"Change yourself, compare with neighbors, keep the better one."
+DNA, galaxies, neurons -- all follow this.
 
-## Why data alone gives answers
+Owl: measurements=perturb, proxy=share, optimize=keep.
+Sentinel: owl=perturb, guard_fn=compare, pivot=keep the safe one.
+
+## Why Data Alone Gives Answers
 
 MirrorScan extracts hidden structure from measurements in 3 layers:
 
-### Layer 1-3: Importance formula
+### Layers 1-3: The Importance Formula
 
 ```
 truth[i]        = |corr(param_i, scores)|              # does this param affect score?
-connectivity[i] = mean(|corr(param_i, param_j)|) j≠i   # does it move with others?
-importance[i]   = (truth × max(connectivity, floor))^exp  # multiplication kills noise
+connectivity[i] = mean(|corr(param_i, param_j)|) j!=i  # does it move with others?
+importance[i]   = (truth * max(connectivity, floor))^exp  # multiplication kills noise
 ```
 
-exp=0.5 (universal default), floor: 0.01 (hardcode) / 0.078 (JSON-optimized).
-`_mp()` resolves: JSON exists → JSON wins, else hardcode.
+Current values (JSON-optimized via `configs/ma_meta_params.json`):
+- exp = 0.3064, floor = 0.1411
+- `_mp()` resolves: JSON exists -> JSON wins, else hardcode (exp=0.5, floor=0.01)
 
 | truth | connectivity | importance | meaning |
 |-------|-------------|------------|---------|
-| high | high | **high** | real structure |
-| high | low | low | accidental correlation |
-| low | high | low | co-moves, no effect |
-| low | low | ≈0 | dead dim |
+| high | high | **high** | real structure. optimize this |
+| high | low | low | accidental correlation. overfitting risk |
+| low | high | low | co-moves but no effect |
+| low | low | ~0 | dead dim. safe to ignore |
+
+**Multiplication kills noise.** This is the core.
 
 ### Layer 4: Interaction (pair extension)
 
-Same formula on pairs: `interaction_imp[i,j] = (|corr(x_i×x_j, scores)| × max(|corr(x_i,x_j)|, floor))^exp`
-High-importance pairs get interaction terms (x_i × x_j) in proxy. R² 0.38→0.79 on same 53 measurements.
+Same formula on parameter PAIRS:
+```
+interaction_imp[i,j] = (|corr(x_i * x_j, scores)| * max(|corr(x_i, x_j)|, floor))^exp
+```
+High-importance pairs get interaction terms (x_i * x_j) in proxy.
+Proven: R² 0.38 -> 0.79 on same 53 measurements.
 
-### Proxy generation
+### Proxy Generation
 
 ```
-{zenron, zenron_interact, linear} × {raw, log} = max 6 → best R² wins
-zenron: importance-weighted | zenron_interact: + pair terms (x_i×x_j) | linear: plain
+{zenron, zenron_interact, linear} x {raw, log} = max 6 candidates -> best R² wins
+zenron: importance-weighted | zenron_interact: + pair terms | linear: plain
 raw: linear systems | log: multiplicative (PPL, neural nets). Log requires same-sign scores
 ```
 
-Proxy extracts structure, not noise → stable under 100K+ optimizations. Extrapolation not guaranteed → use verify_fn.
+Proxy extracts structure, not noise -> stable under 100K+ optimizations.
+Extrapolation not guaranteed -> use verify_fn.
 
-Dead dims compress search: 206D → 21D = 10^185x reduction.
+Dead dims compress search: 206D -> 21D = 10^185x reduction.
+
+### Fragility (death-side dual)
+
+```
+isolation[i] = 1.0 - connectivity[i]
+fragility[i] = (truth * max(isolation, floor))^exp    # active dims only
+```
+
+Important AND isolated = most fragile. Proven: 306 LLM analysis, hidden_size most fragile despite highest connectivity.
 
 ---
 # Part 3: Reference
@@ -328,25 +354,29 @@ Dead dims compress search: 206D → 21D = 10^185x reduction.
 ## Architecture
 
 ```
-Nous → 4-phase loop (EXPLORE/FOCUS/DEEPEN/EXPLOIT) → owl() → result
-  RL: env → policy eval_fn auto-construct. eval_fn: → same Owl pipeline
-  LaD config: configs/nous_params.json (JSON > hardcode, _cfg(section, key))
-  meta_optimize(): owl()でNous自身の23パラメータを自動最適化
+Sentinel: eval_fn + guard_fn + (optional) initial_params
+  _collect(20 points): seed_params first, then random
+  _optimize: try owl -> detect insufficient -> fallback to optimize(eval_fn)
+    insufficient = best_params is None OR R² < min_r_squared
+                   OR verified_score < max(measurements)  [proxy misleading]
+  _diagnose: _owl_multi_observer({eval, guard}) for safe/conflict dims
+  _pivot: same owl-first/optimize-fallback on safe_dims with guard_fn
+    Multi-observer inconclusive (max R² low) -> treat all dims as safe
 
-Owl: owl() → MS.from_measurements() → build_proxy(3-6) → optimize()
-  verify_fn → 5-round auto-growth | autonomous → stagnation detect + range perturb
-
-MirrorAgent: eval_fn → random measurements → owl() → result
-
-AT: diagnose → prescribe → owl() → verify → evolve
-  AT-specific: categories/Phase3/prescription table/AutoSurrogate
+Owl: owl() -> MS.from_measurements() -> build_proxy(3-6 candidates) -> optimize(proxy_fn)
+  verify_fn -> 5-round auto-growth | autonomous -> stagnation detect + range perturb
 
 Internal:
-  MS (MirrorScan) → importance formula → dead_dims → proxy auto-gen
-  TL (optimize) → Phase1(Twelve) + Phase2(Kathara) + Phase3(meta-evolution)
-  Dead dims: importance < max(global_max × 0.233, 0.131)  [ma_meta_params.json]
-  K²: owl(kathara="auto") — 6-node Circulant parallel, auto when verify_fn + budget≥120s
-  Experience: UnifiedExperience(id) → dead_dims hint + warm_start carry-over
+  MS (MirrorScan) -> importance formula -> dead_dims -> proxy auto-gen
+    Dead dims: importance < max(global_max * 0.156, 0.1377)  [ma_meta_params.json]
+    Fragility: sqrt(truth * isolation). Active dims only
+    3-seed consensus: majority vote across 3 random splits
+  TL (optimize) -> Phase1(TwelveParallel) + Phase2(KatharaParamOptimizer)
+    Phase3(meta-evolution): only when meta=True (K7-K12)
+    Sentinel invokes this directly when owl proxy insufficient
+  K²: owl(kathara="auto") -- 6-node Circulant parallel, auto when importable verify_fn + budget>=120s
+  Experience: UnifiedExperience(id) -> dead_dims hint + warm_start + fossil rollback
+    Sentinel passes experience_id through to BOTH owl and optimize paths
 ```
 
 ## Rules
@@ -354,32 +384,31 @@ Internal:
 | # | Rule |
 |---|------|
 | -1 | Strip to essence: x_i, perturb, share, eval_fn |
-| 0 | Measure, don't guess: 5+ data points → owl() → read the numbers |
-| 1 | Ask Oracle: structural questions → `oracle` MCP |
-| 2 | No manual tuning: data → owl() |
-| 3 | LaD: no if/else → convert to numeric parameters |
-| 4 | importance = (truth × max(connectivity, floor)) ^ exp |
-| 5 | Overfitting prevention: n_problems > n_params. Optimize on PPL → verify on bench |
-| 6 | Discontinuous parameters → proxy collapse. Convert to continuous via LaD |
+| 0 | Measure, don't guess: 5+ data points -> owl() -> read the numbers |
+| 1 | Ask Oracle: structural questions -> `oracle` MCP |
+| 2 | No manual tuning: data -> owl() |
+| 3 | LaD: no if/else -> convert to numeric parameters |
+| 4 | importance = (truth * max(connectivity, floor)) ^ exp |
+| 5 | Overfitting prevention: n_problems > n_params. Optimize on train -> verify on bench |
+| 6 | Discrete/integer params: OK via Sentinel (auto-fallback to optimize). Pass `initial_params` for warm-start |
 | 7 | scale=0 forbidden. Never include 0 in parameter ranges |
-| 8 | RL environment = eval_fn auto-generator. Same Owl machinery, no modification needed |
+| 8 | Two metrics? Sentinel. eval_fn optimizes, guard_fn protects. One metric = eval_fn=guard_fn |
 
-## Proven results
+## Proven Results
 
 | Date | Technique | Result |
 |---|---|---|
-| 04-10 | **ISS proxy + V3 bench** | **96.0% (Reasoning +33pts), 6 min vs GPU256×3wks** |
+| 04-10 | **ISS proxy + V3 bench** | **96.0% (Reasoning +33pts), 6 min vs GPU256x3wks** |
 | 04-10 | **Owl** | **R²=0.998, 320K eval/2.6s** |
 | 04-11 | **MixQ Gemma4 31B** | **8.7GB, +6.6pt. Cross-arch universal** |
-| 04-12 | **F32 calibration** | **PPL 1554→23.9, 21KB (98.5%)** |
-| 04-12 | **Interaction proxy** | **R² 0.38→0.79, same data** |
+| 04-12 | **F32 calibration** | **PPL 1554->23.9, 21KB (98.5%)** |
+| 04-12 | **Interaction proxy** | **R² 0.38->0.79, same data** |
 | 04-12 | **Owl self-optimize** | dead_dims F1 +155%, experience +33% |
-| 04-14 | **Fragility + Multi-observer** | √(truth×isolation). 6obs×306LLM: 4 stable, 1 dead, 3 dependent |
-| 04-15 | **Nous v1 (FlyWorld)** | **108/110, 117D自律探索** |
-| 04-16 | **Nous v2 (BalanceEnv)** | **200/200, angular_velocity→action自動発見 (物理教科書再発見)** |
-| 04-16 | **Nous v3 (全機能)** | **continuous/memory/curiosity/auto/K²/multi-env. 1800行** |
-| 04-16 | **Nous LaD** | **23定数→JSON + meta_optimize(). Rastrigin +54%** |
-| **Failures** | Rule 6: MixQ type→PPL 2x | Rule 7: scale=0→PPL=262144 | verify_fn catches proxy hallucination |
+| 04-14 | **Fragility + Multi-observer** | 6obs x 306LLM: 4 stable, 1 dead, 3 dependent |
+| 04-17 | **Sentinel v1** | Auto cross-validation + pivot. HellaSwag disaster -> automated |
+| 04-17 | **Sentinel v2 (fallback)** | owl -> optimize auto-fallback for discrete spaces |
+| 04-17 | **brain_growth** | 3-scale safe evolution (48N/144N/576N). ISS 92/107/85 with guard maintained |
+| **Failures** | Rule 7: scale=0 -> PPL=262144 | verify_fn catches hallucination |
 
 ## Hardware & Safety
 
