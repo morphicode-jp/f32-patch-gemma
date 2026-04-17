@@ -287,12 +287,27 @@ def save_result(result, mode_name, out_dir="."):
 # Runners
 # ============================================================
 
-def run_mode(mode, time_budget=1800):
-    """Run a single Sentinel mode on the brain simulation."""
+def run_mode(mode, time_budget=1800, initial_params=None, learn=False, meta=False):
+    """Run a single Sentinel mode on the brain simulation.
+
+    Args:
+        mode: biological / progressive / intelligent
+        time_budget: seconds
+        initial_params: warm-start (optional, 91-D list)
+        learn: accumulate experience across runs
+        meta: enable Phase3 meta-evolution in optimize() fallback
+    """
     eval_fn, guard_fn, desc = _get_mode_fns(mode)
     print(f"\n[brain_sentinel] Mode: {mode}")
     print(f"  {desc}")
-    print(f"  time_budget={time_budget}s, n_dims={len(PARAM_RANGES)}\n")
+    print(f"  time_budget={time_budget}s, n_dims={len(PARAM_RANGES)}")
+    if initial_params is not None:
+        print(f"  initial_params: [...]  (warm-start from {len(initial_params)}D seed)")
+    if learn:
+        print(f"  learn=True (experience accumulation enabled)")
+    if meta:
+        print(f"  meta=True (Phase3 K7-K12 enabled on optimize fallback)")
+    print()
 
     result = Sentinel(
         eval_fn=eval_fn,
@@ -300,6 +315,9 @@ def run_mode(mode, time_budget=1800):
         param_ranges=PARAM_RANGES,
         param_names=PARAM_NAMES,
         experience_id=f"brain_{mode}",
+        initial_params=initial_params,
+        learn=learn,
+        meta=meta,
     ).run(time_budget=time_budget, verbose=True)
 
     report_result(result, mode)
@@ -377,6 +395,10 @@ def main():
     ap.add_argument("--evolution-mode", default="biological",
                     choices=["biological", "progressive", "intelligent"],
                     help="Inner mode for evolution")
+    ap.add_argument("--learn", action="store_true",
+                    help="Enable experience accumulation across runs")
+    ap.add_argument("--meta", action="store_true",
+                    help="Enable Phase3 meta-evolution on optimize fallback")
     args = ap.parse_args()
 
     if args.mode == "evolution":
@@ -384,7 +406,8 @@ def main():
                       n_gens=args.n_gens,
                       time_per_gen=args.time_per_gen)
     else:
-        run_mode(args.mode, time_budget=args.time_budget)
+        run_mode(args.mode, time_budget=args.time_budget,
+                 learn=args.learn, meta=args.meta)
 
 
 if __name__ == "__main__":
