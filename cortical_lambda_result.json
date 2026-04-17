@@ -1,0 +1,25 @@
+{
+  "n_brains": 11,
+  "pearson_r_unseen": 0.411,
+  "pearson_r_reach": 0.417,
+  "spearman_rho_unseen": null,
+  "note": "run hit 120s timeout during final save; data captured from stdout",
+  "data": [
+    {"name": "cort_midpoint",  "lambda2": 1.07, "unseen_mean": 18.36, "reach_rate": 0.25},
+    {"name": "cort_uniform",   "lambda2": 5.73, "unseen_mean": 17.41, "reach_rate": 0.25},
+    {"name": "cort_opt",       "lambda2": 6.86, "unseen_mean": 49.57, "reach_rate": 0.62},
+    {"name": "cort_rand_0",    "lambda2": 5.60, "unseen_mean": 0.00,  "reach_rate": 0.0},
+    {"name": "cort_rand_1",    "lambda2": 6.23, "unseen_mean": 53.95, "reach_rate": 0.62},
+    {"name": "cort_rand_2",    "lambda2": 2.52, "unseen_mean": 3.06,  "reach_rate": 0.0},
+    {"name": "cort_rand_3",    "lambda2": 5.67, "unseen_mean": 0.00,  "reach_rate": 0.0},
+    {"name": "cort_rand_4",    "lambda2": 0.83, "unseen_mean": 0.00,  "reach_rate": 0.0},
+    {"name": "cort_rand_5",    "lambda2": 3.18, "unseen_mean": 2.13,  "reach_rate": 0.0},
+    {"name": "cort_rand_6",    "lambda2": 6.51, "unseen_mean": 0.00,  "reach_rate": 0.0},
+    {"name": "cort_rand_7",    "lambda2": 3.48, "unseen_mean": 0.00,  "reach_rate": 0.0}
+  ],
+  "comparison": {
+    "12N_n25_pearson_r": 0.312,
+    "cortical_n11_pearson_r": 0.411,
+    "interpretation": "Similar weak positive correlation across architectures"
+  }
+}
