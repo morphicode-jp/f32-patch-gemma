@@ -37,6 +37,17 @@ def load_best(path):
     return d.get("best_ever_params") or d.get("best_params")
 
 
+def lambda2_value(params):
+    """Return raw |lambda_2| (NOT the score)."""
+    from kathara_brain_sim_v8 import KATHARA_EDGES
+    p = np.array(params, dtype=np.float64)
+    W = np.zeros((12, 12), dtype=np.float64)
+    for i, (a, b) in enumerate(KATHARA_EDGES):
+        W[a, b] = p[i]; W[b, a] = p[i]
+    eigs_abs = sorted(np.abs(np.linalg.eigvalsh(W)), reverse=True)
+    return eigs_abs[1] if len(eigs_abs) > 1 else 0.0
+
+
 def main():
     mid = [(lo + hi) / 2 for lo, hi in PARAM_RANGES]
     uniform = [1.0] * 30 + mid[30:]
@@ -54,36 +65,39 @@ def main():
     if hyb_params:
         brains["hybrid_opt"] = hyb_params
 
-    print("=" * 78)
-    print(f"  {'brain':<15s}  {'lambda':>8s}  {'ISS':>8s}  {'hybrid':>8s}  "
-          f"{'unseen':>8s}  {'reach':>6s}")
-    print("=" * 78)
+    print("=" * 90)
+    print(f"  {'brain':<15s}  {'|λ₂|':>6s}  {'λ_sc':>6s}  {'ISS':>6s}  "
+          f"{'hyb':>6s}  {'unseen':>8s}  {'reach':>6s}")
+    print("=" * 90)
 
     results = {}
     for name, p in brains.items():
         if p is None:
             print(f"  {name:<15s}  (missing)")
             continue
+        lam2 = lambda2_value(p)
         l = lambda_score(p)
         i = iss_score_fn(p, n_ep=4, n_steps=30)
         h = float(np.sqrt(max(l, 0) * max(i, 0)))
         mean, std, reach = flyworld_perf(p, n_seeds=20)
-        print(f"  {name:<15s}  {l:>8.2f}  {i:>8.2f}  {h:>8.2f}  "
-              f"{mean:>8.2f}  {reach*100:>5.0f}%")
+        print(f"  {name:<15s}  {lam2:>6.2f}  {l:>6.2f}  {i:>6.2f}  "
+              f"{h:>6.2f}  {mean:>8.2f}  {reach*100:>5.0f}%")
         results[name] = {
-            "lambda": round(l, 2),
+            "lambda2_raw": round(lam2, 3),
+            "lambda_score": round(l, 2),
             "iss": round(i, 2),
             "hybrid": round(h, 2),
             "unseen_mean": round(mean, 2),
             "unseen_std": round(std, 2),
             "reach_rate": round(reach, 3),
         }
-    print("=" * 78)
+    print("=" * 90)
 
     # Correlation analysis
     names = [n for n in brains if brains[n] is not None]
     if len(names) >= 3:
-        lams = np.array([results[n]["lambda"] for n in names])
+        lam2s = np.array([results[n]["lambda2_raw"] for n in names])
+        lams = np.array([results[n]["lambda_score"] for n in names])
         isss = np.array([results[n]["iss"] for n in names])
         hyb = np.array([results[n]["hybrid"] for n in names])
         unseens = np.array([results[n]["unseen_mean"] for n in names])
@@ -94,9 +108,20 @@ def main():
             return float(np.corrcoef(a, b)[0, 1])
 
         print("\nCorrelations with unseen_mean (n={}):".format(len(names)))
-        print(f"  lambda -> unseen:  r = {corr(lams, unseens):+.3f}")
-        print(f"  ISS -> unseen:     r = {corr(isss, unseens):+.3f}")
-        print(f"  hybrid -> unseen:  r = {corr(hyb, unseens):+.3f}")
+        print(f"  |λ₂| raw  -> unseen:  r = {corr(lam2s, unseens):+.3f}")
+        print(f"  λ score   -> unseen:  r = {corr(lams, unseens):+.3f}")
+        print(f"  ISS       -> unseen:  r = {corr(isss, unseens):+.3f}")
+        print(f"  hybrid    -> unseen:  r = {corr(hyb, unseens):+.3f}")
+
+        # Find which lambda target would maximize correlation
+        print("\nBest lambda_target sweep (n={}, target = fit peak):".format(len(names)))
+        best_r, best_t = -1.0, 4.0
+        for t in np.arange(2.0, 9.0, 0.25):
+            scores = 100 * np.exp(-((lam2s - t) ** 2) / 2.0)
+            r = corr(scores, unseens)
+            if r > best_r:
+                best_r, best_t = r, t
+        print(f"  best target lambda = {best_t:.2f} (r = {best_r:+.3f})")
 
     with open("hybrid_analysis_result.json", "w") as f:
         json.dump(results, f, indent=2)
