@@ -1,0 +1,135 @@
+{
+  "n_layers": 12,
+  "n_gens": 5,
+  "time_per_gen": 240,
+  "experience_id": "brain_evolve_12L",
+  "started": "2026-04-17 12:40:14",
+  "gens": [
+    {
+      "gen": 1,
+      "verdict": "approved",
+      "iss_v2": 107.18,
+      "guard": 89.76,
+      "baseline_guard": 85.15,
+      "optimization_mode": "direct",
+      "L": 2.047,
+      "C": 0.23,
+      "hub": 10.3,
+      "n_edges": 1296,
+      "offsets": [
+        7,
+        3,
+        8,
+        9,
+        6
+      ],
+      "skips": [
+        5,
+        3,
+        4
+      ],
+      "elapsed_s": 142.8
+    },
+    {
+      "gen": 2,
+      "verdict": "approved",
+      "iss_v2": 107.33,
+      "guard": 89.58,
+      "baseline_guard": 85.15,
+      "optimization_mode": "direct",
+      "L": 2.085,
+      "C": 0.276,
+      "hub": 11.3,
+      "n_edges": 1296,
+      "offsets": [
+        8,
+        0,
+        10,
+        11,
+        9
+      ],
+      "skips": [
+        4,
+        3,
+        6
+      ],
+      "elapsed_s": 142.8
+    },
+    {
+      "gen": 3,
+      "verdict": "approved",
+      "iss_v2": 107.37,
+      "guard": 89.69,
+      "baseline_guard": 85.15,
+      "optimization_mode": "direct",
+      "L": 2.063,
+      "C": 0.269,
+      "hub": 10.8,
+      "n_edges": 1296,
+      "offsets": [
+        8,
+        10,
+        9,
+        11,
+        5
+      ],
+      "skips": [
+        5,
+        4,
+        4
+      ],
+      "elapsed_s": 142.7
+    },
+    {
+      "gen": 4,
+      "verdict": "approved",
+      "iss_v2": 107.33,
+      "guard": 89.58,
+      "baseline_guard": 85.15,
+      "optimization_mode": "direct",
+      "L": 2.085,
+      "C": 0.276,
+      "hub": 11.3,
+      "n_edges": 1296,
+      "offsets": [
+        10,
+        0,
+        8,
+        11,
+        9
+      ],
+      "skips": [
+        6,
+        3,
+        4
+      ],
+      "elapsed_s": 142.8
+    },
+    {
+      "gen": 5,
+      "verdict": "approved",
+      "iss_v2": 107.69,
+      "guard": 89.55,
+      "baseline_guard": 85.15,
+      "optimization_mode": "direct",
+      "L": 2.091,
+      "C": 0.242,
+      "hub": 11.3,
+      "n_edges": 1296,
+      "offsets": [
+        8,
+        4,
+        6,
+        7,
+        9
+      ],
+      "skips": [
+        3,
+        4,
+        5
+      ],
+      "elapsed_s": 142.6
+    }
+  ],
+  "last_update": "2026-04-17 12:52:07"
+}
