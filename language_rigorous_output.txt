@@ -1,0 +1,209 @@
+======================================================================
+  Cooperative Language Emergence: Rigorous Statistical Test
+======================================================================
+
+######################################################################
+  Condition: COOP
+######################################################################
+
+[coop brain 1/3] train seed=42
+  [MS Proxy] zenron R2=0.388, linear R2=0.388, linear_log R2=0.328, zenron_log R2=0.328 -> zenron selected
+  [MS] Recovered from dead: dim17(r=0.31)
+  [MS Proxy] linear R2=0.272, zenron R2=0.272, linear_log R2=0.181, zenron_log R2=0.181 -> linear selected
+  [MS] Recovered from dead: dim8(r=0.34), dim17(r=0.30)
+  [MS Proxy] zenron R2=0.362, linear R2=0.362, zenron_log R2=0.356, linear_log R2=0.356 -> zenron selected
+  [MS Proxy] zenron R2=0.371, linear R2=0.371, zenron_log R2=0.359, linear_log R2=0.359 -> zenron selected
+  [MS Proxy] zenron R2=0.390, linear R2=0.390, linear_log R2=0.376, zenron_log R2=0.376 -> zenron selected
+  [MS Proxy] linear R2=0.291, zenron R2=0.291, linear_log R2=0.271, zenron_log R2=0.271 -> linear selected
+  [MS Proxy] zenron R2=0.326, linear R2=0.326, zenron_log R2=0.308, linear_log R2=0.308 -> zenron selected
+  [MS Proxy] linear R2=0.276, zenron R2=0.276, linear_log R2=0.249, zenron_log R2=0.249 -> linear selected
+  train=110s  MI_a=0.0012 (p=0.895)  MI_b=0.0719 (p=0.000)  gain_max=+0.0674
+
+[coop brain 2/3] train seed=142
+  [MS Proxy] zenron R2=0.405, linear R2=0.405, zenron_log R2=0.336, linear_log R2=0.336 -> zenron selected
+  [MS] Recovered from dead: dim17(r=0.30)
+  [MS Proxy] zenron R2=0.431, linear R2=0.431, zenron_log R2=0.359, linear_log R2=0.359 -> zenron selected
+  [MS Proxy] zenron R2=0.444, linear R2=0.444, linear_log R2=0.364, zenron_log R2=0.364 -> zenron selected
+  [MS Proxy] zenron R2=0.432, linear R2=0.432, linear_log R2=0.347, zenron_log R2=0.347 -> zenron selected
+  [MS] Recovered from dead: dim17(r=0.32)
+  [MS Proxy] linear R2=0.457, zenron R2=0.457, zenron_log R2=0.382, linear_log R2=0.382 -> linear selected
+  [MS Proxy] zenron R2=0.461, linear R2=0.461, linear_log R2=0.391, zenron_log R2=0.391 -> zenron selected
+  [MS Proxy] zenron R2=0.469, linear R2=0.469, linear_log R2=0.402, zenron_log R2=0.402 -> zenron selected
+  [MS Proxy] zenron_log R2=0.889, linear_log R2=0.889, linear R2=0.887, zenron R2=0.887 -> zenron_log selected
+  [MS Proxy] zenron R2=0.853, linear R2=0.853, zenron_log R2=0.831, linear_log R2=0.831 -> zenron selected
+  [MS Proxy] linear R2=0.797, zenron R2=0.797, linear_log R2=0.745, zenron_log R2=0.745 -> linear selected
+  [MS Proxy] zenron R2=0.370, linear R2=0.370, zenron_log R2=0.363, linear_log R2=0.363 -> zenron selected
+  [MS Proxy] zenron_log R2=0.982, linear_log R2=0.982, linear R2=0.980, zenron R2=0.980 -> zenron_log selected
+  [MS Proxy] zenron_log R2=0.869, linear_log R2=0.869, zenron R2=0.856, linear R2=0.856 -> zenron_log selected
+  [MS Proxy] linear_log R2=0.855, zenron_log R2=0.855, zenron R2=0.847, linear R2=0.847 -> linear_log selected
+  [MS Proxy] linear_log R2=0.924, zenron_log R2=0.924, linear R2=0.919, zenron R2=0.919 -> linear_log selected
+  [MS Proxy] linear_log R2=0.790, zenron_log R2=0.790, zenron R2=0.786, linear R2=0.786 -> linear_log selected
+  [MS Proxy] zenron_log R2=0.759, linear_log R2=0.759, zenron R2=0.759, linear R2=0.759 -> zenron_log selected
+  [MS Proxy] zenron R2=0.746, linear R2=0.746, zenron_log R2=0.741, linear_log R2=0.741 -> zenron selected
+  [MS Proxy] zenron R2=0.735, linear R2=0.735, zenron_log R2=0.732, linear_log R2=0.732 -> zenron selected
+  [MS Proxy] zenron R2=0.717, linear R2=0.717, zenron_log R2=0.712, linear_log R2=0.712 -> zenron selected
+  [MS Proxy] zenron R2=1.000, linear R2=1.000, zenron_log R2=1.000, linear_log R2=1.000 -> zenron selected
+  [MS Proxy] zenron_log R2=0.994, linear_log R2=0.994, linear R2=0.992, zenron R2=0.992 -> zenron_log selected
+  [MS Proxy] zenron_log R2=0.908, linear_log R2=0.908, zenron R2=0.903, linear R2=0.903 -> zenron_log selected
+  [MS Proxy] zenron_log R2=0.873, linear_log R2=0.873, linear R2=0.862, zenron R2=0.862 -> zenron_log selected
+  [MS Proxy] zenron R2=0.361, linear R2=0.361, linear_log R2=0.351, zenron_log R2=0.351 -> zenron selected
+  [MS Proxy] zenron R2=0.418, linear R2=0.418, zenron_log R2=0.414, linear_log R2=0.414 -> zenron selected
+  [MS Proxy] linear R2=0.353, zenron R2=0.353, linear_log R2=0.336, zenron_log R2=0.336 -> linear selected
+  [MS Proxy] zenron R2=0.347, linear R2=0.347, linear_log R2=0.328, zenron_log R2=0.328 -> zenron selected
+  [MS Proxy] zenron_log R2=0.848, linear_log R2=0.848, linear R2=0.837, zenron R2=0.837 -> zenron_log selected
+  [MS Proxy] zenron_log R2=0.769, linear_log R2=0.769, zenron R2=0.761, linear R2=0.761 -> zenron_log selected
+  train=263s  MI_a=0.0001 (p=1.000)  MI_b=0.0145 (p=0.000)  gain_max=+0.0099
+
+[coop brain 3/3] train seed=242
+  [MS Proxy] linear R2=0.375, zenron R2=0.375, zenron_log R2=0.293, linear_log R2=0.293 -> linear selected
+  [MS Proxy] zenron R2=0.308, linear R2=0.308, linear_log R2=0.187, zenron_log R2=0.187 -> zenron selected
+  [MS] Recovered from dead: dim17(r=0.37)
+  [MS Proxy] zenron R2=0.292, linear R2=0.292, zenron_log R2=0.166, linear_log R2=0.166 -> zenron selected
+  [MS] Recovered from dead: dim17(r=0.38)
+  [MS Proxy] zenron R2=0.373, linear R2=0.373, linear_log R2=0.366, zenron_log R2=0.366 -> zenron selected
+  [MS Proxy] linear R2=0.254, zenron R2=0.254, zenron_log R2=0.231, linear_log R2=0.231 -> linear selected
+  [MS Proxy] linear R2=0.325, zenron R2=0.325, zenron_log R2=0.307, linear_log R2=0.307 -> linear selected
+  [MS] Recovered from dead: dim70(r=0.30)
+  [MS Proxy] linear_log R2=0.993, zenron_log R2=0.993, zenron R2=0.992, linear R2=0.992 -> linear_log selected
+  [MS Proxy] linear R2=0.159, zenron R2=0.159, zenron_log R2=0.129, linear_log R2=0.129 -> linear selected
+  [MS] Recovered from dead: dim8(r=0.32)
+  train=113s  MI_a=0.0001 (p=0.990)  MI_b=0.0050 (p=0.130)  gain_max=+0.0019
+
+######################################################################
+  Condition: COMPETE
+######################################################################
+
+[compete brain 1/3] train seed=42
+  [MS Proxy] zenron R2=0.465, linear R2=0.465, linear_log R2=-11.616, zenron_log R2=-11.616 -> zenron selected
+  [MS Proxy] zenron R2=0.463, linear R2=0.463, linear_log R2=-13.803, zenron_log R2=-13.803 -> zenron selected
+  [MS Proxy] zenron R2=0.465, linear R2=0.465, linear_log R2=-10.171, zenron_log R2=-10.171 -> zenron selected
+  [MS Proxy] zenron R2=0.470, linear R2=0.470, zenron_log R2=-7.456, linear_log R2=-7.456 -> zenron selected
+  [MS Proxy] zenron R2=0.481, linear R2=0.481, linear_log R2=-5.707, zenron_log R2=-5.707 -> zenron selected
+  [MS Proxy] linear R2=0.486, zenron R2=0.486, linear_log R2=-4.469, zenron_log R2=-4.469 -> linear selected
+  [MS Proxy] linear R2=0.490, zenron R2=0.490, linear_log R2=-3.691, zenron_log R2=-3.691 -> linear selected
+  [MS Proxy] zenron R2=0.467, linear R2=0.467, zenron_log R2=-2.849, linear_log R2=-2.849 -> zenron selected
+  [MS Proxy] zenron R2=0.475, linear R2=0.475, linear_log R2=-2.459, zenron_log R2=-2.459 -> zenron selected
+  [MS Proxy] zenron R2=0.480, linear R2=0.480, linear_log R2=-2.152, zenron_log R2=-2.152 -> zenron selected
+  [MS Proxy] zenron R2=0.989, linear R2=0.989, linear_log R2=0.733, zenron_log R2=0.733 -> zenron selected
+  [MS Proxy] zenron R2=0.933, linear R2=0.933, zenron_log R2=0.004, linear_log R2=0.004 -> zenron selected
+  [MS Proxy] zenron R2=0.454, linear R2=0.454, zenron_interact_log R2=-7.033, linear_log R2=-13.793, zenron_log R2=-13.793 -> zenron selected
+  [MS Proxy] zenron_interact R2=0.397, zenron R2=0.394, linear R2=0.394, zenron_interact_log R2=-10.230, zenron_log R2=-49.701, linear_log R2=-49.701 -> zenron_interact selected
+  [MS Proxy] zenron_interact R2=0.340, zenron R2=0.310, linear R2=0.310, zenron_interact_log R2=-3.411, linear_log R2=-13.251, zenron_log R2=-13.251 -> zenron_interact selected
+  [MS Proxy] zenron R2=0.261, linear R2=0.261, zenron_interact_log R2=-3.450, zenron_log R2=-6.352, linear_log R2=-6.352 -> zenron selected
+  [MS Proxy] zenron R2=0.511, linear R2=0.511, zenron_log R2=-10.487, linear_log R2=-10.487 -> zenron selected
+  [MS] Recovered from dead: dim14(r=0.31)
+  [MS Proxy] zenron R2=0.521, linear R2=0.521, linear_log R2=-12.953, zenron_log R2=-12.953 -> zenron selected
+  [MS] Recovered from dead: dim14(r=0.32)
+  [MS Proxy] zenron R2=0.549, linear R2=0.549, linear_log R2=-9.671, zenron_log R2=-9.671 -> zenron selected
+  [MS] Recovered from dead: dim14(r=0.32)
+  [MS Proxy] zenron R2=0.572, linear R2=0.572, linear_log R2=-7.162, zenron_log R2=-7.162 -> zenron selected
+  [MS] Recovered from dead: dim14(r=0.32)
+  [MS Proxy] zenron R2=0.969, linear R2=0.969, zenron_log R2=0.695, linear_log R2=0.695 -> zenron selected
+  [MS Proxy] zenron R2=0.892, linear R2=0.892, linear_log R2=0.076, zenron_log R2=0.076 -> zenron selected
+  [MS Proxy] linear R2=0.526, zenron R2=0.526, zenron_log R2=-2.800, linear_log R2=-2.800 -> linear selected
+  [MS] Recovered from dead: dim21(r=0.31)
+  [MS Proxy] zenron R2=0.852, linear R2=0.852, linear_log R2=-0.591, zenron_log R2=-0.591 -> zenron selected
+  [MS Proxy] linear R2=0.821, zenron R2=0.821, linear_log R2=-0.986, zenron_log R2=-0.986 -> linear selected
+  [MS Proxy] zenron R2=0.793, linear R2=0.793, linear_log R2=-1.001, zenron_log R2=-1.001 -> zenron selected
+  train=205s  MI_a=0.1312 (p=0.000)  MI_b=0.0049 (p=0.580)  gain_max=+0.1235
+
+[compete brain 2/3] train seed=142
+  [MS Proxy] zenron R2=0.342, linear R2=0.342, zenron_log R2=-8.825, linear_log R2=-8.825 -> zenron selected
+  [MS] Recovered from dead: dim8(r=0.32)
+  [MS Proxy] zenron R2=0.290, linear R2=0.290, linear_log R2=-9.037, zenron_log R2=-9.037 -> zenron selected
+  [MS Proxy] zenron R2=0.980, linear R2=0.980, linear_log R2=0.550, zenron_log R2=0.550 -> zenron selected
+  [MS Proxy] zenron R2=0.902, linear R2=0.902, zenron_log R2=-0.090, linear_log R2=-0.090 -> zenron selected
+  [MS Proxy] zenron R2=0.802, linear R2=0.802, zenron_log R2=-0.115, linear_log R2=-0.115 -> zenron selected
+  [MS Proxy] zenron R2=0.730, linear R2=0.730, linear_log R2=0.171, zenron_log R2=0.171 -> zenron selected
+  [MS Proxy] zenron R2=0.725, linear R2=0.725, linear_log R2=0.329, zenron_log R2=0.329 -> zenron selected
+  [MS Proxy] zenron R2=0.690, linear R2=0.690, zenron_log R2=0.335, linear_log R2=0.335 -> zenron selected
+  [MS Proxy] zenron R2=0.670, linear R2=0.670, linear_log R2=0.283, zenron_log R2=0.283 -> zenron selected
+  [MS Proxy] zenron R2=0.640, linear R2=0.640, linear_log R2=0.088, zenron_log R2=0.088 -> zenron selected
+  [MS Proxy] zenron R2=0.576, linear R2=0.576, linear_log R2=-1.648, zenron_log R2=-1.648 -> zenron selected
+  [MS Proxy] zenron R2=0.245, linear R2=0.245, zenron_log R2=-0.640, linear_log R2=-0.640 -> zenron selected
+  [MS Proxy] zenron R2=0.482, linear R2=0.482, linear_log R2=-11.144, zenron_log R2=-11.144 -> zenron selected
+  [MS] Recovered from dead: dim14(r=0.34)
+  [MS Proxy] zenron R2=0.337, linear R2=0.337, zenron_log R2=-7.024, linear_log R2=-7.024 -> zenron selected
+  [MS] Recovered from dead: dim21(r=0.37)
+  [MS Proxy] linear R2=0.365, zenron R2=0.365, linear_log R2=-5.531, zenron_log R2=-5.531 -> linear selected
+  [MS] Recovered from dead: dim21(r=0.37)
+  [MS Proxy] zenron R2=0.363, linear R2=0.363, linear_log R2=-4.181, zenron_log R2=-4.181 -> zenron selected
+  [MS] Recovered from dead: dim21(r=0.38)
+  [MS Proxy] zenron R2=0.371, linear R2=0.371, linear_log R2=-3.330, zenron_log R2=-3.330 -> zenron selected
+  [MS] Recovered from dead: dim21(r=0.38)
+  [MS Proxy] linear R2=0.401, zenron R2=0.401, linear_log R2=-2.679, zenron_log R2=-2.679 -> linear selected
+  [MS] Recovered from dead: dim21(r=0.38)
+  [MS Proxy] zenron R2=0.396, linear R2=0.396, zenron_log R2=-2.206, linear_log R2=-2.206 -> zenron selected
+  [MS] Recovered from dead: dim21(r=0.33)
+  [MS Proxy] zenron R2=0.360, linear R2=0.360, linear_log R2=-1.612, zenron_log R2=-1.612 -> zenron selected
+  [MS] Recovered from dead: dim21(r=0.35)
+  [MS Proxy] zenron R2=0.375, linear R2=0.375, zenron_log R2=-1.402, linear_log R2=-1.402 -> zenron selected
+  [MS] Recovered from dead: dim21(r=0.35)
+  [MS Proxy] linear R2=0.370, zenron R2=0.370, linear_log R2=-1.253, zenron_log R2=-1.253 -> linear selected
+  [MS] Recovered from dead: dim21(r=0.35)
+  train=197s  MI_a=0.0059 (p=0.440)  MI_b=0.0051 (p=0.880)  gain_max=-0.0000
+
+[compete brain 3/3] train seed=242
+  [MS Proxy] zenron R2=0.380, linear R2=0.380, linear_log R2=-8.906, zenron_log R2=-8.906 -> zenron selected
+  [MS Proxy] zenron R2=0.382, linear R2=0.382, linear_log R2=-7.104, zenron_log R2=-7.104 -> zenron selected
+  [MS] Recovered from dead: dim17(r=0.30)
+  [MS Proxy] zenron R2=0.380, linear R2=0.380, linear_log R2=-9.701, zenron_log R2=-9.701 -> zenron selected
+  [MS Proxy] linear R2=0.359, zenron R2=0.359, zenron_log R2=-7.284, linear_log R2=-7.284 -> linear selected
+  [MS Proxy] zenron R2=0.349, linear R2=0.349, zenron_log R2=-5.732, linear_log R2=-5.732 -> zenron selected
+  [MS] Recovered from dead: dim8(r=0.30)
+  [MS Proxy] zenron R2=0.340, linear R2=0.340, zenron_log R2=-4.484, linear_log R2=-4.484 -> zenron selected
+  [MS Proxy] zenron R2=0.342, linear R2=0.342, zenron_log R2=-3.766, linear_log R2=-3.766 -> zenron selected
+  [MS Proxy] zenron R2=0.348, linear R2=0.348, linear_log R2=-3.190, zenron_log R2=-3.190 -> zenron selected
+  [MS Proxy] zenron R2=0.334, linear R2=0.334, linear_log R2=-2.753, zenron_log R2=-2.753 -> zenron selected
+  [MS Proxy] linear R2=0.340, zenron R2=0.340, linear_log R2=-2.436, zenron_log R2=-2.436 -> linear selected
+  [MS Proxy] zenron R2=0.988, linear R2=0.988, linear_log R2=0.914, zenron_log R2=0.914 -> zenron selected
+  [MS Proxy] zenron R2=0.902, linear R2=0.902, linear_log R2=0.303, zenron_log R2=0.303 -> zenron selected
+  [MS Proxy] zenron R2=0.852, linear R2=0.852, zenron_log R2=-0.183, linear_log R2=-0.183 -> zenron selected
+  [MS Proxy] zenron R2=0.782, linear R2=0.782, linear_log R2=0.167, zenron_log R2=0.167 -> zenron selected
+  [MS Proxy] linear R2=0.722, zenron R2=0.722, zenron_log R2=-0.311, linear_log R2=-0.311 -> linear selected
+  [MS Proxy] zenron R2=0.772, linear R2=0.772, zenron_log R2=0.035, linear_log R2=0.035 -> zenron selected
+  [MS Proxy] linear R2=0.678, zenron R2=0.678, zenron_log R2=-0.179, linear_log R2=-0.179 -> linear selected
+  [MS Proxy] zenron R2=0.667, linear R2=0.667, linear_log R2=-0.660, zenron_log R2=-0.660 -> zenron selected
+  [MS Proxy] zenron R2=0.641, linear R2=0.641, zenron_log R2=-0.406, linear_log R2=-0.406 -> zenron selected
+  [MS Proxy] zenron R2=0.608, linear R2=0.608, linear_log R2=-0.544, zenron_log R2=-0.544 -> zenron selected
+  [MS Proxy] linear R2=0.487, zenron R2=0.487, zenron_log R2=-11.496, linear_log R2=-11.496 -> linear selected
+  [MS Proxy] zenron R2=0.502, linear R2=0.502, linear_log R2=-13.687, zenron_log R2=-13.687 -> zenron selected
+  [MS] Recovered from dead: dim14(r=0.31)
+  [MS Proxy] linear R2=0.509, zenron R2=0.509, zenron_log R2=-9.089, linear_log R2=-9.089 -> linear selected
+  [MS Proxy] zenron R2=0.501, linear R2=0.501, linear_log R2=-6.539, zenron_log R2=-6.539 -> zenron selected
+  [MS Proxy] zenron R2=0.404, linear R2=0.404, zenron_log R2=-3.373, linear_log R2=-3.373 -> zenron selected
+  [MS] Recovered from dead: dim14(r=0.33)
+  [MS Proxy] linear R2=0.424, zenron R2=0.424, zenron_log R2=-2.716, linear_log R2=-2.716 -> linear selected
+  [MS] Recovered from dead: dim14(r=0.31)
+  [MS Proxy] zenron R2=0.437, linear R2=0.437, zenron_log R2=-2.287, linear_log R2=-2.287 -> zenron selected
+  [MS Proxy] zenron R2=0.457, linear R2=0.457, linear_log R2=-1.924, zenron_log R2=-1.924 -> zenron selected
+  [MS Proxy] zenron R2=0.456, linear R2=0.456, zenron_log R2=-1.665, linear_log R2=-1.665 -> zenron selected
+  [MS Proxy] zenron R2=0.472, linear R2=0.472, linear_log R2=-1.437, zenron_log R2=-1.437 -> zenron selected
+  train=228s  MI_a=0.0121 (p=0.050)  MI_b=0.0031 (p=0.810)  gain_max=+0.0057
+
+  Total training + eval time: 1119s
+
+======================================================================
+  STATISTICAL SUMMARY
+======================================================================
+
+  MI gain (observed - null) per condition:
+    cooperative:  +0.0264  95% CI [+0.0019, +0.0674]
+    competitive:  +0.0431  95% CI [-0.0000, +0.1235]
+
+  Difference (coop - compete): -0.0167
+    Cohen's d: -0.30
+    permutation p-value (coop > compete): p = 0.585
+
+  Per-brain significance (p<0.05 for MI vs null):
+    cooperative:  2/3 brains significant
+    competitive:  1/3 brains significant
+
+======================================================================
+  VERDICT
+======================================================================
+  NO clear difference
+
+  Interpretation:
+
+  Saved: language_rigorous_result.json
