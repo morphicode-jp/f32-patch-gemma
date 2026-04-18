@@ -166,6 +166,267 @@ PAPERS = [
          n_agents=2, n_params_log10=10, arch=4, learning=1, task=1, reward=1,
          env_dim=1, has_embodiment=0, uses_plasticity=0, emergence_reported=1.0),
 
+    # === Compositional / iterated learning ===
+    dict(paper_id="ren2020_iterated",
+         title="Compositional Languages Emerge in a Neural Iterated Learning Model",
+         year=2020, venue="ICLR",
+         n_agents=2, n_params_log10=5, arch=3, learning=2, task=1, reward=1,
+         env_dim=1, has_embodiment=0, uses_plasticity=0, emergence_reported=1.0),
+
+    dict(paper_id="cogswell2020_compositional",
+         title="Emergence of Compositional Language via Population-based Training",
+         year=2020, venue="ICLR",
+         n_agents=8, n_params_log10=6, arch=3, learning=2, task=1, reward=1,
+         env_dim=1, has_embodiment=0, uses_plasticity=0, emergence_reported=1.0),
+
+    dict(paper_id="chaabouni2019_anti",
+         title="Anti-efficient encoding in emergent communication",
+         year=2019, venue="NeurIPS",
+         n_agents=2, n_params_log10=5, arch=3, learning=2, task=1, reward=1,
+         env_dim=1, has_embodiment=0, uses_plasticity=0, emergence_reported=0.5),
+
+    dict(paper_id="chaabouni2020_compositionality",
+         title="Compositionality and Generalization In Emergent Languages",
+         year=2020, venue="ACL",
+         n_agents=2, n_params_log10=6, arch=3, learning=2, task=1, reward=1,
+         env_dim=1, has_embodiment=0, uses_plasticity=0, emergence_reported=0.5),
+
+    dict(paper_id="li2019_ease",
+         title="Ease-of-teaching and language structure from emergent communication",
+         year=2019, venue="NeurIPS",
+         n_agents=4, n_params_log10=5, arch=3, learning=2, task=1, reward=1,
+         env_dim=1, has_embodiment=0, uses_plasticity=0, emergence_reported=1.0),
+
+    dict(paper_id="kharitonov2019_egg",
+         title="EGG: Toolkit for research on Emergence of lanGuage in Games",
+         year=2019, venue="EMNLP demo",
+         n_agents=2, n_params_log10=5, arch=3, learning=2, task=1, reward=1,
+         env_dim=1, has_embodiment=0, uses_plasticity=0, emergence_reported=1.0),
+
+    dict(paper_id="andreas2017_analogs",
+         title="Analogs of Linguistic Structure in Deep Representations",
+         year=2017, venue="EMNLP",
+         n_agents=2, n_params_log10=5, arch=3, learning=2, task=1, reward=1,
+         env_dim=1, has_embodiment=0, uses_plasticity=0, emergence_reported=0.5),
+
+    dict(paper_id="graesser2019",
+         title="Emergent linguistic phenomena in Multi-Agent Communication Games",
+         year=2019, venue="EMNLP",
+         n_agents=4, n_params_log10=5, arch=3, learning=2, task=1, reward=1,
+         env_dim=1, has_embodiment=0, uses_plasticity=0, emergence_reported=1.0),
+
+    dict(paper_id="lowe2019_pitfalls",
+         title="On the Pitfalls of Measuring Emergent Communication",
+         year=2019, venue="AAMAS",
+         n_agents=2, n_params_log10=5, arch=3, learning=2, task=1, reward=1,
+         env_dim=1, has_embodiment=0, uses_plasticity=0, emergence_reported=0.5),
+
+    # === Larger-scale / biases / curricula ===
+    dict(paper_id="eccles2019_biases",
+         title="Biases for emergent communication in MARL",
+         year=2019, venue="NeurIPS",
+         n_agents=3, n_params_log10=5.5, arch=3, learning=2, task=2, reward=1,
+         env_dim=2, has_embodiment=1, uses_plasticity=0, emergence_reported=1.0),
+
+    dict(paper_id="bullard2021_zeroshot",
+         title="Exploring Zero-Shot Emergent Communication in Embodied Multi-Agent",
+         year=2021, venue="arXiv",
+         n_agents=2, n_params_log10=5.5, arch=3, learning=2, task=2, reward=1,
+         env_dim=2, has_embodiment=1, uses_plasticity=0, emergence_reported=0.5),
+
+    dict(paper_id="lazaridou2020_survey",
+         title="Emergent Multi-Agent Communication in the Deep Learning Era (survey)",
+         year=2020, venue="arXiv",
+         n_agents=3, n_params_log10=5, arch=3, learning=2, task=1, reward=1,
+         env_dim=1, has_embodiment=0, uses_plasticity=0, emergence_reported=1.0),
+
+    dict(paper_id="ren2021_decouple",
+         title="How to decouple semantic and syntactic in emergent communication",
+         year=2021, venue="NAACL",
+         n_agents=2, n_params_log10=5, arch=3, learning=2, task=1, reward=1,
+         env_dim=1, has_embodiment=0, uses_plasticity=0, emergence_reported=0.5),
+
+    dict(paper_id="vanneste2022_analysis",
+         title="Analysis of emergent communication under varying behaviors",
+         year=2022, venue="AAMAS",
+         n_agents=3, n_params_log10=5, arch=3, learning=2, task=2, reward=3,
+         env_dim=2, has_embodiment=1, uses_plasticity=0, emergence_reported=0.5),
+
+    # === Theory of Mind ===
+    dict(paper_id="yuan2019_tom_collab",
+         title="Emergence of Theory of Mind Collaboration in Multiagent Systems",
+         year=2019, venue="NeurIPS ws",
+         n_agents=2, n_params_log10=5, arch=3, learning=2, task=2, reward=1,
+         env_dim=2, has_embodiment=1, uses_plasticity=0, emergence_reported=1.0),
+
+    dict(paper_id="oguntola2025_tom",
+         title="Theory of Mind in Multi-Agent Systems (CMU PhD thesis)",
+         year=2025, venue="CMU",
+         n_agents=4, n_params_log10=6, arch=3, learning=2, task=2, reward=3,
+         env_dim=2, has_embodiment=1, uses_plasticity=0, emergence_reported=1.0),
+
+    dict(paper_id="zhao2023_matom_snn",
+         title="Brain-inspired ToM spiking NN for multi-agent coop/compete",
+         year=2023, venue="Patterns (Cell)",
+         n_agents=4, n_params_log10=4, arch=5, learning=2, task=2, reward=3,
+         env_dim=2, has_embodiment=1, uses_plasticity=1, emergence_reported=1.0),
+
+    dict(paper_id="mate2022",
+         title="MATE: Multi-Agent Task Execution via Emergent Communication",
+         year=2022, venue="NeurIPS",
+         n_agents=4, n_params_log10=6, arch=3, learning=2, task=2, reward=1,
+         env_dim=2, has_embodiment=1, uses_plasticity=0, emergence_reported=1.0),
+
+    dict(paper_id="deception_tom2023",
+         title="Emerging deception and skepticism via ToM",
+         year=2023, venue="PMC",
+         n_agents=2, n_params_log10=5, arch=3, learning=2, task=3, reward=2,
+         env_dim=1, has_embodiment=0, uses_plasticity=0, emergence_reported=0.5),
+
+    # === Evolutionary / embodied robotics ===
+    dict(paper_id="quinn2000_diff_com",
+         title="Evolving communication without dedicated comm channel",
+         year=2000, venue="ALife",
+         n_agents=4, n_params_log10=2, arch=5, learning=3, task=5, reward=1,
+         env_dim=2, has_embodiment=1, uses_plasticity=0, emergence_reported=1.0),
+
+    dict(paper_id="cangelosi2001_sg",
+         title="Symbol grounding and symbolic theft hypothesis",
+         year=2001, venue="Connection Science",
+         n_agents=10, n_params_log10=2, arch=5, learning=3, task=5, reward=1,
+         env_dim=2, has_embodiment=1, uses_plasticity=0, emergence_reported=1.0),
+
+    dict(paper_id="marocco2002",
+         title="The emergence of communication in evolutionary robots",
+         year=2002, venue="ALife",
+         n_agents=6, n_params_log10=2, arch=5, learning=3, task=5, reward=1,
+         env_dim=2, has_embodiment=1, uses_plasticity=0, emergence_reported=1.0),
+
+    dict(paper_id="wagner2003",
+         title="Progress in the simulation of emergent communication",
+         year=2003, venue="AI Magazine",
+         n_agents=10, n_params_log10=3, arch=5, learning=3, task=5, reward=1,
+         env_dim=2, has_embodiment=1, uses_plasticity=0, emergence_reported=1.0),
+
+    dict(paper_id="mirolli2013",
+         title="Evolution of language and cooperation in populations",
+         year=2013, venue="Adapt Behav",
+         n_agents=20, n_params_log10=3, arch=5, learning=3, task=5, reward=3,
+         env_dim=2, has_embodiment=1, uses_plasticity=0, emergence_reported=0.5),
+
+    dict(paper_id="swarm_spiking2023",
+         title="Emergent communication enhances foraging in evolved spiking swarms",
+         year=2023, venue="Swarm Intelligence",
+         n_agents=20, n_params_log10=3, arch=5, learning=3, task=5, reward=1,
+         env_dim=2, has_embodiment=1, uses_plasticity=0, emergence_reported=1.0),
+
+    dict(paper_id="epuck_signaling2024",
+         title="Improvement of signal communication for foraging (e-puck)",
+         year=2024, venue="J. Appl Res Tech",
+         n_agents=4, n_params_log10=3, arch=5, learning=3, task=5, reward=1,
+         env_dim=3, has_embodiment=1, uses_plasticity=0, emergence_reported=1.0),
+
+    dict(paper_id="swarm_plos2016",
+         title="Emergence of Swarming Behavior: Foraging Agents with Signaling",
+         year=2016, venue="PLOS ONE",
+         n_agents=30, n_params_log10=2, arch=5, learning=3, task=5, reward=1,
+         env_dim=2, has_embodiment=1, uses_plasticity=0, emergence_reported=1.0),
+
+    # === Hebbian / plasticity approaches ===
+    dict(paper_id="najarro2020_hebbian",
+         title="Meta-Learning through Hebbian Plasticity in Random Networks",
+         year=2020, venue="NeurIPS",
+         n_agents=1, n_params_log10=3, arch=5, learning=4, task=4, reward=4,
+         env_dim=3, has_embodiment=1, uses_plasticity=1, emergence_reported=1.0),
+
+    dict(paper_id="risi2021_voxel_hebbian",
+         title="Evolving Hebbian Learning Rules in Voxel-based Soft Robots",
+         year=2021, venue="GECCO",
+         n_agents=1, n_params_log10=3, arch=5, learning=4, task=5, reward=4,
+         env_dim=3, has_embodiment=1, uses_plasticity=1, emergence_reported=1.0),
+
+    dict(paper_id="reward_mod_hebbian2015",
+         title="Reward-Modulated Hebbian Plasticity in Compliant Robotics",
+         year=2015, venue="Front. Neurorobotics",
+         n_agents=1, n_params_log10=3, arch=5, learning=4, task=5, reward=4,
+         env_dim=3, has_embodiment=1, uses_plasticity=1, emergence_reported=1.0),
+
+    # === Iterated learning / cultural transmission ===
+    dict(paper_id="kirby2014",
+         title="Iterated learning and the evolution of language",
+         year=2014, venue="Current Opin Neurobiol",
+         n_agents=10, n_params_log10=0, arch=1, learning=5, task=1, reward=1,
+         env_dim=1, has_embodiment=0, uses_plasticity=0, emergence_reported=1.0),
+
+    dict(paper_id="smith2003_iterated",
+         title="Iterated learning: Framework for emergence of language",
+         year=2003, venue="ALife",
+         n_agents=10, n_params_log10=0, arch=1, learning=5, task=1, reward=1,
+         env_dim=1, has_embodiment=0, uses_plasticity=0, emergence_reported=1.0),
+
+    dict(paper_id="spatial_pop2023",
+         title="Spatial community structure impedes language amalgamation",
+         year=2023, venue="ALIFE Proc",
+         n_agents=50, n_params_log10=3, arch=5, learning=5, task=1, reward=1,
+         env_dim=2, has_embodiment=1, uses_plasticity=0, emergence_reported=0.5),
+
+    dict(paper_id="social_learning2024",
+         title="Framework for emergence/analysis of language in social learning agents",
+         year=2024, venue="Nat Commun",
+         n_agents=4, n_params_log10=5, arch=3, learning=2, task=2, reward=1,
+         env_dim=2, has_embodiment=1, uses_plasticity=0, emergence_reported=1.0),
+
+    # === Classical biological / game theoretic foundations ===
+    dict(paper_id="smith1974_games",
+         title="The Theory of Games and Evolution of Animal Conflicts",
+         year=1974, venue="J Theor Biol",
+         n_agents=2, n_params_log10=0, arch=1, learning=5, task=6, reward=2,
+         env_dim=1, has_embodiment=0, uses_plasticity=0, emergence_reported=0.5),
+
+    dict(paper_id="zahavi1975_handicap",
+         title="Mate selection: a selection for a handicap",
+         year=1975, venue="J Theor Biol",
+         n_agents=2, n_params_log10=0, arch=1, learning=5, task=1, reward=2,
+         env_dim=1, has_embodiment=0, uses_plasticity=0, emergence_reported=1.0),
+
+    dict(paper_id="axelrod1984",
+         title="The Evolution of Cooperation",
+         year=1984, venue="Basic Books",
+         n_agents=2, n_params_log10=0, arch=1, learning=5, task=6, reward=3,
+         env_dim=1, has_embodiment=0, uses_plasticity=0, emergence_reported=1.0),
+
+    # === Swarm / collective ===
+    dict(paper_id="embodied_evo2017",
+         title="Learning collaborative foraging via embodied evolution",
+         year=2017, venue="IEEE",
+         n_agents=20, n_params_log10=3, arch=5, learning=3, task=5, reward=1,
+         env_dim=3, has_embodiment=1, uses_plasticity=0, emergence_reported=1.0),
+
+    dict(paper_id="diff_communicative2017",
+         title="Evolution via differentiation of comm and goal-directed behaviors",
+         year=2017, venue="Artif Life Robotics",
+         n_agents=4, n_params_log10=2, arch=5, learning=3, task=5, reward=1,
+         env_dim=2, has_embodiment=1, uses_plasticity=0, emergence_reported=1.0),
+
+    dict(paper_id="role_allocation2018",
+         title="Communication for Scalable Role Allocation in Collective Robotics",
+         year=2018, venue="ANTS",
+         n_agents=10, n_params_log10=3, arch=5, learning=3, task=5, reward=1,
+         env_dim=3, has_embodiment=1, uses_plasticity=0, emergence_reported=1.0),
+
+    # === Additional MARL / networked comm ===
+    dict(paper_id="networked_marl2020",
+         title="Networked Multi-Agent RL with Emergent Communication",
+         year=2020, venue="AAMAS",
+         n_agents=8, n_params_log10=5.5, arch=3, learning=2, task=2, reward=1,
+         env_dim=2, has_embodiment=1, uses_plasticity=0, emergence_reported=1.0),
+
+    dict(paper_id="curiosity_comm2020",
+         title="Emergent communication through curiosity-driven MARL",
+         year=2020, venue="ANR",
+         n_agents=2, n_params_log10=5, arch=3, learning=2, task=4, reward=4,
+         env_dim=2, has_embodiment=1, uses_plasticity=0, emergence_reported=0.5),
+
     # === Our experiments (for positioning) ===
     dict(paper_id="our_phase3_compete",
          title="Kathara Sentinel: competitive signaling (1-food)",
@@ -184,6 +445,24 @@ PAPERS = [
          year=2026, venue="self",
          n_agents=2, n_params_log10=1.96, arch=6, learning=3, task=5, reward=3,
          env_dim=2, has_embodiment=1, uses_plasticity=0, emergence_reported=0.5),
+
+    dict(paper_id="our_hebbian_memory",
+         title="Kathara Hebbian memory (Phase 5) - not language, but related subsystem",
+         year=2026, venue="self",
+         n_agents=1, n_params_log10=1.96, arch=6, learning=4, task=5, reward=4,
+         env_dim=2, has_embodiment=1, uses_plasticity=1, emergence_reported=0.5),
+
+    dict(paper_id="our_dual_hippo",
+         title="Kathara Dual brain + replay (Phase 6)",
+         year=2026, venue="self",
+         n_agents=1, n_params_log10=2.27, arch=6, learning=4, task=5, reward=4,
+         env_dim=2, has_embodiment=1, uses_plasticity=1, emergence_reported=0.5),
+
+    dict(paper_id="our_coevo_red_queen",
+         title="Kathara co-evolution Red Queen (Phase 2)",
+         year=2026, venue="self",
+         n_agents=2, n_params_log10=1.96, arch=6, learning=3, task=5, reward=2,
+         env_dim=2, has_embodiment=1, uses_plasticity=0, emergence_reported=1.0),
 ]
 
 
