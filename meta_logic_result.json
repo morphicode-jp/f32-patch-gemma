@@ -1,0 +1,199 @@
+{
+  "n_claims": 46,
+  "n_unique_features": 25,
+  "outcomes_seen": [
+    "compositional",
+    "deceptive",
+    "emerges",
+    "fails",
+    "honest",
+    "robust",
+    "scales"
+  ],
+  "top_conditions_for_emergence": [
+    {
+      "condition": "iterated_learning=True",
+      "net_rate": 1.0,
+      "n": 2,
+      "pos": 2,
+      "neg": 0
+    },
+    {
+      "condition": "population=2",
+      "net_rate": 1.0,
+      "n": 3,
+      "pos": 3,
+      "neg": 0
+    },
+    {
+      "condition": "tom_active=True",
+      "net_rate": 1.0,
+      "n": 2,
+      "pos": 2,
+      "neg": 0
+    },
+    {
+      "condition": "population=10",
+      "net_rate": 1.0,
+      "n": 2,
+      "pos": 2,
+      "neg": 0
+    },
+    {
+      "condition": "reward_coop=True",
+      "net_rate": 0.9166666666666666,
+      "n": 12,
+      "pos": 11,
+      "neg": 0
+    },
+    {
+      "condition": "evolution=True",
+      "net_rate": 0.8333333333333334,
+      "n": 6,
+      "pos": 5,
+      "neg": 0
+    },
+    {
+      "condition": "reward_compete=True",
+      "net_rate": 0.5,
+      "n": 2,
+      "pos": 1,
+      "neg": 0
+    },
+    {
+      "condition": "reward_mixed=True",
+      "net_rate": 0.5,
+      "n": 4,
+      "pos": 2,
+      "neg": 0
+    },
+    {
+      "condition": "has_plasticity=True",
+      "net_rate": 0.5,
+      "n": 2,
+      "pos": 1,
+      "neg": 0
+    },
+    {
+      "condition": "reward_gated_plasticity=True",
+      "net_rate": 0.5,
+      "n": 2,
+      "pos": 1,
+      "neg": 0
+    }
+  ],
+  "contradictions": [
+    {
+      "conditions": [
+        [
+          "reward_coop",
+          "True"
+        ]
+      ],
+      "papers": [
+        "skyrms2010",
+        "lazaridou2017",
+        "chaabouni2019_anti"
+      ],
+      "strengths": [
+        1,
+        1,
+        -1
+      ]
+    },
+    {
+      "conditions": [
+        [
+          "reward_compete",
+          "True"
+        ]
+      ],
+      "papers": [
+        "smith1974_games",
+        "noukhovitch2021",
+        "cao_competitive2018"
+      ],
+      "strengths": [
+        1,
+        0,
+        -1
+      ]
+    }
+  ],
+  "top_rules": [
+    {
+      "condition": "iterated_learning=True",
+      "rate": 1.0,
+      "lift": 0.28260869565217395,
+      "n": 5
+    },
+    {
+      "condition": "population=3",
+      "rate": 1.0,
+      "lift": 0.28260869565217395,
+      "n": 4
+    },
+    {
+      "condition": "tom_active=True",
+      "rate": 1.0,
+      "lift": 0.28260869565217395,
+      "n": 4
+    },
+    {
+      "condition": "reward_coop=True",
+      "rate": 0.7777777777777778,
+      "lift": 0.06038647342995174,
+      "n": 18
+    },
+    {
+      "condition": "population=2",
+      "rate": 0.75,
+      "lift": 0.03260869565217395,
+      "n": 4
+    },
+    {
+      "condition": "has_plasticity=True",
+      "rate": 0.75,
+      "lift": 0.03260869565217395,
+      "n": 4
+    },
+    {
+      "condition": "evolution=True",
+      "rate": 0.7,
+      "lift": -0.017391304347826098,
+      "n": 10
+    },
+    {
+      "condition": "population=10",
+      "rate": 0.6666666666666666,
+      "lift": -0.050724637681159424,
+      "n": 3
+    },
+    {
+      "condition": "discrete_messages=True",
+      "rate": 0.5,
+      "lift": -0.21739130434782605,
+      "n": 2
+    },
+    {
+      "condition": "reward_compete=True",
+      "rate": 0.5,
+      "lift": -0.21739130434782605,
+      "n": 8
+    },
+    {
+      "condition": "reward_mixed=True",
+      "rate": 0.5,
+      "lift": -0.21739130434782605,
+      "n": 4
+    },
+    {
+      "condition": "reward_gated_plasticity=True",
+      "rate": 0.5,
+      "lift": -0.21739130434782605,
+      "n": 2
+    }
+  ],
+  "owl_r2": 0.41258215962441325,
+  "owl_importance": {}
+}
