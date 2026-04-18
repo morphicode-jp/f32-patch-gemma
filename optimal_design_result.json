@@ -1,0 +1,442 @@
+{
+  "n_candidates": 13542,
+  "top_supported": [
+    {
+      "rank": 1.0,
+      "design": "bayesian_inference & population=100",
+      "score": 1.0,
+      "matches": [
+        "cogswell2020_compositional",
+        "chaabouni2022"
+      ],
+      "n_positive": 2,
+      "n_negative": 0,
+      "outcomes": {
+        "compositional": 1,
+        "scales": 1
+      }
+    },
+    {
+      "rank": 1.0,
+      "design": "co_evolution_alternating & population=100",
+      "score": 1.0,
+      "matches": [
+        "cogswell2020_compositional",
+        "chaabouni2022"
+      ],
+      "n_positive": 2,
+      "n_negative": 0,
+      "outcomes": {
+        "compositional": 1,
+        "scales": 1
+      }
+    },
+    {
+      "rank": 1.0,
+      "design": "discrete_messages & population=100",
+      "score": 1.0,
+      "matches": [
+        "cogswell2020_compositional",
+        "chaabouni2022"
+      ],
+      "n_positive": 2,
+      "n_negative": 0,
+      "outcomes": {
+        "compositional": 1,
+        "scales": 1
+      }
+    },
+    {
+      "rank": 1.0,
+      "design": "evolution & population=100",
+      "score": 1.0,
+      "matches": [
+        "cogswell2020_compositional",
+        "chaabouni2022"
+      ],
+      "n_positive": 2,
+      "n_negative": 0,
+      "outcomes": {
+        "compositional": 1,
+        "scales": 1
+      }
+    },
+    {
+      "rank": 1.0,
+      "design": "has_embodiment & population=100",
+      "score": 1.0,
+      "matches": [
+        "cogswell2020_compositional",
+        "chaabouni2022"
+      ],
+      "n_positive": 2,
+      "n_negative": 0,
+      "outcomes": {
+        "compositional": 1,
+        "scales": 1
+      }
+    },
+    {
+      "rank": 1.0,
+      "design": "has_noise & population=100",
+      "score": 1.0,
+      "matches": [
+        "cogswell2020_compositional",
+        "chaabouni2022"
+      ],
+      "n_positive": 2,
+      "n_negative": 0,
+      "outcomes": {
+        "compositional": 1,
+        "scales": 1
+      }
+    },
+    {
+      "rank": 1.0,
+      "design": "has_plasticity & population=3",
+      "score": 1.0,
+      "matches": [
+        "cogswell2020_compositional",
+        "risi2021_voxel_hebbian"
+      ],
+      "n_positive": 2,
+      "n_negative": 0,
+      "outcomes": {
+        "compositional": 1,
+        "robust": 1
+      }
+    },
+    {
+      "rank": 1.0,
+      "design": "has_plasticity & population=10",
+      "score": 1.0,
+      "matches": [
+        "cogswell2020_compositional",
+        "risi2021_voxel_hebbian"
+      ],
+      "n_positive": 2,
+      "n_negative": 0,
+      "outcomes": {
+        "compositional": 1,
+        "robust": 1
+      }
+    },
+    {
+      "rank": 1.0,
+      "design": "has_plasticity & population=100",
+      "score": 1.0,
+      "matches": [
+        "cogswell2020_compositional",
+        "risi2021_voxel_hebbian",
+        "chaabouni2022"
+      ],
+      "n_positive": 3,
+      "n_negative": 0,
+      "outcomes": {
+        "compositional": 1,
+        "robust": 1,
+        "scales": 1
+      }
+    },
+    {
+      "rank": 1.0,
+      "design": "iterated_learning & population=1",
+      "score": 1.0,
+      "matches": [
+        "ren2020_iterated",
+        "kirby2014"
+      ],
+      "n_positive": 2,
+      "n_negative": 0,
+      "outcomes": {
+        "compositional": 2
+      }
+    },
+    {
+      "rank": 1.0,
+      "design": "iterated_learning & population=2",
+      "score": 1.0,
+      "matches": [
+        "ren2020_iterated",
+        "kirby2014"
+      ],
+      "n_positive": 2,
+      "n_negative": 0,
+      "outcomes": {
+        "compositional": 2
+      }
+    },
+    {
+      "rank": 1.0,
+      "design": "iterated_learning & population=3",
+      "score": 1.0,
+      "matches": [
+        "ren2020_iterated",
+        "cogswell2020_compositional",
+        "kirby2014",
+        "smith2003_iterated"
+      ],
+      "n_positive": 4,
+      "n_negative": 0,
+      "outcomes": {
+        "compositional": 4
+      }
+    },
+    {
+      "rank": 1.0,
+      "design": "iterated_learning & population=10",
+      "score": 1.0,
+      "matches": [
+        "ren2020_iterated",
+        "cogswell2020_compositional",
+        "kirby2014",
+        "smith2003_iterated"
+      ],
+      "n_positive": 4,
+      "n_negative": 0,
+      "outcomes": {
+        "compositional": 4
+      }
+    },
+    {
+      "rank": 1.0,
+      "design": "iterated_learning & population=100",
+      "score": 1.0,
+      "matches": [
+        "ren2020_iterated",
+        "cogswell2020_compositional",
+        "kirby2014",
+        "smith2003_iterated",
+        "chaabouni2022"
+      ],
+      "n_positive": 5,
+      "n_negative": 0,
+      "outcomes": {
+        "compositional": 4,
+        "scales": 1
+      }
+    },
+    {
+      "rank": 1.0,
+      "design": "iterated_learning",
+      "score": 1.0,
+      "matches": [
+        "ren2020_iterated",
+        "kirby2014"
+      ],
+      "n_positive": 2,
+      "n_negative": 0,
+      "outcomes": {
+        "compositional": 2
+      }
+    }
+  ],
+  "top_balanced": [
+    {
+      "rank": 1.3,
+      "design": "bayesian_inference & co_evolution_alternating & has_embodiment & population=1",
+      "score": 1.0,
+      "matches": [],
+      "novelty": 1.0
+    },
+    {
+      "rank": 1.3,
+      "design": "bayesian_inference & co_evolution_alternating & has_embodiment",
+      "score": 1.0,
+      "matches": [],
+      "novelty": 1.0
+    },
+    {
+      "rank": 1.3,
+      "design": "bayesian_inference & co_evolution_alternating & has_noise & population=1",
+      "score": 1.0,
+      "matches": [],
+      "novelty": 1.0
+    },
+    {
+      "rank": 1.3,
+      "design": "bayesian_inference & co_evolution_alternating & has_noise",
+      "score": 1.0,
+      "matches": [],
+      "novelty": 1.0
+    },
+    {
+      "rank": 1.3,
+      "design": "bayesian_inference & co_evolution_alternating & kin_selection & population=1",
+      "score": 1.0,
+      "matches": [],
+      "novelty": 1.0
+    },
+    {
+      "rank": 1.3,
+      "design": "bayesian_inference & co_evolution_alternating & kin_selection",
+      "score": 1.0,
+      "matches": [],
+      "novelty": 1.0
+    },
+    {
+      "rank": 1.3,
+      "design": "bayesian_inference & co_evolution_alternating & memory_limit & population=1",
+      "score": 1.0,
+      "matches": [],
+      "novelty": 1.0
+    },
+    {
+      "rank": 1.3,
+      "design": "bayesian_inference & co_evolution_alternating & memory_limit",
+      "score": 1.0,
+      "matches": [],
+      "novelty": 1.0
+    },
+    {
+      "rank": 1.3,
+      "design": "bayesian_inference & co_evolution_alternating & n_neurons_small & population=1",
+      "score": 1.0,
+      "matches": [],
+      "novelty": 1.0
+    },
+    {
+      "rank": 1.3,
+      "design": "bayesian_inference & co_evolution_alternating & n_neurons_small",
+      "score": 1.0,
+      "matches": [],
+      "novelty": 1.0
+    }
+  ],
+  "top_unexplored": [
+    {
+      "design": "bayesian_inference & co_evolution_alternating & has_embodiment & population=1",
+      "feature_score": 1.0,
+      "n_feature_support": 3
+    },
+    {
+      "design": "bayesian_inference & co_evolution_alternating & has_embodiment",
+      "feature_score": 1.0,
+      "n_feature_support": 3
+    },
+    {
+      "design": "bayesian_inference & co_evolution_alternating & has_noise & population=1",
+      "feature_score": 1.0,
+      "n_feature_support": 3
+    },
+    {
+      "design": "bayesian_inference & co_evolution_alternating & has_noise",
+      "feature_score": 1.0,
+      "n_feature_support": 3
+    },
+    {
+      "design": "bayesian_inference & co_evolution_alternating & kin_selection & population=1",
+      "feature_score": 1.0,
+      "n_feature_support": 3
+    },
+    {
+      "design": "bayesian_inference & co_evolution_alternating & kin_selection",
+      "feature_score": 1.0,
+      "n_feature_support": 3
+    },
+    {
+      "design": "bayesian_inference & co_evolution_alternating & memory_limit & population=1",
+      "feature_score": 1.0,
+      "n_feature_support": 3
+    },
+    {
+      "design": "bayesian_inference & co_evolution_alternating & memory_limit",
+      "feature_score": 1.0,
+      "n_feature_support": 3
+    },
+    {
+      "design": "bayesian_inference & co_evolution_alternating & n_neurons_small & population=1",
+      "feature_score": 1.0,
+      "n_feature_support": 3
+    },
+    {
+      "design": "bayesian_inference & co_evolution_alternating & n_neurons_small",
+      "feature_score": 1.0,
+      "n_feature_support": 3
+    },
+    {
+      "design": "bayesian_inference & has_embodiment & has_noise & population=1",
+      "feature_score": 1.0,
+      "n_feature_support": 3
+    },
+    {
+      "design": "bayesian_inference & has_embodiment & has_noise",
+      "feature_score": 1.0,
+      "n_feature_support": 3
+    },
+    {
+      "design": "bayesian_inference & has_embodiment & kin_selection & population=1",
+      "feature_score": 1.0,
+      "n_feature_support": 3
+    },
+    {
+      "design": "bayesian_inference & has_embodiment & kin_selection",
+      "feature_score": 1.0,
+      "n_feature_support": 3
+    },
+    {
+      "design": "bayesian_inference & has_embodiment & memory_limit & population=1",
+      "feature_score": 1.0,
+      "n_feature_support": 3
+    }
+  ],
+  "our_designs": [
+    {
+      "name": "our_phase35_coop",
+      "design": "evolution & n_neurons_small & population=2 & reward_coop",
+      "score": 0.7142857142857143,
+      "matches": [
+        "skyrms2010",
+        "foerster2016",
+        "lazaridou2017",
+        "werner1991",
+        "swarm_spiking2023",
+        "chaabouni2019_anti",
+        "our_phase35_coop"
+      ]
+    },
+    {
+      "name": "our_phase3_compete",
+      "design": "evolution & population=2 & reward_compete",
+      "score": -0.25,
+      "matches": [
+        "smith1974_games",
+        "noukhovitch2021",
+        "cao_competitive2018",
+        "our_phase3_compete"
+      ]
+    },
+    {
+      "name": "our_coevo_red_queen",
+      "design": "co_evolution_alternating & reward_compete",
+      "score": 0.25,
+      "matches": [
+        "smith1974_games",
+        "noukhovitch2021",
+        "cao_competitive2018",
+        "our_coevo_red_queen"
+      ]
+    },
+    {
+      "name": "our_rigorous_n3_random",
+      "design": "random_init & reward_coop & short_training",
+      "score": 0.25,
+      "matches": [
+        "skyrms2010",
+        "lazaridou2017",
+        "chaabouni2019_anti",
+        "our_rigorous_n3_random"
+      ]
+    },
+    {
+      "name": "our_hebbian_memory",
+      "design": "has_plasticity & reward_gated_plasticity",
+      "score": 0.6666666666666666,
+      "matches": [
+        "risi2021_voxel_hebbian",
+        "reward_mod_hebbian2015",
+        "our_hebbian_memory"
+      ]
+    }
+  ]
+}
