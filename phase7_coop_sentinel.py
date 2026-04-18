@@ -207,11 +207,26 @@ def make_guard_for_agent(agent_idx, other_params, seed_offset,
 
 
 def train_phase7(N_AGENTS=5, n_cycles=3, budget_per_agent=45,
-                 use_hebbian=False, verbose=True, seed_base=0):
-    """Full Phase 7 training: alternating co-evolution N agents x n_cycles."""
-    # Initialize with midpoint (can later warm-start from previous)
-    mid = [(lo + hi) / 2 for lo, hi in PARAM_RANGES_16]
-    agent_params = [list(mid) for _ in range(N_AGENTS)]
+                 use_hebbian=False, verbose=True, seed_base=0,
+                 init_params_list=None):
+    """Full Phase 7 training: alternating co-evolution N agents x n_cycles.
+
+    init_params_list: optional list of N initial parameter vectors (warm-start).
+      If None: all agents start from midpoint.
+      If provided: agent i starts from init_params_list[i].
+    """
+    if init_params_list is not None:
+        assert len(init_params_list) == N_AGENTS, (
+            f"init_params_list length {len(init_params_list)} != N_AGENTS {N_AGENTS}"
+        )
+        agent_params = [list(p) for p in init_params_list]
+        if verbose:
+            print(f"  [init] warm-started from provided {N_AGENTS}-agent params")
+    else:
+        mid = [(lo + hi) / 2 for lo, hi in PARAM_RANGES_16]
+        agent_params = [list(mid) for _ in range(N_AGENTS)]
+        if verbose:
+            print(f"  [init] midpoint (no warm-start)")
     history = []
     t_start = time.time()
 

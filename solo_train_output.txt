@@ -1,0 +1,14 @@
+======================================================================
+  Kathara(16) SOLO PRE-TRAINING (Phase 7 Stage 1)
+======================================================================
+
+[baseline midpoint]
+  reach=10%  score=6.9  final_dist=2.79
+
+[training] Sentinel 300s budget...
+  [MS Proxy] zenron R2=0.966, linear R2=0.966, zenron_log R2=0.712, linear_log R2=0.712 -> zenron selected
+  [MS Proxy] zenron R2=0.915, linear R2=0.915, linear_log R2=-1.503, zenron_log R2=-1.503 -> zenron selected
+  [MS Proxy] zenron R2=0.814, linear R2=0.814, linear_log R2=-3.754, zenron_log R2=-3.754 -> zenron selected
+  [MS Proxy] zenron R2=0.763, linear R2=0.763, linear_log R2=-1.755, zenron_log R2=-1.755 -> zenron selected
+  [MS Proxy] linear R2=0.859, zenron R2=0.859, zenron_log R2=-1.673, linear_log R2=-1.673 -> linear selected
+  [MS Proxy] zenron R2=0.773, linear R2=0.773, zenron_log R2=-2.141, linear_log R2=-2.141 -> zenron selected
