@@ -1,0 +1,83 @@
+{
+  "config": {
+    "dale_law": false,
+    "hebbian": false,
+    "reward_reach_weight": 0.6
+  },
+  "thresholds": [
+    0.5,
+    0.8,
+    1.0,
+    1.5,
+    2.0,
+    3.0
+  ],
+  "results": [
+    {
+      "threshold": 0.5,
+      "mean_reach": 0.0,
+      "per_agent_reach": [
+        0.0,
+        0.0,
+        0.0,
+        0.0,
+        0.0
+      ]
+    },
+    {
+      "threshold": 0.8,
+      "mean_reach": 0.0,
+      "per_agent_reach": [
+        0.0,
+        0.0,
+        0.0,
+        0.0,
+        0.0
+      ]
+    },
+    {
+      "threshold": 1.0,
+      "mean_reach": 0.01,
+      "per_agent_reach": [
+        0.0,
+        0.05,
+        0.0,
+        0.0,
+        0.0
+      ]
+    },
+    {
+      "threshold": 1.5,
+      "mean_reach": 0.02,
+      "per_agent_reach": [
+        0.05,
+        0.05,
+        0.0,
+        0.0,
+        0.0
+      ]
+    },
+    {
+      "threshold": 2.0,
+      "mean_reach": 0.05,
+      "per_agent_reach": [
+        0.05,
+        0.15,
+        0.0,
+        0.0,
+        0.05
+      ]
+    },
+    {
+      "threshold": 3.0,
+      "mean_reach": 0.16,
+      "per_agent_reach": [
+        0.2,
+        0.25,
+        0.05,
+        0.1,
+        0.2
+      ]
+    }
+  ]
+}
