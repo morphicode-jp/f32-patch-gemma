@@ -219,7 +219,7 @@ result["observers"]          # per-observer detail (importance, fragility, dead_
 Single `"score"` field still works (backward compatible).
 Sentinel uses this internally: when guard_fn fails, it runs multi-observer on `{"eval": ..., "guard": ...}` to find safe_dims vs conflict_dims.
 
-## Recipe: Quantify and Optimize (LaD)
+## Recipe: Quantify and Optimize (LaD v1 -- measurements)
 
 Everything expressible can be quantified. Everything quantified can be optimized.
 
@@ -250,6 +250,79 @@ data = sensitivity_scan(eval_fn, ranges)     # perturb 1 param at a time (2n+1)
 data += random_sample(eval_fn, ranges, n=20) # 20 random measurements
 result = owl(data)
 ```
+
+## LaD v2 -- Propositions (Logic as Data, proper form)
+
+**v1 (above) encodes measurements (x, score)**. v2 encodes **claims** —
+conditional propositions with strength. Use when analyzing a LITERATURE,
+EXPERIMENTS across papers, or any DOMAIN OF DISPUTED ASSERTIONS.
+
+```python
+# Each "datum" is a claim: (condition, outcome, strength, reason)
+claims = [
+    dict(paper_id="lewis1969",
+         condition=[("reward_coop", "=", True), ("discrete_messages", "=", True)],
+         outcome="emerges", strength=+1,
+         reason="Cooperative Lewis game converges to common code"),
+
+    dict(paper_id="cao_competitive2018",
+         condition=[("reward_compete", "=", True)],
+         outcome="fails", strength=-1,
+         reason="Pure competition fails to produce informative comm"),
+
+    dict(paper_id="zahavi1975",
+         condition=[("reward_compete", "=", True), ("has_noise", "=", True)],
+         outcome="honest", strength=+1,
+         reason="Costly signals + competition -> honest signaling"),
+    # ... N claims total ...
+]
+```
+
+### Analysis operators (applied to `claims`)
+
+| Operator | What it finds | Value |
+|---|---|---|
+| `IF-THEN lift` | `P(positive \| feature) - baseline` | Conditional rules |
+| `contradiction detector` | Same condition-set -> opposing strengths | Active disputes in the field |
+| `feature co-occurrence` | Pairs of features appearing together in claims | Research patterns |
+| `owl() on claim-matrix` | Structural importance of features | Meta-dimensions of the field |
+| `gap analysis` | Untried feature conjunctions | Unexplored experimental space |
+
+Reference implementation:
+- `meta_logic_claims.py` -- claim dataset schema + features/outcomes
+- `meta_logic_analysis.py` -- rule extraction + contradictions + owl
+
+### What LaD v2 reveals that LaD v1 (metadata) misses
+
+| Aspect | LaD v1 (Pearson on metadata) | LaD v2 (claim propositions) |
+|---|---|---|
+| Output form | `r = -0.28` | `IF coop=T THEN positive rate=0.78 (lift +0.06)` |
+| Contradictions | Invisible | Detected directly |
+| Conditional rules | Invisible | Primary output |
+| Knowledge gaps | Surface | Can list missing feature conjunctions |
+
+### Proven field insights from 46-claim analysis (2026-04-18)
+
+- Baseline positive claim rate across field: **0.72**
+- `iterated_learning=True`, `population=3`, `tom_active=True`: **100% positive** (n=4-5 each)
+- `reward_coop=True`: **0.78** (lift +0.06) -- *weaker than hype suggests*
+- `reward_compete=True`: **0.50** (lift -0.22) -- but splits **three ways**:
+  - deception (Zahavi 1975 costly signal / Smith 1974 ESS)
+  - failure (cao_competitive2018)
+  - partial (noukhovitch2021)
+- `n_params_log10`: Pearson r ~ 0 -> **scale does NOT predict emergence**
+- `evolution=True`: lift ~ 0 -> **learning rule neutral** (evolution OK vs gradient)
+
+**Methodological lesson**: attribute correlations hide the true binary
+split in "competition" outcomes. Only propositional logic form surfaces it.
+
+### When to use LaD v2
+
+Use propositional claim form when:
+- Reviewing/integrating literature (meta-analysis)
+- Documenting experimental findings across conditions
+- Searching for unexplored design space
+- Detecting when researchers disagree vs. just parameterize differently
 
 ## eval_fn Design Guide
 
