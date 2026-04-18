@@ -65,7 +65,20 @@ def dual_step(main_p, hippo_p, sensors, main_states, hippo_states,
               w_adapt_hippo, reward, m_to_h, h_to_m, k):
     """One step of dual brain system.
 
-    Returns: (new_main_states, new_hippo_states, w_adapt_hippo, firing_main, firing_hippo)
+    Architectural detail (v2): hippo reinstates sensory patterns.
+      Real hippocampus projects back to entorhinal cortex, which then
+      re-excites the same cortical patterns that originally encoded
+      the memory. We mirror this: hippo_firing is MIXED element-wise
+      into main brain's sensor input using h_to_m as gate strength.
+
+      main_input[i] = sensors[i] * (1 - gate) + hippo_firing[i] * gate
+      where gate = sigmoid(h_to_m - 1.5)  (0..1, centered at h_to_m=1.5)
+
+    When gate=0 (h_to_m small): main ignores hippo (Phase 5b behavior)
+    When gate=1 (h_to_m large): main sees hippo pattern instead of sensors
+
+    This way hippo "fills in" missing sensor information when memory recall
+    is strong, rather than corrupting the existing sensor channel.
     """
     sensors_arr = np.asarray(sensors, dtype=np.float64)
 
@@ -76,11 +89,10 @@ def dual_step(main_p, hippo_p, sensors, main_states, hippo_states,
         reward=reward, k=k
     )
 
-    # Main brain pass: sensors + hippo recall on node 0
-    main_input = sensors_arr.copy()
-    # Hippo firing summary projects to main's sensor[0] (memory recall channel)
-    recall = float(hippo_firing_sparse.sum()) * h_to_m
-    main_input[0] = main_input[0] + recall
+    # Main brain pass: sensor-hippo MIX via sigmoid gate
+    # h_to_m in [0.3, 3.0] -> gate in ~[0.23, 0.82]
+    gate = 1.0 / (1.0 + np.exp(-(h_to_m - 1.5)))
+    main_input = sensors_arr * (1.0 - gate) + hippo_firing_sparse * gate
     main_states_new, main_firing = simulate_step(main_p, main_input, main_states)
 
     return (main_states_new, hippo_states_new, w_adapt_hippo,

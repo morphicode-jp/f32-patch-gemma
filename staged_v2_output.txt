@@ -1,0 +1,74 @@
+======================================================================
+  Phase 6 STAGED: Sentinel exploited via experience_id accumulation
+======================================================================
+  Frozen main brain: 91D from Phase 5b (baseline reach 30%)
+  Optimization space: 95D (hippo 91 + coupling 4)
+  Warm-start: Phase 6 hippo+coupling (previously reach 15%)
+
+[pre-stage baseline]
+  standard: reach=10%  final=2.22  |w|=13.25
+  persistent reach per ep: [0.4, 0.4, 0.4]
+
+======================================================================
+  STAGE 1: Sentinel on 95D hippo+coupling subspace, 300s
+======================================================================
+  [MS Proxy] zenron R2=1.000, linear R2=1.000, zenron_log R2=1.000, linear_log R2=1.000 -> zenron selected
+  [MS Proxy] zenron R2=0.902, linear R2=0.902, zenron_log R2=0.886, linear_log R2=0.886 -> zenron selected
+  [MS Proxy] linear R2=0.895, zenron R2=0.895, linear_log R2=0.874, zenron_log R2=0.874 -> linear selected
+  [MS Proxy] zenron R2=0.834, linear R2=0.834, linear_log R2=0.774, zenron_log R2=0.774 -> zenron selected
+  [MS Proxy] zenron R2=0.778, linear R2=0.778, zenron_log R2=0.712, linear_log R2=0.712 -> zenron selected
+  [MS Proxy] zenron R2=0.754, linear R2=0.754, zenron_log R2=0.707, linear_log R2=0.707 -> zenron selected
+  [MS Proxy] zenron R2=0.722, linear R2=0.722, zenron_log R2=0.659, linear_log R2=0.659 -> zenron selected
+  [MS Proxy] zenron R2=0.711, linear R2=0.711, linear_log R2=0.662, zenron_log R2=0.662 -> zenron selected
+  [MS Proxy] zenron R2=0.711, linear R2=0.711, zenron_log R2=0.643, linear_log R2=0.643 -> zenron selected
+  [MS Proxy] linear R2=0.674, zenron R2=0.674, linear_log R2=0.618, zenron_log R2=0.618 -> linear selected
+  [MS Proxy] zenron R2=1.000, linear R2=1.000, zenron_log R2=1.000, linear_log R2=1.000 -> zenron selected
+  [MS Proxy] linear R2=0.964, zenron R2=0.964, linear_log R2=0.956, zenron_log R2=0.956 -> linear selected
+  [MS Proxy] zenron R2=0.931, linear R2=0.931, zenron_log R2=0.920, linear_log R2=0.920 -> zenron selected
+  [MS Proxy] zenron R2=0.903, linear R2=0.903, linear_log R2=0.888, zenron_log R2=0.888 -> zenron selected
+  [MS Proxy] zenron_interact R2=0.391, zenron_interact_log R2=0.382, zenron R2=0.347, linear R2=0.347, linear_log R2=0.316, zenron_log R2=0.316 -> zenron_interact selected
+  [MS Proxy] zenron R2=0.770, linear R2=0.770, linear_log R2=0.739, zenron_log R2=0.739 -> zenron selected
+  [MS Proxy] zenron R2=0.339, linear R2=0.339, zenron_log R2=0.311, linear_log R2=0.311 -> zenron selected
+  [MS Proxy] zenron R2=0.756, linear R2=0.756, linear_log R2=0.725, zenron_log R2=0.725 -> zenron selected
+  [MS Proxy] zenron R2=0.680, linear R2=0.680, linear_log R2=0.653, zenron_log R2=0.653 -> zenron selected
+  [MS Proxy] zenron R2=0.711, linear R2=0.711, zenron_log R2=0.688, linear_log R2=0.688 -> zenron selected
+  [MS Proxy] zenron R2=0.367, linear R2=0.367, zenron_log R2=0.339, linear_log R2=0.339 -> zenron selected
+  [MS Proxy] linear R2=0.656, zenron R2=0.656, linear_log R2=0.633, zenron_log R2=0.633 -> linear selected
+  stage1: eval=154.77  guard=154.77  elapsed=886s  verdict=pivoted  mode=direct
+  stage1 eval: std reach=33%  persistent ep=[0.0, 0.0, 0.0]  |w|=0.0
+
+======================================================================
+  STAGE 2: Sentinel on 95D hippo+coupling subspace, 300s
+======================================================================
+  [MS Proxy] zenron R2=0.923, linear R2=0.923, linear_log R2=0.895, zenron_log R2=0.895 -> zenron selected
+  [MS Proxy] zenron R2=0.931, linear R2=0.931, zenron_log R2=0.919, linear_log R2=0.919 -> zenron selected
+  [MS Proxy] zenron R2=0.904, linear R2=0.904, zenron_log R2=0.885, linear_log R2=0.885 -> zenron selected
+  [MS Proxy] zenron_interact R2=0.255, zenron R2=0.240, linear R2=0.240, zenron_log R2=0.186, linear_log R2=0.186 -> zenron_interact selected
+  [MS Proxy] zenron R2=0.923, linear R2=0.923, linear_log R2=0.895, zenron_log R2=0.895 -> zenron selected
+  [MS Proxy] zenron R2=0.980, linear R2=0.980, zenron_log R2=0.972, linear_log R2=0.972 -> zenron selected
+  [MS Proxy] linear R2=0.959, zenron R2=0.959, zenron_log R2=0.948, linear_log R2=0.948 -> linear selected
+  [MS Proxy] zenron R2=0.908, linear R2=0.908, linear_log R2=0.891, zenron_log R2=0.891 -> zenron selected
+  [MS Proxy] zenron R2=0.856, linear R2=0.856, linear_log R2=0.837, zenron_log R2=0.837 -> zenron selected
+  [MS Proxy] zenron R2=0.798, linear R2=0.798, zenron_log R2=0.772, linear_log R2=0.772 -> zenron selected
+  [MS Proxy] zenron R2=0.754, linear R2=0.754, zenron_log R2=0.729, linear_log R2=0.729 -> zenron selected
+  [MS Proxy] linear R2=0.629, zenron R2=0.629, linear_log R2=0.603, zenron_log R2=0.603 -> linear selected
+  [MS Proxy] zenron R2=0.641, linear R2=0.641, zenron_log R2=0.614, linear_log R2=0.614 -> zenron selected
+  [MS Proxy] linear R2=0.591, zenron R2=0.591, zenron_log R2=0.563, linear_log R2=0.563 -> linear selected
+  [MS Proxy] zenron R2=0.518, linear R2=0.518, zenron_log R2=0.488, linear_log R2=0.488 -> zenron selected
+  [MS Proxy] linear R2=0.559, zenron R2=0.559, linear_log R2=0.530, zenron_log R2=0.530 -> linear selected
+  stage2: eval=154.95  guard=154.95  elapsed=403s  verdict=pivoted  mode=direct
+  stage2 eval: std reach=27%  persistent ep=[0.0, 0.0, 0.0]  |w|=1.9
+
+======================================================================
+  STAGE 3: Sentinel on 95D hippo+coupling subspace, 300s
+======================================================================
+  [MS Proxy] zenron_interact R2=0.383, zenron_interact_log R2=0.330, zenron R2=0.312, linear R2=0.312, zenron_log R2=0.295, linear_log R2=0.295 -> zenron_interact selected
+  [MS Proxy] zenron_interact R2=0.395, zenron R2=0.353, linear R2=0.353, zenron_log R2=0.335, linear_log R2=0.335, zenron_interact_log R2=0.321 -> zenron_interact selected
+  [MS Proxy] zenron_interact R2=0.419, zenron R2=0.386, linear R2=0.386, zenron_log R2=0.369, linear_log R2=0.369, zenron_interact_log R2=0.349 -> zenron_interact selected
+  [MS Proxy] zenron R2=0.923, linear R2=0.923, linear_log R2=0.887, zenron_log R2=0.887 -> zenron selected
+  [MS Proxy] zenron R2=0.840, linear R2=0.840, linear_log R2=0.775, zenron_log R2=0.775 -> zenron selected
+  [MS Proxy] zenron_interact R2=0.445, zenron R2=0.399, linear R2=0.399, zenron_interact_log R2=0.382, linear_log R2=0.374, zenron_log R2=0.374 -> zenron_interact selected
+  [MS Proxy] zenron R2=0.815, linear R2=0.815, linear_log R2=0.764, zenron_log R2=0.764 -> zenron selected
+  [MS Proxy] zenron R2=0.763, linear R2=0.763, linear_log R2=0.684, zenron_log R2=0.684 -> zenron selected
+  [MS Proxy] linear R2=0.708, zenron R2=0.708, linear_log R2=0.662, zenron_log R2=0.662 -> linear selected
+  [MS Proxy] zenron R2=0.645, linear R2=0.645, zenron_log R2=0.607, linear_log R2=0.607 -> zenron selected
