@@ -1,0 +1,31 @@
+{
+  "baseline": {
+    "hparams": {
+      "min_r_squared": 0.3,
+      "learn": false
+    },
+    "inner_scores": [
+      97.54,
+      97.12,
+      97.74
+    ],
+    "mean": 97.47
+  },
+  "tuned": {
+    "hparams": {
+      "min_r_squared": 0.748,
+      "learn": false
+    },
+    "inner_scores": [
+      95.51,
+      95.24,
+      97.37
+    ],
+    "mean": 96.04
+  },
+  "improvement_delta": -1.43,
+  "improvement_ratio": 0.985,
+  "outer_total_elapsed_s": 1106.6,
+  "outer_verdict": "approved",
+  "verdict": "META-NEUTRAL: no meaningful change"
+}
