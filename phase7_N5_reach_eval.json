@@ -1,0 +1,130 @@
+{
+  "n_agents": 5,
+  "standard": {
+    "n_seeds": 20,
+    "per_agent_reach_rate": [
+      0.1,
+      0.1,
+      0.1,
+      0.1,
+      0.05
+    ],
+    "mean_agent_reach_rate": 0.09,
+    "group_at_least_one_reach": 0.4,
+    "group_all_reach": 0.0,
+    "mean_score": 14.15181265719358,
+    "mean_final_dist": 6.729360353530556
+  },
+  "mi_panel": {
+    "per_agent": [
+      {
+        "agent": 0,
+        "mi": 0.011745331269842398,
+        "p": 0.01,
+        "gain": 0.007247583889903436,
+        "null_mean": 0.004497747379938962
+      },
+      {
+        "agent": 1,
+        "mi": 0.018364597325245716,
+        "p": 0.0,
+        "gain": 0.013933127062370366,
+        "null_mean": 0.004431470262875351
+      },
+      {
+        "agent": 2,
+        "mi": 0.002837131452987983,
+        "p": 0.13,
+        "gain": 0.0013090676530300347,
+        "null_mean": 0.0015280637999579485
+      },
+      {
+        "agent": 3,
+        "mi": 0.009471714550486995,
+        "p": 0.02,
+        "gain": 0.005533569304427681,
+        "null_mean": 0.003938145246059314
+      },
+      {
+        "agent": 4,
+        "mi": 0.00829088923014287,
+        "p": 0.07,
+        "gain": 0.003243030441236504,
+        "null_mean": 0.005047858788906365
+      }
+    ],
+    "max_gain": 0.013933127062370366,
+    "mean_gain": 0.006253275670193605,
+    "n_significant": 3,
+    "n_samples_per_agent": [
+      1500,
+      1500,
+      1500,
+      1500,
+      1500
+    ]
+  },
+  "tom": {
+    "n_pairs_measured": 20,
+    "n_pairs_predictive": 15,
+    "pair_fraction_predictive": 0.75,
+    "max_gain": 0.8808855885182699,
+    "mean_gain": 0.23812602357190893,
+    "top_5_pairs": [
+      {
+        "speaker": 1,
+        "listener": 4,
+        "mi_cross": 0.8859860202455185,
+        "mi_null": 0.005100431727248604,
+        "gain": 0.8808855885182699
+      },
+      {
+        "speaker": 1,
+        "listener": 2,
+        "mi_cross": 0.7646651534594937,
+        "mi_null": 0.0023152119697307204,
+        "gain": 0.762349941489763
+      },
+      {
+        "speaker": 1,
+        "listener": 0,
+        "mi_cross": 0.6673273194243128,
+        "mi_null": 0.0001278569332442993,
+        "gain": 0.6671994624910684
+      },
+      {
+        "speaker": 0,
+        "listener": 2,
+        "mi_cross": 0.5402807778400492,
+        "mi_null": 0.0033449797754361577,
+        "gain": 0.5369357980646131
+      },
+      {
+        "speaker": 0,
+        "listener": 4,
+        "mi_cross": 0.5022739361572199,
+        "mi_null": 0.0014599245711493642,
+        "gain": 0.5008140115860705
+      }
+    ]
+  },
+  "scales": {
+    "target_N": 10,
+    "base_N": 5,
+    "mean_agent_reach_rate": 0.09,
+    "per_agent_reach_rate": [
+      0.1,
+      0.1,
+      0.0,
+      0.0,
+      0.2,
+      0.0,
+      0.2,
+      0.1,
+      0.2,
+      0.0
+    ]
+  },
+  "criteria_met": 1,
+  "verdict": "PHASE 7 INCOMPLETE (<2 criteria met)"
+}

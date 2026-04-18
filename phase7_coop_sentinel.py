@@ -139,16 +139,23 @@ def run_coop_match(params_list, seed, n_steps=50, use_hebbian=False,
     reached = [world.reached[i] for i in range(N)]
     all_r = all(reached)
 
+    # REACH-CENTRIC REWARD (Phase 7b redesign):
+    # Reach own food is the MAIN reward (80pt).
+    # Partners' reach is secondary bonus (up to 20pt).
+    # Approach is small learning-signal nudge (15pt).
+    # Synergy bonus if all reached (10pt).
     per_agent_scores = []
     for i in range(N):
         own = own_approaches[i]
-        others = [own_approaches[j] for j in range(N) if j != i]
-        avg_partner = float(np.mean(others)) if others else 0.0
+        reached_i = reached[i]
+        others_reached = [reached[j] for j in range(N) if j != i]
+        avg_partner_reached = (float(np.mean(others_reached))
+                                if others_reached else 0.0)
         score = (
-            own * 40
-            + avg_partner * 30
-            + (30 if all_r else 0)
-            + (20 if reached[i] else 0)
+            (80 if reached_i else 0)
+            + avg_partner_reached * 20
+            + own * 15
+            + (10 if all_r else 0)
         )
         per_agent_scores.append(score)
 
