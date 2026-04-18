@@ -1,0 +1,501 @@
+{
+  "compositional": {
+    "n_claims_in_dataset": 9,
+    "top_designs": [
+      {
+        "rank": 10.5,
+        "score": 1.0,
+        "n_matches": 5,
+        "n_positive": 5,
+        "n_negative": 0,
+        "design": "iterated_learning & listener_changes & population=3",
+        "supporting_papers": [
+          "ren2020_iterated",
+          "cogswell2020_compositional",
+          "li2019_ease",
+          "kirby2014",
+          "smith2003_iterated"
+        ]
+      },
+      {
+        "rank": 10.5,
+        "score": 1.0,
+        "n_matches": 5,
+        "n_positive": 5,
+        "n_negative": 0,
+        "design": "iterated_learning & listener_changes & population=10",
+        "supporting_papers": [
+          "ren2020_iterated",
+          "cogswell2020_compositional",
+          "li2019_ease",
+          "kirby2014",
+          "smith2003_iterated"
+        ]
+      },
+      {
+        "rank": 10.5,
+        "score": 1.0,
+        "n_matches": 5,
+        "n_positive": 5,
+        "n_negative": 0,
+        "design": "iterated_learning & listener_changes & population=100",
+        "supporting_papers": [
+          "ren2020_iterated",
+          "cogswell2020_compositional",
+          "li2019_ease",
+          "kirby2014",
+          "smith2003_iterated"
+        ]
+      },
+      {
+        "rank": 10.5,
+        "score": 1.0,
+        "n_matches": 5,
+        "n_positive": 5,
+        "n_negative": 0,
+        "design": "bayesian_inference & iterated_learning & listener_changes & population=3",
+        "supporting_papers": [
+          "ren2020_iterated",
+          "cogswell2020_compositional",
+          "li2019_ease",
+          "kirby2014",
+          "smith2003_iterated"
+        ]
+      },
+      {
+        "rank": 10.5,
+        "score": 1.0,
+        "n_matches": 5,
+        "n_positive": 5,
+        "n_negative": 0,
+        "design": "bayesian_inference & iterated_learning & listener_changes & population=10",
+        "supporting_papers": [
+          "ren2020_iterated",
+          "cogswell2020_compositional",
+          "li2019_ease",
+          "kirby2014",
+          "smith2003_iterated"
+        ]
+      }
+    ]
+  },
+  "deceptive": {
+    "n_claims_in_dataset": 2,
+    "top_designs": [
+      {
+        "rank": 10.2,
+        "score": 1.0,
+        "n_matches": 2,
+        "n_positive": 2,
+        "n_negative": 0,
+        "design": "population=1 & reward_compete & tom_active",
+        "supporting_papers": [
+          "smith1974_games",
+          "deception_tom2023"
+        ]
+      },
+      {
+        "rank": 10.2,
+        "score": 1.0,
+        "n_matches": 2,
+        "n_positive": 2,
+        "n_negative": 0,
+        "design": "population=2 & reward_compete & tom_active",
+        "supporting_papers": [
+          "smith1974_games",
+          "deception_tom2023"
+        ]
+      },
+      {
+        "rank": 10.2,
+        "score": 1.0,
+        "n_matches": 2,
+        "n_positive": 2,
+        "n_negative": 0,
+        "design": "population=3 & reward_compete & tom_active",
+        "supporting_papers": [
+          "smith1974_games",
+          "deception_tom2023"
+        ]
+      },
+      {
+        "rank": 10.2,
+        "score": 1.0,
+        "n_matches": 2,
+        "n_positive": 2,
+        "n_negative": 0,
+        "design": "population=10 & reward_compete & tom_active",
+        "supporting_papers": [
+          "smith1974_games",
+          "deception_tom2023"
+        ]
+      },
+      {
+        "rank": 10.2,
+        "score": 1.0,
+        "n_matches": 2,
+        "n_positive": 2,
+        "n_negative": 0,
+        "design": "population=100 & reward_compete & tom_active",
+        "supporting_papers": [
+          "smith1974_games",
+          "deception_tom2023"
+        ]
+      }
+    ]
+  },
+  "emerges": {
+    "n_claims_in_dataset": 24,
+    "top_designs": [
+      {
+        "rank": 10.9,
+        "score": 1.0,
+        "n_matches": 9,
+        "n_positive": 9,
+        "n_negative": 0,
+        "design": "evolution & population=10 & reward_coop & tom_active",
+        "supporting_papers": [
+          "skyrms2010",
+          "foerster2016",
+          "lazaridou2017",
+          "werner1991",
+          "nolfi1999",
+          "swarm_plos2016",
+          "yuan2019_tom_collab",
+          "zhao2023_matom_snn",
+          "kim2021"
+        ]
+      },
+      {
+        "rank": 10.9,
+        "score": 1.0,
+        "n_matches": 9,
+        "n_positive": 9,
+        "n_negative": 0,
+        "design": "evolution & population=100 & reward_coop & tom_active",
+        "supporting_papers": [
+          "skyrms2010",
+          "foerster2016",
+          "lazaridou2017",
+          "werner1991",
+          "nolfi1999",
+          "swarm_plos2016",
+          "yuan2019_tom_collab",
+          "zhao2023_matom_snn",
+          "kim2021"
+        ]
+      },
+      {
+        "rank": 10.8,
+        "score": 1.0,
+        "n_matches": 8,
+        "n_positive": 8,
+        "n_negative": 0,
+        "design": "discrete_messages & evolution & population=10 & reward_coop",
+        "supporting_papers": [
+          "lewis1969",
+          "skyrms2010",
+          "foerster2016",
+          "lazaridou2017",
+          "werner1991",
+          "nolfi1999",
+          "swarm_plos2016",
+          "kim2021"
+        ]
+      },
+      {
+        "rank": 10.8,
+        "score": 1.0,
+        "n_matches": 8,
+        "n_positive": 8,
+        "n_negative": 0,
+        "design": "discrete_messages & evolution & population=100 & reward_coop",
+        "supporting_papers": [
+          "lewis1969",
+          "skyrms2010",
+          "foerster2016",
+          "lazaridou2017",
+          "werner1991",
+          "nolfi1999",
+          "swarm_plos2016",
+          "kim2021"
+        ]
+      },
+      {
+        "rank": 10.8,
+        "score": 1.0,
+        "n_matches": 8,
+        "n_positive": 8,
+        "n_negative": 0,
+        "design": "evolution & kin_selection & population=10 & reward_coop",
+        "supporting_papers": [
+          "skyrms2010",
+          "foerster2016",
+          "lazaridou2017",
+          "werner1991",
+          "nolfi1999",
+          "floreano2007",
+          "swarm_plos2016",
+          "kim2021"
+        ]
+      }
+    ]
+  },
+  "fails": {
+    "n_claims_in_dataset": 4,
+    "top_designs": [
+      {
+        "rank": -9.8,
+        "score": -1.0,
+        "n_matches": 2,
+        "n_positive": 0,
+        "n_negative": 2,
+        "design": "evolution & population=2 & reward_compete",
+        "supporting_papers": [
+          "cao_competitive2018",
+          "our_phase3_compete"
+        ]
+      },
+      {
+        "rank": -9.8,
+        "score": -1.0,
+        "n_matches": 2,
+        "n_positive": 0,
+        "n_negative": 2,
+        "design": "bayesian_inference & evolution & population=2 & reward_compete",
+        "supporting_papers": [
+          "cao_competitive2018",
+          "our_phase3_compete"
+        ]
+      },
+      {
+        "rank": -9.8,
+        "score": -1.0,
+        "n_matches": 2,
+        "n_positive": 0,
+        "n_negative": 2,
+        "design": "co_evolution_alternating & evolution & population=2 & reward_compete",
+        "supporting_papers": [
+          "cao_competitive2018",
+          "our_phase3_compete"
+        ]
+      },
+      {
+        "rank": -9.8,
+        "score": -1.0,
+        "n_matches": 2,
+        "n_positive": 0,
+        "n_negative": 2,
+        "design": "discrete_messages & evolution & population=2 & reward_compete",
+        "supporting_papers": [
+          "cao_competitive2018",
+          "our_phase3_compete"
+        ]
+      },
+      {
+        "rank": -9.8,
+        "score": -1.0,
+        "n_matches": 2,
+        "n_positive": 0,
+        "n_negative": 2,
+        "design": "emergence_claim & evolution & population=2 & reward_compete",
+        "supporting_papers": [
+          "cao_competitive2018",
+          "our_phase3_compete"
+        ]
+      }
+    ]
+  },
+  "honest": {
+    "n_claims_in_dataset": 1,
+    "top_designs": [
+      {
+        "rank": 10.1,
+        "score": 1.0,
+        "n_matches": 1,
+        "n_positive": 1,
+        "n_negative": 0,
+        "design": "has_noise & population=1 & reward_compete",
+        "supporting_papers": [
+          "zahavi1975_handicap"
+        ]
+      },
+      {
+        "rank": 10.1,
+        "score": 1.0,
+        "n_matches": 1,
+        "n_positive": 1,
+        "n_negative": 0,
+        "design": "has_noise & population=2 & reward_compete",
+        "supporting_papers": [
+          "zahavi1975_handicap"
+        ]
+      },
+      {
+        "rank": 10.1,
+        "score": 1.0,
+        "n_matches": 1,
+        "n_positive": 1,
+        "n_negative": 0,
+        "design": "has_noise & population=3 & reward_compete",
+        "supporting_papers": [
+          "zahavi1975_handicap"
+        ]
+      },
+      {
+        "rank": 10.1,
+        "score": 1.0,
+        "n_matches": 1,
+        "n_positive": 1,
+        "n_negative": 0,
+        "design": "has_noise & population=10 & reward_compete",
+        "supporting_papers": [
+          "zahavi1975_handicap"
+        ]
+      },
+      {
+        "rank": 10.1,
+        "score": 1.0,
+        "n_matches": 1,
+        "n_positive": 1,
+        "n_negative": 0,
+        "design": "has_noise & population=100 & reward_compete",
+        "supporting_papers": [
+          "zahavi1975_handicap"
+        ]
+      }
+    ]
+  },
+  "robust": {
+    "n_claims_in_dataset": 3,
+    "top_designs": [
+      {
+        "rank": 10.3,
+        "score": 1.0,
+        "n_matches": 3,
+        "n_positive": 3,
+        "n_negative": 0,
+        "design": "evolution & has_plasticity & population=10 & tom_active",
+        "supporting_papers": [
+          "oguntola2025_tom",
+          "najarro2020_hebbian",
+          "risi2021_voxel_hebbian"
+        ]
+      },
+      {
+        "rank": 10.3,
+        "score": 1.0,
+        "n_matches": 3,
+        "n_positive": 3,
+        "n_negative": 0,
+        "design": "evolution & has_plasticity & population=100 & tom_active",
+        "supporting_papers": [
+          "oguntola2025_tom",
+          "najarro2020_hebbian",
+          "risi2021_voxel_hebbian"
+        ]
+      },
+      {
+        "rank": 10.2,
+        "score": 1.0,
+        "n_matches": 2,
+        "n_positive": 2,
+        "n_negative": 0,
+        "design": "evolution & has_plasticity & population=1",
+        "supporting_papers": [
+          "najarro2020_hebbian",
+          "risi2021_voxel_hebbian"
+        ]
+      },
+      {
+        "rank": 10.2,
+        "score": 1.0,
+        "n_matches": 2,
+        "n_positive": 2,
+        "n_negative": 0,
+        "design": "evolution & has_plasticity & population=2",
+        "supporting_papers": [
+          "najarro2020_hebbian",
+          "risi2021_voxel_hebbian"
+        ]
+      },
+      {
+        "rank": 10.2,
+        "score": 1.0,
+        "n_matches": 2,
+        "n_positive": 2,
+        "n_negative": 0,
+        "design": "evolution & has_plasticity & population=3",
+        "supporting_papers": [
+          "najarro2020_hebbian",
+          "risi2021_voxel_hebbian"
+        ]
+      }
+    ]
+  },
+  "scales": {
+    "n_claims_in_dataset": 3,
+    "top_designs": [
+      {
+        "rank": 10.2,
+        "score": 1.0,
+        "n_matches": 2,
+        "n_positive": 2,
+        "n_negative": 0,
+        "design": "evolution & population=100 & reward_coop",
+        "supporting_papers": [
+          "swarm_spiking2023",
+          "chaabouni2022"
+        ]
+      },
+      {
+        "rank": 10.2,
+        "score": 1.0,
+        "n_matches": 2,
+        "n_positive": 2,
+        "n_negative": 0,
+        "design": "bayesian_inference & evolution & population=100 & reward_coop",
+        "supporting_papers": [
+          "swarm_spiking2023",
+          "chaabouni2022"
+        ]
+      },
+      {
+        "rank": 10.2,
+        "score": 1.0,
+        "n_matches": 2,
+        "n_positive": 2,
+        "n_negative": 0,
+        "design": "co_evolution_alternating & evolution & population=100 & reward_coop",
+        "supporting_papers": [
+          "swarm_spiking2023",
+          "chaabouni2022"
+        ]
+      },
+      {
+        "rank": 10.2,
+        "score": 1.0,
+        "n_matches": 2,
+        "n_positive": 2,
+        "n_negative": 0,
+        "design": "discrete_messages & evolution & population=100 & reward_coop",
+        "supporting_papers": [
+          "swarm_spiking2023",
+          "chaabouni2022"
+        ]
+      },
+      {
+        "rank": 10.2,
+        "score": 1.0,
+        "n_matches": 2,
+        "n_positive": 2,
+        "n_negative": 0,
+        "design": "emergence_claim & evolution & population=100 & reward_coop",
+        "supporting_papers": [
+          "swarm_spiking2023",
+          "chaabouni2022"
+        ]
+      }
+    ]
+  }
+}
