@@ -1,0 +1,508 @@
+{
+  "n_claims": 46,
+  "coverage_by_feature": {
+    "reward_coop": {
+      "total": 18,
+      "outcomes": {
+        "emerges": 12,
+        "compositional": 4,
+        "scales": 1,
+        "fails": 1
+      }
+    },
+    "discrete_messages": {
+      "total": 2,
+      "outcomes": {
+        "emerges": 1,
+        "compositional": 1
+      }
+    },
+    "reward_compete": {
+      "total": 8,
+      "outcomes": {
+        "honest": 1,
+        "deceptive": 2,
+        "emerges": 2,
+        "fails": 3
+      }
+    },
+    "has_noise": {
+      "total": 1,
+      "outcomes": {
+        "honest": 1
+      }
+    },
+    "reward_mixed": {
+      "total": 4,
+      "outcomes": {
+        "emerges": 4
+      }
+    },
+    "iterated_learning": {
+      "total": 5,
+      "outcomes": {
+        "emerges": 2,
+        "compositional": 3
+      }
+    },
+    "population": {
+      "total": 13,
+      "outcomes": {
+        "emerges": 6,
+        "compositional": 3,
+        "scales": 2,
+        "robust": 1,
+        "fails": 1
+      }
+    },
+    "has_embodiment": {
+      "total": 1,
+      "outcomes": {
+        "compositional": 1
+      }
+    },
+    "memory_limit": {
+      "total": 1,
+      "outcomes": {
+        "compositional": 1
+      }
+    },
+    "listener_changes": {
+      "total": 1,
+      "outcomes": {
+        "compositional": 1
+      }
+    },
+    "tom_active": {
+      "total": 4,
+      "outcomes": {
+        "deceptive": 1,
+        "emerges": 2,
+        "robust": 1
+      }
+    },
+    "social_influence": {
+      "total": 1,
+      "outcomes": {
+        "emerges": 1
+      }
+    },
+    "evolution": {
+      "total": 10,
+      "outcomes": {
+        "emerges": 6,
+        "fails": 2,
+        "scales": 1,
+        "robust": 1
+      }
+    },
+    "kin_selection": {
+      "total": 2,
+      "outcomes": {
+        "emerges": 1,
+        "fails": 1
+      }
+    },
+    "spatial_structure": {
+      "total": 1,
+      "outcomes": {
+        "scales": 1
+      }
+    },
+    "has_plasticity": {
+      "total": 4,
+      "outcomes": {
+        "robust": 2,
+        "emerges": 2
+      }
+    },
+    "reward_gated_plasticity": {
+      "total": 2,
+      "outcomes": {
+        "emerges": 2
+      }
+    },
+    "bayesian_inference": {
+      "total": 1,
+      "outcomes": {
+        "emerges": 1
+      }
+    },
+    "large_neural": {
+      "total": 1,
+      "outcomes": {
+        "emerges": 1
+      }
+    },
+    "no_bottleneck": {
+      "total": 1,
+      "outcomes": {
+        "fails": 1
+      }
+    },
+    "emergence_claim": {
+      "total": 1,
+      "outcomes": {
+        "emerges": 1
+      }
+    },
+    "n_neurons_small": {
+      "total": 1,
+      "outcomes": {
+        "emerges": 1
+      }
+    },
+    "co_evolution_alternating": {
+      "total": 1,
+      "outcomes": {
+        "emerges": 1
+      }
+    },
+    "random_init": {
+      "total": 1,
+      "outcomes": {
+        "emerges": 1
+      }
+    },
+    "short_training": {
+      "total": 1,
+      "outcomes": {
+        "emerges": 1
+      }
+    }
+  },
+  "coverage_by_outcome": {
+    "emerges": 24,
+    "honest": 1,
+    "deceptive": 2,
+    "compositional": 9,
+    "fails": 4,
+    "scales": 3,
+    "robust": 3
+  },
+  "total_gaps": 161,
+  "top_priority_gaps": [
+    {
+      "priority_score": 66.0,
+      "feature": "population",
+      "outcome": "honest",
+      "current_n": 0,
+      "shortfall": 2,
+      "search_query": "population honest signaling handicap"
+    },
+    {
+      "priority_score": 62.67,
+      "feature": "population",
+      "outcome": "deceptive",
+      "current_n": 0,
+      "shortfall": 2,
+      "search_query": "population deception adversarial communication"
+    },
+    {
+      "priority_score": 61.0,
+      "feature": "population",
+      "outcome": "robust",
+      "current_n": 0,
+      "shortfall": 2,
+      "search_query": "population generalization transfer"
+    },
+    {
+      "priority_score": 61.0,
+      "feature": "population",
+      "outcome": "scales",
+      "current_n": 0,
+      "shortfall": 2,
+      "search_query": "population scaling laws population"
+    },
+    {
+      "priority_score": 60.0,
+      "feature": "population",
+      "outcome": "fails",
+      "current_n": 0,
+      "shortfall": 2,
+      "search_query": "population communication failure negative result"
+    },
+    {
+      "priority_score": 58.0,
+      "feature": "population",
+      "outcome": "compositional",
+      "current_n": 0,
+      "shortfall": 2,
+      "search_query": "population compositional structure"
+    },
+    {
+      "priority_score": 56.8,
+      "feature": "population",
+      "outcome": "emerges",
+      "current_n": 0,
+      "shortfall": 2,
+      "search_query": "population emergence evolution"
+    },
+    {
+      "priority_score": 56.0,
+      "feature": "evolution",
+      "outcome": "honest",
+      "current_n": 0,
+      "shortfall": 2,
+      "search_query": "evolutionary neural network honest signaling handicap"
+    },
+    {
+      "priority_score": 56.0,
+      "feature": "reward_coop",
+      "outcome": "honest",
+      "current_n": 0,
+      "shortfall": 2,
+      "search_query": "cooperative reward honest signaling handicap"
+    },
+    {
+      "priority_score": 53.0,
+      "feature": "reward_compete",
+      "outcome": "honest",
+      "current_n": 1,
+      "shortfall": 1,
+      "search_query": "competitive honest signaling handicap"
+    },
+    {
+      "priority_score": 52.67,
+      "feature": "evolution",
+      "outcome": "deceptive",
+      "current_n": 0,
+      "shortfall": 2,
+      "search_query": "evolutionary neural network deception adversarial communication"
+    },
+    {
+      "priority_score": 52.67,
+      "feature": "reward_coop",
+      "outcome": "deceptive",
+      "current_n": 0,
+      "shortfall": 2,
+      "search_query": "cooperative reward deception adversarial communication"
+    },
+    {
+      "priority_score": 51.0,
+      "feature": "reward_compete",
+      "outcome": "robust",
+      "current_n": 0,
+      "shortfall": 2,
+      "search_query": "competitive generalization transfer"
+    },
+    {
+      "priority_score": 51.0,
+      "feature": "reward_coop",
+      "outcome": "robust",
+      "current_n": 0,
+      "shortfall": 2,
+      "search_query": "cooperative reward generalization transfer"
+    },
+    {
+      "priority_score": 51.0,
+      "feature": "reward_compete",
+      "outcome": "scales",
+      "current_n": 0,
+      "shortfall": 2,
+      "search_query": "competitive scaling laws population"
+    },
+    {
+      "priority_score": 48.0,
+      "feature": "evolution",
+      "outcome": "compositional",
+      "current_n": 0,
+      "shortfall": 2,
+      "search_query": "evolutionary neural network compositional structure"
+    },
+    {
+      "priority_score": 48.0,
+      "feature": "reward_compete",
+      "outcome": "compositional",
+      "current_n": 0,
+      "shortfall": 2,
+      "search_query": "competitive compositional structure"
+    },
+    {
+      "priority_score": 48.0,
+      "feature": "evolution",
+      "outcome": "robust",
+      "current_n": 1,
+      "shortfall": 1,
+      "search_query": "evolutionary neural network generalization transfer"
+    },
+    {
+      "priority_score": 48.0,
+      "feature": "evolution",
+      "outcome": "scales",
+      "current_n": 1,
+      "shortfall": 1,
+      "search_query": "evolutionary neural network scaling laws population"
+    },
+    {
+      "priority_score": 48.0,
+      "feature": "reward_coop",
+      "outcome": "scales",
+      "current_n": 1,
+      "shortfall": 1,
+      "search_query": "cooperative reward scaling laws population"
+    },
+    {
+      "priority_score": 47.0,
+      "feature": "reward_coop",
+      "outcome": "fails",
+      "current_n": 1,
+      "shortfall": 1,
+      "search_query": "cooperative reward communication failure negative result"
+    },
+    {
+      "priority_score": 46.0,
+      "feature": "tom_active",
+      "outcome": "honest",
+      "current_n": 0,
+      "shortfall": 2,
+      "search_query": "theory of mind multi-agent honest signaling handicap"
+    },
+    {
+      "priority_score": 41.0,
+      "feature": "tom_active",
+      "outcome": "scales",
+      "current_n": 0,
+      "shortfall": 2,
+      "search_query": "theory of mind multi-agent scaling laws population"
+    },
+    {
+      "priority_score": 40.0,
+      "feature": "tom_active",
+      "outcome": "fails",
+      "current_n": 0,
+      "shortfall": 2,
+      "search_query": "theory of mind multi-agent communication failure negative result"
+    },
+    {
+      "priority_score": 39.67,
+      "feature": "tom_active",
+      "outcome": "deceptive",
+      "current_n": 1,
+      "shortfall": 1,
+      "search_query": "theory of mind multi-agent deception adversarial communication"
+    },
+    {
+      "priority_score": 38.0,
+      "feature": "tom_active",
+      "outcome": "compositional",
+      "current_n": 0,
+      "shortfall": 2,
+      "search_query": "theory of mind multi-agent compositional structure"
+    },
+    {
+      "priority_score": 38.0,
+      "feature": "tom_active",
+      "outcome": "robust",
+      "current_n": 1,
+      "shortfall": 1,
+      "search_query": "theory of mind multi-agent generalization transfer"
+    },
+    {
+      "priority_score": 36.0,
+      "feature": "discrete_messages",
+      "outcome": "honest",
+      "current_n": 0,
+      "shortfall": 2,
+      "search_query": "discrete symbol communication honest signaling handicap"
+    },
+    {
+      "priority_score": 36.0,
+      "feature": "has_plasticity",
+      "outcome": "honest",
+      "current_n": 0,
+      "shortfall": 2,
+      "search_query": "synaptic plasticity honest signaling handicap"
+    },
+    {
+      "priority_score": 36.0,
+      "feature": "iterated_learning",
+      "outcome": "honest",
+      "current_n": 0,
+      "shortfall": 2,
+      "search_query": "iterated learning language transmission honest signaling handicap"
+    }
+  ],
+  "recommended_searches": [
+    {
+      "priority_rank": 1,
+      "feature": "population",
+      "outcome_target": "honest",
+      "current_n": 0,
+      "query": "population honest signaling handicap",
+      "reason": "gap in population -> honest (0 claims)"
+    },
+    {
+      "priority_rank": 2,
+      "feature": "evolution",
+      "outcome_target": "honest",
+      "current_n": 0,
+      "query": "evolutionary neural network honest signaling handicap",
+      "reason": "gap in evolution -> honest (0 claims)"
+    },
+    {
+      "priority_rank": 3,
+      "feature": "reward_coop",
+      "outcome_target": "honest",
+      "current_n": 0,
+      "query": "cooperative reward honest signaling handicap",
+      "reason": "gap in reward_coop -> honest (0 claims)"
+    },
+    {
+      "priority_rank": 4,
+      "feature": "reward_compete",
+      "outcome_target": "honest",
+      "current_n": 1,
+      "query": "competitive honest signaling handicap",
+      "reason": "gap in reward_compete -> honest (1 claims)"
+    },
+    {
+      "priority_rank": 5,
+      "feature": "tom_active",
+      "outcome_target": "honest",
+      "current_n": 0,
+      "query": "theory of mind multi-agent honest signaling handicap",
+      "reason": "gap in tom_active -> honest (0 claims)"
+    },
+    {
+      "priority_rank": 6,
+      "feature": "discrete_messages",
+      "outcome_target": "honest",
+      "current_n": 0,
+      "query": "discrete symbol communication honest signaling handicap",
+      "reason": "gap in discrete_messages -> honest (0 claims)"
+    },
+    {
+      "priority_rank": 7,
+      "feature": "has_plasticity",
+      "outcome_target": "honest",
+      "current_n": 0,
+      "query": "synaptic plasticity honest signaling handicap",
+      "reason": "gap in has_plasticity -> honest (0 claims)"
+    },
+    {
+      "priority_rank": 8,
+      "feature": "iterated_learning",
+      "outcome_target": "honest",
+      "current_n": 0,
+      "query": "iterated learning language transmission honest signaling handicap",
+      "reason": "gap in iterated_learning -> honest (0 claims)"
+    },
+    {
+      "priority_rank": 9,
+      "feature": "kin_selection",
+      "outcome_target": "honest",
+      "current_n": 0,
+      "query": "kin selection cooperation emergence honest signaling handicap",
+      "reason": "gap in kin_selection -> honest (0 claims)"
+    },
+    {
+      "priority_rank": 10,
+      "feature": "bayesian_inference",
+      "outcome_target": "honest",
+      "current_n": 0,
+      "query": "Bayesian naming game honest signaling handicap",
+      "reason": "gap in bayesian_inference -> honest (0 claims)"
+    }
+  ]
+}
