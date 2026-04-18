@@ -1,0 +1,112 @@
+{
+  "n_agents": 3,
+  "standard": {
+    "n_seeds": 20,
+    "per_agent_reach_rate": [
+      0.0,
+      0.05,
+      0.0
+    ],
+    "mean_agent_reach_rate": 0.016666666666666666,
+    "group_at_least_one_reach": 0.05,
+    "group_all_reach": 0.0,
+    "mean_score": 1.4777463125168155,
+    "mean_final_dist": 5.316569739585206
+  },
+  "mi_panel": {
+    "per_agent": [
+      {
+        "agent": 0,
+        "mi": 0.0022483313424294157,
+        "p": 0.96,
+        "gain": -0.002456129577170307,
+        "null_mean": 0.0047044609195997225
+      },
+      {
+        "agent": 1,
+        "mi": 0.002333528349821702,
+        "p": 0.56,
+        "gain": -0.00044310745924982294,
+        "null_mean": 0.002776635809071525
+      },
+      {
+        "agent": 2,
+        "mi": 0.0017232329180819272,
+        "p": 0.81,
+        "gain": -0.001214955505506148,
+        "null_mean": 0.002938188423588075
+      }
+    ],
+    "max_gain": -0.00044310745924982294,
+    "mean_gain": -0.0013713975139754257,
+    "n_significant": 0,
+    "n_samples_per_agent": [
+      1500,
+      1500,
+      1500
+    ]
+  },
+  "tom": {
+    "n_pairs_measured": 6,
+    "n_pairs_predictive": 0,
+    "pair_fraction_predictive": 0.0,
+    "max_gain": 0.0,
+    "mean_gain": 0.0,
+    "top_5_pairs": [
+      {
+        "speaker": 0,
+        "listener": 1,
+        "mi_cross": 0.0,
+        "mi_null": 0.0,
+        "gain": 0.0
+      },
+      {
+        "speaker": 0,
+        "listener": 2,
+        "mi_cross": 0.0,
+        "mi_null": 0.0,
+        "gain": 0.0
+      },
+      {
+        "speaker": 1,
+        "listener": 0,
+        "mi_cross": 0.0,
+        "mi_null": 0.0,
+        "gain": 0.0
+      },
+      {
+        "speaker": 1,
+        "listener": 2,
+        "mi_cross": 0.0,
+        "mi_null": 0.0,
+        "gain": 0.0
+      },
+      {
+        "speaker": 2,
+        "listener": 0,
+        "mi_cross": 0.0,
+        "mi_null": 0.0,
+        "gain": 0.0
+      }
+    ]
+  },
+  "scales": {
+    "target_N": 10,
+    "base_N": 3,
+    "mean_agent_reach_rate": 0.030000000000000006,
+    "per_agent_reach_rate": [
+      0.0,
+      0.0,
+      0.0,
+      0.0,
+      0.0,
+      0.0,
+      0.1,
+      0.0,
+      0.2,
+      0.0
+    ]
+  },
+  "criteria_met": 0,
+  "verdict": "PHASE 7 INCOMPLETE (<2 criteria met)"
+}
