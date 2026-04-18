@@ -1,0 +1,356 @@
+{
+  "n_candidates": 518,
+  "current_kathara_rank": 99,
+  "top_20": [
+    {
+      "n": 16,
+      "skips": [
+        3,
+        6,
+        7
+      ],
+      "n_edges": 48,
+      "degree": 6,
+      "lambda_1": 6.0,
+      "lambda_2": 4.027339492125846,
+      "spectral_gap": 1.9726605078741537,
+      "clustering": 0.6,
+      "diameter": 3,
+      "score": 2.044089079302725,
+      "is_current": false
+    },
+    {
+      "n": 16,
+      "skips": [
+        1,
+        5,
+        6
+      ],
+      "n_edges": 48,
+      "degree": 6,
+      "lambda_1": 5.9999999999999964,
+      "lambda_2": 4.027339492125848,
+      "spectral_gap": 1.9726605078741484,
+      "clustering": 0.6,
+      "diameter": 3,
+      "score": 2.044089079302723,
+      "is_current": false
+    },
+    {
+      "n": 16,
+      "skips": [
+        2,
+        5,
+        7
+      ],
+      "n_edges": 48,
+      "degree": 6,
+      "lambda_1": 6.0000000000000036,
+      "lambda_2": 4.027339492125848,
+      "spectral_gap": 1.9726605078741555,
+      "clustering": 0.6,
+      "diameter": 3,
+      "score": 2.044089079302723,
+      "is_current": false
+    },
+    {
+      "n": 16,
+      "skips": [
+        1,
+        2,
+        3
+      ],
+      "n_edges": 48,
+      "degree": 6,
+      "lambda_1": 5.999999999999996,
+      "lambda_2": 4.027339492125853,
+      "spectral_gap": 1.9726605078741422,
+      "clustering": 0.6,
+      "diameter": 3,
+      "score": 2.0440890793027178,
+      "is_current": false
+    },
+    {
+      "n": 16,
+      "skips": [
+        3,
+        5,
+        8
+      ],
+      "n_edges": 40,
+      "degree": 5,
+      "lambda_1": 4.9999999999999964,
+      "lambda_2": 3.828427124746189,
+      "spectral_gap": 1.1715728752538075,
+      "clustering": 0.6,
+      "diameter": 4,
+      "score": 1.9728715691906333,
+      "is_current": false
+    },
+    {
+      "n": 16,
+      "skips": [
+        1,
+        7,
+        8
+      ],
+      "n_edges": 40,
+      "degree": 5,
+      "lambda_1": 4.999999999999997,
+      "lambda_2": 3.8284271247461885,
+      "spectral_gap": 1.1715728752538088,
+      "clustering": 0.6,
+      "diameter": 4,
+      "score": 1.972871569190633,
+      "is_current": false
+    },
+    {
+      "n": 20,
+      "skips": [
+        1,
+        9,
+        10
+      ],
+      "n_edges": 50,
+      "degree": 5,
+      "lambda_1": 5.000000000000001,
+      "lambda_2": 4.236067977499791,
+      "spectral_gap": 0.7639320225002102,
+      "clustering": 0.6,
+      "diameter": 5,
+      "score": 1.8275683861365728,
+      "is_current": false
+    },
+    {
+      "n": 20,
+      "skips": [
+        3,
+        7,
+        10
+      ],
+      "n_edges": 50,
+      "degree": 5,
+      "lambda_1": 5.000000000000001,
+      "lambda_2": 4.2360679774997925,
+      "spectral_gap": 0.7639320225002084,
+      "clustering": 0.6,
+      "diameter": 5,
+      "score": 1.827568386136571,
+      "is_current": false
+    },
+    {
+      "n": 20,
+      "skips": [
+        1,
+        4,
+        8
+      ],
+      "n_edges": 60,
+      "degree": 6,
+      "lambda_1": 6.000000000000002,
+      "lambda_2": 4.000000000000001,
+      "spectral_gap": 2.000000000000001,
+      "clustering": 0.4,
+      "diameter": 3,
+      "score": 1.6714285714285706,
+      "is_current": false
+    },
+    {
+      "n": 20,
+      "skips": [
+        4,
+        8,
+        9
+      ],
+      "n_edges": 60,
+      "degree": 6,
+      "lambda_1": 6.0000000000000036,
+      "lambda_2": 4.000000000000001,
+      "spectral_gap": 2.0000000000000027,
+      "clustering": 0.4,
+      "diameter": 3,
+      "score": 1.6714285714285706,
+      "is_current": false
+    },
+    {
+      "n": 20,
+      "skips": [
+        3,
+        4,
+        8
+      ],
+      "n_edges": 60,
+      "degree": 6,
+      "lambda_1": 6.0,
+      "lambda_2": 3.9999999999999982,
+      "spectral_gap": 2.0000000000000018,
+      "clustering": 0.4,
+      "diameter": 3,
+      "score": 1.6714285714285697,
+      "is_current": false
+    },
+    {
+      "n": 24,
+      "skips": [
+        1,
+        6,
+        7
+      ],
+      "n_edges": 72,
+      "degree": 6,
+      "lambda_1": 6.000000000000001,
+      "lambda_2": 4.000000000000002,
+      "spectral_gap": 1.9999999999999991,
+      "clustering": 0.4,
+      "diameter": 3,
+      "score": 1.6714285714285697,
+      "is_current": false
+    },
+    {
+      "n": 24,
+      "skips": [
+        5,
+        6,
+        11
+      ],
+      "n_edges": 72,
+      "degree": 6,
+      "lambda_1": 6.000000000000002,
+      "lambda_2": 4.000000000000002,
+      "spectral_gap": 2.0,
+      "clustering": 0.4,
+      "diameter": 3,
+      "score": 1.6714285714285697,
+      "is_current": false
+    },
+    {
+      "n": 24,
+      "skips": [
+        6,
+        7,
+        11
+      ],
+      "n_edges": 72,
+      "degree": 6,
+      "lambda_1": 6.000000000000002,
+      "lambda_2": 4.000000000000003,
+      "spectral_gap": 1.9999999999999991,
+      "clustering": 0.4,
+      "diameter": 3,
+      "score": 1.6714285714285688,
+      "is_current": false
+    },
+    {
+      "n": 20,
+      "skips": [
+        4,
+        7,
+        8
+      ],
+      "n_edges": 60,
+      "degree": 6,
+      "lambda_1": 6.0000000000000036,
+      "lambda_2": 4.0000000000000036,
+      "spectral_gap": 2.0,
+      "clustering": 0.4,
+      "diameter": 3,
+      "score": 1.671428571428568,
+      "is_current": false
+    },
+    {
+      "n": 24,
+      "skips": [
+        1,
+        5,
+        6
+      ],
+      "n_edges": 72,
+      "degree": 6,
+      "lambda_1": 6.000000000000001,
+      "lambda_2": 4.0000000000000036,
+      "spectral_gap": 1.9999999999999973,
+      "clustering": 0.4,
+      "diameter": 3,
+      "score": 1.671428571428568,
+      "is_current": false
+    },
+    {
+      "n": 20,
+      "skips": [
+        4,
+        5,
+        8
+      ],
+      "n_edges": 60,
+      "degree": 6,
+      "lambda_1": 6.0,
+      "lambda_2": 4.000000000000004,
+      "spectral_gap": 1.9999999999999956,
+      "clustering": 0.4,
+      "diameter": 3,
+      "score": 1.671428571428567,
+      "is_current": false
+    },
+    {
+      "n": 12,
+      "skips": [
+        2,
+        3,
+        4
+      ],
+      "n_edges": 36,
+      "degree": 6,
+      "lambda_1": 6.0000000000000036,
+      "lambda_2": 4.000000000000001,
+      "spectral_gap": 2.0000000000000027,
+      "clustering": 0.26666666666666666,
+      "diameter": 2,
+      "score": 1.6333333333333324,
+      "is_current": false
+    },
+    {
+      "n": 24,
+      "skips": [
+        5,
+        6,
+        12
+      ],
+      "n_edges": 60,
+      "degree": 5,
+      "lambda_1": 5.0,
+      "lambda_2": 3.9999999999999987,
+      "spectral_gap": 1.0000000000000013,
+      "clustering": 0.3,
+      "diameter": 4,
+      "score": 1.544444444444443,
+      "is_current": false
+    },
+    {
+      "n": 24,
+      "skips": [
+        6,
+        7,
+        12
+      ],
+      "n_edges": 60,
+      "degree": 5,
+      "lambda_1": 4.999999999999998,
+      "lambda_2": 3.9999999999999982,
+      "spectral_gap": 1.0,
+      "clustering": 0.3,
+      "diameter": 4,
+      "score": 1.5444444444444425,
+      "is_current": false
+    }
+  ],
+  "recommendation": {
+    "n": 16,
+    "skips": [
+      3,
+      6,
+      7
+    ],
+    "score": 2.044089079302725,
+    "reasoning": "topology with best composite score (|lambda_2| close to 4, small diameter, high clustering)"
+  }
+}
