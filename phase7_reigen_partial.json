@@ -1,0 +1,42 @@
+{
+  "status": "PARTIAL — task killed by restart before completion (exit 4)",
+  "n_evals_completed": 12,
+  "evals": [
+    {"dale": false, "hebb": false, "reach_w": 0.60, "reach": 0.17, "tom": 0.33, "mi": 0.015, "composite": 0.186},
+    {"dale": false, "hebb": false, "reach_w": 0.60, "reach": 0.17, "tom": 1.00, "mi": 0.024, "composite": 0.388},
+    {"dale": true,  "hebb": false, "reach_w": 0.47, "reach": 0.20, "tom": 0.67, "mi": 0.015, "composite": 0.303},
+    {"dale": false, "hebb": true,  "reach_w": 0.71, "reach": 0.07, "tom": 0.33, "mi": 0.011, "composite": 0.135},
+    {"dale": true,  "hebb": false, "reach_w": 0.55, "reach": 0.13, "tom": 1.00, "mi": 0.029, "composite": 0.372},
+    {"dale": false, "hebb": false, "reach_w": 0.60, "reach": 0.20, "tom": 0.00, "mi": 0.013, "composite": 0.103},
+    {"dale": false, "hebb": false, "reach_w": 0.69, "reach": 0.20, "tom": 0.67, "mi": 0.000, "composite": 0.300},
+    {"dale": true,  "hebb": false, "reach_w": 0.65, "reach": 0.10, "tom": 0.33, "mi": 0.000, "composite": 0.150},
+    {"dale": true,  "hebb": false, "reach_w": 0.78, "reach": 0.20, "tom": 0.33, "mi": 0.025, "composite": 0.205},
+    {"dale": true,  "hebb": false, "reach_w": 0.39, "reach": 0.17, "tom": 0.83, "mi": 0.015, "composite": 0.336},
+    {"dale": true,  "hebb": false, "reach_w": 0.36, "reach": 0.13, "tom": 0.67, "mi": 0.004, "composite": 0.267},
+    {"dale": false, "hebb": true,  "reach_w": 0.66, "reach": 0.13, "tom": 0.67, "mi": 0.033, "composite": 0.273}
+  ],
+  "best_composite": {
+    "dale": false, "hebb": false, "reach_w": 0.60,
+    "reach": 0.17, "tom": 1.00, "mi": 0.024, "composite": 0.388
+  },
+  "best_reach": 0.20,
+  "findings": {
+    "reach_ceiling_broken": "YES - reach reached 17-20%, vs prior ceiling of 9%",
+    "hebbian_effect": "consistently negative - all hebb=true runs below 14% reach",
+    "dale_effect": "no clear signal - both True and False produce good runs",
+    "reach_w_sweet_spot": "0.47-0.60 for composite; 0.60-0.78 also gets 20% reach",
+    "tom_retained": "YES - max ToM 100% coexists with 17% reach"
+  },
+  "reach_by_config": {
+    "best_no_hebb_balanced_reach_w": {
+      "n_evals": 10,
+      "mean_reach": 0.171,
+      "max_reach": 0.20
+    },
+    "hebbian_on": {
+      "n_evals": 2,
+      "mean_reach": 0.10,
+      "max_reach": 0.13
+    }
+  }
+}
