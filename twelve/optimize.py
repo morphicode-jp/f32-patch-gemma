@@ -1774,6 +1774,8 @@ def owl(
     """
     from .agent.mirror_agent import MirrorScan
 
+    t0 = time.time()   # owl's own wall clock (for autonomous budget-aware loop)
+
     # Resolve measurements input: explicit `measurements` wins over `curated_measurements`
     # alias. Alias exists to make domain-curated data intent explicit in user code.
     if measurements is None:
@@ -1950,7 +1952,52 @@ def owl(
     _stagnant_count = 0
     _prev_best_verified = float('-inf')
 
-    for round_i in range(n_rounds):
+    # Budget-aware autonomous extension (added 2026-04-19):
+    # When autonomous=True, continue past n_rounds while time_budget remains and
+    # verify_fn cost is tracked. This ensures cheap eval_fn (e.g., synthetic
+    # benchmarks) fully utilize the given budget instead of exiting after
+    # max_iterations rounds (default 10) regardless of wall time.
+    # Hard cap at 200 rounds to prevent runaway.
+    _AUTONOMOUS_HARD_CAP = 200
+    _verify_eval_times = []           # rolling cost estimate of verify_fn
+    _global_t0 = t0                   # for elapsed check
+
+    round_i = -1
+    while True:
+        round_i += 1
+
+        # Budget check at top of every autonomous round (total-budget semantics).
+        # time_budget is treated as the TOTAL owl wall budget for autonomous mode.
+        # This prevents overruns when per-round optimize() calls accumulate.
+        if autonomous:
+            _elapsed = time.time() - _global_t0
+            if _elapsed > time_budget:
+                if verbose:
+                    print(f"  [Auto] total time_budget {time_budget}s exhausted "
+                          f"at round {round_i} ({_elapsed:.1f}s elapsed)")
+                break
+
+        # Stopping condition A: non-autonomous, fixed n_rounds
+        if not autonomous and round_i >= n_rounds:
+            break
+
+        # Stopping condition B: autonomous, extend past n_rounds if budget allows
+        if autonomous and round_i >= n_rounds:
+            if round_i >= _AUTONOMOUS_HARD_CAP:
+                if verbose:
+                    print(f"  [Auto] hard cap {_AUTONOMOUS_HARD_CAP} reached")
+                break
+            if _verify_eval_times:
+                _avg_cost = sum(_verify_eval_times) / len(_verify_eval_times)
+                _elapsed = time.time() - _global_t0
+                _remaining = time_budget - _elapsed
+                if _remaining < _avg_cost * 2:
+                    if verbose:
+                        print(f"  [Auto] budget exhausted extending at round {round_i + 1}")
+                    break
+            else:
+                # No cost data → don't extend
+                break
         if verbose and n_rounds > 1:
             print(f"\n{'='*50}")
             print(f"  [Round {round_i+1}/{n_rounds}] {len(growing_data)}件のデータ")
@@ -1990,6 +2037,30 @@ def owl(
                 "n_measurements": len(growing_data),
                 "rounds_completed": round_i + 1,
             }
+            # Autonomous with verify_fn: don't bail — grow data via random exploration
+            # then continue to next round. Without this, cheap-eval problems abort
+            # before exploring their budget.
+            if autonomous and verify_fn is not None and param_ranges is not None:
+                _expl_rng = random.Random(round_i * 17 + 3)
+                _n_explore = 5
+                _n_added = 0
+                for _ in range(_n_explore):
+                    _sample = [_expl_rng.uniform(lo, hi) for lo, hi in param_ranges]
+                    try:
+                        _vt0 = time.time()
+                        _s = float(verify_fn(_sample))
+                        _verify_eval_times.append(time.time() - _vt0)
+                    except Exception:
+                        continue
+                    if is_dict:
+                        growing_data.append({"params": {n: v for n, v in zip(names, _sample)}, "score": _s})
+                    else:
+                        growing_data.append({"params": _sample, "score": _s})
+                    _n_added += 1
+                if verbose:
+                    print(f"  [Auto-explore] added {_n_added}/{_n_explore} via verify_fn")
+                if _n_added > 0:
+                    continue   # retry proxy build with more data next round
             break
 
         confidence = "high" if proxy_r2 >= min_r_squared else "low"
@@ -1997,10 +2068,22 @@ def owl(
         # --- Step 4: proxyで高速最適化 ---
         ranges = param_ranges if param_ranges is not None else ms.param_ranges
 
+        # In autonomous mode, scale inner optimize budget to remaining total
+        # time so we don't over-commit a whole time_budget per round.
+        _inner_budget = time_budget
+        if autonomous:
+            _remaining = time_budget - (time.time() - _global_t0)
+            if _remaining > 0:
+                # Divide remaining among expected remaining rounds; keep at least 1s
+                _rounds_left = max(1, n_rounds - round_i)
+                _inner_budget = max(1.0, _remaining / _rounds_left)
+            else:
+                _inner_budget = 1.0
+
         best_params, best_score, info = optimize(
             eval_fn=proxy_fn,
             param_ranges=ranges,
-            time_budget=time_budget,
+            time_budget=_inner_budget,
             learn=True,
             experience_id=experience_id or "measurements_auto",
             verbose=verbose,
@@ -2021,7 +2104,9 @@ def owl(
         verified_score = None
         if verify_fn is not None:
             try:
+                _verify_t0 = time.time()
                 verified_score = float(verify_fn(best_params))
+                _verify_eval_times.append(time.time() - _verify_t0)
                 if verbose:
                     print(f"  [Verify] proxy={best_score:.4f} → real={verified_score:.4f}")
 
