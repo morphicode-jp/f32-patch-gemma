@@ -145,8 +145,40 @@ class ExperienceStore:
         }
 
     def save(self):
-        with open(self._path, "w", encoding="utf-8") as f:
-            json.dump(self._data, f, ensure_ascii=False)
+        """Atomic write: unique tmp per writer + os.replace. Retries on
+        Windows PermissionError caused by brief contention (antivirus scan,
+        indexer, or another writer mid-replace). Readers always see a
+        consistent snapshot; same-ID parallel writers have lost-update (last
+        writer wins). Mirrors reigen._mk_save() pattern.
+        """
+        import threading as _th
+        import time as _time
+        # Per-caller unique tmp: PID + thread id + monotonic ns
+        tmp = (f"{self._path}.{os.getpid()}.{_th.get_ident()}."
+               f"{_time.monotonic_ns()}.tmp")
+        try:
+            with open(tmp, "w", encoding="utf-8") as f:
+                json.dump(self._data, f, ensure_ascii=False)
+            # Windows os.replace can fail with PermissionError under heavy
+            # concurrency (another writer holding handle briefly). Retry up
+            # to 5 times with exponential backoff; after that, raise so the
+            # caller is aware.
+            last_err = None
+            for attempt in range(5):
+                try:
+                    os.replace(tmp, self._path)
+                    return
+                except PermissionError as e:
+                    last_err = e
+                    _time.sleep(0.01 * (2 ** attempt))  # 10ms, 20, 40, 80, 160
+            raise last_err
+        finally:
+            # If os.replace never succeeded, remove our orphan tmp.
+            if os.path.exists(tmp):
+                try:
+                    os.remove(tmp)
+                except OSError:
+                    pass
 
     @property
     def runs(self):
@@ -1679,6 +1711,8 @@ def owl(
     max_iterations=10,
     verbose=False,
     kathara="auto",
+    stagnation_threshold=None,   # NEW: overrides autonomous stagnation threshold (default 3)
+    force_proxy_type=None,       # NEW: forces a specific proxy (zenron/zenron_interact/linear); None = R²-best
 ):
     """Owl — 見えない構造を見つけて最適化する。
 
@@ -1882,7 +1916,7 @@ def owl(
             print(f"  [MS] active={len(ms.active_dims)}, dead={len(ms.dead_dims)}")
 
         # --- Step 2: proxy自動生成（4候補自動選択） ---
-        proxy_fn, proxy_r2, proxy_name = ms.build_proxy()
+        proxy_fn, proxy_r2, proxy_name = ms.build_proxy(force_proxy_type=force_proxy_type)
 
         proxy_type = proxy_name or "auto"
 
@@ -1965,12 +1999,13 @@ def owl(
             elif _tracking is not None:
                 _stagnant_count += 1
 
+            _stag_thr = int(stagnation_threshold) if stagnation_threshold is not None else 3
             if verbose:
-                print(f"  [Auto] stagnant={_stagnant_count}/3, "
+                print(f"  [Auto] stagnant={_stagnant_count}/{_stag_thr}, "
                       f"best={_prev_best_verified:.4f}")
 
-            # 停滞3回: 探索範囲摂動
-            if _stagnant_count >= 3:
+            # 停滞 N 回: 探索範囲摂動 (N defaults to 3, Reigen can override)
+            if _stagnant_count >= _stag_thr:
                 _stagnant_count = 0
                 if verbose:
                     print(f"  [Auto] Stagnation -> range perturbation")
