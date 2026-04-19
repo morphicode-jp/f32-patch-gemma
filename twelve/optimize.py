@@ -1699,7 +1699,7 @@ def _owl_multi_observer(measurements, param_names=None, verbose=False):
 # ═══════════════════════════════════════════════════════
 
 def owl(
-    measurements,
+    measurements=None,
     param_ranges=None,
     param_names=None,
     time_budget=60,
@@ -1713,6 +1713,12 @@ def owl(
     kathara="auto",
     stagnation_threshold=None,   # NEW: overrides autonomous stagnation threshold (default 3)
     force_proxy_type=None,       # NEW: forces a specific proxy (zenron/zenron_interact/linear); None = R²-best
+    curated_measurements=None,   # Explicit alias of `measurements`. Domain-curated prior data; use this name to signal intent.
+    n_seed_samples=None,         # Empty-data path: seed count (default max(5, n_dims+2))
+    seed_rng_state=42,           # Empty-data path: RNG seed for uniform sampling
+    guard_fn=None,               # Optional safety: guard_fn(params) → float. Baseline set via guard_threshold or midpoint eval.
+    guard_threshold=None,        # Minimum acceptable guard_score. If None and guard_fn given, computed at midpoint params.
+    safe_dim_analysis=False,     # If True + guard_fn + guard fails, run multi-observer analysis to surface safe_dims.
 ):
     """Owl — 見えない構造を見つけて最適化する。
 
@@ -1767,6 +1773,48 @@ def owl(
         }
     """
     from .agent.mirror_agent import MirrorScan
+
+    # Resolve measurements input: explicit `measurements` wins over `curated_measurements`
+    # alias. Alias exists to make domain-curated data intent explicit in user code.
+    if measurements is None:
+        measurements = curated_measurements if curated_measurements is not None else []
+    elif curated_measurements is not None and verbose:
+        print("  [owl] both measurements and curated_measurements given; using measurements")
+
+    # Empty-data autonomous start: if no measurements but verify_fn + ranges available,
+    # seed initial samples by calling verify_fn on uniform-random points in ranges.
+    # This removes the hard 5-point minimum for callers with just a callable.
+    if len(measurements) == 0:
+        if verify_fn is None or param_ranges is None:
+            raise ValueError(
+                "owl(): empty measurements requires both verify_fn and param_ranges "
+                "for autonomous seed sampling. Provide measurements, or both verify_fn "
+                "and param_ranges."
+            )
+        import random as _random
+        n_dims = len(param_ranges)
+        n_seed = n_seed_samples if n_seed_samples is not None else max(5, n_dims + 2)
+        _rng = _random.Random(seed_rng_state)
+        if verbose:
+            print(f"  [owl empty-start] seeding {n_seed} points in {n_dims}d via verify_fn")
+        measurements = []
+        for _ in range(n_seed):
+            sample = [_rng.uniform(lo, hi) for lo, hi in param_ranges]
+            try:
+                s = float(verify_fn(sample))
+            except Exception as e:
+                if verbose:
+                    print(f"    seed eval error ({type(e).__name__}), skipping")
+                continue
+            use_params = sample
+            if param_names:
+                use_params = {n: v for n, v in zip(param_names, sample)}
+            measurements.append({"params": use_params, "score": s})
+        if len(measurements) < 2:
+            raise RuntimeError(
+                f"owl() empty-start: only {len(measurements)}/{n_seed} seed evals succeeded; "
+                f"verify_fn failing too often"
+            )
 
     # Multi-observer検出: "scores" dictがあればmulti-observer分析にディスパッチ
     if measurements and "scores" in measurements[0] and isinstance(measurements[0]["scores"], dict):
@@ -2099,6 +2147,61 @@ def owl(
             )
         except Exception:
             pass
+
+    # --- guard_fn analysis (post-hoc, Sentinel's pivot logic ported here) ---
+    # Non-invasive: existing return schema preserved, new keys only added when
+    # guard_fn is provided. No change in behavior for legacy callers.
+    if guard_fn is not None and best_result and best_result.get("best_params") is not None:
+        try:
+            bp = best_result["best_params"]
+            bp_list = ([bp.get(n, 0.0) for n in best_result.get("param_names", [])]
+                       if isinstance(bp, dict) else list(bp))
+
+            # Baseline: midpoint or caller-supplied threshold
+            if guard_threshold is None:
+                ranges_for_gb = param_ranges or (ms.param_ranges if 'ms' in dir() else None)
+                if ranges_for_gb is not None:
+                    mid = [(lo + hi) / 2 for lo, hi in ranges_for_gb]
+                    baseline_guard = float(guard_fn(mid))
+                else:
+                    baseline_guard = float("-inf")
+            else:
+                baseline_guard = float(guard_threshold)
+
+            best_guard = float(guard_fn(bp_list))
+            guard_ok = best_guard >= baseline_guard
+            best_result["guard_score"] = best_guard
+            best_result["baseline_guard"] = baseline_guard
+            best_result["guard_verdict"] = "approved" if guard_ok else "failed"
+
+            # Optional multi-observer safe-dim analysis when guard fails.
+            # Uses growing_data (eval scores) + fresh guard evals to identify
+            # dims that are safe under both objectives.
+            if safe_dim_analysis and not guard_ok and len(growing_data) >= 5:
+                try:
+                    multi_data = []
+                    for m in growing_data[:50]:  # cap for cost
+                        p = m["params"] if isinstance(m["params"], list) \
+                            else [m["params"].get(n, 0.0) for n in names]
+                        try:
+                            g = float(guard_fn(p))
+                        except Exception:
+                            continue
+                        multi_data.append({
+                            "params": p,
+                            "scores": {"eval": float(m["score"]), "guard": g},
+                        })
+                    if len(multi_data) >= 5:
+                        mo = _owl_multi_observer(multi_data, param_names=names, verbose=False)
+                        best_result["safe_dims"] = mo.get("stable_active", [])
+                        best_result["conflict_dims"] = mo.get("observer_dependent", [])
+                        best_result["multi_observer"] = mo
+                except Exception as _e:
+                    if verbose:
+                        print(f"  [guard/safe_dim_analysis] skipped: {type(_e).__name__}")
+        except Exception as _e:
+            if verbose:
+                print(f"  [guard_fn] evaluation failed: {type(_e).__name__}")
 
     return best_result
 

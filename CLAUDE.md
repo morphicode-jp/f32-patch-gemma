@@ -6,46 +6,67 @@ All responses in Japanese.
 
 ## Quick Reference
 
-### 最重要の 1 問: `eval_fn` (callable な評価関数) があるか?
+### owl 中心主義 (2026-04-19 以降)
+
+**`owl()` が知能の本体**。Reigen/Sentinel は周辺機構 (meta_knowledge 累積、orchestration) で、owl の算法を賢くするものではない。
 
 ```python
 def eval_fn(params: list[float]) -> float:
-    # params = 試すパラメータ (例: [0.8, 1.2, 0.5])
-    # return = 点数 (高いほど良い float。損失なら -loss で反転)
-    return score
+    return score   # 高いほど良い float。損失なら -loss で反転
 ```
 
-| 状況 | 使うやつ |
-|---|---|
-| **eval_fn がある** (99% の場合) | **`reigen(eval_fn, guard_fn, ranges)`** |
-| **測定データしかない** (過去ログ・論文抽出等、callable 無し) | **`owl(data, verify_fn=...)`** |
+| 状況 | 使うやつ | 備考 |
+|---|---|---|
+| **過去実測データがある** (ドメイン知識あり) | `owl(measurements=curated_data, verify_fn=eval_fn, guard_fn=..., ...)` | **最強**: 情報量高い curated data を直接活用 |
+| **callable だけ、初期データ無し** | `owl(measurements=[], verify_fn=eval_fn, param_ranges=...)` | owl が自動で初期 N 点サンプリング |
+| **cross-task 学習蓄積したい** | `reigen(eval_fn, guard_fn, ranges)` | Sentinel wrapper + meta_knowledge 自動 |
+| **素直に使いたい、選ぶのがしんどい** | `reigen(eval_fn, guard_fn, ranges)` | デフォで賢い (kathara_17_adaptive) |
 
-これだけ。`Sentinel` / `optimize` / `MirrorScan` の直呼びは内部機構で、user が触る必要ない (Reigen が必要時に自動 fallback する)。AT = reigen() を HTTP 公開する殻 (`api.py`)、別選択肢ではなく配信機構。
+**curated data がある時は owl 直使い** (Reigen/Sentinel の random _collect はドメイン知識を破棄する)。
 
 ```python
-from twelve.agent.reigen import reigen            # shortest (99% これ)
-from twelve.optimize import owl                    # 測定データだけある時
+from twelve.optimize import owl                    # 直接、最強経路
+from twelve.agent.reigen import reigen            # 楽したい / 累積学習したい時
 ```
 
 `experience_id`: 任意の task 名札を付ける。self_params cross-task 学習は `reigen_meta_knowledge.json` 経由で自動共有される (2026-04-19 以降、ID 共有不要)。fossil は per-ID 分離で並列時の衝突回避。
 
-### `eval_fn` 例 (LLM calibration)
+### `owl()` 使用例 — curated data から最適化
 
 ```python
-def eval_fn(params):
-    apply_scales({"L18": params[0], "L25": params[1], ...})
-    hs = run_hellaswag(n=400)
-    restore_scales()
-    return hs                                      # 正解率 (高いほど良い)
-
-def guard_fn(params):
-    apply_scales({...})
-    ppl = measure_perplexity()
-    restore_scales()
-    return -ppl                                    # PPL は低いほど良い → 負で反転
-
-r = reigen(eval_fn, guard_fn, [(0.8, 1.5)] * 5)
+# 過去実験の結果が手元にある: owl に直接投入
+past_results = [
+    {"params": [0.8, 1.2, 1.5], "score": 0.71},
+    {"params": [1.0, 1.3, 1.4], "score": 0.68},
+    ...  # 15-30 点のドメイン curated data
+]
+r = owl(
+    measurements=past_results,          # curated なので高 R² 期待
+    param_ranges=[(0.5, 2.0)] * 3,
+    verify_fn=my_eval_fn,                # 最適点の verify 実測
+    guard_fn=my_guard_fn,                # safety (任意)
+    autonomous=True,                     # 停滞時 range 拡張
+    experience_id="my_task_v1",
+)
+print(r["best_params"], r["guard_verdict"])
 ```
+
+### `reigen()` 使用例 — 楽に累積学習
+
+```python
+# 手軽。Reigen が内部で Sentinel + owl を呼び、meta_knowledge 更新
+r = reigen(eval_fn, guard_fn, [(0.8, 1.5)] * 5, experience_id="my_task_v1")
+```
+
+### owl の新機能 (2026-04-19)
+
+| kwarg | 用途 |
+|---|---|
+| `measurements=[]` + `verify_fn=` + `param_ranges=` | 空データから自律サンプリング |
+| `curated_measurements=` | `measurements=` の明示 alias (ドメイン知識 intent) |
+| `guard_fn=` + `guard_threshold=` | 安全指標ゲート (owl 内で評価) |
+| `safe_dim_analysis=True` | guard 失敗時 multi-observer で safe_dims 出力 |
+| `n_seed_samples=` | 空データ時の初期点数 (default max(5, N+2)) |
 
 ---
 
@@ -561,6 +582,8 @@ Archival entries (individual runs, method evolution): `@docs/LAB_NOTES.md`.
 | MirrorAgent / MS | `@twelve/agent/mirror_agent.py` |
 | UnifiedExperience | `@twelve/agent/unified_experience.py` |
 | Reigen tests | `@twelve/tests/test_reigen.py` · `@twelve/tests/test_reigen_params.py` · `@twelve/tests/test_reigen_adaptive.py` · `@twelve/tests/test_reigen_meta_knowledge.py` |
+| owl enhancements tests | `@twelve/tests/test_owl_enhancements.py` (empty-data / curated / guard_fn / safe_dim) |
+| Sentinel curated-data tests | `@twelve/tests/test_sentinel_curated.py` (initial_measurements) |
 | Reigen params JSON | `@twelve/configs/reigen_params.json` (static defaults) |
 | Reigen meta_knowledge | `@twelve/configs/reigen_meta_knowledge.json` (learned cross-task) |
 | Test isolation fixture | `@twelve/tests/conftest.py` (meta_knowledge autouse) |

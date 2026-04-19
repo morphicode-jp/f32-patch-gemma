@@ -33,7 +33,20 @@ class Sentinel:
     def __init__(self, eval_fn, guard_fn, param_ranges,
                  param_names=None, experience_id=None,
                  initial_params=None, learn=False, min_r_squared=0.3,
-                 meta=False, meta_config=None):
+                 meta=False, meta_config=None,
+                 initial_measurements=None):
+        """
+        Args (core):
+          eval_fn, guard_fn, param_ranges, param_names: standard.
+          initial_params: single warm-start point (optional).
+          initial_measurements: list of curated {"params": [...], "score": float}
+              entries. If provided, _collect() uses these directly instead of
+              generating uniform-random samples. Preserves domain knowledge from
+              past experiments. When used, eval_fn is NOT called during
+              initial data collection (samples are taken as-is).
+              Missing samples (len < max(20, n_dims)) ARE topped up with random
+              samples as before.
+        """
         self.eval_fn = eval_fn
         self.guard_fn = guard_fn
         self.param_ranges = param_ranges
@@ -41,6 +54,7 @@ class Sentinel:
         self.param_names = param_names or [f"p{i}" for i in range(self.n_dims)]
         self.experience_id = experience_id
         self.initial_params = initial_params
+        self.initial_measurements = initial_measurements   # domain-curated prior data
         self.learn = learn
         self.min_r_squared = min_r_squared
         # Phase3 meta-evolution (K7-K12). Only applies to optimize() fallback path.
@@ -152,23 +166,48 @@ class Sentinel:
             mo_result=mo_result)
 
     def _collect(self, n_samples, verbose=False):
-        """n点をeval_fnで測定。seed_paramsがあれば最初のサンプルに使う。"""
-        rng = random.Random(42)
+        """n点をeval_fnで測定 (or initial_measurements が渡されてたら優先使用)。
+
+        Domain-curated data path: `self.initial_measurements` is a list of
+        {"params": [...], "score": float} dicts. If provided, those ARE the
+        initial data (not re-evaluated). If the curated set has fewer than
+        `n_samples` entries, the shortage is topped up with uniform-random
+        samples called through eval_fn (same as the legacy path).
+
+        Uniform-random path (no curated data, legacy): seed + midpoint +
+        random RNG(42) samples.
+        """
         measurements = []
-        # First: seed (== initial_params if provided, else midpoint)
-        s = float(self.eval_fn(self.seed_params))
-        measurements.append({"params": list(self.seed_params), "score": s})
-        # Add midpoint too if different from seed (diversity)
-        if self.initial_params is not None:
-            s2 = float(self.eval_fn(self.baseline_params))
-            measurements.append({"params": list(self.baseline_params), "score": s2})
-        # Random samples
+
+        # --- domain-curated path: use supplied data as-is, top up if needed ---
+        if self.initial_measurements:
+            for m in self.initial_measurements:
+                if not isinstance(m, dict) or "params" not in m or "score" not in m:
+                    continue
+                p = list(m["params"]) if not isinstance(m["params"], dict) else m["params"]
+                measurements.append({"params": p, "score": float(m["score"])})
+            if verbose:
+                print(f"  [Collect] {len(measurements)} curated "
+                      f"(of {len(self.initial_measurements)} provided)")
+
+        # --- top up with random if still short (handles both paths) ---
+        rng = random.Random(42)
+        # Seed and midpoint only on pure-random path (curated path skips these
+        # to avoid mixing eval_fn calls with pre-provided scores).
+        if not measurements:
+            s = float(self.eval_fn(self.seed_params))
+            measurements.append({"params": list(self.seed_params), "score": s})
+            if self.initial_params is not None:
+                s2 = float(self.eval_fn(self.baseline_params))
+                measurements.append({"params": list(self.baseline_params), "score": s2})
         while len(measurements) < n_samples:
             sample = [rng.uniform(lo, hi) for lo, hi in self.param_ranges]
             s = float(self.eval_fn(sample))
             measurements.append({"params": sample, "score": s})
-        if verbose:
+        if verbose and not self.initial_measurements:
             print(f"  [Collect] {len(measurements)} measurements")
+        elif verbose:
+            print(f"  [Collect] total {len(measurements)} (curated + random top-up)")
         return measurements
 
     def _optimize(self, measurements, budget, verbose=False):
