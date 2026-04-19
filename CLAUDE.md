@@ -20,13 +20,13 @@ from twelve.agent.sentinel import Sentinel        # bare Sentinel
 from twelve.optimize import owl, optimize          # primitives
 ```
 
-Always: one shared `experience_id="genesis"` for all tasks → cross-task learning.
+`experience_id`: 任意の task 名札を付ける。self_params cross-task 学習は `reigen_meta_knowledge.json` 経由で自動共有される (2026-04-19 以降、ID 共有不要)。fossil は per-ID 分離で並列時の衝突回避。
 
 ---
 
 ## Reigen (零玄) — default tool (集大成)
 
-Dimension-additive self-application: one outer Sentinel over (N_user + 12)-dim joint space.
+Dimension-additive self-application: one outer Sentinel over (N_user + N_self)-dim joint space (N_self = 17 for kathara_17_adaptive default, 12 for kathara_12 legacy).
 Internally composes Sentinel → owl → MS → multi-observer → Kathara K² → optimize → UnifiedExperience.
 `twelve/agent/sentinel.py` is **never modified** (uses `_TunableSentinel` subclass + `mirror_agent._mp()` monkey-patch).
 
@@ -37,16 +37,17 @@ Internally composes Sentinel → owl → MS → multi-observer → Kathara K² �
 from twelve.agent.reigen import reigen
 r = reigen(my_eval, my_guard, [(-5, 5)] * 8, experience_id="genesis")
 
-# (2) class form — defaults already optimal (kathara_12 + Hebbian + one ID)
+# (2) class form — defaults already optimal (kathara_17_adaptive + adaptive Hebbian + auto meta_knowledge)
 from twelve.agent.reigen import Reigen
 r = Reigen(
     eval_fn=..., guard_fn=..., user_param_ranges=[(-5, 5)] * 8,
-    experience_id="genesis",          # ONE id for ALL tasks (cross-task self-param transfer)
+    experience_id="my_task_v1",       # ← ID は好きに付けろ。meta_knowledge 経由で学習は自動共有
     inner_time_budget=2,              # sec per inner Sentinel
-    # default: self_dim_preset="kathara_12", enable_hebbian=True
+    # default: self_dim_preset="kathara_17_adaptive" (2026-04-19 昇格), enable_hebbian=True
     batch_eval_fn=None,               # opt-in: GPU/vectorized eval (see Reigen Reference)
     batch_size=8,
-    # legacy opt-out: self_dim_preset="minimal_4"  # for N_user > 16
+    # legacy opt-in: self_dim_preset="kathara_12" (static Hebbian)
+    #                self_dim_preset="minimal_4"   (N_user > 16)
 ).run(time_budget=300, wall_time_factor=3.0)  # wall cap = budget × factor
 
 # (3) HTTP: POST http://localhost:8282/reigen {eval_module, eval_fn, guard_fn,
@@ -72,12 +73,13 @@ Plus all Sentinel keys: `verdict | best_params | eval_score | guard_score | base
 
 | preset | n_self | Hebbian | cost vs legacy | when |
 |---|---|---|---|---|
-| `"kathara_12"` **(default)** | 12 | ✓ Circulant(12,{1,4,6}) 30 edges | same (N_user ≤ 8), +20% (N_user > 8) | almost always |
-| `"kathara_17_adaptive"` | 17 | ✓ (first 12 dims only; adaptive lr/gate/winners from best-history) | +25-30% dim search | hard landscapes where default Hebbian tuning is sub-optimal (proven 2-4× faster + better verdict on Rosenbrock 5d / Styblinski 6d) |
+| `"kathara_17_adaptive"` **(default)** | 17 | ✓ first 12 dims (adaptive lr/gate/winners from best-history) | +25-30% dim search | default since 2026-04-19 A/B: 3/3 wins (Rosenbrock 5d / Ackley 8d / Styblinski 6d), 2.7-3.3× faster + 15/15 approved (vs kathara_12's 8/15) |
+| `"kathara_12"` (legacy) | 12 | ✓ Circulant(12,{1,4,6}) 30 edges, static lr | same (N_user ≤ 8), +20% (N_user > 8) | bit-identical canary baseline; explicit opt-in when you want static Hebbian |
 | `"minimal_4"` | 4 | — | baseline | N_user > 16 (Rule 5 pressure); 1-shot throwaway |
 
-Switching mid-stream `minimal_4 → kathara_12`: inner fossils transfer ✓, outer self-params restart ✗.
-Switching `kathara_12 → kathara_17_adaptive`: meta_knowledge is per-preset keyed, no cross-leak. A/B benchmark shows kathara_17 beats kathara_12 on non-trivial problems; still opt-in (not default).
+`kathara_17_adaptive` の extra 5 dims (13: `self_batch_size`, 14-17: `self_hebbian_lr/min_history/percentile_gate/k_winners`) は Kathara 隣接グラフ上に**無い** — Hebbian 伝播は先頭 12 dims のみに適用 (Rule 10 保護)。14-17 は `best_p` から動的参照される outer-level パラメータ。
+
+Switching mid-stream `minimal_4 → kathara_12 → kathara_17_adaptive`: inner fossils transfer ✓、meta_knowledge は preset 別 key なので cross-leak なし。
 
 ### Wall time model
 
@@ -439,7 +441,7 @@ Response: `{"session_id": "abc12345"}`. Session TTL 30 min idle; all 3 endpoints
 | 6 | Discrete/int params OK via Sentinel (auto-fallback). Pass `initial_params` for warm-start | Sentinel |
 | 7 | **scale=0 forbidden**. Never include 0 in parameter ranges (proven: PPL=262144) | eval_fn |
 | 8 | Two metrics? Sentinel/Reigen. eval_fn optimizes, guard_fn protects. 1 metric: `guard_fn=eval_fn` | Reigen, Sentinel |
-| 9 | **Default to Reigen** (`kathara_12` + one `experience_id="genesis"`). self_params cross-task inheritance via `reigen_meta_knowledge.json` (auto read at __init__, auto write on approved/pivoted runs). Fossils stay task-local. N_user ≤ 8 optimal. | Reigen |
+| 9 | **Default to Reigen** (`kathara_17_adaptive` as of 2026-04-19). self_params cross-task inheritance via `reigen_meta_knowledge.json` (auto read at __init__, auto write on approved/pivoted runs). Fossils stay task-local; use any `experience_id` per task (no need to share — meta_knowledge handles shared learning). N_user ≤ 8 optimal. | Reigen |
 | 10 | Kathara chaos-game uniformity (0.993) requires N=12 + 5-regular + **symmetric placement**. Break any → collapse. Applying Kathara to a new domain: check all three. **Reigen uses graph properties only, not uniformity** | Reigen Ref |
 | 11 | `batch_eval_fn` works only for **external params** (lr, dropout, prompt). **Internal model state** (KV scale, weight scale, LoRA) forbids batching — shared global state. Strategy: fast eval_fn (≤2s) + **multi-observer** `{nll, hs, mmlu, ...}` → owl() for max info/eval. | Reigen, owl() |
 
