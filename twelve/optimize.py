@@ -2037,14 +2037,64 @@ def owl(
                 "n_measurements": len(growing_data),
                 "rounds_completed": round_i + 1,
             }
-            # Autonomous with verify_fn: don't bail — grow data via random exploration
-            # then continue to next round. Without this, cheap-eval problems abort
-            # before exploring their budget.
-            if autonomous and verify_fn is not None and param_ranges is not None:
+            # Autonomous + low R² + verify_fn: try direct-optimize fallback on
+            # real eval_fn first (Sentinel's trick ported to owl). Warm-start
+            # from best measurement. If proxy is fundamentally inadequate
+            # (multimodal/deceptive landscape), this path wins big.
+            if autonomous and verify_fn is not None and param_ranges is not None \
+                    and len(growing_data) > 0:
+                _best_m = max(growing_data, key=lambda m: m["score"])
+                _warm = (_best_m["params"] if not isinstance(_best_m["params"], dict)
+                         else [_best_m["params"].get(n, 0.0) for n in names])
+                _elapsed = time.time() - _global_t0
+                _fb_budget = min(_inner_budget if '_inner_budget' in dir() else time_budget,
+                                 max(1.0, (time_budget - _elapsed) / 3.0))
+                if verbose:
+                    print(f"  [Fallback-low-R²] direct optimize on verify_fn "
+                          f"from warm-start, {_fb_budget:.1f}s")
+                try:
+                    _fb_bp, _fb_bs, _ = optimize(
+                        eval_fn=verify_fn,
+                        param_ranges=param_ranges,
+                        initial_params=_warm,
+                        time_budget=_fb_budget,
+                        learn=True,
+                        experience_id=experience_id or "owl_fallback_lowR",
+                        verbose=False,
+                    )
+                    if _fb_bs is not None:
+                        if is_dict:
+                            growing_data.append({
+                                "params": {n: float(v) for n, v in zip(names, _fb_bp)},
+                                "score": float(_fb_bs)})
+                        else:
+                            growing_data.append({"params": [float(v) for v in _fb_bp],
+                                                 "score": float(_fb_bs)})
+                        # Promote into best_result so fallback improves aren't lost
+                        best_result = {
+                            "best_params": ({n: float(v) for n, v in zip(names, _fb_bp)}
+                                            if is_dict else [float(v) for v in _fb_bp]),
+                            "best_score": float(_fb_bs),
+                            "verified_score": float(_fb_bs),
+                            "proxy_r2": proxy_r2,
+                            "proxy_type": proxy_type,
+                            "active_dims": ms.active_dims,
+                            "dead_dims": ms.dead_dims,
+                            "recovered_dims": getattr(ms, 'recovered_dims', []),
+                            "param_names": names,
+                            "confidence": "direct",
+                            "n_measurements": len(growing_data),
+                            "rounds_completed": round_i + 1,
+                        }
+                        if verbose:
+                            print(f"  [Fallback-low-R²] direct best={_fb_bs:.4f}")
+                except Exception as _fb_e:
+                    if verbose:
+                        print(f"  [Fallback-low-R²] error: {type(_fb_e).__name__}")
+
+                # Also explore random points to grow data for next proxy attempt
                 _expl_rng = random.Random(round_i * 17 + 3)
-                _n_explore = 5
-                _n_added = 0
-                for _ in range(_n_explore):
+                for _ in range(3):
                     _sample = [_expl_rng.uniform(lo, hi) for lo, hi in param_ranges]
                     try:
                         _vt0 = time.time()
@@ -2056,11 +2106,7 @@ def owl(
                         growing_data.append({"params": {n: v for n, v in zip(names, _sample)}, "score": _s})
                     else:
                         growing_data.append({"params": _sample, "score": _s})
-                    _n_added += 1
-                if verbose:
-                    print(f"  [Auto-explore] added {_n_added}/{_n_explore} via verify_fn")
-                if _n_added > 0:
-                    continue   # retry proxy build with more data next round
+                continue   # retry proxy build next round
             break
 
         confidence = "high" if proxy_r2 >= min_r_squared else "low"
@@ -2122,6 +2168,62 @@ def owl(
             except Exception as e:
                 if verbose:
                     print(f"  [Verify] error: {e}")
+
+        # --- Step 5b: proxy untrustworthy → direct-optimize fallback ---
+        # Ported from Sentinel._optimize (2026-04-19). When the proxy predicts
+        # a best that underperforms the best actually measured (meaning the
+        # proxy is misleading / landscape is non-smooth), skip ahead and run
+        # optimize() directly on verify_fn with a warm-start from the best
+        # measurement. This is exactly what makes Sentinel win on multimodal
+        # landscapes — moving the capability into owl itself.
+        # Triggers only when autonomous + verify_fn + we have real measurements.
+        if (autonomous and verify_fn is not None and len(growing_data) > 0
+                and ranges is not None):
+            _max_measured = max(m["score"] for m in growing_data)
+            _measurement_winning = (verified_score is None
+                                    or verified_score < _max_measured)
+            _proxy_weak = proxy_r2 < min_r_squared
+            if _measurement_winning and _proxy_weak:
+                # Find the best measurement's params to warm-start
+                _best_m = max(growing_data, key=lambda m: m["score"])
+                _warm = (_best_m["params"] if not isinstance(_best_m["params"], dict)
+                         else [_best_m["params"].get(n, 0.0) for n in names])
+                # Budget: half of remaining autonomous time
+                _elapsed = time.time() - _global_t0
+                _remaining = max(1.0, time_budget - _elapsed)
+                _fb_budget = min(_inner_budget, _remaining / 2.0)
+                if verbose:
+                    print(f"  [Fallback] proxy weak (R²={proxy_r2:.2f}) + "
+                          f"measurement-winning ({_max_measured:.3f} > verified "
+                          f"{verified_score}); direct optimize() on verify_fn "
+                          f"for {_fb_budget:.1f}s")
+                try:
+                    _fb_bp, _fb_bs, _ = optimize(
+                        eval_fn=verify_fn,
+                        param_ranges=ranges,
+                        initial_params=_warm,
+                        time_budget=_fb_budget,
+                        learn=True,
+                        experience_id=experience_id or "owl_fallback",
+                        verbose=False,
+                    )
+                    if _fb_bs is not None and _fb_bs > _max_measured:
+                        best_params = list(_fb_bp)
+                        best_score = float(_fb_bs)
+                        verified_score = float(_fb_bs)
+                        # Add to growing_data
+                        if is_dict:
+                            growing_data.append({
+                                "params": {n: float(v) for n, v in zip(names, best_params)},
+                                "score": verified_score})
+                        else:
+                            growing_data.append({"params": [float(v) for v in best_params],
+                                                 "score": verified_score})
+                        if verbose:
+                            print(f"  [Fallback] improved: verified={verified_score:.4f}")
+                except Exception as _fb_e:
+                    if verbose:
+                        print(f"  [Fallback] error: {type(_fb_e).__name__}: {_fb_e}")
 
         # --- autonomous: 停滞検知 + 探索サンプリング ---
         if autonomous:
