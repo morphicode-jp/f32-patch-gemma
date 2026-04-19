@@ -2238,6 +2238,46 @@ def owl(
                             experience_id=experience_id or "owl_fallback",
                             verbose=False,
                         )
+                        # Per-warm-start L-BFGS-B polish: fire gradient refinement
+                        # in-place so each basin gets its own gradient descent, not
+                        # just the overall best at the end. Rosenbrock-type curved
+                        # valleys benefit hugely (each warm-start may land in a
+                        # different basin, end-of-run polish only saves the luckiest).
+                        if (use_lbfgs_refinement and _fb_bp is not None
+                                and _fb_bs is not None):
+                            try:
+                                from scipy.optimize import minimize as _sp_min2
+                                import numpy as _np2
+                                _pw_best = [float(_fb_bs)]
+                                _pw_bp = [list(_fb_bp)]
+                                def _pw_neg(p, _pw_best=_pw_best, _pw_bp=_pw_bp):
+                                    try:
+                                        v = float(verify_fn(list(p)))
+                                    except Exception:
+                                        return 0.0
+                                    if v > _pw_best[0]:
+                                        _pw_best[0] = v
+                                        _pw_bp[0] = [float(x) for x in p]
+                                    return -v
+                                try:
+                                    _sp_min2(
+                                        _pw_neg,
+                                        x0=_np2.array(_fb_bp, dtype=float),
+                                        method="L-BFGS-B",
+                                        bounds=list(ranges),
+                                        options={"maxfun": 30, "ftol": 1e-8,
+                                                 "gtol": 1e-6},
+                                    )
+                                except Exception:
+                                    pass
+                                if _pw_best[0] > float(_fb_bs):
+                                    if verbose:
+                                        print(f"  [Fallback/warm{_w_idx+1}/lbfgs] "
+                                              f"{_fb_bs:.4f} → {_pw_best[0]:.4f}")
+                                    _fb_bp = _pw_bp[0]
+                                    _fb_bs = _pw_best[0]
+                            except ImportError:
+                                pass
                         if _fb_bs is not None and _fb_bs > _fb_best_score:
                             _fb_best_score = float(_fb_bs)
                             _fb_best_params = list(_fb_bp)
