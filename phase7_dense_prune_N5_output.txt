@@ -1,0 +1,178 @@
+======================================================================
+  DENSE-THEN-PRUNE N=5 (full evaluation)
+======================================================================
+  Config: dale=OFF, hebb=OFF, reach_w=0.6
+
+======================================================================
+  STAGE 1: Dense (120 edges), 5 agents
+======================================================================
+  [init] midpoint (no warm-start)
+
+  === cycle 1/1  agent 0/5  (round 1/5) ===
+  [MS Proxy] zenron R2=1.000, linear R2=1.000, zenron_log R2=1.000, linear_log R2=1.000 -> zenron selected
+  [MS Proxy] zenron R2=0.957, linear R2=0.957, linear_log R2=0.662, zenron_log R2=0.662 -> zenron selected
+  [MS Proxy] zenron R2=0.947, linear R2=0.947, zenron_log R2=0.596, linear_log R2=0.596 -> zenron selected
+  [MS Proxy] zenron R2=0.901, linear R2=0.901, zenron_log R2=-2.305, linear_log R2=-2.305 -> zenron selected
+  [MS Proxy] zenron R2=0.878, linear R2=0.878, linear_log R2=-2.395, zenron_log R2=-2.395 -> zenron selected
+  [MS Proxy] linear R2=0.809, zenron R2=0.809, linear_log R2=0.090, zenron_log R2=0.090 -> linear selected
+  [MS Proxy] zenron R2=0.770, linear R2=0.770, linear_log R2=-0.473, zenron_log R2=-0.473 -> zenron selected
+  [MS Proxy] zenron R2=0.718, linear R2=0.718, zenron_log R2=-0.261, linear_log R2=-0.261 -> zenron selected
+  [MS Proxy] zenron_interact R2=0.090, zenron R2=0.071, linear R2=0.071, zenron_interact_log R2=-0.190, zenron_log R2=-0.191, linear_log R2=-0.191 -> zenron_interact selected
+  eval=71.53  round_t=171s  total_t=171s
+
+  === cycle 1/1  agent 1/5  (round 2/5) ===
+  [MS Proxy] zenron R2=1.000, linear R2=1.000, zenron_log R2=1.000, linear_log R2=1.000 -> zenron selected
+  [MS Proxy] zenron R2=0.974, linear R2=0.974, zenron_log R2=0.956, linear_log R2=0.956 -> zenron selected
+  [MS Proxy] zenron R2=0.912, linear R2=0.912, linear_log R2=0.798, zenron_log R2=0.798 -> zenron selected
+  [MS Proxy] linear R2=0.937, zenron R2=0.937, linear_log R2=0.895, zenron_log R2=0.895 -> linear selected
+  [MS Proxy] zenron R2=0.901, linear R2=0.901, zenron_log R2=0.833, linear_log R2=0.833 -> zenron selected
+  [MS Proxy] linear R2=0.871, zenron R2=0.871, zenron_log R2=0.802, linear_log R2=0.802 -> linear selected
+  [MS Proxy] zenron R2=0.817, linear R2=0.817, linear_log R2=0.577, zenron_log R2=0.577 -> zenron selected
+  [MS Proxy] zenron R2=0.676, linear R2=0.676, zenron_log R2=0.202, linear_log R2=0.202 -> zenron selected
+  [MS Proxy] zenron_interact R2=0.150, zenron R2=0.114, linear R2=0.114, zenron_interact_log R2=-0.019, zenron_log R2=-0.046, linear_log R2=-0.046 -> zenron_interact selected
+  eval=51.64  round_t=161s  total_t=332s
+
+  === cycle 1/1  agent 2/5  (round 3/5) ===
+  [MS Proxy] linear R2=0.883, zenron R2=0.883, linear_log R2=0.866, zenron_log R2=0.866 -> linear selected
+  [MS Proxy] linear R2=0.947, zenron R2=0.947, linear_log R2=0.946, zenron_log R2=0.946 -> linear selected
+  [MS Proxy] linear_log R2=0.955, zenron_log R2=0.955, linear R2=0.951, zenron R2=0.951 -> linear_log selected
+  [MS Proxy] zenron R2=0.936, linear R2=0.936, linear_log R2=0.927, zenron_log R2=0.927 -> zenron selected
+  [MS Proxy] zenron R2=0.900, linear R2=0.900, linear_log R2=0.891, zenron_log R2=0.891 -> zenron selected
+  [MS Proxy] zenron R2=0.860, linear R2=0.860, zenron_log R2=0.842, linear_log R2=0.842 -> zenron selected
+  [MS Proxy] zenron R2=0.850, linear R2=0.850, linear_log R2=0.842, zenron_log R2=0.842 -> zenron selected
+  [MS Proxy] linear R2=0.771, zenron R2=0.771, linear_log R2=0.736, zenron_log R2=0.736 -> linear selected
+  [MS Proxy] zenron R2=0.640, linear R2=0.640, linear_log R2=0.592, zenron_log R2=0.592 -> zenron selected
+  [MS Proxy] zenron R2=0.618, linear R2=0.618, linear_log R2=0.558, zenron_log R2=0.558 -> zenron selected
+  eval=12.69  round_t=202s  total_t=534s
+
+  === cycle 1/1  agent 3/5  (round 4/5) ===
+  [MS Proxy] zenron_interact R2=0.120, zenron R2=0.109, linear R2=0.109, zenron_interact_log R2=0.076, linear_log R2=0.067, zenron_log R2=0.067 -> zenron_interact selected
+  [MS Proxy] zenron_interact R2=0.120, zenron R2=0.109, linear R2=0.109, zenron_interact_log R2=0.076, linear_log R2=0.067, zenron_log R2=0.067 -> zenron_interact selected
+  [MS Proxy] zenron R2=0.942, linear R2=0.942, zenron_log R2=-6.277, linear_log R2=-6.277 -> zenron selected
+  [MS Proxy] zenron R2=0.942, linear R2=0.942, zenron_log R2=-6.277, linear_log R2=-6.277 -> zenron selected
+  [MS Proxy] zenron R2=0.810, linear R2=0.810, zenron_log R2=-20.420, linear_log R2=-20.420 -> zenron selected
+  [MS Proxy] zenron R2=0.723, linear R2=0.723, linear_log R2=-27.915, zenron_log R2=-27.915 -> zenron selected
+  [MS Proxy] zenron R2=0.665, linear R2=0.665, zenron_log R2=-6.215, linear_log R2=-6.215 -> zenron selected
+  [MS Proxy] zenron R2=0.651, linear R2=0.651, linear_log R2=-7.306, zenron_log R2=-7.306 -> zenron selected
+  [MS Proxy] zenron R2=0.592, linear R2=0.592, linear_log R2=-7.395, zenron_log R2=-7.395 -> zenron selected
+  [MS Proxy] zenron R2=0.580, linear R2=0.580, linear_log R2=-4.778, zenron_log R2=-4.778 -> zenron selected
+  [MS Proxy] zenron R2=0.565, linear R2=0.565, linear_log R2=-6.146, zenron_log R2=-6.146 -> zenron selected
+  [MS Proxy] zenron R2=0.518, linear R2=0.518, linear_log R2=-4.597, zenron_log R2=-4.597 -> zenron selected
+  [MS Proxy] zenron R2=0.483, linear R2=0.483, linear_log R2=-5.529, zenron_log R2=-5.529 -> zenron selected
+  eval=59.78  round_t=239s  total_t=773s
+
+  === cycle 1/1  agent 4/5  (round 5/5) ===
+  [MS Proxy] zenron R2=1.000, linear R2=1.000, zenron_log R2=1.000, linear_log R2=1.000 -> zenron selected
+  [MS Proxy] zenron_log R2=0.995, linear_log R2=0.995, linear R2=0.991, zenron R2=0.991 -> zenron_log selected
+  [MS Proxy] zenron R2=0.980, linear R2=0.980, zenron_log R2=0.971, linear_log R2=0.971 -> zenron selected
+  [MS Proxy] linear_log R2=0.942, zenron_log R2=0.942, zenron R2=0.942, linear R2=0.942 -> linear_log selected
+  [MS Proxy] zenron R2=0.922, linear R2=0.922, linear_log R2=0.909, zenron_log R2=0.909 -> zenron selected
+  [MS Proxy] zenron R2=0.908, linear R2=0.908, zenron_log R2=0.897, linear_log R2=0.897 -> zenron selected
+  [MS Proxy] zenron R2=0.833, linear R2=0.833, linear_log R2=0.824, zenron_log R2=0.824 -> zenron selected
+  [MS Proxy] linear R2=0.765, zenron R2=0.765, linear_log R2=0.717, zenron_log R2=0.717 -> linear selected
+  [MS Proxy] zenron R2=0.723, linear R2=0.723, linear_log R2=0.683, zenron_log R2=0.683 -> zenron selected
+  [MS Proxy] zenron R2=0.728, linear R2=0.728, linear_log R2=0.689, zenron_log R2=0.689 -> zenron selected
+  eval=55.34  round_t=217s  total_t=989s
+
+  Stage 1 elapsed: 989s
+
+======================================================================
+  STAGE 2: Prune (keep top 40% by |weight|)
+======================================================================
+  Edges kept: 48/120 (threshold |w|>=1.747)
+
+======================================================================
+  STAGE 3: Retrain pruned (48 edges)
+======================================================================
+  [init] warm-started from provided 5-agent params
+
+  === cycle 1/1  agent 0/5  (round 1/5) ===
+  [MS Proxy] zenron R2=0.961, linear R2=0.961, linear_log R2=0.223, zenron_log R2=0.223 -> zenron selected
+  [MS Proxy] zenron R2=0.911, linear R2=0.911, linear_log R2=0.620, zenron_log R2=0.620 -> zenron selected
+  [MS Proxy] linear R2=0.982, zenron R2=0.982, zenron_log R2=0.667, linear_log R2=0.667 -> linear selected
+  [MS Proxy] zenron R2=0.951, linear R2=0.951, linear_log R2=0.396, zenron_log R2=0.396 -> zenron selected
+  [MS Proxy] zenron R2=0.908, linear R2=0.908, linear_log R2=0.032, zenron_log R2=0.032 -> zenron selected
+  [MS Proxy] zenron R2=0.831, linear R2=0.831, linear_log R2=0.235, zenron_log R2=0.235 -> zenron selected
+  [MS Proxy] zenron R2=0.889, linear R2=0.889, zenron_log R2=0.694, linear_log R2=0.694 -> zenron selected
+  [MS Proxy] zenron R2=0.825, linear R2=0.825, zenron_log R2=0.493, linear_log R2=0.493 -> zenron selected
+  [MS Proxy] zenron R2=0.823, linear R2=0.823, zenron_log R2=0.391, linear_log R2=0.391 -> zenron selected
+  [MS Proxy] zenron R2=0.806, linear R2=0.806, linear_log R2=0.538, zenron_log R2=0.538 -> zenron selected
+  eval=48.59  round_t=202s  total_t=202s
+
+  === cycle 1/1  agent 1/5  (round 2/5) ===
+  [MS Proxy] zenron R2=1.000, linear R2=1.000, zenron_log R2=0.997, linear_log R2=0.997 -> zenron selected
+  [MS Proxy] zenron R2=0.996, linear R2=0.996, zenron_log R2=0.730, linear_log R2=0.730 -> zenron selected
+  [MS Proxy] zenron R2=0.974, linear R2=0.974, linear_log R2=0.263, zenron_log R2=0.263 -> zenron selected
+  [MS Proxy] zenron R2=0.974, linear R2=0.974, zenron_log R2=0.729, linear_log R2=0.729 -> zenron selected
+  [MS Proxy] zenron R2=0.950, linear R2=0.950, zenron_log R2=0.488, linear_log R2=0.488 -> zenron selected
+  [MS Proxy] zenron R2=0.893, linear R2=0.893, linear_log R2=0.148, zenron_log R2=0.148 -> zenron selected
+  [MS Proxy] zenron R2=0.858, linear R2=0.858, linear_log R2=-0.169, zenron_log R2=-0.169 -> zenron selected
+  [MS Proxy] zenron R2=0.785, linear R2=0.785, linear_log R2=0.063, zenron_log R2=0.063 -> zenron selected
+  [MS Proxy] linear R2=0.779, zenron R2=0.779, zenron_log R2=0.130, linear_log R2=0.130 -> linear selected
+  [MS Proxy] zenron_interact R2=0.215, zenron R2=0.158, linear R2=0.158, zenron_interact_log R2=-0.104, zenron_log R2=-0.261, linear_log R2=-0.261 -> zenron_interact selected
+  eval=52.60  round_t=185s  total_t=387s
+
+  === cycle 1/1  agent 2/5  (round 3/5) ===
+  [MS Proxy] linear R2=0.144, zenron R2=0.144, zenron_interact_log R2=0.113, linear_log R2=0.108, zenron_log R2=0.108 -> linear selected
+  eval=55.00  round_t=47s  total_t=434s
+
+  === cycle 1/1  agent 3/5  (round 4/5) ===
+  [MS Proxy] linear_log R2=0.975, zenron_log R2=0.975, linear R2=0.950, zenron R2=0.950 -> linear_log selected
+  [MS Proxy] zenron_log R2=0.841, linear_log R2=0.841, zenron R2=0.832, linear R2=0.832 -> zenron_log selected
+  [MS Proxy] zenron R2=0.782, linear R2=0.782, zenron_log R2=0.778, linear_log R2=0.778 -> zenron selected
+  [MS Proxy] zenron R2=0.699, linear R2=0.699, zenron_log R2=0.685, linear_log R2=0.685 -> zenron selected
+  [MS Proxy] zenron R2=0.613, linear R2=0.613, zenron_log R2=0.579, linear_log R2=0.579 -> zenron selected
+  [MS Proxy] zenron R2=0.503, linear R2=0.503, zenron_log R2=0.440, linear_log R2=0.440 -> zenron selected
+  [MS Proxy] zenron R2=0.430, linear R2=0.430, zenron_log R2=0.351, linear_log R2=0.351 -> zenron selected
+  [MS Proxy] zenron R2=0.396, linear R2=0.396, linear_log R2=0.313, zenron_log R2=0.313 -> zenron selected
+  [MS Proxy] zenron R2=0.318, linear R2=0.318, zenron_log R2=0.233, linear_log R2=0.233 -> zenron selected
+  [MS Proxy] zenron R2=0.277, linear R2=0.277, zenron_log R2=0.186, linear_log R2=0.186 -> zenron selected
+  eval=55.98  round_t=170s  total_t=605s
+
+  === cycle 1/1  agent 4/5  (round 5/5) ===
+  [MS Proxy] linear_log R2=0.961, zenron_log R2=0.961, linear R2=0.950, zenron R2=0.950 -> linear_log selected
+  [MS Proxy] linear_log R2=0.887, zenron_log R2=0.887, zenron R2=0.886, linear R2=0.886 -> linear_log selected
+  [MS Proxy] linear_log R2=0.804, zenron_log R2=0.804, zenron R2=0.789, linear R2=0.789 -> linear_log selected
+  [MS Proxy] zenron R2=0.743, linear R2=0.743, zenron_log R2=0.741, linear_log R2=0.741 -> zenron selected
+  [MS Proxy] linear R2=0.798, zenron R2=0.798, linear_log R2=0.769, zenron_log R2=0.769 -> linear selected
+  [MS Proxy] zenron R2=0.648, linear R2=0.648, zenron_log R2=0.640, linear_log R2=0.640 -> zenron selected
+  [MS Proxy] zenron R2=0.740, linear R2=0.740, linear_log R2=0.727, zenron_log R2=0.727 -> zenron selected
+  [MS Proxy] zenron R2=0.706, linear R2=0.706, zenron_log R2=0.678, linear_log R2=0.678 -> zenron selected
+  [MS Proxy] zenron R2=0.670, linear R2=0.670, zenron_log R2=0.658, linear_log R2=0.658 -> zenron selected
+  [MS Proxy] zenron R2=0.644, linear R2=0.644, linear_log R2=0.630, zenron_log R2=0.630 -> zenron selected
+  eval=56.89  round_t=200s  total_t=804s
+
+  Stage 3 elapsed: 804s
+
+======================================================================
+  FULL EVALUATION (Stage 3 pruned brain)
+======================================================================
+
+[1/4] Standard task...
+  mean reach: 9%
+  per-agent: ['7%', '7%', '13%', '13%', '7%']
+
+[2/4] MI panel...
+  mean MI gain: +0.0218
+  max MI gain: +0.0424
+
+[3/4] ToM test...
+  predictive pairs: 17/20 (85%)
+  max gain: +0.8835
+
+[4/4] Scales test (N=5 -> N=10)...
+  N=10 mean reach: 9%
+
+======================================================================
+  PRE-REGISTERED CRITERIA
+======================================================================
+  [x] 1. Reach > 80%:    9%
+  [x] 2. MI > 0.08:      +0.0218
+  [v] 3. ToM > 45%:      85%
+  [x] 4. Scales > 60%:   9%
+
+  CRITERIA MET: 1/4
+  Verdict: PHASE 7 INCOMPLETE
+
+  Total: 1797s (29.9 min)
+  Saved: phase7_dense_prune_N5_full.json
