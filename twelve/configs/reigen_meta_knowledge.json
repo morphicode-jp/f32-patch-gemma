@@ -1,0 +1,7 @@
+{
+  "_doc": "Cross-task Reigen self-param knowledge. Grows via Reigen.run() on successful runs. Read at Reigen.__init__() as prior for self_param_defaults. Schema: self_param_best is keyed by preset name; each value maps self_param name → {value, score}. self_param_history is capped at 100 FIFO entries.",
+  "_version": 1,
+  "self_param_best": {},
+  "self_param_history": [],
+  "proxy_type_wins": {}
+}
