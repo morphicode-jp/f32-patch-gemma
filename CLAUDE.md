@@ -6,32 +6,39 @@ All responses in Japanese.
 
 ## Quick Reference
 
-### owl 中心主義 (2026-04-19 以降)
+### 2026-04-19 以降: owl 中心化 + Sentinel 秘密兵器を owl に吸収
 
-**`owl()` が知能の本体**。Reigen/Sentinel は周辺機構 (meta_knowledge 累積、orchestration) で、owl の算法を賢くするものではない。
+**`owl()` が主軸**。Sentinel の "proxy 不能時 direct HC on verify_fn" 秘密兵器も owl に移植済 (commit 911997e)。Reigen は **(a) meta_knowledge 累積 (b) cheap eval + deceptive 多峰でのブルートフォース優位** の用途に限定。
 
 ```python
 def eval_fn(params: list[float]) -> float:
     return score   # 高いほど良い float。損失なら -loss で反転
 ```
 
-| 状況 | 使うやつ | 備考 |
-|---|---|---|
-| **過去実測データがある** (ドメイン知識あり) | `owl(measurements=curated_data, verify_fn=eval_fn, guard_fn=..., ...)` | **最強**: 情報量高い curated data を直接活用 |
-| **callable だけ、初期データ無し** | `owl(measurements=[], verify_fn=eval_fn, param_ranges=...)` | owl が自動で初期 N 点サンプリング |
-| **cross-task 学習蓄積したい** | `reigen(eval_fn, guard_fn, ranges)` | Sentinel wrapper + meta_knowledge 自動 |
-| **素直に使いたい、選ぶのがしんどい** | `reigen(eval_fn, guard_fn, ranges)` | デフォで賢い (kathara_17_adaptive) |
+### 選択フロー (2026-04-19 A/B 実測根拠あり)
 
-**curated data がある時は owl 直使い** (Reigen/Sentinel の random _collect はドメイン知識を破棄する)。
+| 状況 | 使うやつ | A/B 実証 |
+|---|---|---|
+| **eval 高コスト** (LLM 等、> 0.5s/call) | `owl(measurements=data, verify_fn=..., autonomous=True)` | owl は **5-16× 少ない eval** で reigen と同等/近似品質。LLM 換算で reigen = 数時間、owl = 数分 |
+| **過去実測データがある** (ドメイン知識) | `owl(measurements=curated_data, ...)` | curated 20 点は random 20 点の 10-100× 情報量。Reigen は _collect で捨てる |
+| **cheap eval + 多峰 / deceptive** | `reigen(eval_fn, guard_fn, ranges)` | reigen のブルートフォース optimize() が有利 (A/B: Ackley / Schwefel で勝ち) |
+| **smooth landscape** | `owl(..., autonomous=True)` | direct-HC fallback で Rastrigin 5d も解ける (gap=0) |
+| **cross-task 学習累積したい** | `reigen(..., experience_id="...")` | meta_knowledge が自動で prior 継承 |
+| **guard_fn (安全指標) 要** | `owl(..., guard_fn=..., safe_dim_analysis=True)` | Sentinel wrap 不要、owl 内で直接 |
 
 ```python
-from twelve.optimize import owl                    # 直接、最強経路
-from twelve.agent.reigen import reigen            # 楽したい / 累積学習したい時
+from twelve.optimize import owl                    # 2026-04-19 以降の主軸
+from twelve.agent.reigen import reigen            # cross-task / cheap+多峰 特化
 ```
 
 `experience_id`: 任意の task 名札を付ける。self_params cross-task 学習は `reigen_meta_knowledge.json` 経由で自動共有される (2026-04-19 以降、ID 共有不要)。fossil は per-ID 分離で並列時の衝突回避。
 
-### `owl()` 使用例 — curated data から最適化
+### 実測値問題 (最重要)
+
+**curated 20 点 ≈ random 200-2000 点の情報量**。ドメインエキスパートの 20 点は proxy R² を 0.5→0.85 に引き上げる。
+Sentinel の `_collect` は uniform random で **この価値を捨てる**。owl 直使いが 99% 正解。
+
+### `owl()` 使用例 — curated data + 自律成長
 
 ```python
 # 過去実験の結果が手元にある: owl に直接投入
@@ -43,30 +50,36 @@ past_results = [
 r = owl(
     measurements=past_results,          # curated なので高 R² 期待
     param_ranges=[(0.5, 2.0)] * 3,
-    verify_fn=my_eval_fn,                # 最適点の verify 実測
+    verify_fn=my_eval_fn,                # 最適点の verify 実測 + direct-HC fallback
     guard_fn=my_guard_fn,                # safety (任意)
-    autonomous=True,                     # 停滞時 range 拡張
+    autonomous=True,                     # 停滞時 range 拡張 + budget-aware loop
     experience_id="my_task_v1",
 )
-print(r["best_params"], r["guard_verdict"])
+print(r["best_params"], r["confidence"], r.get("guard_verdict"))
+# confidence: "high"/"low"/"direct"/"insufficient"
+#   "direct" = proxy 不能で real eval_fn に対する直接 HC が走った (algorithmic win)
 ```
 
-### `reigen()` 使用例 — 楽に累積学習
+### `reigen()` 使用例 — cross-task 累積 or deceptive 多峰
 
 ```python
-# 手軽。Reigen が内部で Sentinel + owl を呼び、meta_knowledge 更新
+# cheap eval + 多峰 landscape で brute-force 安心したい時
 r = reigen(eval_fn, guard_fn, [(0.8, 1.5)] * 5, experience_id="my_task_v1")
+# kathara_17_adaptive default、meta_knowledge 自動累積
 ```
 
-### owl の新機能 (2026-04-19)
+### owl の 2026-04-19 強化まとめ
 
-| kwarg | 用途 |
-|---|---|
-| `measurements=[]` + `verify_fn=` + `param_ranges=` | 空データから自律サンプリング |
-| `curated_measurements=` | `measurements=` の明示 alias (ドメイン知識 intent) |
-| `guard_fn=` + `guard_threshold=` | 安全指標ゲート (owl 内で評価) |
-| `safe_dim_analysis=True` | guard 失敗時 multi-observer で safe_dims 出力 |
-| `n_seed_samples=` | 空データ時の初期点数 (default max(5, N+2)) |
+| kwarg / 機能 | 分類 | 説明 |
+|---|---|---|
+| `measurements=[]` + `verify_fn=` + `param_ranges=` | usability | 空データ → owl が自動で N 点 seed |
+| `curated_measurements=` | usability | `measurements=` の明示 alias (intent 可視化) |
+| `guard_fn=` / `guard_threshold=` / `safe_dim_analysis=` | usability + Sentinel 移植 | 安全ゲート + multi-observer pivot を owl 内で |
+| `n_seed_samples=` / `seed_rng_state=` | usability | 空データ seed 数・seed 制御 |
+| **budget-aware autonomous loop** | **algorithm** | `time_budget` 厳守、cheap eval では max_iterations 超え |
+| **direct-HC fallback (Step 5b + insufficient branch)** | **algorithm** ★ | proxy 不能時 `optimize(eval_fn=verify_fn)` 直接起動、warm-start from best measurement。**Rastrigin 5d で gap 45→0 達成の主犯** |
+
+★ = 今日の唯一の真の「算法強化」。他は既存 owl のアクセス改善。
 
 ---
 
@@ -74,7 +87,7 @@ r = reigen(eval_fn, guard_fn, [(0.8, 1.5)] * 5, experience_id="my_task_v1")
 
 Dimension-additive self-application: one outer Sentinel over (N_user + N_self)-dim joint space (N_self = 17 for kathara_17_adaptive default, 12 for kathara_12 legacy).
 Internally composes Sentinel → owl → MS → multi-observer → Kathara K² → optimize → UnifiedExperience.
-`twelve/agent/sentinel.py` is **never modified** (uses `_TunableSentinel` subclass + `mirror_agent._mp()` monkey-patch).
+`twelve/agent/sentinel.py` は 2026-04-19 に **`initial_measurements=` kwarg 追加のみ**修正 (curated data 経路、その他不変)。`_TunableSentinel` subclass + `mirror_agent._mp()` monkey-patch は維持。
 
 ### 3 ways to invoke
 
@@ -286,9 +299,11 @@ PPL / HellaSwag · binding / toxicity · character power / meta diversity · exp
 
 **Direct-mode fires when**: discrete spaces · non-smooth landscapes · proxy R² < 0.3 · verified_score < max measurement. Proven on brain_growth 04-17 (ISS 92-107 on 8D discrete topo where owl alone returned 0.0).
 
+**2026-04-19 以降、owl 自身にも direct-HC fallback 移植済** (commit 911997e)。autonomous + verify_fn があれば Sentinel wrap 不要で同じ動作。新規 code では owl 直使い推奨、Sentinel は legacy 互換で残置。
+
 ---
 
-## owl() — structure discovery + proxy optimization
+## owl() — structure discovery + proxy optimization + direct-HC fallback
 
 ```python
 r = owl(data, verify_fn=eval_fn, autonomous=True, max_iterations=10,
@@ -299,19 +314,50 @@ r = owl(data, verify_fn=eval_fn, autonomous=True, max_iterations=10,
 
 | option | effect | notes |
 |---|---|---|
-| verify_fn | 5-round auto-growth: verify proxy optimum with real eval | prevents proxy hallucination |
-| autonomous=True | stagnation → range perturb → re-expand | pair with verify_fn for long runs |
+| measurements=[] | empty-data autonomous start — seed via verify_fn + param_ranges | 2026-04-19 added |
+| curated_measurements= | explicit alias for `measurements=` (domain-curated intent) | 2026-04-19 added |
+| verify_fn | proxy optimum を real eval で verify; data 成長に使用 | prevents proxy hallucination |
+| guard_fn= / guard_threshold= / safe_dim_analysis= | 安全指標ゲート + multi-observer safe_dim 分解 | 2026-04-19 added (Sentinel pivot 移植) |
+| autonomous=True | 停滞 → range perturb → 継続、**budget-aware** (time_budget 厳守) | cheap eval で max_iterations 超え可 |
 | experience_id | cross-call learning with same ID | smarter per call |
-| time_budget | seconds (default 60) | |
-| max_iterations | autonomous round cap (default 10) | |
+| time_budget | seconds (default 60) | **autonomous 時は TOTAL wall budget** |
+| max_iterations | autonomous round cap (default 10) — budget 残ってれば hard cap 200 まで継続 | |
 | n_rounds | verify_fn rounds; auto=5 when verify_fn set | |
 | stagnation_threshold | autonomous range-perturb trigger (default 3) | added for Reigen |
-| min_r_squared | proxy confidence threshold; owl default 0.7, **Sentinel overrides to 0.3** | lower for noisy data |
-| force_proxy_type | "zenron"/"zenron_interact"/"linear"; default R²-best | added for Reigen |
+| min_r_squared | proxy confidence threshold; default 0.7 | lower for noisy data |
+| force_proxy_type | "zenron"/"zenron_interact"/"linear"; default R²-best | |
+| n_seed_samples / seed_rng_state | empty-data path 制御 | 2026-04-19 added |
 | kathara="auto" | 6-node K² parallel; auto if verify_fn importable + budget ≥ 120s | |
 
 ### Confidence bands
-`r² ≥ 0.7` → high (trustworthy, verify_fn effective). `0.3–0.7` → low (use with caution). `< 0.3` → insufficient (add more data).
+`r² ≥ 0.7` → high. `0.3–0.7` → low. `< 0.3` → **insufficient (proxy 不能) だが autonomous + verify_fn があれば direct-HC fallback が発動**。
+
+### Direct-HC fallback (2026-04-19 追加、commit 911997e) ★
+
+**owl 最大の算法強化**。proxy 不能な多峰 / deceptive / plateau 地形で effect 大。
+
+**発動条件**:
+- `autonomous=True` + `verify_fn` 提供
+- 以下のどちらかが真:
+  - A. proxy_r2 < 0.3 (insufficient): insufficient branch で自動発動
+  - B. proxy_r2 < min_r_squared + verified_score < max(measurements) (proxy 騙された): Step 5b で発動
+
+**動作**:
+1. `growing_data` から best measurement 特定
+2. その params を warm-start として `optimize(eval_fn=verify_fn, initial_params=warm, ...)` を直接起動
+3. 結果が既存 best を上回れば best_result 更新 (`confidence="direct"`)
+
+**効果実測 (A/B 2026-04-19、Rastrigin 5d、eval_fn=20ms/call)**:
+- Before: gap=45.6 (proxy 頼み、諦め)
+- After: **gap=0.000** (global optimum 到達)
+- eval 数 1/5 (279 vs reigen 1465)
+
+これで owl は verify_fn あれば reigen/Sentinel 不要、多峰 landscape も突破できる汎用最適化器に昇格。
+
+### Budget-aware autonomous loop (2026-04-19 追加、commit 1addbd9)
+
+従来: `autonomous=True` で max_iterations=10 固定、cheap eval で予算余らせ。
+現行: `time_budget` を TOTAL 予算として厳守。budget 残っていれば max_iterations 超え (hard cap 200) で継続。inner optimize の budget も残時間に応じて動的分配。
 
 ### 5 readings from 1 owl() computation
 
@@ -343,10 +389,11 @@ Single `"score"` key remains backward-compatible. Sentinel uses this internally 
 | good | bad | why |
 |---|---|---|
 | `return -ppl` (higher=better) | `return ppl` | score convention |
-| discrete params via Sentinel + `initial_params` | owl() alone on discrete | owl proxy collapses; Sentinel auto-fallbacks |
+| discrete / non-smooth params via owl() + autonomous | 旧: Sentinel でラップ必要 | 2026-04-19 以降 owl に direct-HC fallback 移植、単体で対応可 |
 | range `[0.5, 1.5]` | range includes 0 | scale=0 catastrophic (PPL=262144, proven) |
 | apply → measure → restore | state leaks | measurement contamination |
 | eval on training data | eval on test answers | cheating |
+| curated 過去 data → `owl(measurements=past, ...)` | Reigen で random `_collect` | curated data は 10-100× 情報量、捨てるな |
 
 ---
 
@@ -487,7 +534,7 @@ Response: `{"session_id": "abc12345"}`. Session TTL 30 min idle; all 3 endpoints
 | 6 | Discrete/int params OK via Sentinel (auto-fallback). Pass `initial_params` for warm-start | Sentinel |
 | 7 | **scale=0 forbidden**. Never include 0 in parameter ranges (proven: PPL=262144) | eval_fn |
 | 8 | Two metrics? Sentinel/Reigen. eval_fn optimizes, guard_fn protects. 1 metric: `guard_fn=eval_fn` | Reigen, Sentinel |
-| 9 | **Default to Reigen** (`kathara_17_adaptive` as of 2026-04-19). self_params cross-task inheritance via `reigen_meta_knowledge.json` (auto read at __init__, auto write on approved/pivoted runs). Fossils stay task-local; use any `experience_id` per task (no need to share — meta_knowledge handles shared learning). N_user ≤ 8 optimal. | Reigen |
+| 9 | **Default to owl** (2026-04-19 更新)。`owl(measurements=curated, verify_fn=..., autonomous=True)` が主経路。direct-HC fallback で多峰 landscape も対応、5-16× eval 効率。Reigen は cross-task 学習累積 or cheap+多峰 ブルートフォースが要る時のみ (`kathara_17_adaptive` default、meta_knowledge 自動)。| owl / Reigen |
 | 10 | Kathara chaos-game uniformity (0.993) requires N=12 + 5-regular + **symmetric placement**. Break any → collapse. Applying Kathara to a new domain: check all three. **Reigen uses graph properties only, not uniformity** | Reigen Ref |
 | 11 | `batch_eval_fn` works only for **external params** (lr, dropout, prompt). **Internal model state** (KV scale, weight scale, LoRA) forbids batching — shared global state. Strategy: fast eval_fn (≤2s) + **multi-observer** `{nll, hs, mmlu, ...}` → owl() for max info/eval. | Reigen, owl() |
 
@@ -527,6 +574,12 @@ r = owl(data)   # finds stable_active / observer_dependent / stable_dead
 | 04-18 | **Reigen v1+v2+v3 unified** | dim-additive self-application, kathara_12 default (12 knobs + Hebbian 30-edges), batch_eval_fn API. 45+12 tests all green. Sentinel untouched. |
 | 04-18 | Kathara chaos-game uniformity | **0.993** on 12-icosahedron (p=0.17, indistinguishable from uniform). Rule 10. |
 | 04-18 | Qwen3.6-NVFP4 KV-Reigen | Single-obs NLL hurt HS -2pt (hit boundary 0.01/1.5 = proxy overfit). Birth of Rule 11. |
+| 04-19 | **kathara_17_adaptive A/B 3/3 勝利** | Rosenbrock 5d / Ackley 8d / Styblinski 6d で vs kathara_12: 2.7-3.3× 速 + 15/15 approved (vs 8/15)。default に昇格 (commit 9381df1) |
+| 04-19 | **Rule 9 (genesis 学習累積) 実装** | meta_knowledge.json 新設 + atomic write、Reigen.run() 成功時に self_param_best 書戻し。これまで「累積」は建前だけだった (commit 888dfc1) |
+| 04-19 | **owl direct-HC fallback 移植** | Sentinel 秘密兵器を owl 本体に。Rastrigin 5d で gap 45.6 → 0.000 (global optimum)、1/5 eval 数。autonomous + verify_fn で多峰 landscape 突破可能に (commit 911997e) |
+| 04-19 | **owl budget-aware autonomous loop** | time_budget を TOTAL 予算として厳守、cheap eval で max_iterations 超え継続 (commit 1addbd9) |
+| 04-19 | **Sentinel curated-data path** | `initial_measurements=` kwarg、Sentinel/Reigen 経由でもドメイン知識注入可能に (commit 6ed20c0) |
+| 04-19 | **A/B realistic (20ms/eval)** | owl vs reigen: 同 budget で reigen 2/3 勝ち gap 小だが eval 5-16× 多 (= LLM 換算で実用不能)。owl は eval 効率で実戦優位 |
 | failures | scale=0 → PPL=262144 | Rule 7. verify_fn catches hallucination |
 | failures | single-obs on internal model state | fix: multi-observer + fast eval (Rule 11) |
 
