@@ -68,7 +68,7 @@ r = reigen(eval_fn, guard_fn, [(0.8, 1.5)] * 5, experience_id="my_task_v1")
 # kathara_17_adaptive default、meta_knowledge 自動累積
 ```
 
-### owl の 2026-04-19 強化まとめ
+### owl の 2026-04-19 〜 04-20 強化まとめ
 
 | kwarg / 機能 | 分類 | 説明 |
 |---|---|---|
@@ -78,8 +78,12 @@ r = reigen(eval_fn, guard_fn, [(0.8, 1.5)] * 5, experience_id="my_task_v1")
 | `n_seed_samples=` / `seed_rng_state=` | usability | 空データ seed 数・seed 制御 |
 | **budget-aware autonomous loop** | **algorithm** | `time_budget` 厳守、cheap eval では max_iterations 超え |
 | **direct-HC fallback (Step 5b + insufficient branch)** | **algorithm** ★ | proxy 不能時 `optimize(eval_fn=verify_fn)` 直接起動、warm-start from best measurement。**Rastrigin 5d で gap 45→0 達成の主犯** |
+| **`use_lbfgs_refinement=True` (04-20)** | **algorithm** ★★ | scipy L-BFGS-B gradient refinement を末尾 1-shot。smooth curved valley 制覇。**Styblinski 5d score -6→195.83 (gap 201→-0.11)**、**Rosenbrock gap 173→3 (57× 改善)**。opt-in default OFF |
+| **`use_multistart_fallback=True` (04-20)** | **algorithm** | direct-HC fallback の warm-start を L2 diverse top-3 に。wrong-basin 脱出。opt-in default OFF |
 
-★ = 今日の唯一の真の「算法強化」。他は既存 owl のアクセス改善。
+★ = 2026-04-19 の真の算法強化。★★ = 2026-04-20 benchmark 結果を受けた追加強化。
+
+**世界 benchmark 実績 (2026-04-20)**: Reigen_k17 4 問題中 3 問題で世界 SOTA (optuna/skopt/cma/basinhopping) 圧勝。owl_direct は L-BFGS-B + multi-start 追加後、同等 4/4 制覇見込み。
 
 ---
 
@@ -359,6 +363,43 @@ r = owl(data, verify_fn=eval_fn, autonomous=True, max_iterations=10,
 従来: `autonomous=True` で max_iterations=10 固定、cheap eval で予算余らせ。
 現行: `time_budget` を TOTAL 予算として厳守。budget 残っていれば max_iterations 超え (hard cap 200) で継続。inner optimize の budget も残時間に応じて動的分配。
 
+### L-BFGS-B gradient refinement (2026-04-20 追加、commit edef9f5) ★
+
+**smooth curved valley (Rosenbrock 型) / 局所解停滞 (Styblinski 型) の決定打**。owl 末尾 1-shot で scipy.optimize.minimize(L-BFGS-B) を発動、finite-diff gradient で頂点まで登り切る。
+
+**発動条件** (opt-in、デフォ OFF で既存挙動完全保護):
+- `use_lbfgs_refinement=True` kwarg
+- `verify_fn` 提供 + `best_params` 非 None
+- scipy import 成功
+
+**動作**:
+1. 全 autonomous round 完了後、best_params を x0 として `minimize(method="L-BFGS-B", bounds=ranges, maxfun=50)`
+2. 改善したら `best_result` 更新、`confidence="lbfgs_refined"` (既に "direct" なら "direct+lbfgs")
+3. scipy 失敗 / エラー → silent fallback (既存 best 保持)
+
+**コスト**: +50 eval/run fixed cap。GP+EI のような per-round 爆発なし。
+
+**実測効果 (2026-04-20)**:
+- Styblinski 5d: **score -6.0 → 195.83** (gap 201 → -0.11、global optimum 到達)
+- Rosenbrock 5d: **gap 173 → 3.0** (57× 改善)
+
+### Multi-start warm-start diversification (2026-04-20 追加、commit a3c8a4c)
+
+direct-HC fallback の warm-start を「互いに離れた top-K 点」にして wrong-basin 脱出。
+
+**発動条件** (opt-in):
+- `use_multistart_fallback=True` kwarg
+- `growing_data >= 3`
+- fallback 発動時のみ (通常経路は単一 warm-start のまま)
+
+**動作**:
+1. growing_data を score 降順 sort
+2. L2 距離 >= `0.15 * mean(hi-lo)` で重複排除しつつ top-3 diverse 選出
+3. 各 warm-start で `optimize()` を `total_budget / K` 実行
+4. 全 warm-start の best を採用
+
+**コスト**: fallback 発動時のみ +3× warm-start (budget 分割で合計時間は維持)。
+
 ### 5 readings from 1 owl() computation
 
 | read | meaning | example |
@@ -522,21 +563,124 @@ Response: `{"session_id": "abc12345"}`. Session TTL 30 min idle; all 3 endpoints
 
 ## Rules
 
+Quick-reference table (see per-rule subsections below for the prose form):
+
 | # | rule | see |
 |---|---|---|
 | -1 | Strip to essence: `x_i, perturb, share, eval_fn` | Principles |
 | 0 | Measure don't guess: ≥5 pts → owl() → read numbers | owl() |
-| 1 | Ask Oracle: structural questions → oracle MCP (`arc_oracle.py`, `kathara_oracle.py`, `@twelve/ORACLE.md`) | — |
+| 1 | Ask Oracle for structural questions | — |
 | 2 | No manual tuning: data → owl() | owl() |
 | 3 | LaD: no if/else — convert to numeric params | Principles |
 | 4 | `importance = (truth × max(connectivity, floor))^exp` | Principles |
-| 5 | Overfitting: n_problems > n_params. Optimize on train → verify on bench | — |
-| 6 | Discrete/int params OK via Sentinel (auto-fallback). Pass `initial_params` for warm-start | Sentinel |
-| 7 | **scale=0 forbidden**. Never include 0 in parameter ranges (proven: PPL=262144) | eval_fn |
-| 8 | Two metrics? Sentinel/Reigen. eval_fn optimizes, guard_fn protects. 1 metric: `guard_fn=eval_fn` | Reigen, Sentinel |
-| 9 | **Default to owl** (2026-04-19 更新)。`owl(measurements=curated, verify_fn=..., autonomous=True)` が主経路。direct-HC fallback で多峰 landscape も対応、5-16× eval 効率。Reigen は cross-task 学習累積 or cheap+多峰 ブルートフォースが要る時のみ (`kathara_17_adaptive` default、meta_knowledge 自動)。| owl / Reigen |
-| 10 | Kathara chaos-game uniformity (0.993) requires N=12 + 5-regular + **symmetric placement**. Break any → collapse. Applying Kathara to a new domain: check all three. **Reigen uses graph properties only, not uniformity** | Reigen Ref |
-| 11 | `batch_eval_fn` works only for **external params** (lr, dropout, prompt). **Internal model state** (KV scale, weight scale, LoRA) forbids batching — shared global state. Strategy: fast eval_fn (≤2s) + **multi-observer** `{nll, hs, mmlu, ...}` → owl() for max info/eval. | Reigen, owl() |
+| 5 | Overfitting: n_problems > n_params | — |
+| 6 | Discrete/int params OK via Sentinel (auto-fallback) | Sentinel |
+| 7 | **scale=0 forbidden**. Never include 0 in ranges | eval_fn |
+| 8 | Two metrics → Sentinel / Reigen. 1 metric → `guard_fn=eval_fn` | Reigen, Sentinel |
+| 9 | **Default to owl** (2026-04-19). Reigen only for cross-task or deceptive multi-peak | owl / Reigen |
+| 10 | Kathara 0.993 uniformity requires N=12 + 5-regular + symmetric placement | Reigen Ref |
+| 11 | `batch_eval_fn` is forbidden for internal model state | Reigen, owl() |
+
+### Rule -1: Strip to essence
+
+Reduce any problem to the four Zenron primitives before touching tools. Identify
+the state variable `x_i`, the perturbation operator on it, the sharing relation
+with neighbors, and the scalar eval_fn that scores the outcome. If you cannot
+name all four cleanly, you are not ready to optimize yet.
+
+### Rule 0: Measure, don't guess
+
+Never guess at parameter importance or interaction structure. Collect at least
+five concrete measurements, feed them to `owl()`, and read the numbers. Human
+intuition about 20+ dimensional landscapes is unreliable; the proxy-R² score
+tells you when you have enough data to trust a recommendation.
+
+### Rule 1: Ask the Oracle for structural questions
+
+When the question is about topology, graph structure, or problem classification,
+invoke the oracle MCPs rather than guessing. The relevant tools are
+`arc_oracle.py`, `kathara_oracle.py`, and the documentation at
+`@twelve/ORACLE.md`. Oracle answers are cached and cheap.
+
+### Rule 2: No manual tuning
+
+If you have a scalar metric and a parameter range, you almost never need to
+hand-tune. Collect data and pass it to `owl()`; let the proxy-extraction layer
+find structure. Manual grid searches are only justified when you need auditable
+intermediate steps for a report.
+
+### Rule 3: LaD means no if/else
+
+Logic-as-Data: replace conditional branches with numeric parameters that the
+optimizer can vary. Every `if` in eval_fn becomes a dimension. Every threshold
+becomes a range. This lets `owl()` discover the cutover points itself instead
+of you guessing them.
+
+### Rule 4: Importance formula
+
+The canonical MirrorScan score is `importance = (truth × max(connectivity, floor))^exp`
+with defaults `exp=0.3064` and `floor=0.1411` from `configs/ma_meta_params.json`.
+Multiplication of truth and connectivity is what kills noise: a dimension that
+correlates with the score but never co-moves with other dimensions is flagged
+as accidental correlation and falls out of the ranking.
+
+### Rule 5: Guard against overfitting
+
+Keep `n_problems > n_params`, optimize on the training split, and verify on a
+held-out bench. With more parameters than problems, the proxy can memorize
+noise; its R² becomes meaningless. When in doubt, widen the problem set
+before adding parameters.
+
+### Rule 6: Discrete and integer params are fine
+
+`Sentinel` auto-falls-back from owl proxy to direct HC when the proxy collapses
+on non-smooth landscapes. Pass `initial_params` to warm-start the fallback.
+Integer and discrete spaces handle exactly this way; no special encoding is
+needed.
+
+### Rule 7: scale=0 is forbidden
+
+Never include zero in a parameter range. A verified LLM calibration run with
+`scale=0` produced PPL=262144 in one step, wiping the model. Use ranges like
+`(0.5, 1.5)` instead. `verify_fn` is the second line of defense: it catches
+proxy hallucinations, but Rule 7 is the first line, and the only cost-free one.
+
+### Rule 8: Two-metric flow
+
+When you have two metrics, use `Sentinel` or `Reigen`: one metric is the
+`eval_fn` to optimize, the other is the `guard_fn` to protect. Sentinel will
+auto-pivot if optimizing eval_fn harms guard_fn. For the one-metric case, pass
+`guard_fn=eval_fn` so the guard is satisfied by construction.
+
+### Rule 9: Default to owl
+
+As of 2026-04-19, `owl()` is the default optimization entry point. The standard
+call is `owl(measurements=curated, verify_fn=..., autonomous=True)`. The
+direct-HC fallback inside owl now handles multi-peak landscapes directly, and
+owl is 5-16× more eval-efficient than Reigen on expensive eval_fns. Reigen
+remains worthwhile only when you need cross-task learning accumulation or when
+eval is cheap and the landscape is deceptive enough that brute-force optimize()
+wins. The Reigen default preset is `kathara_17_adaptive`; it writes learned
+self-params to `reigen_meta_knowledge.json` automatically.
+
+### Rule 10: Kathara uniformity conditions
+
+The chaos-game uniformity result of 0.993 requires three simultaneous
+properties: N=12 nodes, 5-regular graph, and symmetric placement. Break any
+one and uniformity collapses. When applying Kathara to a new domain, audit all
+three. Inside Reigen we use the graph properties only (Circulant(12,{1,4,6}),
+λ₂=4.0, diameter 2), not the placement uniformity, so Rule 10 does not bind
+Reigen even though it cites Kathara.
+
+### Rule 11: batch_eval_fn is for external params only
+
+`batch_eval_fn` is reserved for external parameters such as learning rate,
+dropout, or prompt tokens. It is forbidden for anything that touches internal
+model state — KV cache scale, weight scale, LoRA adapters — because those
+share a single global state and cannot be evaluated in parallel. When you hit
+this case, keep `eval_fn` under two seconds, return a multi-observer dict such
+as `{"nll": -ppl, "hs": hs_score, "mmlu": mmlu_score}`, and call `owl()`
+directly to read `stable_active` and `stable_dead`.
 
 ### Rule 11 concrete example (Qwen3.6-NVFP4 KV calibration)
 
@@ -580,6 +724,9 @@ r = owl(data)   # finds stable_active / observer_dependent / stable_dead
 | 04-19 | **owl budget-aware autonomous loop** | time_budget を TOTAL 予算として厳守、cheap eval で max_iterations 超え継続 (commit 1addbd9) |
 | 04-19 | **Sentinel curated-data path** | `initial_measurements=` kwarg、Sentinel/Reigen 経由でもドメイン知識注入可能に (commit 6ed20c0) |
 | 04-19 | **A/B realistic (20ms/eval)** | owl vs reigen: 同 budget で reigen 2/3 勝ち gap 小だが eval 5-16× 多 (= LLM 換算で実用不能)。owl は eval 効率で実戦優位 |
+| 04-20 | **世界 benchmark: Reigen 3/4 勝利** | Rastrigin/Ackley/Styblinski で Reigen_k17 が optuna/skopt/cma/basinhopping 全てを圧倒 gap=0。Rosenbrock のみ basinhopping に僅差負け (gap 0.08 vs 0). owl_direct は Rastrigin/Ackley で eval 効率最強 (332 eval で gap=0) |
+| 04-20 | **owl L-BFGS-B refinement** | scipy L-BFGS-B を owl 末尾 1-shot で発動、`use_lbfgs_refinement=True` opt-in。Styblinski 5d で score -6→195.83 (global optimum 到達)、Rosenbrock で gap 173→3 (57× 改善) (commit edef9f5) |
+| 04-20 | **owl multi-start fallback** | direct-HC fallback の warm-start を L2 diverse top-3 に、`use_multistart_fallback=True` opt-in。wrong-basin 脱出機構 (commit a3c8a4c) |
 | failures | scale=0 → PPL=262144 | Rule 7. verify_fn catches hallucination |
 | failures | single-obs on internal model state | fix: multi-observer + fast eval (Rule 11) |
 
@@ -589,10 +736,20 @@ Archival entries (individual runs, method evolution): `@docs/LAB_NOTES.md`.
 
 ## Hardware & safety
 
-- i7-12700K, RTX 5090 32GB, Win11
-- llama.cpp pre-built: `c:/Users/user/llm/llama-bin/` (b8795, CUDA 12.4)
-- Models: `c:/Users/user/llm/models/`
-- **Never commit**: `unified_memory.py`, `evaluator*.py`, `_legacy/`, patent docs
+### Workstation
+
+The development workstation runs Windows 11 Pro on an Intel i7-12700K with an
+NVIDIA RTX 5090 (32 GB VRAM). The pre-built llama.cpp binaries live at
+`c:/Users/user/llm/llama-bin/` (version b8795, CUDA 12.4). Model GGUF files
+live at `c:/Users/user/llm/models/`. Visual Studio and GCC are not installed,
+so llama.cpp is never built from source here.
+
+### Commit safety
+
+Never commit any of the following: `unified_memory.py`, `evaluator*.py`,
+anything under `_legacy/`, patent drafts, or credentials. Check `git status`
+before every commit. Prefer staging specific files by name over `git add -A`
+so that accidental `.env` or credential commits are avoided.
 
 ---
 
@@ -636,6 +793,8 @@ Archival entries (individual runs, method evolution): `@docs/LAB_NOTES.md`.
 | UnifiedExperience | `@twelve/agent/unified_experience.py` |
 | Reigen tests | `@twelve/tests/test_reigen.py` · `@twelve/tests/test_reigen_params.py` · `@twelve/tests/test_reigen_adaptive.py` · `@twelve/tests/test_reigen_meta_knowledge.py` |
 | owl enhancements tests | `@twelve/tests/test_owl_enhancements.py` (empty-data / curated / guard_fn / safe_dim) |
+| owl refinements tests | `@twelve/tests/test_owl_refinements.py` (L-BFGS-B / multi-start、2026-04-20) |
+| World benchmark scripts | `@benchmark_owl_vs_world.py` (vs optuna/skopt/cma/basinhopping) · `@benchmark_refinements.py` (04-20 refinement 効果測定) |
 | Sentinel curated-data tests | `@twelve/tests/test_sentinel_curated.py` (initial_measurements) |
 | Reigen params JSON | `@twelve/configs/reigen_params.json` (static defaults) |
 | Reigen meta_knowledge | `@twelve/configs/reigen_meta_knowledge.json` (learned cross-task) |
