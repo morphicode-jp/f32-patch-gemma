@@ -2370,7 +2370,17 @@ def owl(
             _bp_dict = best_result["best_params"]
             _bp_list = ([_bp_dict.get(n, 0.0) for n in names]
                         if isinstance(_bp_dict, dict) else list(_bp_dict))
-            _current_best = best_result.get("verified_score") or best_result.get("best_score") or float("-inf")
+            # Use explicit None checks — `0.0 or X → X` bug otherwise (falsy zero).
+            # Before fix: Ackley with baseline score=0 got _current_best=-inf, letting
+            # L-BFGS-B overwrite good results with bad plateau scores.
+            _vs = best_result.get("verified_score")
+            _bs = best_result.get("best_score")
+            if _vs is not None:
+                _current_best = float(_vs)
+            elif _bs is not None:
+                _current_best = float(_bs)
+            else:
+                _current_best = float("-inf")
             _lbfgs_ranges = (param_ranges if param_ranges is not None
                              else (ms.param_ranges if 'ms' in dir() and ms else None))
             if _lbfgs_ranges is not None:
