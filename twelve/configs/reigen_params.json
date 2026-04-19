@@ -1,0 +1,15 @@
+{
+  "_doc": "Reigen internal constants — JSON > kwarg-default fallback. Unknown sections/keys are silently ignored (permissive). Match section and key exactly; typos are not warned.",
+  "_version": 1,
+  "outer": {
+    "outer_min_r_squared": 0.3,
+    "wall_time_factor": 3.0,
+    "batch_size": 8
+  },
+  "hebbian": {
+    "hebbian_lr": 0.05,
+    "min_history": 5,
+    "percentile_gate": 0.75,
+    "k_winners": 3
+  }
+}
