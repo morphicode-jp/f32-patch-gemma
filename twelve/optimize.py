@@ -2186,46 +2186,78 @@ def owl(
                                     or verified_score < _max_measured)
             _proxy_weak = proxy_r2 < min_r_squared
             if _measurement_winning and _proxy_weak:
-                # Find the best measurement's params to warm-start
-                _best_m = max(growing_data, key=lambda m: m["score"])
-                _warm = (_best_m["params"] if not isinstance(_best_m["params"], dict)
-                         else [_best_m["params"].get(n, 0.0) for n in names])
-                # Budget: half of remaining autonomous time
+                # Warm-start selection: diverse top-K (if multi-start opt-in)
+                # or single best (legacy)
+                def _to_list(p):
+                    return p if not isinstance(p, dict) else [p.get(n, 0.0) for n in names]
+
+                _warm_candidates = []
+                if use_multistart_fallback and len(growing_data) >= 3:
+                    # Diverse top-K by L2 distance (Phase B, 2026-04-20)
+                    import numpy as _np
+                    _K = 3
+                    _sorted = sorted(growing_data, key=lambda m: -m["score"])
+                    _selected = [_to_list(_sorted[0]["params"])]
+                    _range_scale = float(_np.mean([hi - lo for lo, hi in ranges]))
+                    _min_dist = 0.15 * _range_scale
+                    for _m in _sorted[1:]:
+                        _p = _np.array(_to_list(_m["params"]))
+                        if all(_np.linalg.norm(_p - _np.array(s)) > _min_dist
+                               for s in _selected):
+                            _selected.append(list(_p.tolist()))
+                            if len(_selected) >= _K:
+                                break
+                    _warm_candidates = _selected
+                    if verbose:
+                        print(f"  [Fallback/multistart] {len(_warm_candidates)} diverse warm-starts selected")
+                else:
+                    _best_m = max(growing_data, key=lambda m: m["score"])
+                    _warm_candidates = [_to_list(_best_m["params"])]
+
+                # Budget: split among warm-starts
                 _elapsed = time.time() - _global_t0
                 _remaining = max(1.0, time_budget - _elapsed)
-                _fb_budget = min(_inner_budget, _remaining / 2.0)
-                if verbose:
+                _total_fb_budget = min(_inner_budget, _remaining / 2.0)
+                _per_warm_budget = max(0.5, _total_fb_budget / max(1, len(_warm_candidates)))
+                if verbose and not use_multistart_fallback:
                     print(f"  [Fallback] proxy weak (R²={proxy_r2:.2f}) + "
                           f"measurement-winning ({_max_measured:.3f} > verified "
                           f"{verified_score}); direct optimize() on verify_fn "
-                          f"for {_fb_budget:.1f}s")
-                try:
-                    _fb_bp, _fb_bs, _ = optimize(
-                        eval_fn=verify_fn,
-                        param_ranges=ranges,
-                        initial_params=_warm,
-                        time_budget=_fb_budget,
-                        learn=True,
-                        experience_id=experience_id or "owl_fallback",
-                        verbose=False,
-                    )
-                    if _fb_bs is not None and _fb_bs > _max_measured:
-                        best_params = list(_fb_bp)
-                        best_score = float(_fb_bs)
-                        verified_score = float(_fb_bs)
-                        # Add to growing_data
-                        if is_dict:
-                            growing_data.append({
-                                "params": {n: float(v) for n, v in zip(names, best_params)},
-                                "score": verified_score})
-                        else:
-                            growing_data.append({"params": [float(v) for v in best_params],
-                                                 "score": verified_score})
+                          f"for {_per_warm_budget:.1f}s")
+
+                _fb_best_score = _max_measured
+                _fb_best_params = None
+                for _w_idx, _warm in enumerate(_warm_candidates):
+                    try:
+                        _fb_bp, _fb_bs, _ = optimize(
+                            eval_fn=verify_fn,
+                            param_ranges=ranges,
+                            initial_params=_warm,
+                            time_budget=_per_warm_budget,
+                            learn=True,
+                            experience_id=experience_id or "owl_fallback",
+                            verbose=False,
+                        )
+                        if _fb_bs is not None and _fb_bs > _fb_best_score:
+                            _fb_best_score = float(_fb_bs)
+                            _fb_best_params = list(_fb_bp)
+                            if verbose:
+                                print(f"  [Fallback/warm{_w_idx+1}] improved: {_fb_best_score:.4f}")
+                    except Exception as _fb_e:
                         if verbose:
-                            print(f"  [Fallback] improved: verified={verified_score:.4f}")
-                except Exception as _fb_e:
-                    if verbose:
-                        print(f"  [Fallback] error: {type(_fb_e).__name__}: {_fb_e}")
+                            print(f"  [Fallback/warm{_w_idx+1}] error: {type(_fb_e).__name__}")
+
+                if _fb_best_params is not None:
+                    best_params = _fb_best_params
+                    best_score = _fb_best_score
+                    verified_score = _fb_best_score
+                    if is_dict:
+                        growing_data.append({
+                            "params": {n: float(v) for n, v in zip(names, best_params)},
+                            "score": verified_score})
+                    else:
+                        growing_data.append({"params": [float(v) for v in best_params],
+                                             "score": verified_score})
 
         # --- autonomous: 停滞検知 + 探索サンプリング ---
         if autonomous:
