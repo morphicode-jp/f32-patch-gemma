@@ -73,9 +73,11 @@ Plus all Sentinel keys: `verdict | best_params | eval_score | guard_score | base
 | preset | n_self | Hebbian | cost vs legacy | when |
 |---|---|---|---|---|
 | `"kathara_12"` **(default)** | 12 | ✓ Circulant(12,{1,4,6}) 30 edges | same (N_user ≤ 8), +20% (N_user > 8) | almost always |
+| `"kathara_17_adaptive"` | 17 | ✓ (first 12 dims only; adaptive lr/gate/winners from best-history) | +25-30% dim search | hard landscapes where default Hebbian tuning is sub-optimal (proven 2-4× faster + better verdict on Rosenbrock 5d / Styblinski 6d) |
 | `"minimal_4"` | 4 | — | baseline | N_user > 16 (Rule 5 pressure); 1-shot throwaway |
 
 Switching mid-stream `minimal_4 → kathara_12`: inner fossils transfer ✓, outer self-params restart ✗.
+Switching `kathara_12 → kathara_17_adaptive`: meta_knowledge is per-preset keyed, no cross-leak. A/B benchmark shows kathara_17 beats kathara_12 on non-trivial problems; still opt-in (not default).
 
 ### Wall time model
 
@@ -121,9 +123,27 @@ Reigen reads `twelve/configs/reigen_meta_knowledge.json` at `__init__` and overl
 
 Override via `self_dim_preset="minimal_4"` or explicit `self_param_ranges / _names / _defaults` kwargs.
 
-### Hebbian propagation (`kathara_12` only)
+### 7 JSON-overridable Reigen constants (`reigen_params.json`)
 
-Top-3 "winner" self-dims (largest delta vs best history) propagate `hebbian_lr × delta` to their 5 Kathara neighbors via Circulant(12,{1,4,6}). Fires only when current score > 75th-percentile of history (min 5 entries). Disable via `enable_hebbian=False`.
+Static defaults for non-self-tuned knobs. Edit file for persistent change, or pass kwargs for per-call override.
+
+| kwarg | JSON path | default | controls |
+|---|---|---|---|
+| `outer_min_r_squared` | `outer.outer_min_r_squared` | 0.3 | outer owl→optimize fallback threshold |
+| `wall_time_factor` | `outer.wall_time_factor` | 3.0 | soft wall cap = budget × factor |
+| `batch_size` | `outer.batch_size` | 8 | batch_eval_fn default size |
+| `hebbian_lr` | `hebbian.hebbian_lr` | 0.05 | Hebbian propagation step size |
+| `hebbian_min_history` | `hebbian.min_history` | 5 | min fossil count before Hebbian fires |
+| `hebbian_percentile_gate` | `hebbian.percentile_gate` | 0.75 | reward gate (best must exceed this quantile) |
+| `hebbian_k_winners` | `hebbian.k_winners` | 3 | top-K winner dims for propagation |
+
+Precedence (strongest first): explicit kwarg → `reigen_params.json` → hardcoded fallback. Falsy kwarg (e.g., `hebbian_lr=0.0`) is respected via None-sentinel — Reigen² meta-tuning relies on this.
+
+### Hebbian propagation (`kathara_12` and `kathara_17_adaptive`)
+
+Top-K "winner" self-dims (largest delta vs best history) propagate `hebbian_lr × delta` to their 5 Kathara neighbors via Circulant(12,{1,4,6}). Fires only when best score > percentile-gate of history (min `hebbian_min_history` entries). Disable via `enable_hebbian=False`.
+
+For `kathara_17_adaptive`: `hebbian_lr`, `min_history`, `percentile_gate`, `k_winners` are read from **best-history entry's self_p[13..16]** (dynamic per-call) instead of static attributes. The extra 5 dims are NOT on Kathara adjacency — propagation stays on first 12 dims only (Rule 10 preserved).
 
 Cost: < 1ms numpy update per outer eval. Benefit: λ₂=4.0 → 3-step full propagation across all 12 dims.
 
