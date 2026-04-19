@@ -47,7 +47,8 @@ def test_kathara_17_adaptive_first_12_match_kathara_12():
 
 def test_self_batch_size_routes_to_inner_batch_size():
     mapping = Reigen._NAME_TO_TUNABLE_KWARG
-    assert mapping.get("self_batch_size") == "batch_size"
+    # _batch_size (underscore prefix matches other _TunableSentinel kwargs)
+    assert mapping.get("self_batch_size") == "_batch_size"
 
 
 def test_outer_only_hebbian_names_not_in_mapping():
@@ -88,7 +89,8 @@ def test_build_inner_kwargs_includes_batch_size():
     # Force self_batch_size to 12.7 → should become int(13) in kwargs
     self_p[12] = 12.7
     kwargs = r._build_inner_kwargs(self_p)
-    assert kwargs.get("batch_size") == 13
+    # _batch_size (underscore prefix) — routes to inner _TunableSentinel kwarg
+    assert kwargs.get("_batch_size") == 13
 
 
 def test_build_inner_kwargs_no_hebbian_extras():

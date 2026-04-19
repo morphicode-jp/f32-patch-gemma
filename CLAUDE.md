@@ -6,21 +6,46 @@ All responses in Japanese.
 
 ## Quick Reference
 
-| situation | use | why |
-|---|---|---|
-| 2 metrics (eval+guard), **N_user ≤ 8**, repeated/related runs | **`reigen(...)`** | self-tuning default, cross-task learning |
-| 2 metrics, N_user > 16, or 1-shot | `Sentinel(...)` | smaller overhead, no self-dim bloat |
-| **Internal model state** (KV/weight/LoRA) | `Sentinel` + multi-obs | Rule 11: can't batch shared state |
-| Have measurement data already | `owl(data)` | direct structure + optimization |
-| Discrete-only, no guard | `optimize(eval, ranges)` | primitive direct search |
+### 最重要の 1 問: `eval_fn` (callable な評価関数) があるか?
 
 ```python
-from twelve.agent.reigen import reigen            # shortest (recommended)
-from twelve.agent.sentinel import Sentinel        # bare Sentinel
-from twelve.optimize import owl, optimize          # primitives
+def eval_fn(params: list[float]) -> float:
+    # params = 試すパラメータ (例: [0.8, 1.2, 0.5])
+    # return = 点数 (高いほど良い float。損失なら -loss で反転)
+    return score
+```
+
+| 状況 | 使うやつ |
+|---|---|
+| **eval_fn がある** (99% の場合) | **`reigen(eval_fn, guard_fn, ranges)`** |
+| **測定データしかない** (過去ログ・論文抽出等、callable 無し) | **`owl(data, verify_fn=...)`** |
+
+これだけ。`Sentinel` / `optimize` / `MirrorScan` の直呼びは内部機構で、user が触る必要ない (Reigen が必要時に自動 fallback する)。AT = reigen() を HTTP 公開する殻 (`api.py`)、別選択肢ではなく配信機構。
+
+```python
+from twelve.agent.reigen import reigen            # shortest (99% これ)
+from twelve.optimize import owl                    # 測定データだけある時
 ```
 
 `experience_id`: 任意の task 名札を付ける。self_params cross-task 学習は `reigen_meta_knowledge.json` 経由で自動共有される (2026-04-19 以降、ID 共有不要)。fossil は per-ID 分離で並列時の衝突回避。
+
+### `eval_fn` 例 (LLM calibration)
+
+```python
+def eval_fn(params):
+    apply_scales({"L18": params[0], "L25": params[1], ...})
+    hs = run_hellaswag(n=400)
+    restore_scales()
+    return hs                                      # 正解率 (高いほど良い)
+
+def guard_fn(params):
+    apply_scales({...})
+    ppl = measure_perplexity()
+    restore_scales()
+    return -ppl                                    # PPL は低いほど良い → 負で反転
+
+r = reigen(eval_fn, guard_fn, [(0.8, 1.5)] * 5)
+```
 
 ---
 
