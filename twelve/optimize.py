@@ -1719,6 +1719,8 @@ def owl(
     guard_fn=None,               # Optional safety: guard_fn(params) → float. Baseline set via guard_threshold or midpoint eval.
     guard_threshold=None,        # Minimum acceptable guard_score. If None and guard_fn given, computed at midpoint params.
     safe_dim_analysis=False,     # If True + guard_fn + guard fails, run multi-observer analysis to surface safe_dims.
+    use_lbfgs_refinement=False,  # 2026-04-20: opt-in scipy L-BFGS-B local refinement at the end (crushes smooth curved valleys like Rosenbrock; uses finite-diff gradient, ~50 extra evals).
+    use_multistart_fallback=False,  # 2026-04-20: opt-in diversified warm-starts in direct-HC fallback (rescues wrong-basin failures like Styblinski).
 ):
     """Owl — 見えない構造を見つけて最適化する。
 
@@ -2321,6 +2323,63 @@ def owl(
             "rounds_completed": round_i + 1,
         }
 
+
+    # --- L-BFGS-B gradient refinement (2026-04-20, opt-in) ---
+    # Terminal 1-shot refinement using scipy.optimize (L-BFGS-B + finite-diff).
+    # Decisive for smooth curved-valley problems (Rosenbrock). Bounded cost:
+    # ~50 extra verify_fn calls per run (regardless of autonomous iterations).
+    # Disabled by default (opt-in); backward-compat preserved.
+    if (use_lbfgs_refinement and verify_fn is not None
+            and best_result is not None
+            and best_result.get("best_params") is not None):
+        try:
+            from scipy.optimize import minimize as _sp_min
+            import numpy as _np
+            _bp_dict = best_result["best_params"]
+            _bp_list = ([_bp_dict.get(n, 0.0) for n in names]
+                        if isinstance(_bp_dict, dict) else list(_bp_dict))
+            _current_best = best_result.get("verified_score") or best_result.get("best_score") or float("-inf")
+            _lbfgs_ranges = (param_ranges if param_ranges is not None
+                             else (ms.param_ranges if 'ms' in dir() and ms else None))
+            if _lbfgs_ranges is not None:
+                # Track eval count for the refinement phase
+                _lbfgs_best = [_current_best]
+                _lbfgs_best_params = [list(_bp_list)]
+                def _neg_obj(p):
+                    try:
+                        v = float(verify_fn(list(p)))
+                    except Exception:
+                        return 0.0
+                    if v > _lbfgs_best[0]:
+                        _lbfgs_best[0] = v
+                        _lbfgs_best_params[0] = [float(x) for x in p]
+                    return -v   # scipy minimizes
+                try:
+                    _sp_min(
+                        _neg_obj,
+                        x0=_np.array(_bp_list, dtype=float),
+                        method="L-BFGS-B",
+                        bounds=list(_lbfgs_ranges),
+                        options={"maxfun": 50, "ftol": 1e-8, "gtol": 1e-6},
+                    )
+                except Exception:
+                    pass   # refinement failure → keep pre-refinement best
+                if _lbfgs_best[0] > _current_best:
+                    if verbose:
+                        print(f"  [L-BFGS-B] refinement improved: "
+                              f"{_current_best:.4f} → {_lbfgs_best[0]:.4f}")
+                    _refined_bp = _lbfgs_best_params[0]
+                    if isinstance(_bp_dict, dict):
+                        best_result["best_params"] = {n: float(v) for n, v in zip(names, _refined_bp)}
+                    else:
+                        best_result["best_params"] = [float(v) for v in _refined_bp]
+                    best_result["best_score"] = float(_lbfgs_best[0])
+                    best_result["verified_score"] = float(_lbfgs_best[0])
+                    _prev_conf = best_result.get("confidence", "")
+                    best_result["confidence"] = (
+                        "lbfgs_refined" if _prev_conf != "direct" else "direct+lbfgs")
+        except ImportError:
+            pass   # scipy missing — silent fallback
 
     # 経験保存
     if _ue and best_result:

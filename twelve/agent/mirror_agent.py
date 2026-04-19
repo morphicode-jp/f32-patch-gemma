@@ -452,7 +452,7 @@ class MirrorScan:
         """TLの評価結果をMSに報告"""
         self.history.append({'params': list(params), 'score': score})
 
-    def build_proxy(self, active_dims=None):
+    def build_proxy(self, active_dims=None, force_proxy_type=None):
         """MSのhistoryからproxy eval_fnを自動構築。
 
         6種類のproxyを試して最良を返す:
@@ -698,7 +698,18 @@ class MirrorScan:
             return None, 0.0, None
 
         candidates.sort(key=lambda x: x[2], reverse=True)
-        best_name, best_fn, best_r2 = candidates[0]
+
+        # Reigen kathara_12/17 can force a specific proxy family
+        # (zenron / zenron_interact / linear). Fallback to R²-best if none match.
+        if force_proxy_type:
+            pref = str(force_proxy_type).lower()
+            matched = [c for c in candidates if pref in c[0].lower()]
+            if matched:
+                best_name, best_fn, best_r2 = matched[0]
+            else:
+                best_name, best_fn, best_r2 = candidates[0]
+        else:
+            best_name, best_fn, best_r2 = candidates[0]
 
         summary = ", ".join(f"{n} R2={r:.3f}" for n, _, r in candidates)
         print(f"  [MS Proxy] {summary} -> {best_name} selected")
