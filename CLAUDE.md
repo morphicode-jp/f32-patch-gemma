@@ -164,7 +164,7 @@ mimir は owl を呼ぶ時、以下の強化を全て ON にする。直呼び�
 
 実測効果: Rastrigin 5d gap 45→0、Styblinski 5d score -6→195.83、Rosenbrock 5d gap 173→3。
 
-## 世界 Benchmark 実績
+## 世界 Benchmark 実績 (5d)
 
 2026-04-20 v3 時点、25s budget、3 seeds、fossil clean 条件での結果を示す。mimir は 3/4 問題で gap≈0 完璧、Rosenbrock のみ basinhopping に 0.086 差の 2 位。
 
@@ -178,6 +178,33 @@ mimir は owl を呼ぶ時、以下の強化を全て ON にする。直呼び�
 mimir は 4 問題全てで Top 2 完走した唯一のツール。cma_es は 0 勝、basinhopping は Rosenbrock 1 勝のみで他 3 問題は敗北、reigen は mimir と同率。optuna_tpe と skopt_gp は前回 benchmark で圧倒敗北 (Rastrigin gap +10〜+20) のため除外した。
 
 v3 で修正した点は 2 つ。confidence_skip_threshold を 0.7 → 0.95 に引き上げ、多峰で proxy_r2 が高く出る場合も cascade 発火するようにした。benchmark の experience_id を per-problem 分離 (`bhmim_{fn.__name__}_{seed}`) し、fossil が問題間で汚染するバグを修正した。この副産物として owl_direct 単体も改善した (Styblinski +18.4→+6.1、Rosenbrock +3.79→+0.22)。
+
+## 次元スケール Benchmark (5d / 10d / 20d)
+
+`benchmark_mimir_dimscale.py` で計測した高次元挙動。mimir は Rastrigin 系 (格子多峰) では次元増加で更に優位拡大、**Styblinski と Rosenbrock の 10d+ で崩壊する**。これは正直に記録する。
+
+| 問題 | dim | cma_es gap | basinhopping gap | **mimir gap** | 勝者 |
+|---|---|---|---|---|---|
+| Rastrigin | 5 | +5.97 | +5.97 | **0** | mimir |
+| Rastrigin | 10 | +17.9 | +21.9 | **0** | mimir |
+| Rastrigin | 20 | +128.9 | +93.5 | **0** | **mimir (128×)** |
+| Ackley | 5 | 0 | 0 | 0 | 全員同着 |
+| Ackley | 10 | 0 | 0 | 0 | 全員同着 |
+| Ackley | 20 | +0.004 | +8.1 | **0** | mimir |
+| Styblinski | 5 | +28.3 | +28.3 | **-0.00** | mimir |
+| Styblinski | 10 | **+28.3** | +42.4 | +333 ❌ | cma |
+| Styblinski | 20 | **+99.0** | +99.0 | +711 ❌ | cma/basin |
+| Rosenbrock | 5 | 0 | 0 | +0.09 | cma/basin |
+| Rosenbrock | 10 | +3.4 | **0** | +29.7 ❌ | basinhopping |
+| Rosenbrock | 20 | +17.7 | **0** | +2041 ❌❌ | **basinhopping** |
+
+mimir の強みは**格子状多峰 (Rastrigin)** で決定的に出る。20d Rastrigin で cma_es の 128 倍の精度。構造発見 + proxy + direct-HC fallback が「規則的な多峰の底」を効率的に掴むからである。
+
+mimir の弱点は 2 つ判明した。第1は **curved valley (Rosenbrock) の高次元**。basinhopping の `niter=200 × L-BFGS-B` は gradient で谷を滑るが、mimir の Reigen cascade は warm-start なしで valley を見つけられない。第2は **Styblinski の 10d+**。owl と Reigen の両方が小さな basin (score ~60) に引き込まれ、global basin (score ~783) に到達できない。
+
+解釈すると、mimir は**構造が対称的で proxy が真の形を捕まえられる問題**で圧勝する。非対称な basin 分布 (Styblinski) や gradient 支配 (Rosenbrock) では高次元で苦しむ。この事実は CLAUDE.md を読む Claude 自身にとっても重要で、実問題の性質に応じて mimir が prime choice か basinhopping や cma が prime choice か判断する材料になる。
+
+実用 guidance: **多峰・格子的・対称的な landscape** (MLP hyper tuning, scale calibration, LLM 層重要度など) は mimir を使え。**curved valley / gradient 重要** (continuous control, PID tuning) は scipy basinhopping を使え。**混在** なら mimir で構造発見 → 有望次元を特定 → 各次元は scipy で細部追込、が最強。
 
 ## experience_id の扱い
 
@@ -875,7 +902,8 @@ so that accidental `.env` or credential commits are avoided.
 | **Numerology bound NB1-NB3** (near-match の統計的棄却基準; α⁻¹, m_p/m_e マッチが NB3 再現性で失敗 = numerology 判定、spacetime=4 のみ principled 残存) | `@docs/ZENRON_NUMEROLOGY_BOUND.md` |
 | **Hierarchy + Discovery (H1, D1)** (Kathara^n 階層は OP3 を解決せず; 3-stage 公式発見は statistical consistent = 未知法則の discoverer) | `@docs/ZENRON_HIERARCHY_DISCOVERY.md` |
 | **Final open problems** (OP3 系統 framework 見つからず honest null; **OP4: Type C が K-minimum, Type B は sub-optimal**; OP-S3 局所接触条件 L1-L4) | `@docs/ZENRON_FINAL_OPEN_PROBLEMS.md` |
-| Verification scripts (`python <file>`) | `@zenron_proof_verify.py`, `@zenron_void_verify.py`, `@zenron_time_space_verify.py`, `@zenron_mult_mixing_verify.py`, `@zenron_noether_verify.py`, `@zenron_kuramoto_verify.py`, `@zenron_parallelism_verify.py`, `@zenron_circuits_verify.py`, `@zenron_self_reference_verify.py`, `@zenron_uniqueness_search.py`, `@zenron_op3_op4_search.py` |
+| **Russell 深層 15 項** (R1-R10 の奥、#1 Breathing / #7 Desire=OP6 候補 / #15 Pulse=Planck×12^n / Octave 4 Carbon; 73% Zenron 対応、pulse は statistical null) | `@docs/ZENRON_RUSSELL_DEEP.md` |
+| Verification scripts (`python <file>`) | `@zenron_proof_verify.py`, `@zenron_void_verify.py`, `@zenron_time_space_verify.py`, `@zenron_mult_mixing_verify.py`, `@zenron_noether_verify.py`, `@zenron_kuramoto_verify.py`, `@zenron_parallelism_verify.py`, `@zenron_circuits_verify.py`, `@zenron_self_reference_verify.py`, `@zenron_uniqueness_search.py`, `@zenron_op3_op4_search.py`, `@zenron_pulse_hierarchy.py` |
 
 ## Source files
 
