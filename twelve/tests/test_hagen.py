@@ -137,20 +137,34 @@ def test_hagen_returns_structure_info():
 # tool_used reflects actual cascade decision
 # -----------------------------------------------------------------
 
-def test_hagen_cascade_fires_for_cheap_eval():
-    """Cheap eval without curated data triggers owl→Reigen cascade."""
+def test_hagen_cascade_fires_when_forced():
+    """force_cascade=True fires Reigen even on high proxy_r2 problems."""
     def eval_fn(p):
         return -sum((x - 0.5) ** 2 for x in p)
     r = hagen(
         eval_fn=eval_fn,
         param_ranges=[(-1, 1)] * 2,
         time_budget=15,
-        # eval_cost auto-measured, will be <<0.5s for this cheap fn
-        experience_id="test_hagen_cascade",
+        force_cascade=True,  # override proxy_r2 gate
+        experience_id="test_hagen_force_cascade",
     )
-    # Either full cascade OR reigen-tried; definitely not "owl" with route=expensive
     assert r["route"] == "cheap_cascade"
     assert r["tool_used"] in ("owl+reigen", "owl(reigen_tried)")
+
+
+def test_hagen_skips_reigen_on_high_proxy_r2():
+    """Smooth quadratic → owl proxy_r2 ≥ threshold → Reigen skipped."""
+    def eval_fn(p):
+        return -sum((x - 0.5) ** 2 for x in p)
+    r = hagen(
+        eval_fn=eval_fn,
+        param_ranges=[(-1, 1)] * 2,
+        time_budget=15,
+        experience_id="test_hagen_skip_reigen",
+    )
+    assert r["route"] == "cheap_cascade"
+    # Quadratic → high proxy_r2 → no escalation, tool_used=="owl"
+    assert r["tool_used"] == "owl"
 
 
 # -----------------------------------------------------------------

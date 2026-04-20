@@ -11,11 +11,68 @@
   - 全 opt-in 強化機能を デフォルト ON で呼ぶ (use_lbfgs/multi/random_restart=5)
   - Reigen escalation は opt-in 判定 (confidence / budget 残量)
   - GP+EI 型 overhead の再発防止: bounded cost (1 owl + 高々 1 Reigen)
+
+LaD (Logic-as-Data):
+  dispatch 閾値と owl/Reigen kwargs は hagen_params.json で JSON 制御可能。
+  precedence: 明示 kwarg > JSON > hardcode fallback。K² 自己最適化対応。
 """
 from __future__ import annotations
 
+import json
+import os
 import time
 from typing import Any, Callable, Optional, Sequence
+
+
+_HAGEN_PARAMS_PATH = os.path.join(
+    os.path.dirname(os.path.dirname(os.path.abspath(__file__))),
+    "configs", "hagen_params.json")
+
+_HARDCODE_DEFAULTS = {
+    "dispatch": {
+        "eval_cost_threshold": 0.5,
+        "owl_share": 0.4,
+        "escalation_min_remaining": 5.0,
+        "confidence_skip_threshold": 0.7,
+    },
+    "owl_kwargs": {
+        "random_restart_count": 5,
+        "max_iterations": 30,
+        "min_r_squared": 0.1,
+    },
+    "reigen_kwargs": {
+        "inner_time_budget": 2.0,
+        "wall_time_factor": 1.0,
+    },
+}
+
+
+def _load_hagen_params() -> dict:
+    """Load hagen_params.json, falling back to hardcoded defaults silently."""
+    try:
+        with open(_HAGEN_PARAMS_PATH, "r", encoding="utf-8") as f:
+            data = json.load(f)
+    except (FileNotFoundError, json.JSONDecodeError, OSError):
+        return {k: dict(v) for k, v in _HARDCODE_DEFAULTS.items()}
+    # Merge with hardcode (missing keys fall through to hardcode)
+    merged = {k: dict(v) for k, v in _HARDCODE_DEFAULTS.items()}
+    for section, values in (data or {}).items():
+        if section.startswith("_") or not isinstance(values, dict):
+            continue
+        if section in merged:
+            merged[section].update({
+                k: v for k, v in values.items() if not k.startswith("_")
+            })
+    return merged
+
+
+def _resolve(kwarg_val, json_val, hardcode_val):
+    """Precedence: explicit kwarg > JSON > hardcode. None-sentinel for kwarg."""
+    if kwarg_val is not None:
+        return kwarg_val
+    if json_val is not None:
+        return json_val
+    return hardcode_val
 
 
 def _measure_eval_cost(eval_fn: Callable, ranges: Sequence[tuple[float, float]]) -> float:
@@ -39,11 +96,18 @@ def hagen(
     experience_id: str = "hagen",
     time_budget: float = 300.0,
     eval_cost_hint: Optional[float] = None,
-    owl_share: float = 0.4,
-    owl_confidence_accepted: tuple = (
-        "high",),  # Strict: only "high" proxy R² skips Reigen. direct/lbfgs_refined → escalate
+    # LaD dispatch overrides (None = load from JSON/hardcode)
+    eval_cost_threshold: Optional[float] = None,
+    owl_share: Optional[float] = None,
+    escalation_min_remaining: Optional[float] = None,
+    confidence_skip_threshold: Optional[float] = None,
+    random_restart_count: Optional[int] = None,
+    reigen_inner_time_budget: Optional[float] = None,
+    reigen_wall_time_factor: Optional[float] = None,
+    # Misc
     force_cascade: bool = False,
     n_seed_samples: Optional[int] = None,
+    hagen_cfg: Optional[dict] = None,
     verbose: bool = False,
 ) -> dict:
     """Meta-dispatcher routing to owl or cascading owl→Reigen.
@@ -72,6 +136,41 @@ def hagen(
 
     t_start = time.time()
 
+    # ---- LaD: resolve dispatch params (kwarg > hagen_cfg > JSON > hardcode) ----
+    _p = _load_hagen_params()
+    _cfg_override = dict(hagen_cfg or {})
+    _d = _p["dispatch"]
+    _o = _p["owl_kwargs"]
+    _r = _p["reigen_kwargs"]
+    _eval_cost_threshold = _resolve(
+        eval_cost_threshold, _cfg_override.get("eval_cost_threshold"),
+        _d.get("eval_cost_threshold",
+               _HARDCODE_DEFAULTS["dispatch"]["eval_cost_threshold"]))
+    _owl_share = _resolve(
+        owl_share, _cfg_override.get("owl_share"),
+        _d.get("owl_share",
+               _HARDCODE_DEFAULTS["dispatch"]["owl_share"]))
+    _escalation_min_remaining = _resolve(
+        escalation_min_remaining, _cfg_override.get("escalation_min_remaining"),
+        _d.get("escalation_min_remaining",
+               _HARDCODE_DEFAULTS["dispatch"]["escalation_min_remaining"]))
+    _confidence_skip_threshold = _resolve(
+        confidence_skip_threshold, _cfg_override.get("confidence_skip_threshold"),
+        _d.get("confidence_skip_threshold",
+               _HARDCODE_DEFAULTS["dispatch"]["confidence_skip_threshold"]))
+    _owl_random_K = int(_resolve(
+        random_restart_count, _cfg_override.get("random_restart_count"),
+        _o.get("random_restart_count",
+               _HARDCODE_DEFAULTS["owl_kwargs"]["random_restart_count"])))
+    _reigen_inner = float(_resolve(
+        reigen_inner_time_budget, _cfg_override.get("reigen_inner_time_budget"),
+        _r.get("inner_time_budget",
+               _HARDCODE_DEFAULTS["reigen_kwargs"]["inner_time_budget"])))
+    _reigen_wtf = float(_resolve(
+        reigen_wall_time_factor, _cfg_override.get("reigen_wall_time_factor"),
+        _r.get("wall_time_factor",
+               _HARDCODE_DEFAULTS["reigen_kwargs"]["wall_time_factor"])))
+
     # ---- Phase 0: eval cost probing ----
     if eval_cost_hint is not None:
         t_eval = float(eval_cost_hint)
@@ -79,12 +178,12 @@ def hagen(
         t_eval = _measure_eval_cost(eval_fn, param_ranges)
 
     # Expensive eval OR curated data provided → owl single-shot with full enhancements
-    expensive_route = (t_eval > 0.5) or (curated_measurements is not None
-                                         and len(curated_measurements) > 0)
+    expensive_route = (t_eval > _eval_cost_threshold) or (
+        curated_measurements is not None and len(curated_measurements) > 0)
 
     # ---- Phase 1: owl (always) ----
     owl_budget = (time_budget if expensive_route
-                  else max(5.0, time_budget * owl_share))
+                  else max(5.0, time_budget * _owl_share))
     owl_kwargs = dict(
         measurements=curated_measurements if curated_measurements else [],
         param_ranges=list(param_ranges),
@@ -96,7 +195,7 @@ def hagen(
         experience_id=f"{experience_id}_owl",
         use_lbfgs_refinement=True,
         use_multistart_fallback=True,
-        random_restart_count=5,
+        random_restart_count=_owl_random_K,
         verbose=verbose,
     )
     if param_names is not None:
@@ -118,13 +217,15 @@ def hagen(
     # ---- Phase 2: decide whether to escalate ----
     elapsed = time.time() - t_start
     remaining = max(0.0, time_budget - elapsed)
-    # Policy for cheap eval: always cascade unless owl confidence is STRICTLY
-    # "high" or "lbfgs_refined". "direct" alone doesn't guarantee optimality —
-    # it just means we fell back. Escalate Reigen to verify/improve.
+    # LaD escalation gate: use proxy_r2 continuous value (was categorical "high").
+    # proxy_r2 ≥ confidence_skip_threshold → trust owl, skip Reigen.
+    # Lower threshold = more aggressive cascade (Reigen fires more often).
+    _owl_proxy_r2 = r_owl.get("proxy_r2") or 0.0
+    _proxy_good_enough = (_owl_proxy_r2 >= _confidence_skip_threshold)
     escalate = (
         not expensive_route
-        and (force_cascade or owl_conf not in owl_confidence_accepted)
-        and remaining > 5.0
+        and (force_cascade or not _proxy_good_enough)
+        and remaining > _escalation_min_remaining
     )
 
     result = {
@@ -170,14 +271,14 @@ def hagen(
             user_param_names=param_names,
             initial_user_params=_init_user_params,
             experience_id=f"{experience_id}_reigen",
-            inner_time_budget=2,
+            inner_time_budget=_reigen_inner,
             verbose=verbose,
         )
-        # wall_time_factor=1.0 keeps total wall close to time_budget (Reigen's
-        # default 3.0 would multiply remaining × 3, blowing user's budget).
+        # wall_time_factor from LaD (default 1.0 keeps total wall close to
+        # time_budget; Reigen's native default 3.0 would blow user's budget).
         r_reigen = reigen_obj.run(
             time_budget=max(5.0, remaining),
-            wall_time_factor=1.0,
+            wall_time_factor=_reigen_wtf,
         )
     except Exception as e:
         r_reigen = {"error": f"{type(e).__name__}: {e}",
