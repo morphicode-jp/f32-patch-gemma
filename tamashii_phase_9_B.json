@@ -1,0 +1,867 @@
+{
+  "elapsed_s": 88.2,
+  "n_steps_run": 5000,
+  "final_stats": {
+    "steps": 5000,
+    "n_total_agents": 30,
+    "n_alive": 30,
+    "n_births": 27,
+    "n_deaths": 0,
+    "mean_energy": 96.71999999999989,
+    "mean_generation": 3.1666666666666665,
+    "max_generation": 6,
+    "dna_diversity": 0.23791586838117695,
+    "light_level": 0.0,
+    "vision_factor": 0.3,
+    "n_food_voxels": 10,
+    "n_corpse_voxels": 0
+  },
+  "snapshots": [
+    {
+      "steps": 1,
+      "n_total_agents": 3,
+      "n_alive": 3,
+      "n_births": 0,
+      "n_deaths": 0,
+      "mean_energy": 58.18333333333333,
+      "mean_generation": 0.0,
+      "max_generation": 0,
+      "dna_diversity": 0.18760714625946706,
+      "light_level": 0.9999975326009292,
+      "vision_factor": 0.9999982728206505,
+      "n_food_voxels": 10,
+      "n_corpse_voxels": 0,
+      "step": 0
+    },
+    {
+      "steps": 201,
+      "n_total_agents": 4,
+      "n_alive": 4,
+      "n_births": 1,
+      "n_deaths": 0,
+      "mean_energy": 97.93749999999991,
+      "mean_generation": 0.25,
+      "max_generation": 1,
+      "dna_diversity": 0.2114201473535845,
+      "light_level": 0.9035832116232001,
+      "vision_factor": 0.9325082481362401,
+      "n_food_voxels": 10,
+      "n_corpse_voxels": 0,
+      "step": 200
+    },
+    {
+      "steps": 401,
+      "n_total_agents": 6,
+      "n_alive": 6,
+      "n_births": 3,
+      "n_deaths": 0,
+      "mean_energy": 97.34999999999991,
+      "mean_generation": 0.6666666666666666,
+      "max_generation": 2,
+      "dna_diversity": 0.22073919561864497,
+      "light_level": 0.6530138210942504,
+      "vision_factor": 0.7571096747659752,
+      "n_food_voxels": 10,
+      "n_corpse_voxels": 0,
+      "step": 400
+    },
+    {
+      "steps": 601,
+      "n_total_agents": 9,
+      "n_alive": 9,
+      "n_births": 6,
+      "n_deaths": 0,
+      "mean_energy": 97.73333333333325,
+      "mean_generation": 1.2222222222222223,
+      "max_generation": 3,
+      "dna_diversity": 0.21950740763529972,
+      "light_level": 0.3439983516557926,
+      "vision_factor": 0.5407988461590548,
+      "n_food_voxels": 10,
+      "n_corpse_voxels": 0,
+      "step": 600
+    },
+    {
+      "steps": 801,
+      "n_total_agents": 13,
+      "n_alive": 13,
+      "n_births": 10,
+      "n_deaths": 0,
+      "mean_energy": 98.25769230769225,
+      "mean_generation": 1.7692307692307692,
+      "max_generation": 4,
+      "dna_diversity": 0.23767163572388897,
+      "light_level": 0.09457020958381335,
+      "vision_factor": 0.3661991467086693,
+      "n_food_voxels": 10,
+      "n_corpse_voxels": 0,
+      "step": 800
+    },
+    {
+      "steps": 1001,
+      "n_total_agents": 19,
+      "n_alive": 19,
+      "n_births": 16,
+      "n_deaths": 0,
+      "mean_energy": 93.80263157894727,
+      "mean_generation": 2.3684210526315788,
+      "max_generation": 5,
+      "dna_diversity": 0.23920226572290684,
+      "light_level": 2.467399070893439e-06,
+      "vision_factor": 0.3000017271793496,
+      "n_food_voxels": 10,
+      "n_corpse_voxels": 0,
+      "step": 1000
+    },
+    {
+      "steps": 1201,
+      "n_total_agents": 28,
+      "n_alive": 28,
+      "n_births": 25,
+      "n_deaths": 0,
+      "mean_energy": 96.742857142857,
+      "mean_generation": 3.0,
+      "max_generation": 6,
+      "dna_diversity": 0.22853343638028928,
+      "light_level": 0.09641678837679979,
+      "vision_factor": 0.3674917518637598,
+      "n_food_voxels": 10,
+      "n_corpse_voxels": 0,
+      "step": 1200
+    },
+    {
+      "steps": 1401,
+      "n_total_agents": 30,
+      "n_alive": 30,
+      "n_births": 27,
+      "n_deaths": 0,
+      "mean_energy": 97.41499999999989,
+      "mean_generation": 3.1666666666666665,
+      "max_generation": 6,
+      "dna_diversity": 0.23791586838117695,
+      "light_level": 0.34698617890574945,
+      "vision_factor": 0.5428903252340246,
+      "n_food_voxels": 10,
+      "n_corpse_voxels": 0,
+      "step": 1400
+    },
+    {
+      "steps": 1601,
+      "n_total_agents": 30,
+      "n_alive": 30,
+      "n_births": 27,
+      "n_deaths": 0,
+      "mean_energy": 97.51499999999992,
+      "mean_generation": 3.1666666666666665,
+      "max_generation": 6,
+      "dna_diversity": 0.23791586838117695,
+      "light_level": 0.6560016483442073,
+      "vision_factor": 0.7592011538409451,
+      "n_food_voxels": 10,
+      "n_corpse_voxels": 0,
+      "step": 1600
+    },
+    {
+      "steps": 1801,
+      "n_total_agents": 30,
+      "n_alive": 30,
+      "n_births": 27,
+      "n_deaths": 0,
+      "mean_energy": 97.35999999999989,
+      "mean_generation": 3.1666666666666665,
+      "max_generation": 6,
+      "dna_diversity": 0.23791586838117695,
+      "light_level": 0.9054297904161865,
+      "vision_factor": 0.9338008532913304,
+      "n_food_voxels": 10,
+      "n_corpse_voxels": 0,
+      "step": 1800
+    },
+    {
+      "steps": 2001,
+      "n_total_agents": 30,
+      "n_alive": 30,
+      "n_births": 27,
+      "n_deaths": 0,
+      "mean_energy": 96.77999999999989,
+      "mean_generation": 3.1666666666666665,
+      "max_generation": 6,
+      "dna_diversity": 0.23791586838117695,
+      "light_level": 0.9999975326009292,
+      "vision_factor": 0.9999982728206505,
+      "n_food_voxels": 10,
+      "n_corpse_voxels": 0,
+      "step": 2000
+    },
+    {
+      "steps": 2201,
+      "n_total_agents": 30,
+      "n_alive": 30,
+      "n_births": 27,
+      "n_deaths": 0,
+      "mean_energy": 98.0149999999999,
+      "mean_generation": 3.1666666666666665,
+      "max_generation": 6,
+      "dna_diversity": 0.23791586838117695,
+      "light_level": 0.9035832116232003,
+      "vision_factor": 0.9325082481362401,
+      "n_food_voxels": 10,
+      "n_corpse_voxels": 0,
+      "step": 2200
+    },
+    {
+      "steps": 2401,
+      "n_total_agents": 30,
+      "n_alive": 30,
+      "n_births": 27,
+      "n_deaths": 0,
+      "mean_energy": 97.69999999999992,
+      "mean_generation": 3.1666666666666665,
+      "max_generation": 6,
+      "dna_diversity": 0.23791586838117695,
+      "light_level": 0.6530138210942507,
+      "vision_factor": 0.7571096747659753,
+      "n_food_voxels": 10,
+      "n_corpse_voxels": 0,
+      "step": 2400
+    },
+    {
+      "steps": 2601,
+      "n_total_agents": 30,
+      "n_alive": 30,
+      "n_births": 27,
+      "n_deaths": 0,
+      "mean_energy": 96.37499999999986,
+      "mean_generation": 3.1666666666666665,
+      "max_generation": 6,
+      "dna_diversity": 0.23791586838117695,
+      "light_level": 0.34399835165579284,
+      "vision_factor": 0.5407988461590549,
+      "n_food_voxels": 10,
+      "n_corpse_voxels": 0,
+      "step": 2600
+    },
+    {
+      "steps": 2801,
+      "n_total_agents": 30,
+      "n_alive": 30,
+      "n_births": 27,
+      "n_deaths": 0,
+      "mean_energy": 95.83999999999986,
+      "mean_generation": 3.1666666666666665,
+      "max_generation": 6,
+      "dna_diversity": 0.23791586838117695,
+      "light_level": 0.0945702095838134,
+      "vision_factor": 0.3661991467086694,
+      "n_food_voxels": 10,
+      "n_corpse_voxels": 0,
+      "step": 2800
+    },
+    {
+      "steps": 3001,
+      "n_total_agents": 30,
+      "n_alive": 30,
+      "n_births": 27,
+      "n_deaths": 0,
+      "mean_energy": 95.75499999999984,
+      "mean_generation": 3.1666666666666665,
+      "max_generation": 6,
+      "dna_diversity": 0.23791586838117695,
+      "light_level": 2.467399070893439e-06,
+      "vision_factor": 0.3000017271793496,
+      "n_food_voxels": 10,
+      "n_corpse_voxels": 0,
+      "step": 3000
+    },
+    {
+      "steps": 3201,
+      "n_total_agents": 30,
+      "n_alive": 30,
+      "n_births": 27,
+      "n_deaths": 0,
+      "mean_energy": 97.7049999999999,
+      "mean_generation": 3.1666666666666665,
+      "max_generation": 6,
+      "dna_diversity": 0.23791586838117695,
+      "light_level": 0.09641678837680023,
+      "vision_factor": 0.36749175186376015,
+      "n_food_voxels": 10,
+      "n_corpse_voxels": 0,
+      "step": 3200
+    },
+    {
+      "steps": 3401,
+      "n_total_agents": 30,
+      "n_alive": 30,
+      "n_births": 27,
+      "n_deaths": 0,
+      "mean_energy": 96.95999999999988,
+      "mean_generation": 3.1666666666666665,
+      "max_generation": 6,
+      "dna_diversity": 0.23791586838117695,
+      "light_level": 0.34698617890574934,
+      "vision_factor": 0.5428903252340245,
+      "n_food_voxels": 10,
+      "n_corpse_voxels": 0,
+      "step": 3400
+    },
+    {
+      "steps": 3601,
+      "n_total_agents": 30,
+      "n_alive": 30,
+      "n_births": 27,
+      "n_deaths": 0,
+      "mean_energy": 96.89999999999989,
+      "mean_generation": 3.1666666666666665,
+      "max_generation": 6,
+      "dna_diversity": 0.23791586838117695,
+      "light_level": 0.6560016483442072,
+      "vision_factor": 0.7592011538409449,
+      "n_food_voxels": 10,
+      "n_corpse_voxels": 0,
+      "step": 3600
+    },
+    {
+      "steps": 3801,
+      "n_total_agents": 30,
+      "n_alive": 30,
+      "n_births": 27,
+      "n_deaths": 0,
+      "mean_energy": 97.84999999999991,
+      "mean_generation": 3.1666666666666665,
+      "max_generation": 6,
+      "dna_diversity": 0.23791586838117695,
+      "light_level": 0.905429790416187,
+      "vision_factor": 0.9338008532913309,
+      "n_food_voxels": 10,
+      "n_corpse_voxels": 0,
+      "step": 3800
+    },
+    {
+      "steps": 4001,
+      "n_total_agents": 30,
+      "n_alive": 30,
+      "n_births": 27,
+      "n_deaths": 0,
+      "mean_energy": 97.32499999999989,
+      "mean_generation": 3.1666666666666665,
+      "max_generation": 6,
+      "dna_diversity": 0.23791586838117695,
+      "light_level": 0.9999975326009292,
+      "vision_factor": 0.9999982728206505,
+      "n_food_voxels": 10,
+      "n_corpse_voxels": 0,
+      "step": 4000
+    },
+    {
+      "steps": 4201,
+      "n_total_agents": 30,
+      "n_alive": 30,
+      "n_births": 27,
+      "n_deaths": 0,
+      "mean_energy": 96.97499999999988,
+      "mean_generation": 3.1666666666666665,
+      "max_generation": 6,
+      "dna_diversity": 0.23791586838117695,
+      "light_level": 0.9035832116232003,
+      "vision_factor": 0.9325082481362401,
+      "n_food_voxels": 10,
+      "n_corpse_voxels": 0,
+      "step": 4200
+    },
+    {
+      "steps": 4401,
+      "n_total_agents": 30,
+      "n_alive": 30,
+      "n_births": 27,
+      "n_deaths": 0,
+      "mean_energy": 97.68999999999993,
+      "mean_generation": 3.1666666666666665,
+      "max_generation": 6,
+      "dna_diversity": 0.23791586838117695,
+      "light_level": 0.6530138210942499,
+      "vision_factor": 0.7571096747659749,
+      "n_food_voxels": 10,
+      "n_corpse_voxels": 0,
+      "step": 4400
+    },
+    {
+      "steps": 4601,
+      "n_total_agents": 30,
+      "n_alive": 30,
+      "n_births": 27,
+      "n_deaths": 0,
+      "mean_energy": 97.56999999999991,
+      "mean_generation": 3.1666666666666665,
+      "max_generation": 6,
+      "dna_diversity": 0.23791586838117695,
+      "light_level": 0.34399835165579296,
+      "vision_factor": 0.540798846159055,
+      "n_food_voxels": 10,
+      "n_corpse_voxels": 0,
+      "step": 4600
+    },
+    {
+      "steps": 4801,
+      "n_total_agents": 30,
+      "n_alive": 30,
+      "n_births": 27,
+      "n_deaths": 0,
+      "mean_energy": 97.33999999999989,
+      "mean_generation": 3.1666666666666665,
+      "max_generation": 6,
+      "dna_diversity": 0.23791586838117695,
+      "light_level": 0.09457020958381351,
+      "vision_factor": 0.36619914670866943,
+      "n_food_voxels": 10,
+      "n_corpse_voxels": 0,
+      "step": 4800
+    },
+    {
+      "steps": 5000,
+      "n_total_agents": 30,
+      "n_alive": 30,
+      "n_births": 27,
+      "n_deaths": 0,
+      "mean_energy": 96.71999999999989,
+      "mean_generation": 3.1666666666666665,
+      "max_generation": 6,
+      "dna_diversity": 0.23791586838117695,
+      "light_level": 0.0,
+      "vision_factor": 0.3,
+      "n_food_voxels": 10,
+      "n_corpse_voxels": 0,
+      "step": 4999
+    }
+  ],
+  "per_agent_final": [
+    {
+      "idx": 0,
+      "alive": true,
+      "generation": 0,
+      "food_eaten": 295,
+      "energy": 98.94999999999996
+    },
+    {
+      "idx": 1,
+      "alive": true,
+      "generation": 0,
+      "food_eaten": 465,
+      "energy": 98.79999999999995
+    },
+    {
+      "idx": 2,
+      "alive": true,
+      "generation": 0,
+      "food_eaten": 254,
+      "energy": 98.04999999999993
+    },
+    {
+      "idx": 3,
+      "alive": true,
+      "generation": 1,
+      "food_eaten": 443,
+      "energy": 99.69999999999999
+    },
+    {
+      "idx": 4,
+      "alive": true,
+      "generation": 2,
+      "food_eaten": 327,
+      "energy": 98.19999999999993
+    },
+    {
+      "idx": 5,
+      "alive": true,
+      "generation": 1,
+      "food_eaten": 255,
+      "energy": 89.19999999999959
+    },
+    {
+      "idx": 6,
+      "alive": true,
+      "generation": 3,
+      "food_eaten": 408,
+      "energy": 99.39999999999998
+    },
+    {
+      "idx": 7,
+      "alive": true,
+      "generation": 2,
+      "food_eaten": 229,
+      "energy": 96.24999999999986
+    },
+    {
+      "idx": 8,
+      "alive": true,
+      "generation": 2,
+      "food_eaten": 360,
+      "energy": 98.94999999999996
+    },
+    {
+      "idx": 9,
+      "alive": true,
+      "generation": 4,
+      "food_eaten": 411,
+      "energy": 99.85
+    },
+    {
+      "idx": 10,
+      "alive": true,
+      "generation": 3,
+      "food_eaten": 359,
+      "energy": 96.99999999999989
+    },
+    {
+      "idx": 11,
+      "alive": true,
+      "generation": 3,
+      "food_eaten": 221,
+      "energy": 99.09999999999997
+    },
+    {
+      "idx": 12,
+      "alive": true,
+      "generation": 2,
+      "food_eaten": 338,
+      "energy": 98.04999999999993
+    },
+    {
+      "idx": 13,
+      "alive": true,
+      "generation": 4,
+      "food_eaten": 202,
+      "energy": 92.94999999999973
+    },
+    {
+      "idx": 14,
+      "alive": true,
+      "generation": 5,
+      "food_eaten": 415,
+      "energy": 99.09999999999997
+    },
+    {
+      "idx": 15,
+      "alive": true,
+      "generation": 3,
+      "food_eaten": 183,
+      "energy": 97.14999999999989
+    },
+    {
+      "idx": 16,
+      "alive": true,
+      "generation": 4,
+      "food_eaten": 240,
+      "energy": 97.59999999999991
+    },
+    {
+      "idx": 17,
+      "alive": true,
+      "generation": 4,
+      "food_eaten": 232,
+      "energy": 99.54999999999998
+    },
+    {
+      "idx": 18,
+      "alive": true,
+      "generation": 2,
+      "food_eaten": 177,
+      "energy": 97.74999999999991
+    },
+    {
+      "idx": 19,
+      "alive": true,
+      "generation": 3,
+      "food_eaten": 281,
+      "energy": 99.09999999999997
+    },
+    {
+      "idx": 20,
+      "alive": true,
+      "generation": 5,
+      "food_eaten": 243,
+      "energy": 89.4999999999996
+    },
+    {
+      "idx": 21,
+      "alive": true,
+      "generation": 4,
+      "food_eaten": 320,
+      "energy": 96.99999999999989
+    },
+    {
+      "idx": 22,
+      "alive": true,
+      "generation": 5,
+      "food_eaten": 312,
+      "energy": 98.49999999999994
+    },
+    {
+      "idx": 23,
+      "alive": true,
+      "generation": 3,
+      "food_eaten": 172,
+      "energy": 91.8999999999997
+    },
+    {
+      "idx": 24,
+      "alive": true,
+      "generation": 5,
+      "food_eaten": 210,
+      "energy": 98.79999999999995
+    },
+    {
+      "idx": 25,
+      "alive": true,
+      "generation": 5,
+      "food_eaten": 168,
+      "energy": 98.79999999999995
+    },
+    {
+      "idx": 26,
+      "alive": true,
+      "generation": 3,
+      "food_eaten": 303,
+      "energy": 99.85
+    },
+    {
+      "idx": 27,
+      "alive": true,
+      "generation": 6,
+      "food_eaten": 151,
+      "energy": 86.9499999999995
+    },
+    {
+      "idx": 28,
+      "alive": true,
+      "generation": 6,
+      "food_eaten": 203,
+      "energy": 85.74999999999946
+    },
+    {
+      "idx": 29,
+      "alive": true,
+      "generation": 5,
+      "food_eaten": 258,
+      "energy": 99.85
+    }
+  ],
+  "event_log": [
+    {
+      "step": 19,
+      "type": "birth",
+      "parent_i": 0,
+      "parent_j": 1,
+      "child": 3,
+      "generation": 1
+    },
+    {
+      "step": 219,
+      "type": "birth",
+      "parent_i": 1,
+      "parent_j": 3,
+      "child": 4,
+      "generation": 2
+    },
+    {
+      "step": 230,
+      "type": "birth",
+      "parent_i": 0,
+      "parent_j": 2,
+      "child": 5,
+      "generation": 1
+    },
+    {
+      "step": 420,
+      "type": "birth",
+      "parent_i": 1,
+      "parent_j": 4,
+      "child": 6,
+      "generation": 3
+    },
+    {
+      "step": 439,
+      "type": "birth",
+      "parent_i": 2,
+      "parent_j": 5,
+      "child": 7,
+      "generation": 2
+    },
+    {
+      "step": 466,
+      "type": "birth",
+      "parent_i": 0,
+      "parent_j": 3,
+      "child": 8,
+      "generation": 2
+    },
+    {
+      "step": 622,
+      "type": "birth",
+      "parent_i": 1,
+      "parent_j": 6,
+      "child": 9,
+      "generation": 4
+    },
+    {
+      "step": 639,
+      "type": "birth",
+      "parent_i": 2,
+      "parent_j": 4,
+      "child": 10,
+      "generation": 3
+    },
+    {
+      "step": 656,
+      "type": "birth",
+      "parent_i": 5,
+      "parent_j": 7,
+      "child": 11,
+      "generation": 3
+    },
+    {
+      "step": 671,
+      "type": "birth",
+      "parent_i": 0,
+      "parent_j": 3,
+      "child": 12,
+      "generation": 2
+    },
+    {
+      "step": 830,
+      "type": "birth",
+      "parent_i": 1,
+      "parent_j": 6,
+      "child": 13,
+      "generation": 4
+    },
+    {
+      "step": 839,
+      "type": "birth",
+      "parent_i": 8,
+      "parent_j": 9,
+      "child": 14,
+      "generation": 5
+    },
+    {
+      "step": 841,
+      "type": "birth",
+      "parent_i": 2,
+      "parent_j": 4,
+      "child": 15,
+      "generation": 3
+    },
+    {
+      "step": 859,
+      "type": "birth",
+      "parent_i": 7,
+      "parent_j": 11,
+      "child": 16,
+      "generation": 4
+    },
+    {
+      "step": 871,
+      "type": "birth",
+      "parent_i": 10,
+      "parent_j": 12,
+      "child": 17,
+      "generation": 4
+    },
+    {
+      "step": 887,
+      "type": "birth",
+      "parent_i": 0,
+      "parent_j": 5,
+      "child": 18,
+      "generation": 2
+    },
+    {
+      "step": 1042,
+      "type": "birth",
+      "parent_i": 3,
+      "parent_j": 8,
+      "child": 19,
+      "generation": 3
+    },
+    {
+      "step": 1047,
+      "type": "birth",
+      "parent_i": 4,
+      "parent_j": 9,
+      "child": 20,
+      "generation": 5
+    },
+    {
+      "step": 1059,
+      "type": "birth",
+      "parent_i": 6,
+      "parent_j": 11,
+      "child": 21,
+      "generation": 4
+    },
+    {
+      "step": 1062,
+      "type": "birth",
+      "parent_i": 1,
+      "parent_j": 16,
+      "child": 22,
+      "generation": 5
+    },
+    {
+      "step": 1065,
+      "type": "birth",
+      "parent_i": 2,
+      "parent_j": 7,
+      "child": 23,
+      "generation": 3
+    },
+    {
+      "step": 1071,
+      "type": "birth",
+      "parent_i": 10,
+      "parent_j": 17,
+      "child": 24,
+      "generation": 5
+    },
+    {
+      "step": 1085,
+      "type": "birth",
+      "parent_i": 13,
+      "parent_j": 15,
+      "child": 25,
+      "generation": 5
+    },
+    {
+      "step": 1088,
+      "type": "birth",
+      "parent_i": 0,
+      "parent_j": 12,
+      "child": 26,
+      "generation": 3
+    },
+    {
+      "step": 1124,
+      "type": "birth",
+      "parent_i": 5,
+      "parent_j": 14,
+      "child": 27,
+      "generation": 6
+    },
+    {
+      "step": 1247,
+      "type": "birth",
+      "parent_i": 3,
+      "parent_j": 20,
+      "child": 28,
+      "generation": 6
+    },
+    {
+      "step": 1247,
+      "type": "birth",
+      "parent_i": 9,
+      "parent_j": 19,
+      "child": 29,
+      "generation": 5
+    }
+  ]
+}
