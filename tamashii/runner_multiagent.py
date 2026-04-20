@@ -29,6 +29,7 @@ from tamashii.shells.dmn import DMN
 from tamashii.shells.hippocampus import Hippocampus
 from tamashii.shells.prefrontal import Prefrontal
 from tamashii.shells.salience import Salience
+from tamashii.shells.taboo import Taboo
 
 
 SHELL_REGISTRY = {
@@ -39,6 +40,7 @@ SHELL_REGISTRY = {
     "hippocampus": Hippocampus,
     "prefrontal": Prefrontal,
     "dmn": DMN,
+    "taboo": Taboo,
 }
 
 

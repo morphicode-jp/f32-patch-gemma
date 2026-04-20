@@ -1,0 +1,209 @@
+{
+  "condition_a": {
+    "label": "A-notaboo",
+    "shells": [
+      "core_brain",
+      "brainstem",
+      "cerebellum",
+      "salience",
+      "hippocampus",
+      "prefrontal",
+      "dmn"
+    ],
+    "total_food": 219,
+    "violations": {
+      "crowding": 142,
+      "hoarding": 8,
+      "silence": 74
+    },
+    "violation_rates": {
+      "crowding": 0.071,
+      "hoarding": 0.004,
+      "silence": 0.037
+    },
+    "per_episode": [
+      {
+        "ep": 0,
+        "seed": 42,
+        "food_eaten": 42,
+        "violations": {
+          "crowding": 37,
+          "hoarding": 2,
+          "silence": 12
+        },
+        "per_agent_food": [
+          14,
+          14,
+          14
+        ]
+      },
+      {
+        "ep": 1,
+        "seed": 49,
+        "food_eaten": 41,
+        "violations": {
+          "crowding": 23,
+          "hoarding": 0,
+          "silence": 11
+        },
+        "per_agent_food": [
+          16,
+          15,
+          10
+        ]
+      },
+      {
+        "ep": 2,
+        "seed": 56,
+        "food_eaten": 35,
+        "violations": {
+          "crowding": 28,
+          "hoarding": 1,
+          "silence": 13
+        },
+        "per_agent_food": [
+          13,
+          12,
+          10
+        ]
+      },
+      {
+        "ep": 3,
+        "seed": 63,
+        "food_eaten": 42,
+        "violations": {
+          "crowding": 27,
+          "hoarding": 2,
+          "silence": 19
+        },
+        "per_agent_food": [
+          12,
+          11,
+          19
+        ]
+      },
+      {
+        "ep": 4,
+        "seed": 70,
+        "food_eaten": 59,
+        "violations": {
+          "crowding": 27,
+          "hoarding": 3,
+          "silence": 19
+        },
+        "per_agent_food": [
+          19,
+          25,
+          15
+        ]
+      }
+    ]
+  },
+  "condition_b": {
+    "label": "B-taboo",
+    "shells": [
+      "core_brain",
+      "brainstem",
+      "cerebellum",
+      "salience",
+      "hippocampus",
+      "prefrontal",
+      "dmn",
+      "taboo"
+    ],
+    "total_food": 157,
+    "violations": {
+      "crowding": 149,
+      "hoarding": 13,
+      "silence": 135
+    },
+    "violation_rates": {
+      "crowding": 0.0745,
+      "hoarding": 0.0065,
+      "silence": 0.0675
+    },
+    "per_episode": [
+      {
+        "ep": 0,
+        "seed": 42,
+        "food_eaten": 33,
+        "violations": {
+          "crowding": 33,
+          "hoarding": 3,
+          "silence": 60
+        },
+        "per_agent_food": [
+          14,
+          19,
+          0
+        ]
+      },
+      {
+        "ep": 1,
+        "seed": 49,
+        "food_eaten": 28,
+        "violations": {
+          "crowding": 30,
+          "hoarding": 1,
+          "silence": 14
+        },
+        "per_agent_food": [
+          12,
+          12,
+          4
+        ]
+      },
+      {
+        "ep": 2,
+        "seed": 56,
+        "food_eaten": 29,
+        "violations": {
+          "crowding": 45,
+          "hoarding": 6,
+          "silence": 28
+        },
+        "per_agent_food": [
+          9,
+          10,
+          10
+        ]
+      },
+      {
+        "ep": 3,
+        "seed": 63,
+        "food_eaten": 30,
+        "violations": {
+          "crowding": 25,
+          "hoarding": 2,
+          "silence": 9
+        },
+        "per_agent_food": [
+          7,
+          10,
+          13
+        ]
+      },
+      {
+        "ep": 4,
+        "seed": 70,
+        "food_eaten": 37,
+        "violations": {
+          "crowding": 16,
+          "hoarding": 1,
+          "silence": 24
+        },
+        "per_agent_food": [
+          18,
+          12,
+          7
+        ]
+      }
+    ]
+  },
+  "reduction_pct": -32.589285714285715,
+  "food_retention": 0.7168949771689498,
+  "pass_viol": false,
+  "pass_food": true,
+  "criterion_6_pass": false,
+  "elapsed_s": 7.7
+}

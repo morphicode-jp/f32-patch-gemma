@@ -1,0 +1,28 @@
+{
+  "shell_name": "taboo",
+  "tick_ms": 50,
+  "gain": 1.0,
+  "params": {
+    "motor_nav": 16,
+    "motor_speed": 17,
+    "motor_voice": 18,
+    "peer_voice": 11,
+    "peer_nav": 12,
+    "peer_speed": 13,
+    "peer_proximity": 14,
+    "food_left": 0,
+    "food_right": 2,
+    "olfactory": 10,
+    "enable_anti_crowding": false,
+    "enable_anti_hoarding": true,
+    "enable_mandatory_voice": true,
+    "crowding_prox_threshold": 0.4,
+    "crowding_speed_threshold": 0.5,
+    "crowding_brake_strength": 0.8,
+    "hoarding_prox_threshold": 0.5,
+    "hoarding_olf_threshold": 1.0,
+    "hoarding_retreat_strength": 0.4,
+    "mandatory_voice_prox": 0.5,
+    "mandatory_voice_min": 0.3
+  }
+}
