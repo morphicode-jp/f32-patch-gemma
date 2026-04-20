@@ -1,0 +1,10 @@
+{
+  "params": {
+    "baseline_alpha": 0.018715284017631766,
+    "novelty_threshold": 0.4,
+    "boost_strength": 0.2743308125091635
+  },
+  "_meta": {
+    "best_score": 39.981069389227756
+  }
+}

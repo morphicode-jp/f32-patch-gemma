@@ -1,0 +1,10 @@
+{
+  "params": {
+    "recall_threshold": 0.85037419,
+    "store_threshold": 0.67067634,
+    "recall_strength": 0.41501924
+  },
+  "_meta": {
+    "best_score": 30.170860029878867
+  }
+}

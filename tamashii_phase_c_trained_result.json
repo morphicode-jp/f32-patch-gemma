@@ -1,0 +1,542 @@
+{
+  "shells": [
+    "core_brain",
+    "brainstem",
+    "cerebellum",
+    "salience",
+    "hippocampus",
+    "prefrontal",
+    "dmn"
+  ],
+  "n_agents": 3,
+  "episodes": [
+    {
+      "episode": 0,
+      "seed": 42,
+      "reach_rate": 0.0,
+      "reached": [
+        false,
+        false,
+        false
+      ],
+      "n_steps": 60,
+      "metrics_per_agent": [
+        {
+          "coupling_off_diag_mean": 0.19538221460374713,
+          "shell_names": [
+            "brainstem",
+            "cerebellum",
+            "core_brain",
+            "dmn",
+            "hippocampus",
+            "prefrontal",
+            "salience"
+          ],
+          "state_diversity": {
+            "explained_variance": [
+              0.9811244121679988,
+              0.007388462755311223,
+              0.0034079754090343556,
+              0.002552831688976461
+            ],
+            "trajectory_length": 198.0356358117447,
+            "unique_bins": 109
+          },
+          "behavioral_coherence": {
+            "autocorr_lag1": 0.4254211932429744,
+            "smoothness": 0.9977526051091905,
+            "std": 0.46989709666552815
+          },
+          "novelty_response": {
+            "response_ratio": 126.71891384298992
+          }
+        },
+        {
+          "coupling_off_diag_mean": 0.19089481094070623,
+          "shell_names": [
+            "brainstem",
+            "cerebellum",
+            "core_brain",
+            "dmn",
+            "hippocampus",
+            "prefrontal",
+            "salience"
+          ],
+          "state_diversity": {
+            "explained_variance": [
+              0.979969355079948,
+              0.007496481091059291,
+              0.004395140947801343,
+              0.003018410376488333
+            ],
+            "trajectory_length": 199.32375945431767,
+            "unique_bins": 112
+          },
+          "behavioral_coherence": {
+            "autocorr_lag1": 0.42627592833513556,
+            "smoothness": 0.9977707069978223,
+            "std": 0.46990675035331403
+          },
+          "novelty_response": {
+            "response_ratio": 131.16956877200712
+          }
+        },
+        {
+          "coupling_off_diag_mean": 0.19258755049924728,
+          "shell_names": [
+            "brainstem",
+            "cerebellum",
+            "core_brain",
+            "dmn",
+            "hippocampus",
+            "prefrontal",
+            "salience"
+          ],
+          "state_diversity": {
+            "explained_variance": [
+              0.867555288635714,
+              0.11865396283327832,
+              0.005092583117194683,
+              0.0028701410167727543
+            ],
+            "trajectory_length": 216.6808196425595,
+            "unique_bins": 112
+          },
+          "behavioral_coherence": {
+            "autocorr_lag1": 0.4254221642670836,
+            "smoothness": 0.9977526710110002,
+            "std": 0.46989704314743364
+          },
+          "novelty_response": {
+            "response_ratio": 142.10657491681656
+          }
+        }
+      ]
+    },
+    {
+      "episode": 1,
+      "seed": 49,
+      "reach_rate": 0.0,
+      "reached": [
+        false,
+        false,
+        false
+      ],
+      "n_steps": 60,
+      "metrics_per_agent": [
+        {
+          "coupling_off_diag_mean": 0.18051751223149914,
+          "shell_names": [
+            "brainstem",
+            "cerebellum",
+            "core_brain",
+            "dmn",
+            "hippocampus",
+            "prefrontal",
+            "salience"
+          ],
+          "state_diversity": {
+            "explained_variance": [
+              0.7199564844602742,
+              0.2006661158526414,
+              0.06889451511018588,
+              0.004498499633062576
+            ],
+            "trajectory_length": 263.08879464526615,
+            "unique_bins": 124
+          },
+          "behavioral_coherence": {
+            "autocorr_lag1": 0.4256715303474479,
+            "smoothness": 0.9977523983800594,
+            "std": 0.46989688765551396
+          },
+          "novelty_response": {
+            "response_ratio": 99.17932837009182
+          }
+        },
+        {
+          "coupling_off_diag_mean": 0.1888663019365044,
+          "shell_names": [
+            "brainstem",
+            "cerebellum",
+            "core_brain",
+            "dmn",
+            "hippocampus",
+            "prefrontal",
+            "salience"
+          ],
+          "state_diversity": {
+            "explained_variance": [
+              0.9745999314516912,
+              0.008649577513961657,
+              0.007660798987103784,
+              0.002698258678691075
+            ],
+            "trajectory_length": 204.51104559863091,
+            "unique_bins": 108
+          },
+          "behavioral_coherence": {
+            "autocorr_lag1": 0.42604853353477895,
+            "smoothness": 0.9977704590984036,
+            "std": 0.46990705881714995
+          },
+          "novelty_response": {
+            "response_ratio": 116.06250188713543
+          }
+        },
+        {
+          "coupling_off_diag_mean": 0.1920661894700606,
+          "shell_names": [
+            "brainstem",
+            "cerebellum",
+            "core_brain",
+            "dmn",
+            "hippocampus",
+            "prefrontal",
+            "salience"
+          ],
+          "state_diversity": {
+            "explained_variance": [
+              0.870598022942009,
+              0.1164581043146622,
+              0.0053918879916485495,
+              0.0020137289739348132
+            ],
+            "trajectory_length": 214.02187379259664,
+            "unique_bins": 108
+          },
+          "behavioral_coherence": {
+            "autocorr_lag1": 0.4254175585557587,
+            "smoothness": 0.9977526480864327,
+            "std": 0.4698971007758897
+          },
+          "novelty_response": {
+            "response_ratio": 137.63060910359528
+          }
+        }
+      ]
+    },
+    {
+      "episode": 2,
+      "seed": 56,
+      "reach_rate": 0.0,
+      "reached": [
+        false,
+        false,
+        false
+      ],
+      "n_steps": 60,
+      "metrics_per_agent": [
+        {
+          "coupling_off_diag_mean": 0.19372288476901,
+          "shell_names": [
+            "brainstem",
+            "cerebellum",
+            "core_brain",
+            "dmn",
+            "hippocampus",
+            "prefrontal",
+            "salience"
+          ],
+          "state_diversity": {
+            "explained_variance": [
+              0.9739349902613116,
+              0.014546405747339617,
+              0.004019552315842718,
+              0.0025062784007801766
+            ],
+            "trajectory_length": 217.50370793352812,
+            "unique_bins": 113
+          },
+          "behavioral_coherence": {
+            "autocorr_lag1": 0.42548435718357264,
+            "smoothness": 0.9977555804202536,
+            "std": 0.4698985163936802
+          },
+          "novelty_response": {
+            "response_ratio": 146.420116248082
+          }
+        },
+        {
+          "coupling_off_diag_mean": 0.19596960305135744,
+          "shell_names": [
+            "brainstem",
+            "cerebellum",
+            "core_brain",
+            "dmn",
+            "hippocampus",
+            "prefrontal",
+            "salience"
+          ],
+          "state_diversity": {
+            "explained_variance": [
+              0.977773656964152,
+              0.010048932149179677,
+              0.004160793934578738,
+              0.0026201984059161334
+            ],
+            "trajectory_length": 211.2241971468194,
+            "unique_bins": 109
+          },
+          "behavioral_coherence": {
+            "autocorr_lag1": 0.4254573781848605,
+            "smoothness": 0.997754399046297,
+            "std": 0.4698978219788911
+          },
+          "novelty_response": {
+            "response_ratio": 148.8969526799011
+          }
+        },
+        {
+          "coupling_off_diag_mean": 0.19510664438686595,
+          "shell_names": [
+            "brainstem",
+            "cerebellum",
+            "core_brain",
+            "dmn",
+            "hippocampus",
+            "prefrontal",
+            "salience"
+          ],
+          "state_diversity": {
+            "explained_variance": [
+              0.9744884871354302,
+              0.013751538357467015,
+              0.004248409200737502,
+              0.0025587517061001646
+            ],
+            "trajectory_length": 212.98703722121837,
+            "unique_bins": 110
+          },
+          "behavioral_coherence": {
+            "autocorr_lag1": 0.4254689933653961,
+            "smoothness": 0.9977550798716079,
+            "std": 0.46989823077922344
+          },
+          "novelty_response": {
+            "response_ratio": 147.42642245255183
+          }
+        }
+      ]
+    },
+    {
+      "episode": 3,
+      "seed": 63,
+      "reach_rate": 0.0,
+      "reached": [
+        false,
+        false,
+        false
+      ],
+      "n_steps": 60,
+      "metrics_per_agent": [
+        {
+          "coupling_off_diag_mean": 0.19178821176598793,
+          "shell_names": [
+            "brainstem",
+            "cerebellum",
+            "core_brain",
+            "dmn",
+            "hippocampus",
+            "prefrontal",
+            "salience"
+          ],
+          "state_diversity": {
+            "explained_variance": [
+              0.9754458050093563,
+              0.00938452323004233,
+              0.0061056004056038995,
+              0.003046625202678822
+            ],
+            "trajectory_length": 213.07479326313674,
+            "unique_bins": 100
+          },
+          "behavioral_coherence": {
+            "autocorr_lag1": 0.42558933948783556,
+            "smoothness": 0.9977524995092583,
+            "std": 0.46989666883473197
+          },
+          "novelty_response": {
+            "response_ratio": 133.30536298187377
+          }
+        },
+        {
+          "coupling_off_diag_mean": 0.19426912724365772,
+          "shell_names": [
+            "brainstem",
+            "cerebellum",
+            "core_brain",
+            "dmn",
+            "hippocampus",
+            "prefrontal",
+            "salience"
+          ],
+          "state_diversity": {
+            "explained_variance": [
+              0.9802558912056334,
+              0.007783609196906195,
+              0.004660379498267338,
+              0.002495383163490266
+            ],
+            "trajectory_length": 203.0093343141601,
+            "unique_bins": 106
+          },
+          "behavioral_coherence": {
+            "autocorr_lag1": 0.42541658195139415,
+            "smoothness": 0.9977526631087698,
+            "std": 0.4698970947125954
+          },
+          "novelty_response": {
+            "response_ratio": 143.19026263205168
+          }
+        },
+        {
+          "coupling_off_diag_mean": 0.19248764955332462,
+          "shell_names": [
+            "brainstem",
+            "cerebellum",
+            "core_brain",
+            "dmn",
+            "hippocampus",
+            "prefrontal",
+            "salience"
+          ],
+          "state_diversity": {
+            "explained_variance": [
+              0.9790384177869604,
+              0.008710360308842357,
+              0.004884442898178846,
+              0.0025094643533496463
+            ],
+            "trajectory_length": 208.15829734039082,
+            "unique_bins": 111
+          },
+          "behavioral_coherence": {
+            "autocorr_lag1": 0.4254974546869621,
+            "smoothness": 0.9977525349030383,
+            "std": 0.46989683552258554
+          },
+          "novelty_response": {
+            "response_ratio": 132.5565032577276
+          }
+        }
+      ]
+    },
+    {
+      "episode": 4,
+      "seed": 70,
+      "reach_rate": 0.0,
+      "reached": [
+        false,
+        false,
+        false
+      ],
+      "n_steps": 60,
+      "metrics_per_agent": [
+        {
+          "coupling_off_diag_mean": 0.18828844967601,
+          "shell_names": [
+            "brainstem",
+            "cerebellum",
+            "core_brain",
+            "dmn",
+            "hippocampus",
+            "prefrontal",
+            "salience"
+          ],
+          "state_diversity": {
+            "explained_variance": [
+              0.870173540457026,
+              0.11372063507986692,
+              0.007254215217330293,
+              0.002943752965475294
+            ],
+            "trajectory_length": 213.14799674632664,
+            "unique_bins": 118
+          },
+          "behavioral_coherence": {
+            "autocorr_lag1": 0.4265293929459841,
+            "smoothness": 0.9977742613181478,
+            "std": 0.46990922336225954
+          },
+          "novelty_response": {
+            "response_ratio": 86.93937876381058
+          }
+        },
+        {
+          "coupling_off_diag_mean": 0.18448359154292632,
+          "shell_names": [
+            "brainstem",
+            "cerebellum",
+            "core_brain",
+            "dmn",
+            "hippocampus",
+            "prefrontal",
+            "salience"
+          ],
+          "state_diversity": {
+            "explained_variance": [
+              0.8736559739881075,
+              0.10891813319342734,
+              0.007666970757400596,
+              0.0035082204966229327
+            ],
+            "trajectory_length": 215.6372780360843,
+            "unique_bins": 116
+          },
+          "behavioral_coherence": {
+            "autocorr_lag1": 0.426518918746811,
+            "smoothness": 0.9977746098487943,
+            "std": 0.46990953609130864
+          },
+          "novelty_response": {
+            "response_ratio": 74.17589858095947
+          }
+        },
+        {
+          "coupling_off_diag_mean": 0.19101657407404168,
+          "shell_names": [
+            "brainstem",
+            "cerebellum",
+            "core_brain",
+            "dmn",
+            "hippocampus",
+            "prefrontal",
+            "salience"
+          ],
+          "state_diversity": {
+            "explained_variance": [
+              0.9767094892967745,
+              0.009131312254359971,
+              0.005364550854323019,
+              0.0027395155693849716
+            ],
+            "trajectory_length": 198.9501231524995,
+            "unique_bins": 112
+          },
+          "behavioral_coherence": {
+            "autocorr_lag1": 0.42600679800725105,
+            "smoothness": 0.9977701746011592,
+            "std": 0.46990695684183004
+          },
+          "novelty_response": {
+            "response_ratio": 112.31893326775537
+          }
+        }
+      ]
+    }
+  ],
+  "aggregate": {
+    "reach_rate_mean": 0.0,
+    "coupling_mean": 0.19116315438299641,
+    "coupling_std": 0.004076120607693794,
+    "unique_bins_mean": 111.2,
+    "coherence_mean": 0.4257484081895497,
+    "novelty_mean": 125.20648851715663,
+    "pass_coupling": "True",
+    "pass_diversity": "True",
+    "pass_coherence": "True",
+    "total_pass": 3
+  },
+  "elapsed_s": 0.8
+}

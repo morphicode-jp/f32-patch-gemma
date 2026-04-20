@@ -1,0 +1,44 @@
+{
+  "total_elapsed_s": 863.2,
+  "summary": {
+    "core_brain": {
+      "best_score": 74.78507767627343,
+      "tool_used": "owl+reigen",
+      "eval_cost_s": 0.03399968147277832,
+      "proxy_r2": 0.42099548178755275,
+      "dead_dims": [
+        7,
+        13,
+        35,
+        56,
+        57,
+        77,
+        80,
+        90,
+        107,
+        114
+      ],
+      "elapsed_s": 190.7
+    },
+    "cerebellum": {
+      "best_score": 16.091702984774987,
+      "elapsed_s": 48.4
+    },
+    "salience": {
+      "best_score": 39.981069389227756,
+      "elapsed_s": 157.9
+    },
+    "hippocampus": {
+      "best_score": 30.170860029878867,
+      "elapsed_s": 143.4
+    },
+    "prefrontal": {
+      "best_score": 37.16034748771309,
+      "elapsed_s": 172.2
+    },
+    "dmn": {
+      "best_score": 10.618907753582203,
+      "elapsed_s": 150.6
+    }
+  }
+}

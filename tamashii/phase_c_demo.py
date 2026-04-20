@@ -114,6 +114,8 @@ def main():
     ap.add_argument("--ticks_per_step", type=int, default=3)
     ap.add_argument("--seed_base", type=int, default=42)
     ap.add_argument("--output", type=str, default="tamashii_phase_c_result.json")
+    ap.add_argument("--trained_dir", type=str, default=None,
+                    help="directory with *_trained.json overlays")
     args = ap.parse_args()
 
     from multi_agent_world_N import MultiAgentCoopWorldN
@@ -136,7 +138,7 @@ def main():
         seed = args.seed_base + ep * 7
         # Fresh agents per episode (deterministic per seed)
         agents = [
-            build_agent(shells, configs_dir, trained_dir=None, D=192)
+            build_agent(shells, configs_dir, trained_dir=args.trained_dir, D=192)
             for _ in range(args.n_agents)
         ]
         world = MultiAgentCoopWorldN(n_agents=args.n_agents, seed=seed)

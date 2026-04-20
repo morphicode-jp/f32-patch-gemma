@@ -1,0 +1,10 @@
+{
+  "params": {
+    "engagement_threshold": 0.19720981,
+    "replay_strength": 0.4,
+    "decay": 0.98
+  },
+  "_meta": {
+    "best_score": 10.618907753582203
+  }
+}

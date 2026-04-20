@@ -1,0 +1,11 @@
+{
+  "params": {
+    "ema_alpha": 0.2,
+    "smoothing_strength": 0.5,
+    "prediction_weight": 0.44965327
+  },
+  "_meta": {
+    "best_score": 16.091702984774987,
+    "tool_used": "owl"
+  }
+}
