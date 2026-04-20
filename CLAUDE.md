@@ -818,6 +818,34 @@ Reigen even though it cites Kathara.
 
 KV cache scale、weight scale、LoRA adapter など **internal model state** を触る param には禁止。それらは単一の global state を共有するため並列 eval が原理的にできない。この場面では eval_fn を 2 秒以内に収め、multi-observer dict (`{"nll": -ppl, "hs": hs_score, "mmlu": mmlu_score}`) を返し、mimir 経由で構造発見させる。stable_active / stable_dead を直接読みたければ `mimir(..., mode="structure_only")` でいい。
 
+### Rule 11b: mimir の parallel cascade も internal state には危険
+
+2026-04-21 追加。mimir の cheap_cascade では `reigen` と `scipy.basinhopping` が **並列 thread で同じ eval_fn を呼ぶ**。eval_fn が global state を touch する場合:
+
+```python
+def eval_fn(p):
+    apply_scales(p)   # ← global mutation
+    score = measure()
+    restore()
+    return score
+```
+
+thread A が `apply_scales(P_A)` した直後、thread B が `apply_scales(P_B)` で状態上書き → A の measure() は P_B で測定される = race condition。
+
+**回避**: `thread_safe_eval=False` を mimir に渡す。これで並列でなく逐次実行になる。
+
+```python
+r = mimir(eval_fn, ranges, thread_safe_eval=False)
+```
+
+あるいは eval_cost_hint で expensive_route を強制すれば cascade 自体発火せず、この問題は起きない:
+
+```python
+r = mimir(eval_fn, ranges, eval_cost_hint=2.0)  # > 0.5s → expensive_single → cascade skip
+```
+
+LLM キャリブは通常 eval_cost > 0.5s で自動的に expensive_route に入るので安全。安 eval で internal state を触るケース (内部 KV quant 実験等) では明示的に `thread_safe_eval=False` を渡すこと。
+
 ### Rule 11 concrete example (Qwen3.6-NVFP4 KV calibration)
 
 ```python

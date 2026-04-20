@@ -124,6 +124,7 @@ def mimir(
     n_seed_samples: Optional[int] = None,
     mimir_cfg: Optional[dict] = None,
     mode: str = "optimize",  # "optimize" | "structure_only"
+    thread_safe_eval: bool = True,  # False: eval_fn touches global state (Rule 11); forces sequential cascade
     verbose: bool = False,
 ) -> dict:
     """Meta-dispatcher routing to owl or cascading owl→Reigen.
@@ -431,23 +432,32 @@ def mimir(
         except Exception as e:
             return {"error": f"{type(e).__name__}: {e}"}
 
-    # Launch both in parallel threads
-    with _cf.ThreadPoolExecutor(max_workers=2) as _ex:
-        _f_reigen = _ex.submit(_reigen_worker)
-        _f_scipy = _ex.submit(_scipy_worker) if _scipy_trigger else None
-        try:
-            r_reigen = _f_reigen.result(timeout=_cascade_budget * 2.0)
-        except _cf.TimeoutError:
-            r_reigen = {"error": "reigen timeout",
-                        "user_best_score": float("-inf"),
-                        "user_best_params": None}
-        if _f_scipy is not None:
+    # Launch cascade: parallel when eval_fn is thread-safe, sequential when not.
+    # Rule 11 cases (eval_fn touches global model state like KV scales) must
+    # use thread_safe_eval=False to avoid race between Reigen and scipy
+    # calling eval_fn concurrently.
+    if thread_safe_eval:
+        with _cf.ThreadPoolExecutor(max_workers=2) as _ex:
+            _f_reigen = _ex.submit(_reigen_worker)
+            _f_scipy = _ex.submit(_scipy_worker) if _scipy_trigger else None
             try:
-                r_scipy = _f_scipy.result(timeout=_cascade_budget * 2.0)
+                r_reigen = _f_reigen.result(timeout=_cascade_budget * 2.0)
             except _cf.TimeoutError:
-                r_scipy = {"error": "scipy timeout"}
-        else:
-            r_scipy = None
+                r_reigen = {"error": "reigen timeout",
+                            "user_best_score": float("-inf"),
+                            "user_best_params": None}
+            if _f_scipy is not None:
+                try:
+                    r_scipy = _f_scipy.result(timeout=_cascade_budget * 2.0)
+                except _cf.TimeoutError:
+                    r_scipy = {"error": "scipy timeout"}
+            else:
+                r_scipy = None
+    else:
+        # Sequential fallback: Reigen first, then scipy (if triggered).
+        # Each call owns the eval_fn for its duration — no cross-thread races.
+        r_reigen = _reigen_worker()
+        r_scipy = _scipy_worker() if _scipy_trigger else None
 
     reigen_best = r_reigen.get("user_best_score", float("-inf"))
     reigen_params = r_reigen.get("user_best_params")
