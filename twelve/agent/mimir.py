@@ -40,6 +40,8 @@ _HARDCODE_DEFAULTS = {
         "owl_share": 0.4,
         "escalation_min_remaining": 5.0,
         "confidence_skip_threshold": 0.7,
+        "scipy_cascade_dim_threshold": 10,
+        "scipy_cascade_budget_share": 0.5,
     },
     "owl_kwargs": {
         "random_restart_count": 5,
@@ -49,6 +51,10 @@ _HARDCODE_DEFAULTS = {
     "reigen_kwargs": {
         "inner_time_budget": 2.0,
         "wall_time_factor": 1.0,
+    },
+    "scipy_kwargs": {
+        "niter": 200,
+        "minimizer_method": "L-BFGS-B",
     },
 }
 
@@ -110,6 +116,9 @@ def mimir(
     random_restart_count: Optional[int] = None,
     reigen_inner_time_budget: Optional[float] = None,
     reigen_wall_time_factor: Optional[float] = None,
+    scipy_cascade_dim_threshold: Optional[int] = None,
+    scipy_cascade_budget_share: Optional[float] = None,
+    enable_scipy_cascade: bool = True,
     # Misc
     force_cascade: bool = False,
     n_seed_samples: Optional[int] = None,
@@ -177,6 +186,16 @@ def mimir(
         reigen_wall_time_factor, _cfg_override.get("reigen_wall_time_factor"),
         _r.get("wall_time_factor",
                _HARDCODE_DEFAULTS["reigen_kwargs"]["wall_time_factor"])))
+    _scipy_dim_thresh = int(_resolve(
+        scipy_cascade_dim_threshold,
+        _cfg_override.get("scipy_cascade_dim_threshold"),
+        _d.get("scipy_cascade_dim_threshold",
+               _HARDCODE_DEFAULTS["dispatch"]["scipy_cascade_dim_threshold"])))
+    _scipy_budget_share = float(_resolve(
+        scipy_cascade_budget_share,
+        _cfg_override.get("scipy_cascade_budget_share"),
+        _d.get("scipy_cascade_budget_share",
+               _HARDCODE_DEFAULTS["dispatch"]["scipy_cascade_budget_share"])))
 
     # ---- Phase 0: eval cost probing ----
     if eval_cost_hint is not None:
@@ -354,16 +373,97 @@ def mimir(
     reigen_best = r_reigen.get("user_best_score", float("-inf"))
     reigen_params = r_reigen.get("user_best_params")
 
-    # Pick winner (keep owl if reigen didn't improve)
+    # ---- Phase 3b: scipy.basinhopping parallel cascade at high dim ----
+    # Rationale: Reigen handles structured problems (Rastrigin 20d gap=0),
+    # but fails on curved valleys (Rosenbrock 20d gap=2041) and asymmetric
+    # basins (Styblinski 20d gap=711). scipy.basinhopping with niter=200 +
+    # L-BFGS-B per hop excels on these, using gradient + exhaustive restart.
+    # Fire when: dim >= threshold AND owl didn't succeed (confidence != "high").
+    scipy_best = float("-inf")
+    scipy_params = None
+    r_scipy = None
+    _dim = len(list(param_ranges))
+    _scipy_trigger = (
+        enable_scipy_cascade
+        and _dim >= _scipy_dim_thresh
+        and owl_conf != "high"
+    )
+    if _scipy_trigger:
+        try:
+            from scipy.optimize import basinhopping as _bh
+            import numpy as _np
+            _elapsed2 = time.time() - t_start
+            _remaining2 = max(2.0, time_budget - _elapsed2)
+            _scipy_budget = _remaining2 * _scipy_budget_share
+            _scipy_t0 = time.time()
+            _rng_np = _np.random.default_rng(hash(experience_id) & 0xFFFFFFFF)
+            _x0 = _np.array([_rng_np.uniform(lo, hi) for lo, hi in param_ranges])
+            _scipy_best_tracker = [float("-inf"), None]
+
+            def _scipy_neg(p):
+                try:
+                    v = float(eval_fn(list(p)))
+                except Exception:
+                    return 0.0
+                if v > _scipy_best_tracker[0]:
+                    _scipy_best_tracker[0] = v
+                    _scipy_best_tracker[1] = [float(x) for x in p]
+                return -v
+
+            def _scipy_cb(x, v, accepted):
+                return time.time() - _scipy_t0 >= _scipy_budget
+
+            _r_bh = _bh(
+                _scipy_neg, _x0,
+                minimizer_kwargs={
+                    "method": _HARDCODE_DEFAULTS["scipy_kwargs"]["minimizer_method"],
+                    "bounds": list(param_ranges),
+                },
+                niter=int(_HARDCODE_DEFAULTS["scipy_kwargs"]["niter"]),
+                seed=hash(experience_id) & 0xFFFFFFFF,
+                callback=_scipy_cb,
+            )
+            scipy_best = _scipy_best_tracker[0]
+            scipy_params = _scipy_best_tracker[1]
+            if scipy_best == float("-inf"):
+                scipy_best = -float(_r_bh.fun)
+                scipy_params = [float(x) for x in _r_bh.x]
+            r_scipy = {
+                "best_score": scipy_best,
+                "best_params": scipy_params,
+                "n_iter": int(_HARDCODE_DEFAULTS["scipy_kwargs"]["niter"]),
+                "elapsed_s": time.time() - _scipy_t0,
+            }
+        except ImportError:
+            r_scipy = {"error": "scipy.optimize unavailable"}
+        except Exception as e:
+            r_scipy = {"error": f"{type(e).__name__}: {e}"}
+
+    # Pick winner among {owl, reigen, scipy}
     owl_score_val = owl_best_score if owl_best_score is not None else float("-inf")
-    if reigen_best > owl_score_val and reigen_params is not None:
-        result["best_params"] = reigen_params
-        result["best_score"] = float(reigen_best)
+    candidates = [("owl", owl_score_val, owl_best_params)]
+    if reigen_params is not None:
+        candidates.append(("reigen", float(reigen_best), reigen_params))
+    if scipy_params is not None:
+        candidates.append(("scipy", float(scipy_best), scipy_params))
+    # Highest score wins
+    winner = max(candidates, key=lambda c: c[1])
+    _tag, _score, _params = winner
+    if _tag == "owl":
+        result["tool_used"] = ("owl(reigen_tried)" if scipy_params is None
+                               else "owl(reigen_scipy_tried)")
+    elif _tag == "reigen":
+        result["best_params"] = _params
+        result["best_score"] = float(_score)
         result["tool_used"] = "owl+reigen"
-    else:
-        result["tool_used"] = "owl(reigen_tried)"
+    else:  # scipy
+        result["best_params"] = _params
+        result["best_score"] = float(_score)
+        result["tool_used"] = "owl+scipy"
 
     result["reigen_result"] = r_reigen
+    if r_scipy is not None:
+        result["scipy_result"] = r_scipy
     result["elapsed_s"] = time.time() - t_start
     return result
 

@@ -5,7 +5,9 @@
         "eval_cost_threshold": 0.5,
         "owl_share": 0.4,
         "escalation_min_remaining": 5.0,
-        "confidence_skip_threshold": 0.95
+        "confidence_skip_threshold": 0.95,
+        "scipy_cascade_dim_threshold": 10,
+        "scipy_cascade_budget_share": 0.5
     },
     "owl_kwargs": {
         "random_restart_count": 5,
