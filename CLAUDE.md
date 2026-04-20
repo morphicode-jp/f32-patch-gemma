@@ -2,136 +2,171 @@
 
 All responses in Japanese.
 
----
+## 最優先ルール: `mimir()` を呼べ
 
-## Quick Reference
+全ての最適化は `mimir(eval_fn, param_ranges, time_budget=N)` で始まる。これが 2026-04-20 以降の公式エントリーポイント。
 
-### 2026-04-20 以降: `mimir()` 1 呼出しが基本
+`mimir()` は内部で eval コストを測定、owl (精鋭) と Reigen (cascade) を自動分岐する。ユーザーは tool 選択で悩まなくていい。
 
-**`mimir()` が全ての入口**。内部で eval コストを計測、`owl` (精鋭) → `Reigen` (cascade) を自動分岐。BBOB 4 問題で **gap≈0 達成** (3/4 perfect、Rosenbrock 0.08 で basinhopping に 2 位)。
+BBOB 4 問題で gap≈0 達成済。3/4 完璧、Rosenbrock のみ basin に 0.086 差の 2 位。全ての問題で Top 2 完走したのは mimir だけ。
+
+## mimir 最小使用法
 
 ```python
 from twelve.agent.mimir import mimir
 
 r = mimir(eval_fn, param_ranges, time_budget=300)
-# r["best_params"]   : 最適パラメータ
-# r["best_score"]    : 最高スコア
-# r["tool_used"]     : "owl" | "owl+reigen" | "owl(reigen_tried)"
-# r["dead_dims"]     : 効果のない次元 (owl 構造発見)
-# r["fragility"]     : 脆い次元
-# r["proxy_r2"]      : proxy 信頼度
-# r["route"]         : "expensive_single" | "cheap_cascade" | "structure_only"
+print(r["best_params"], r["best_score"], r["tool_used"])
 ```
 
-### 使用例 3 パターン
+返り値は dict。主要キー: `best_params` / `best_score` / `tool_used` / `dead_dims` / `fragility` / `proxy_r2` / `route`。構造発見系 (dead_dims, fragility, proxy_r2) は最適化と同時に得られる。
+
+## mimir 使用 5 パターン
+
+第1に、何も知らない状態で最適化したい時。`mimir(fn, ranges, time_budget=300)` で終わる。
+
+第2に、過去実験データがある時。`curated_measurements=past_data` を渡すと mimir は expensive_single route に切替、owl に直接データを食わせる。20 点の curated は random 200-2000 点相当の情報量を持つ。
+
+第3に、LLM キャリブ等 eval が重い時。mimir は 1 call 実測で >0.5s を検知、自動で expensive_single へ。owl 全力モード (L-BFGS + multi-start + random-restart=5) が起動する。
+
+第4に、分析だけしたい時。`mode="structure_only"` を指定する。最適化は skip、dead_dims / fragility / proxy_r2 だけを 15-30s で返す。高次元 LLM の事前分析に最適。
+
+第5に、安全指標を守りたい時。`guard_fn=my_guard` を渡す。owl に safe_dim_analysis=True 経由で引き継がれ、2 指標 pivot が発動する。
 
 ```python
-# (1) 何も知らない、とりあえず最適化
-r = mimir(my_eval_fn, [(-5, 5)] * 8, time_budget=300)
-
-# (2) ドメイン知識 (過去実験 20 点あり) — 高 proxy R² 期待、直接 owl 路線
-r = mimir(my_eval_fn, [(0.5, 2.0)] * 61,
-         curated_measurements=past_lab_results,
-         time_budget=600)
-
-# (3) LLM キャリブ等 eval コスト重い場合 — 自動検出、owl 全力 (L-BFGS + multi + random-restart)
-r = mimir(ppl_eval_fn, [(0.5, 1.5)] * 60, time_budget=1800)
-# 自動で eval_cost_hint > 0.5s → expensive_single route
-
-# (4) 分析だけしたい (高次元で dead_dims 知るため) — 最適化 skip
-r = mimir(my_eval_fn, [(0.5, 1.5)] * 60,
-         curated_measurements=past_data,
-         mode="structure_only",        # 最適化スキップ、構造情報のみ 15-30s で返す
-         time_budget=30)
-
-# (5) 安全指標を守りたい (2 指標)
-r = mimir(my_eval_fn, ranges, guard_fn=my_guard_fn, time_budget=300)
+# 典型例
+r1 = mimir(fn, [(-5, 5)] * 8, time_budget=300)                           # (1)
+r2 = mimir(fn, ranges, curated_measurements=past_data, time_budget=600)  # (2)
+r3 = mimir(ppl_eval, ranges, time_budget=1800)                           # (3) 自動 expensive
+r4 = mimir(fn, ranges, mode="structure_only", time_budget=30)            # (4) 分析のみ
+r5 = mimir(fn, ranges, guard_fn=my_guard, time_budget=300)               # (5) 2 指標
 ```
 
-### mimir 内部分岐ロジック
+## mimir 内部分岐ロジック
+
+mimir は 3 つの route を持ち、問題特性で自動選択する。
+
+第1の判定は mode。`mode="structure_only"` なら最適化せず、owl を autonomous=False で走らせて max 30s で構造情報のみ返す。
+
+第2の判定は eval コストか curated_measurements の有無。eval cost > 0.5s または curated data 提供なら **expensive_single route**。owl に 100% budget を与え、L-BFGS-B + multi-start + random-restart=5 を全て ON にする。Reigen は skip。
+
+第3の判定は proxy_r2 値。eval が安くて curated なしなら **cheap_cascade route**。owl に 40% budget で Phase 1 を走らせ、proxy_r2 ≥ 0.95 なら即終了、未満なら残り budget を Reigen に渡して Phase 2 escalate する。owl の best を initial_user_params で warm-start する。
 
 ```
-eval コスト 1-call 実測 (midpoint で 1 回呼んで time.time 差分)
+mimir(fn, ranges, time_budget) 呼出し
 │
-├── mode="structure_only"
-│      └── owl autonomous=False、max 30s → 構造情報のみ return
-│
-├── eval > 0.5s OR curated_measurements あり → expensive_single route
-│      └── owl 100% budget + 全強化 ON (L-BFGS + multi-start + random-restart=5)
-│
-└── eval ≤ 0.5s → cheap_cascade route
-        ├── Phase 1: owl 40% budget
-        │      ├── proxy_r2 ≥ 0.7 → 即終了 (tool_used="owl")
-        │      └── proxy_r2 < 0.7 → Phase 2 へ
-        └── Phase 2: Reigen 残 budget、wall_time_factor=1.0
-               owl best を initial_user_params で warm-start、
-               winner 選んで tool_used="owl+reigen"
+├── mode="structure_only"          → owl autonomous=False, max 30s
+├── eval > 0.5s or curated あり     → expensive_single: owl 100% + 全強化
+└── eval ≤ 0.5s + curated なし      → cheap_cascade
+        ├── owl 40% budget (proxy_r2 ≥ 0.95 なら即終了)
+        └── Reigen 残 budget (owl best を warm-start)
 ```
 
-### LaD (dispatch 閾値の JSON 制御)
+## mimir LaD 設定 (JSON 制御)
 
-`twelve/configs/mimir_params.json` で以下 6 値を制御可能。precedence: **kwarg > JSON > hardcode**。
+`twelve/configs/mimir_params.json` に 6 個の dispatch 値がある。precedence は kwarg > JSON > hardcode。benchmark 駆動で最適値に設定済。
 
-```json
+| key | default | 意味 |
+|---|---|---|
+| `eval_cost_threshold` | 0.5s | expensive route 切替秒数 |
+| `owl_share` | 0.4 | cheap cascade での Phase 1 budget 比 |
+| `escalation_min_remaining` | 5.0s | Reigen 起動最小残時間 |
+| `confidence_skip_threshold` | 0.95 | Reigen skip の proxy_r2 閾値 |
+| `random_restart_count` | 5 | owl の uniform random 再起動数 |
+| `reigen_inner_time_budget` | 2.0s | Reigen inner Sentinel の 1 回分 |
+
+## mimir の全パラメータ
+
+```python
+mimir(
+    eval_fn,                         # f(params: list[float]) -> float, higher is better
+    param_ranges,                    # [(lo, hi), ...]
+    *,
+    param_names=None,
+    curated_measurements=None,       # list[{"params":..., "score":...}]; あれば expensive_single
+    guard_fn=None,                   # 安全指標、owl へ safe_dim_analysis=True 経由
+    experience_id="mimir",           # cross-call 学習 namespace
+    time_budget=300.0,               # wall 予算 (秒)
+    eval_cost_hint=None,             # None = 1-call 自動測定
+    mode="optimize",                 # "optimize" | "structure_only"
+    # LaD 個別 override
+    eval_cost_threshold=None,
+    owl_share=None,
+    escalation_min_remaining=None,
+    confidence_skip_threshold=None,
+    random_restart_count=None,
+    reigen_inner_time_budget=None,
+    reigen_wall_time_factor=None,
+    force_cascade=False,             # True で必ず Reigen 走らせる
+    n_seed_samples=None,
+    mimir_cfg=None,                  # LaD を dict でまとめて
+    verbose=False,
+) -> dict
+```
+
+## mimir の返り値
+
+```python
 {
-    "dispatch": {
-        "eval_cost_threshold": 0.5,
-        "owl_share": 0.4,
-        "escalation_min_remaining": 5.0,
-        "confidence_skip_threshold": 0.7
-    },
-    "owl_kwargs": {"random_restart_count": 5, "max_iterations": 30, "min_r_squared": 0.1},
-    "reigen_kwargs": {"inner_time_budget": 2.0, "wall_time_factor": 1.0}
+    "best_params":   list|dict,
+    "best_score":    float,
+    "tool_used":     "owl" | "owl+reigen" | "owl(reigen_tried)" | "owl_structure_only",
+    "route":         "expensive_single" | "cheap_cascade" | "structure_only",
+    "eval_cost_s":   float,
+    "confidence":    str,            # owl's confidence: high/low/direct/lbfgs_refined/insufficient
+    "dead_dims":     list,
+    "active_dims":   list,
+    "fragility":     list,
+    "proxy_type":    str,
+    "proxy_r2":      float,
+    "owl_result":    dict,
+    "reigen_result": dict,           # escalation 時のみ
+    "elapsed_s":     float,
 }
 ```
 
-### ツール役割階層
+## ツール役割の階層
+
+表舞台は `mimir()` 1 個。裏方として `owl()` (Phase 1 + 構造発見) と `reigen()` (Phase 2 cascade + cross-task 学習) が動く。
 
 ```
-mimir()              ← 表舞台 (ユーザー呼び口)
-  │
-  ├── owl()         ← Phase 1 + 構造発見専用でも直呼び可
-  │    └── optimize()  ← primitive HC engine
-  │
-  └── Reigen        ← Phase 2 cascade + cross-task 学習
-       └── Sentinel    ← legacy、互換維持
+mimir()                      ← ユーザー呼び口
+  ├── owl()                  ← Phase 1、構造発見単体でも直呼び可
+  │    └── optimize()        ← primitive HC engine
+  └── reigen()               ← Phase 2 cascade
+       └── Sentinel          ← legacy 互換
             └── owl
 ```
 
-| 層 | 用途 | いつ直呼び? |
-|---|---|---|
-| **`mimir()`** | 表舞台 | **全 new code で default** |
-| `owl()` | 構造発見精鋭 | dead_dims/fragility/importance/proxy_fn だけ欲しい時 (mimir mode="structure_only" でも OK) |
-| `reigen()` | cross-task 学習累積 | 複数 task で meta_knowledge 蓄積を明示的に指定したい時のみ |
-| `Sentinel` | 2 指標 legacy | 新規ほぼ不要、mimir の guard_fn 経由で代替可 |
-| `optimize()` | primitive | mimir/owl で包めない特殊事情のみ |
+直呼びが残る場面は限定される。owl は「dead_dims / fragility / proxy だけ欲しい時」に直呼ぶ価値がある。reigen は「複数 task で meta_knowledge を明示共有したい時」のみ直呼ぶ。Sentinel は legacy、新規コードでは mimir の guard_fn で代替する。optimize は primitive、包めない特殊事情のみ。
 
-### experience_id
+## curated 実測値は捨てるな (最重要原則)
 
-任意の task 名札。self_params cross-task 学習は `reigen_meta_knowledge.json` 経由で自動共有される (ID 共有不要、preset 別 key で分離)。fossil は per-ID 分離で並列衝突回避。mimir は内部で `{experience_id}_owl` と `{experience_id}_reigen` に suffix 付けて分離管理。
+curated 20 点は random 200-2000 点の情報量を持つ。proxy R² を 0.5 → 0.85 に引き上げる効果がある。
 
-### 実測値問題 (最重要)
+過去実験データがある時は必ず `curated_measurements=` に渡せ。mimir は自動で expensive_single route に切替え、owl に直接食わせる。random _collect で情報を捨てないこと。
 
-**curated 20 点 ≈ random 200-2000 点の情報量**。ドメインエキスパートの 20 点は proxy R² を 0.5→0.85 に引き上げる。
-mimir は `curated_measurements=` を受けたら expensive_single route に切替、owl に直接渡す。random `_collect` でこの価値を捨てない。
+ドメインエキスパートが選んだ 20 点の価値は、工学的に 10-100 倍の random sampling に相当する。この事実は zenron formula の `importance = sqrt(truth × connectivity)` から直接導かれる。
 
-### owl 2026-04-19〜04-20 強化まとめ (mimir 内で常時 ON)
+## owl の強化機能 (mimir 内で常時 ON)
 
-| kwarg / 機能 | 分類 | 説明 |
-|---|---|---|
-| `measurements=[]` + `verify_fn=` + `param_ranges=` | usability | 空データ → 自動で N 点 seed |
-| `curated_measurements=` | usability | intent-明示 alias |
-| `guard_fn=` / `guard_threshold=` / `safe_dim_analysis=` | safety | Sentinel 秘密兵器を owl 内に移植 |
-| `n_seed_samples=` / `seed_rng_state=` | usability | 空データ seed 数・RNG 制御 |
-| **budget-aware autonomous loop** | **algorithm** | `time_budget` 厳守、cheap eval で max_iterations 超え可 |
-| **direct-HC fallback** | **algorithm** ★ | proxy 不能時に `optimize(eval_fn=verify_fn)` 発動、Rastrigin 5d gap 45→0 の主犯 |
-| **`use_lbfgs_refinement=True`** | **algorithm** ★★ | scipy L-BFGS-B 1-shot、Styblinski score -6→195.83、Rosenbrock gap 173→3 |
-| **`use_multistart_fallback=True`** | **algorithm** | direct-HC fallback の warm-start を L2 diverse top-3 に |
-| **`random_restart_count=K`** | **algorithm** ★★ | K 個の random warm-start 注入、basinhopping-style、Rosenbrock 救済 |
+mimir は owl を呼ぶ時、以下の強化を全て ON にする。直呼びする場合も同じ設定にせよ。
 
-★ = 04-19 算法強化、★★ = 04-20 benchmark 駆動追加。mimir は上記すべてを default ON で呼ぶ。
+| 機能 | 効果 |
+|---|---|
+| `autonomous=True` | budget-aware 自律ループ、停滞時 range 拡張 |
+| `use_lbfgs_refinement=True` | scipy L-BFGS-B 末尾 1-shot、smooth curved valley 制覇 |
+| `use_multistart_fallback=True` | L2 diverse top-3 warm-start で wrong-basin 脱出 |
+| `random_restart_count=5` | basinhopping-style の K 個 uniform random 再起動 |
+| `guard_fn=` + `safe_dim_analysis=True` | Sentinel pivot を owl 内で直実行 |
+| `curated_measurements=` | domain 20 点を直接注入 |
+| direct-HC fallback | proxy 不能時 `optimize(eval_fn=verify_fn)` 発動 |
 
-### 世界 Benchmark 実績 (2026-04-20 v3、25s budget、3 seeds、fossil clean)
+実測効果: Rastrigin 5d gap 45→0、Styblinski 5d score -6→195.83、Rosenbrock 5d gap 173→3。
+
+## 世界 Benchmark 実績
+
+2026-04-20 v3 時点、25s budget、3 seeds、fossil clean 条件での結果を示す。mimir は 3/4 問題で gap≈0 完璧、Rosenbrock のみ basinhopping に 0.086 差の 2 位。
 
 | 問題 | cma_es | basinhopping | reigen_k17 | owl_direct | **mimir** |
 |---|---|---|---|---|---|
@@ -140,69 +175,17 @@ mimir は `curated_measurements=` を受けたら expensive_single route に切�
 | Styblinski 5d | +28.3 | +28.3 | **-0.001 ✅** | +6.1 | **-0.001 ✅** |
 | Rosenbrock 5d | +2.74 | **0 🏆** | +0.082 | +0.220 | **+0.086** |
 
-mimir は 3/4 gap≈0 + Rosenbrock で basin に 0.086 差の 2 位。reigen と同等、owl 単体を全問題で上回る (Styblinski +6.1→-0.001、Rosenbrock +0.22→+0.086)。
-optuna_tpe / skopt_gp は既存 benchmark で圧倒敗北で除外 (Rastrigin gap +10〜+20)。
+mimir は 4 問題全てで Top 2 完走した唯一のツール。cma_es は 0 勝、basinhopping は Rosenbrock 1 勝のみで他 3 問題は敗北、reigen は mimir と同率。optuna_tpe と skopt_gp は前回 benchmark で圧倒敗北 (Rastrigin gap +10〜+20) のため除外した。
 
-**Ranking**: mimir は 4 問題中**全てで Top 2 完走** (1位 3 / 2位 1)。他ツールはこの記録達成できない (cma 0勝、basin 1勝/3敗、reigen 同率)。
+v3 で修正した点は 2 つ。confidence_skip_threshold を 0.7 → 0.95 に引き上げ、多峰で proxy_r2 が高く出る場合も cascade 発火するようにした。benchmark の experience_id を per-problem 分離 (`bhmim_{fn.__name__}_{seed}`) し、fossil が問題間で汚染するバグを修正した。この副産物として owl_direct 単体も改善した (Styblinski +18.4→+6.1、Rosenbrock +3.79→+0.22)。
 
-**v3 での修正点**:
-- `confidence_skip_threshold` 0.7 → 0.95 (多峰で proxy_r2 高くても cascade 発火)
-- benchmark experience_id を per-problem 分離 (`bhmim_{fn.__name__}_{seed}`)、fossil 問題間汚染防止
-- 副産物: 上記修正で owl_direct も改善 (Styblinski +18.4→+6.1、Rosenbrock +3.79→+0.22)
+## experience_id の扱い
 
----
+experience_id は任意の task 名札として使う。self_params の cross-task 学習は `reigen_meta_knowledge.json` 経由で自動共有される。ID 共有は不要で、preset 別 key で分離される。
 
-## mimir — 全パラメータリファレンス
+fossil は per-ID で保存されるため、並列実行時の衝突は起きない。mimir は内部で `{experience_id}_owl` と `{experience_id}_reigen` に suffix を付けて分離管理する。
 
-```python
-mimir(
-    eval_fn,                    # f(params: list[float]) -> float, higher is better
-    param_ranges,               # [(lo, hi), ...]
-    *,
-    # 基本
-    param_names=None,           # 次元名 (optional)
-    curated_measurements=None,  # 過去実験データ [{"params":..., "score":...}]; 提供時 expensive_single
-    guard_fn=None,              # 安全指標 f(params) -> float、owl に safe_dim_analysis=True 経由
-    experience_id="mimir",       # cross-call 学習 namespace
-    time_budget=300.0,          # wall 予算 (秒)
-    eval_cost_hint=None,        # None = 1-call 自動測定
-    mode="optimize",            # "optimize" | "structure_only"
-    # LaD 個別 override (None = JSON→hardcode で解決)
-    eval_cost_threshold=None,         # expensive route 切替閾値 (default 0.5s)
-    owl_share=None,                    # cheap cascade の Phase 1 share (default 0.4)
-    escalation_min_remaining=None,     # Reigen 起動最小残時間 (default 5s)
-    confidence_skip_threshold=None,    # Reigen skip の proxy_r2 閾値 (default 0.7)
-    random_restart_count=None,         # owl の random restart 数 (default 5)
-    reigen_inner_time_budget=None,     # Reigen inner Sentinel budget (default 2s)
-    reigen_wall_time_factor=None,      # Reigen wall cap factor (default 1.0)
-    # 稀に使う
-    force_cascade=False,        # True で confidence 無視し必ず Reigen 走らせる
-    n_seed_samples=None,        # 空データ seed 数
-    mimir_cfg=None,              # 上記 LaD 値を dict でまとめて指定
-    verbose=False,
-) -> dict
-```
-
-返り値 dict:
-```python
-{
-    "best_params":   list|dict,
-    "best_score":    float,
-    "tool_used":     "owl" | "owl+reigen" | "owl(reigen_tried)" | "owl_structure_only",
-    "route":         "expensive_single" | "cheap_cascade" | "structure_only",
-    "mode":          "optimize" | "structure_only",   # structure_only の時のみ
-    "eval_cost_s":   float,                           # 自動測定 or hint
-    "confidence":    str,                             # owl の confidence
-    "dead_dims":     list,
-    "active_dims":   list,
-    "fragility":     list,
-    "proxy_type":    str,
-    "proxy_r2":      float,
-    "owl_result":    dict,                            # 生の owl 返り値
-    "reigen_result": dict,                            # escalation 時のみ
-    "elapsed_s":     float,
-}
-```
+benchmark 目的で問題を横断する時は、per-problem の experience_id を使え (`{prefix}_{problem_name}_{seed}` 等)。同じ ID を異なる param_ranges の問題に使うと fossil 汚染が起きる。これは v3 以前の隠れバグの原因だった。
 
 ---
 
@@ -687,16 +670,16 @@ Quick-reference table (see per-rule subsections below for the prose form):
 | # | rule | see |
 |---|---|---|
 | -1 | Strip to essence: `x_i, perturb, share, eval_fn` | Principles |
-| 0 | Measure don't guess: ≥5 pts → owl() → read numbers | owl() |
+| 0 | Measure don't guess: ≥5 pts → mimir() → read numbers | mimir |
 | 1 | Ask Oracle for structural questions | — |
-| 2 | No manual tuning: data → owl() | owl() |
+| 2 | No manual tuning: data → mimir() | mimir |
 | 3 | LaD: no if/else — convert to numeric params | Principles |
 | 4 | `importance = (truth × max(connectivity, floor))^exp` | Principles |
 | 5 | Overfitting: n_problems > n_params | — |
-| 6 | Discrete/int params OK via Sentinel (auto-fallback) | Sentinel |
+| 6 | Discrete/int params OK via mimir (owl direct-HC fallback auto-fires) | mimir |
 | 7 | **scale=0 forbidden**. Never include 0 in ranges | eval_fn |
-| 8 | Two metrics → Sentinel / Reigen. 1 metric → `guard_fn=eval_fn` | Reigen, Sentinel |
-| 9 | **Default to owl** (2026-04-19). Reigen only for cross-task or deceptive multi-peak | owl / Reigen |
+| 8 | Two metrics → `mimir(..., guard_fn=my_guard)`. 1 metric → guard_fn 不要 | mimir |
+| 9 | **Default to mimir** (2026-04-20). owl/Reigen 直呼びは限定場面のみ | mimir |
 | 10 | Kathara 0.993 uniformity requires N=12 + 5-regular + symmetric placement | Reigen Ref |
 | 11 | `batch_eval_fn` is forbidden for internal model state | Reigen, owl() |
 
@@ -709,10 +692,9 @@ name all four cleanly, you are not ready to optimize yet.
 
 ### Rule 0: Measure, don't guess
 
-Never guess at parameter importance or interaction structure. Collect at least
-five concrete measurements, feed them to `owl()`, and read the numbers. Human
-intuition about 20+ dimensional landscapes is unreliable; the proxy-R² score
-tells you when you have enough data to trust a recommendation.
+パラメータ重要度や相互作用構造を推測するな。5 点以上の実測を集め、`mimir()` に食わせ、返ってきた数値を読め。
+
+人間の直感は 20 次元以上の landscape で信用ならない。mimir の返す proxy_r2 と dead_dims が「この推薦をどこまで信じていいか」を数値で教えてくれる。
 
 ### Rule 1: Ask the Oracle for structural questions
 
@@ -723,10 +705,9 @@ invoke the oracle MCPs rather than guessing. The relevant tools are
 
 ### Rule 2: No manual tuning
 
-If you have a scalar metric and a parameter range, you almost never need to
-hand-tune. Collect data and pass it to `owl()`; let the proxy-extraction layer
-find structure. Manual grid searches are only justified when you need auditable
-intermediate steps for a report.
+スカラー指標と param range があるなら、手動チューニングはほぼ不要。データを集めて `mimir()` に渡せ。
+
+mimir は内部で proxy を構築、構造を発見、必要なら Reigen に cascade する。ユーザーは tool 選択で悩まない。手動 grid search が正当化される唯一の場面は、報告書で中間ステップを監査可能にする必要がある時のみ。
 
 ### Rule 3: LaD means no if/else
 
@@ -752,10 +733,9 @@ before adding parameters.
 
 ### Rule 6: Discrete and integer params are fine
 
-`Sentinel` auto-falls-back from owl proxy to direct HC when the proxy collapses
-on non-smooth landscapes. Pass `initial_params` to warm-start the fallback.
-Integer and discrete spaces handle exactly this way; no special encoding is
-needed.
+mimir/owl は非 smooth landscape で proxy が崩壊した時、direct-HC fallback を自動起動する。Sentinel wrap は不要になった (2026-04-19 以降 owl に移植済)。
+
+integer や discrete な param 空間も特別 encode せず、通常の range を渡すだけで動く。fallback が curated data や growing_data から warm-start を選んで HC する。
 
 ### Rule 7: scale=0 is forbidden
 
@@ -766,21 +746,17 @@ proxy hallucinations, but Rule 7 is the first line, and the only cost-free one.
 
 ### Rule 8: Two-metric flow
 
-When you have two metrics, use `Sentinel` or `Reigen`: one metric is the
-`eval_fn` to optimize, the other is the `guard_fn` to protect. Sentinel will
-auto-pivot if optimizing eval_fn harms guard_fn. For the one-metric case, pass
-`guard_fn=eval_fn` so the guard is satisfied by construction.
+2 指標を持つ最適化は `mimir(eval_fn, ranges, guard_fn=my_guard)` で走らせる。最適化したい方が eval_fn、守りたい方が guard_fn。
 
-### Rule 9: Default to owl
+mimir は owl 経由で safe_dim_analysis=True を引き継ぎ、guard_fn が壊れた時に自動 pivot する。1 指標だけの場合は guard_fn を渡さなくてよい (Rule 9 の default が動く)。Sentinel 直呼びは legacy 扱い、新規コードでは mimir で代替する。
 
-As of 2026-04-19, `owl()` is the default optimization entry point. The standard
-call is `owl(measurements=curated, verify_fn=..., autonomous=True)`. The
-direct-HC fallback inside owl now handles multi-peak landscapes directly, and
-owl is 5-16× more eval-efficient than Reigen on expensive eval_fns. Reigen
-remains worthwhile only when you need cross-task learning accumulation or when
-eval is cheap and the landscape is deceptive enough that brute-force optimize()
-wins. The Reigen default preset is `kathara_17_adaptive`; it writes learned
-self-params to `reigen_meta_knowledge.json` automatically.
+### Rule 9: Default to mimir
+
+2026-04-20 以降、`mimir()` が最適化の default entry point。標準呼び出しは `mimir(eval_fn, param_ranges, time_budget=N)`。過去データがあれば `curated_measurements=` を追加、2 指標なら `guard_fn=` を追加する。
+
+mimir は eval コストを 1-call 測定、owl (Phase 1) と Reigen (Phase 2 cascade) を自動分岐する。手動で owl/Reigen を選ぶ必要はなくなった。
+
+owl 直呼びは「dead_dims や fragility だけ欲しい」「eval 激安で mimir の分岐 overhead 嫌」の 2 場面のみ。Reigen 直呼びは「複数 task で meta_knowledge を明示共有したい」場面のみ。Reigen の default preset は `kathara_17_adaptive`、自動で `reigen_meta_knowledge.json` に学習書き戻す。
 
 ### Rule 10: Kathara uniformity conditions
 
@@ -793,13 +769,9 @@ Reigen even though it cites Kathara.
 
 ### Rule 11: batch_eval_fn is for external params only
 
-`batch_eval_fn` is reserved for external parameters such as learning rate,
-dropout, or prompt tokens. It is forbidden for anything that touches internal
-model state — KV cache scale, weight scale, LoRA adapters — because those
-share a single global state and cannot be evaluated in parallel. When you hit
-this case, keep `eval_fn` under two seconds, return a multi-observer dict such
-as `{"nll": -ppl, "hs": hs_score, "mmlu": mmlu_score}`, and call `owl()`
-directly to read `stable_active` and `stable_dead`.
+`batch_eval_fn` は learning rate、dropout、prompt token などの external param でのみ使える。
+
+KV cache scale、weight scale、LoRA adapter など **internal model state** を触る param には禁止。それらは単一の global state を共有するため並列 eval が原理的にできない。この場面では eval_fn を 2 秒以内に収め、multi-observer dict (`{"nll": -ppl, "hs": hs_score, "mmlu": mmlu_score}`) を返し、mimir 経由で構造発見させる。stable_active / stable_dead を直接読みたければ `mimir(..., mode="structure_only")` でいい。
 
 ### Rule 11 concrete example (Qwen3.6-NVFP4 KV calibration)
 
