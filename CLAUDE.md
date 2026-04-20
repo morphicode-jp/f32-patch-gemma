@@ -161,10 +161,23 @@ r = hagen(
 
 | 条件 | Route | Phase 1 (owl) | Phase 2 (Reigen) |
 |---|---|---|---|
+| `mode="structure_only"` | structure_only | autonomous=False, max 30s | skip |
 | eval cost > 0.5s | expensive_single | **100% budget**、L-BFGS+multi+random=5 全部 ON | skip |
 | curated_measurements あり | expensive_single | 同上 | skip |
-| 安 eval + owl confidence="high" | cheap_cascade | 40% budget | skip |
-| 安 eval + それ以外 | cheap_cascade | 40% budget | **remaining budget、wall_time_factor=1.0** |
+| 安 eval + owl proxy_r2 ≥ threshold (0.7) | cheap_cascade | 40% budget | skip |
+| 安 eval + proxy_r2 低 | cheap_cascade | 40% budget | **remaining budget、wall_time_factor=1.0** |
+
+### structure_only モード (分析専用)
+
+最適化せず、owl の構造発見出力 (dead_dims / importance / fragility / proxy_r2) だけ返す高速経路。
+```python
+r = hagen(eval_fn, param_ranges,
+          mode="structure_only",
+          curated_measurements=past_data,  # optional
+          time_budget=15)
+# r["dead_dims"], r["fragility"], r["proxy_type"], r["proxy_r2"]
+# autonomous=False、L-BFGS skip、max 30s cap → 高次元 LLM の事前分析に最適
+```
 
 ### benchmark 実績 (2026-04-20、25s budget × 3 seeds)
 

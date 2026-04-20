@@ -108,6 +108,7 @@ def hagen(
     force_cascade: bool = False,
     n_seed_samples: Optional[int] = None,
     hagen_cfg: Optional[dict] = None,
+    mode: str = "optimize",  # "optimize" | "structure_only"
     verbose: bool = False,
 ) -> dict:
     """Meta-dispatcher routing to owl or cascading owl→Reigen.
@@ -180,6 +181,49 @@ def hagen(
     # Expensive eval OR curated data provided → owl single-shot with full enhancements
     expensive_route = (t_eval > _eval_cost_threshold) or (
         curated_measurements is not None and len(curated_measurements) > 0)
+
+    # ---- mode="structure_only": skip optimization, run owl just long enough
+    #       to extract dead_dims / importance / fragility / proxy_r2.
+    #       autonomous=False, no verify_fn iterations, no L-BFGS refinement.
+    #       Useful for analysis phase before committing to full optimization.
+    if mode == "structure_only":
+        owl_budget = min(float(time_budget), 30.0)
+        owl_kwargs = dict(
+            measurements=curated_measurements if curated_measurements else [],
+            param_ranges=list(param_ranges),
+            verify_fn=eval_fn,
+            autonomous=False,           # no growing loop
+            max_iterations=1,
+            time_budget=owl_budget,
+            min_r_squared=0.1,
+            experience_id=f"{experience_id}_structure",
+            use_lbfgs_refinement=False,
+            use_multistart_fallback=False,
+            random_restart_count=0,
+            verbose=verbose,
+        )
+        if param_names is not None:
+            owl_kwargs["param_names"] = list(param_names)
+        if n_seed_samples is not None:
+            owl_kwargs["n_seed_samples"] = int(n_seed_samples)
+        r_owl = _owl(**owl_kwargs)
+        return {
+            "mode": "structure_only",
+            "best_params": r_owl.get("best_params"),
+            "best_score": (r_owl.get("verified_score")
+                           or r_owl.get("best_score")),
+            "tool_used": "owl_structure_only",
+            "route": "structure_only",
+            "eval_cost_s": t_eval,
+            "dead_dims": r_owl.get("dead_dims"),
+            "active_dims": r_owl.get("active_dims"),
+            "fragility": r_owl.get("fragility"),
+            "proxy_type": r_owl.get("proxy_type"),
+            "proxy_r2": r_owl.get("proxy_r2"),
+            "confidence": r_owl.get("confidence"),
+            "owl_result": r_owl,
+            "elapsed_s": time.time() - t_start,
+        }
 
     # ---- Phase 1: owl (always) ----
     owl_budget = (time_budget if expensive_route

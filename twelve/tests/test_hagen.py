@@ -186,3 +186,44 @@ def test_hagen_wall_time_reasonable():
     assert wall < 6 * 3, (
         f"hagen wall {wall:.1f}s exceeded 3× budget 6s")
     assert r["elapsed_s"] <= wall + 0.1
+
+
+# -----------------------------------------------------------------
+# mode="structure_only": analysis-only mode
+# -----------------------------------------------------------------
+
+def test_hagen_structure_only_returns_structure():
+    """mode='structure_only' returns dead_dims/importance-style keys without full opt."""
+    def eval_fn(p):
+        # Dim 2 has no effect (dead)
+        return -(p[0] ** 2 + p[1] ** 2)
+    r = hagen(
+        eval_fn=eval_fn,
+        param_ranges=[(-1, 1)] * 3,
+        time_budget=15,
+        mode="structure_only",
+        experience_id="test_hagen_structure_only",
+    )
+    assert r["mode"] == "structure_only"
+    assert r["route"] == "structure_only"
+    assert r["tool_used"] == "owl_structure_only"
+    # Structure keys always present (may be None if owl couldn't compute)
+    for k in ("dead_dims", "active_dims", "fragility", "proxy_type", "proxy_r2"):
+        assert k in r
+
+
+def test_hagen_structure_only_is_fast():
+    """structure_only completes well under 30s on small problem."""
+    def eval_fn(p):
+        return -sum(x * x for x in p)
+    t0 = time.time()
+    r = hagen(
+        eval_fn=eval_fn,
+        param_ranges=[(-1, 1)] * 3,
+        time_budget=30,
+        mode="structure_only",
+        experience_id="test_hagen_structure_fast",
+    )
+    wall = time.time() - t0
+    # structure_only caps owl_budget at min(time_budget, 30s). Should be fast.
+    assert wall < 35, f"structure_only wall {wall:.1f}s unexpectedly slow"
