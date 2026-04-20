@@ -125,7 +125,7 @@
     "wall_s": 31.62731099128723,
     "tool_used": "owl+reigen",
     "problem": "rastrigin_5d",
-    "tool": "apex",
+    "tool": "mimir",
     "rep": 0,
     "gap": 0.0,
     "optimum": 0.0
@@ -136,7 +136,7 @@
     "wall_s": 31.56317973136902,
     "tool_used": "owl+reigen",
     "problem": "rastrigin_5d",
-    "tool": "apex",
+    "tool": "mimir",
     "rep": 1,
     "gap": 0.0,
     "optimum": 0.0
@@ -147,7 +147,7 @@
     "wall_s": 31.51200270652771,
     "tool_used": "owl+reigen",
     "problem": "rastrigin_5d",
-    "tool": "apex",
+    "tool": "mimir",
     "rep": 2,
     "gap": 0.0,
     "optimum": 0.0
@@ -278,7 +278,7 @@
     "wall_s": 32.93056130409241,
     "tool_used": "owl+reigen",
     "problem": "ackley_5d",
-    "tool": "apex",
+    "tool": "mimir",
     "rep": 0,
     "gap": 4.440892098500626e-16,
     "optimum": 0.0
@@ -289,7 +289,7 @@
     "wall_s": 32.8178186416626,
     "tool_used": "owl+reigen",
     "problem": "ackley_5d",
-    "tool": "apex",
+    "tool": "mimir",
     "rep": 1,
     "gap": 4.440892098500626e-16,
     "optimum": 0.0
@@ -300,7 +300,7 @@
     "wall_s": 32.9170343875885,
     "tool_used": "owl+reigen",
     "problem": "ackley_5d",
-    "tool": "apex",
+    "tool": "mimir",
     "rep": 2,
     "gap": 4.440892098500626e-16,
     "optimum": 0.0
@@ -431,7 +431,7 @@
     "wall_s": 32.44475269317627,
     "tool_used": "owl+reigen",
     "problem": "styblinski_5d",
-    "tool": "apex",
+    "tool": "mimir",
     "rep": 0,
     "gap": -0.0008285111545660584,
     "optimum": 195.83
@@ -442,7 +442,7 @@
     "wall_s": 32.43154525756836,
     "tool_used": "owl+reigen",
     "problem": "styblinski_5d",
-    "tool": "apex",
+    "tool": "mimir",
     "rep": 1,
     "gap": -0.0008285157242937657,
     "optimum": 195.83
@@ -453,7 +453,7 @@
     "wall_s": 32.55895781517029,
     "tool_used": "owl+reigen",
     "problem": "styblinski_5d",
-    "tool": "apex",
+    "tool": "mimir",
     "rep": 2,
     "gap": -0.0008285017047739984,
     "optimum": 195.83
@@ -584,7 +584,7 @@
     "wall_s": 31.954806566238403,
     "tool_used": "owl+reigen",
     "problem": "rosenbrock_5d",
-    "tool": "apex",
+    "tool": "mimir",
     "rep": 0,
     "gap": 0.09173374966398762,
     "optimum": 0.0
@@ -595,7 +595,7 @@
     "wall_s": 31.942679166793823,
     "tool_used": "owl+reigen",
     "problem": "rosenbrock_5d",
-    "tool": "apex",
+    "tool": "mimir",
     "rep": 1,
     "gap": 0.0782688721058183,
     "optimum": 0.0
@@ -606,7 +606,7 @@
     "wall_s": 32.05240607261658,
     "tool_used": "owl+reigen",
     "problem": "rosenbrock_5d",
-    "tool": "apex",
+    "tool": "mimir",
     "rep": 2,
     "gap": 0.0814095643095851,
     "optimum": 0.0

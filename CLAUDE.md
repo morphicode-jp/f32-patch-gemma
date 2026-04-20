@@ -6,14 +6,14 @@ All responses in Japanese.
 
 ## Quick Reference
 
-### 2026-04-20 以降: `apex()` 1 呼出しが基本
+### 2026-04-20 以降: `mimir()` 1 呼出しが基本
 
-**`apex()` が全ての入口**。内部で eval コストを計測、`owl` (精鋭) → `Reigen` (cascade) を自動分岐。BBOB 4 問題で **gap≈0 達成** (3/4 perfect、Rosenbrock 0.08 で basinhopping に 2 位)。
+**`mimir()` が全ての入口**。内部で eval コストを計測、`owl` (精鋭) → `Reigen` (cascade) を自動分岐。BBOB 4 問題で **gap≈0 達成** (3/4 perfect、Rosenbrock 0.08 で basinhopping に 2 位)。
 
 ```python
-from twelve.agent.apex import apex
+from twelve.agent.mimir import mimir
 
-r = apex(eval_fn, param_ranges, time_budget=300)
+r = mimir(eval_fn, param_ranges, time_budget=300)
 # r["best_params"]   : 最適パラメータ
 # r["best_score"]    : 最高スコア
 # r["tool_used"]     : "owl" | "owl+reigen" | "owl(reigen_tried)"
@@ -27,28 +27,28 @@ r = apex(eval_fn, param_ranges, time_budget=300)
 
 ```python
 # (1) 何も知らない、とりあえず最適化
-r = apex(my_eval_fn, [(-5, 5)] * 8, time_budget=300)
+r = mimir(my_eval_fn, [(-5, 5)] * 8, time_budget=300)
 
 # (2) ドメイン知識 (過去実験 20 点あり) — 高 proxy R² 期待、直接 owl 路線
-r = apex(my_eval_fn, [(0.5, 2.0)] * 61,
+r = mimir(my_eval_fn, [(0.5, 2.0)] * 61,
          curated_measurements=past_lab_results,
          time_budget=600)
 
 # (3) LLM キャリブ等 eval コスト重い場合 — 自動検出、owl 全力 (L-BFGS + multi + random-restart)
-r = apex(ppl_eval_fn, [(0.5, 1.5)] * 60, time_budget=1800)
+r = mimir(ppl_eval_fn, [(0.5, 1.5)] * 60, time_budget=1800)
 # 自動で eval_cost_hint > 0.5s → expensive_single route
 
 # (4) 分析だけしたい (高次元で dead_dims 知るため) — 最適化 skip
-r = apex(my_eval_fn, [(0.5, 1.5)] * 60,
+r = mimir(my_eval_fn, [(0.5, 1.5)] * 60,
          curated_measurements=past_data,
          mode="structure_only",        # 最適化スキップ、構造情報のみ 15-30s で返す
          time_budget=30)
 
 # (5) 安全指標を守りたい (2 指標)
-r = apex(my_eval_fn, ranges, guard_fn=my_guard_fn, time_budget=300)
+r = mimir(my_eval_fn, ranges, guard_fn=my_guard_fn, time_budget=300)
 ```
 
-### apex 内部分岐ロジック
+### mimir 内部分岐ロジック
 
 ```
 eval コスト 1-call 実測 (midpoint で 1 回呼んで time.time 差分)
@@ -70,7 +70,7 @@ eval コスト 1-call 実測 (midpoint で 1 回呼んで time.time 差分)
 
 ### LaD (dispatch 閾値の JSON 制御)
 
-`twelve/configs/apex_params.json` で以下 6 値を制御可能。precedence: **kwarg > JSON > hardcode**。
+`twelve/configs/mimir_params.json` で以下 6 値を制御可能。precedence: **kwarg > JSON > hardcode**。
 
 ```json
 {
@@ -88,7 +88,7 @@ eval コスト 1-call 実測 (midpoint で 1 回呼んで time.time 差分)
 ### ツール役割階層
 
 ```
-apex()              ← 表舞台 (ユーザー呼び口)
+mimir()              ← 表舞台 (ユーザー呼び口)
   │
   ├── owl()         ← Phase 1 + 構造発見専用でも直呼び可
   │    └── optimize()  ← primitive HC engine
@@ -100,22 +100,22 @@ apex()              ← 表舞台 (ユーザー呼び口)
 
 | 層 | 用途 | いつ直呼び? |
 |---|---|---|
-| **`apex()`** | 表舞台 | **全 new code で default** |
-| `owl()` | 構造発見精鋭 | dead_dims/fragility/importance/proxy_fn だけ欲しい時 (apex mode="structure_only" でも OK) |
+| **`mimir()`** | 表舞台 | **全 new code で default** |
+| `owl()` | 構造発見精鋭 | dead_dims/fragility/importance/proxy_fn だけ欲しい時 (mimir mode="structure_only" でも OK) |
 | `reigen()` | cross-task 学習累積 | 複数 task で meta_knowledge 蓄積を明示的に指定したい時のみ |
-| `Sentinel` | 2 指標 legacy | 新規ほぼ不要、apex の guard_fn 経由で代替可 |
-| `optimize()` | primitive | apex/owl で包めない特殊事情のみ |
+| `Sentinel` | 2 指標 legacy | 新規ほぼ不要、mimir の guard_fn 経由で代替可 |
+| `optimize()` | primitive | mimir/owl で包めない特殊事情のみ |
 
 ### experience_id
 
-任意の task 名札。self_params cross-task 学習は `reigen_meta_knowledge.json` 経由で自動共有される (ID 共有不要、preset 別 key で分離)。fossil は per-ID 分離で並列衝突回避。apex は内部で `{experience_id}_owl` と `{experience_id}_reigen` に suffix 付けて分離管理。
+任意の task 名札。self_params cross-task 学習は `reigen_meta_knowledge.json` 経由で自動共有される (ID 共有不要、preset 別 key で分離)。fossil は per-ID 分離で並列衝突回避。mimir は内部で `{experience_id}_owl` と `{experience_id}_reigen` に suffix 付けて分離管理。
 
 ### 実測値問題 (最重要)
 
 **curated 20 点 ≈ random 200-2000 点の情報量**。ドメインエキスパートの 20 点は proxy R² を 0.5→0.85 に引き上げる。
-apex は `curated_measurements=` を受けたら expensive_single route に切替、owl に直接渡す。random `_collect` でこの価値を捨てない。
+mimir は `curated_measurements=` を受けたら expensive_single route に切替、owl に直接渡す。random `_collect` でこの価値を捨てない。
 
-### owl 2026-04-19〜04-20 強化まとめ (apex 内で常時 ON)
+### owl 2026-04-19〜04-20 強化まとめ (mimir 内で常時 ON)
 
 | kwarg / 機能 | 分類 | 説明 |
 |---|---|---|
@@ -129,26 +129,26 @@ apex は `curated_measurements=` を受けたら expensive_single route に切�
 | **`use_multistart_fallback=True`** | **algorithm** | direct-HC fallback の warm-start を L2 diverse top-3 に |
 | **`random_restart_count=K`** | **algorithm** ★★ | K 個の random warm-start 注入、basinhopping-style、Rosenbrock 救済 |
 
-★ = 04-19 算法強化、★★ = 04-20 benchmark 駆動追加。apex は上記すべてを default ON で呼ぶ。
+★ = 04-19 算法強化、★★ = 04-20 benchmark 駆動追加。mimir は上記すべてを default ON で呼ぶ。
 
 ### 世界 Benchmark 実績 (2026-04-20、25s budget、3 seeds)
 
-| 問題 | cma_es | basinhopping | reigen_k17 | owl | **apex** |
+| 問題 | cma_es | basinhopping | reigen_k17 | owl | **mimir** |
 |---|---|---|---|---|---|
 | Rastrigin 5d | +5.98 | +22.9 | **0 ✅** | **0 ✅** | **0 ✅** |
 | Ackley 5d | +0.002 | +1.65 | **0 ✅** | **0 ✅** | **0 ✅** |
 | Styblinski 5d | +28.3 | +28.3 | **-0.001 ✅** | +18.4 | **-0.001 ✅** |
 | Rosenbrock 5d | +2.74 | **0 🏆** | +0.081 | +3.19 | +0.081 |
 
-apex の勝ち: 3/4 perfect gap≈0 + Rosenbrock で basin に 2 位追走。
+mimir の勝ち: 3/4 perfect gap≈0 + Rosenbrock で basin に 2 位追走。
 optuna_tpe / skopt_gp は既存 benchmark で圧倒敗北で除外 (Rastrigin gap +10〜+20)。
 
 ---
 
-## apex — 全パラメータリファレンス
+## mimir — 全パラメータリファレンス
 
 ```python
-apex(
+mimir(
     eval_fn,                    # f(params: list[float]) -> float, higher is better
     param_ranges,               # [(lo, hi), ...]
     *,
@@ -156,7 +156,7 @@ apex(
     param_names=None,           # 次元名 (optional)
     curated_measurements=None,  # 過去実験データ [{"params":..., "score":...}]; 提供時 expensive_single
     guard_fn=None,              # 安全指標 f(params) -> float、owl に safe_dim_analysis=True 経由
-    experience_id="apex",       # cross-call 学習 namespace
+    experience_id="mimir",       # cross-call 学習 namespace
     time_budget=300.0,          # wall 予算 (秒)
     eval_cost_hint=None,        # None = 1-call 自動測定
     mode="optimize",            # "optimize" | "structure_only"
@@ -171,7 +171,7 @@ apex(
     # 稀に使う
     force_cascade=False,        # True で confidence 無視し必ず Reigen 走らせる
     n_seed_samples=None,        # 空データ seed 数
-    apex_cfg=None,              # 上記 LaD 値を dict でまとめて指定
+    mimir_cfg=None,              # 上記 LaD 値を dict でまとめて指定
     verbose=False,
 ) -> dict
 ```
@@ -199,7 +199,7 @@ apex(
 
 ---
 
-## Reigen (零玄) — apex の Phase 2 cascade 実行体
+## Reigen (零玄) — mimir の Phase 2 cascade 実行体
 
 Dimension-additive self-application: one outer Sentinel over (N_user + N_self)-dim joint space (N_self = 17 for kathara_17_adaptive default, 12 for kathara_12 legacy).
 Internally composes Sentinel → owl → MS → multi-observer → Kathara K² → optimize → UnifiedExperience.
@@ -840,9 +840,9 @@ r = owl(data)   # finds stable_active / observer_dependent / stable_dead
 | 04-20 | **owl L-BFGS-B refinement** | scipy L-BFGS-B を owl 末尾 1-shot で発動、`use_lbfgs_refinement=True` opt-in。Styblinski 5d で score -6→195.83 (global optimum 到達)、Rosenbrock で gap 173→3 (57× 改善) (commit edef9f5) |
 | 04-20 | **owl multi-start fallback** | direct-HC fallback の warm-start を L2 diverse top-3 に、`use_multistart_fallback=True` opt-in。wrong-basin 脱出機構 (commit a3c8a4c) |
 | 04-20 | **owl random_restart_count** | multi-start に K 個の uniform random warm-start を注入 (basinhopping 模倣、L-BFGS-B 直行)。curved-valley 救済 (commit 62d20c1) |
-| 04-20 | **apex 上位層誕生** | owl+Reigen cascade の meta-dispatcher。eval コスト 1-call 測定 → 自動分岐。BBOB 3/4 gap=0 + Rosenbrock 0.08 (basin 追走)。新 default (commit 62d20c1 + 8472c6d + rename) |
-| 04-20 | **apex LaD 化** | dispatch 6 閾値を `apex_params.json` で制御可能、kwarg > JSON > hardcode 優先度。K² 自己最適化は病的 runtime で失敗 (Ch17 self-application は turnkey でない、remediation 必要) |
-| 04-20 | **apex mode="structure_only"** | 最適化 skip、owl の dead_dims/fragility/proxy_r2 のみ返す高速分析経路 (max 30s cap)。高次元 LLM 事前分析用 |
+| 04-20 | **mimir 上位層誕生** | owl+Reigen cascade の meta-dispatcher。eval コスト 1-call 測定 → 自動分岐。BBOB 3/4 gap=0 + Rosenbrock 0.08 (basin 追走)。新 default (commit 62d20c1 + 8472c6d + rename) |
+| 04-20 | **mimir LaD 化** | dispatch 6 閾値を `mimir_params.json` で制御可能、kwarg > JSON > hardcode 優先度。K² 自己最適化は病的 runtime で失敗 (Ch17 self-application は turnkey でない、remediation 必要) |
+| 04-20 | **mimir mode="structure_only"** | 最適化 skip、owl の dead_dims/fragility/proxy_r2 のみ返す高速分析経路 (max 30s cap)。高次元 LLM 事前分析用 |
 | failures | scale=0 → PPL=262144 | Rule 7. verify_fn catches hallucination |
 | failures | single-obs on internal model state | fix: multi-observer + fast eval (Rule 11) |
 
@@ -902,18 +902,18 @@ so that accidental `.env` or credential commits are avoided.
 
 | module | path |
 |---|---|
-| **apex (new default, 2026-04-20)** | `@twelve/agent/apex.py` |
-| apex params (LaD JSON) | `@twelve/configs/apex_params.json` |
+| **mimir(new default, 2026-04-20)** | `@twelve/agent/mimir.py` |
+| mimir params (LaD JSON) | `@twelve/configs/mimir_params.json` |
 | Reigen (cascade backend) | `@twelve/agent/reigen.py` |
 | Sentinel | `@twelve/agent/sentinel.py` |
 | owl / optimize | `@twelve/optimize.py` |
 | MirrorAgent / MS | `@twelve/agent/mirror_agent.py` |
 | UnifiedExperience | `@twelve/agent/unified_experience.py` |
-| **apex tests** | `@twelve/tests/test_apex.py` (smoke / cascade / guard / curated / structure_only / wall-time, 10/10 green) |
+| **mimir tests** | `@twelve/tests/test_mimir.py` (smoke / cascade / guard / curated / structure_only / wall-time, 10/10 green) |
 | Reigen tests | `@twelve/tests/test_reigen.py` · `@twelve/tests/test_reigen_params.py` · `@twelve/tests/test_reigen_adaptive.py` · `@twelve/tests/test_reigen_meta_knowledge.py` |
 | owl enhancements tests | `@twelve/tests/test_owl_enhancements.py` (empty-data / curated / guard_fn / safe_dim) |
 | owl refinements tests | `@twelve/tests/test_owl_refinements.py` (L-BFGS-B / multi-start、2026-04-20) |
-| World benchmark scripts | `@benchmark_apex.py` (apex vs cma/basin/reigen/owl、2026-04-20) · `@benchmark_apex_meta.py` (K² self-opt 試作、⚠ 病的 runtime で失敗) · `@benchmark_owl_vs_world.py` (legacy、vs optuna/skopt) · `@benchmark_refinements.py` (04-20 refinement 効果測定) |
+| World benchmark scripts | `@benchmark_mimir.py` (mimir vs cma/basin/reigen/owl、2026-04-20) · `@benchmark_mimir_meta.py` (K² self-opt 試作、⚠ 病的 runtime で失敗) · `@benchmark_owl_vs_world.py` (legacy、vs optuna/skopt) · `@benchmark_refinements.py` (04-20 refinement 効果測定) |
 | Sentinel curated-data tests | `@twelve/tests/test_sentinel_curated.py` (initial_measurements) |
 | Reigen params JSON | `@twelve/configs/reigen_params.json` (static defaults) |
 | Reigen meta_knowledge | `@twelve/configs/reigen_meta_knowledge.json` (learned cross-task) |

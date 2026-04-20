@@ -1,4 +1,4 @@
-"""apex vs 世界 benchmark. 対決: cma_es, basinhopping, reigen, owl, apex.
+"""mimir vs 世界 benchmark. 対決: cma_es, basinhopping, reigen, owl, mimir.
 
 optuna_tpe / skopt_gp は前回の benchmark で圧倒敗北しているため除外。
 25s budget × 3 seeds × 4 BBOB problems.
@@ -116,10 +116,10 @@ def run_owl(fn, ranges, seed=42):
 
 
 def run_apex(fn, ranges, seed=42):
-    from twelve.agent.apex import apex
+    from twelve.agent.mimir import mimir
     c = Counter(fn); t0 = time.time()
     try:
-        r = apex(c, ranges, time_budget=TIME_LIMIT,
+        r = mimir(c, ranges, time_budget=TIME_LIMIT,
             experience_id=f"bhhgn_{seed}", verbose=False)
         return {"best_score": r["best_score"], "eval_count": c.n,
                 "wall_s": time.time() - t0, "tool_used": r.get("tool_used")}
@@ -133,7 +133,7 @@ TOOLS = [
     ("basinhopping", run_basin),
     ("reigen_k17",   run_reigen),
     ("owl_direct",   run_owl),
-    ("apex",        run_apex),
+    ("mimir",        run_apex),
 ]
 
 
@@ -154,7 +154,7 @@ def main():
                     res.update({"problem": prob_name, "tool": tool_name, "rep": rep,
                                 "gap": gap, "optimum": opt})
                     results.append(res)
-                    extra = f" tool={res.get('tool_used')}" if tool_name == "apex" else ""
+                    extra = f" tool={res.get('tool_used')}" if tool_name == "mimir" else ""
                     print(f"      gap={gap:+.4f} evals={res['eval_count']} wall={res['wall_s']:.1f}s{extra}", flush=True)
                 except Exception as e:
                     results.append({"problem": prob_name, "tool": tool_name, "rep": rep,
@@ -162,7 +162,7 @@ def main():
                         "gap": float("inf"), "best_score": float("-inf"),
                         "eval_count": 0, "wall_s": 0})
                     print(f"      ERROR: {type(e).__name__}", flush=True)
-                json.dump(results, open("benchmark_apex.json", "w"), indent=2, default=str)
+                json.dump(results, open("benchmark_mimir.json", "w"), indent=2, default=str)
 
     # Summary
     print("\n" + "=" * 90)

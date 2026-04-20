@@ -1,4 +1,4 @@
-"""apex — owl と Reigen の上位層 meta-dispatcher (2026-04-20 default entry).
+"""mimir — owl と Reigen の上位層 meta-dispatcher (2026-04-20 default entry).
 
 役目:
   - 問題の eval コストを測定 (1-call tick)
@@ -13,7 +13,7 @@
   - GP+EI 型 overhead の再発防止: bounded cost (1 owl + 高々 1 Reigen)
 
 LaD (Logic-as-Data):
-  dispatch 閾値と owl/Reigen kwargs は apex_params.json で JSON 制御可能。
+  dispatch 閾値と owl/Reigen kwargs は mimir_params.json で JSON 制御可能。
   precedence: 明示 kwarg > JSON > hardcode fallback。K² 自己最適化対応。
 
 Benchmark 実績 (2026-04-20、25s budget、3 seeds):
@@ -30,9 +30,9 @@ import time
 from typing import Any, Callable, Optional, Sequence
 
 
-_APEX_PARAMS_PATH = os.path.join(
+_MIMIR_PARAMS_PATH = os.path.join(
     os.path.dirname(os.path.dirname(os.path.abspath(__file__))),
-    "configs", "apex_params.json")
+    "configs", "mimir_params.json")
 
 _HARDCODE_DEFAULTS = {
     "dispatch": {
@@ -53,10 +53,10 @@ _HARDCODE_DEFAULTS = {
 }
 
 
-def _load_apex_params() -> dict:
-    """Load apex_params.json, falling back to hardcoded defaults silently."""
+def _load_mimir_params() -> dict:
+    """Load mimir_params.json, falling back to hardcoded defaults silently."""
     try:
-        with open(_APEX_PARAMS_PATH, "r", encoding="utf-8") as f:
+        with open(_MIMIR_PARAMS_PATH, "r", encoding="utf-8") as f:
             data = json.load(f)
     except (FileNotFoundError, json.JSONDecodeError, OSError):
         return {k: dict(v) for k, v in _HARDCODE_DEFAULTS.items()}
@@ -92,14 +92,14 @@ def _measure_eval_cost(eval_fn: Callable, ranges: Sequence[tuple[float, float]])
     return max(time.time() - t0, 1e-6)
 
 
-def apex(
+def mimir(
     eval_fn: Callable[[list[float]], float],
     param_ranges: Sequence[tuple[float, float]],
     *,
     param_names: Optional[list[str]] = None,
     curated_measurements: Optional[list[dict]] = None,
     guard_fn: Optional[Callable] = None,
-    experience_id: str = "apex",
+    experience_id: str = "mimir",
     time_budget: float = 300.0,
     eval_cost_hint: Optional[float] = None,
     # LaD dispatch overrides (None = load from JSON/hardcode)
@@ -113,7 +113,7 @@ def apex(
     # Misc
     force_cascade: bool = False,
     n_seed_samples: Optional[int] = None,
-    apex_cfg: Optional[dict] = None,
+    mimir_cfg: Optional[dict] = None,
     mode: str = "optimize",  # "optimize" | "structure_only"
     verbose: bool = False,
 ) -> dict:
@@ -143,9 +143,9 @@ def apex(
 
     t_start = time.time()
 
-    # ---- LaD: resolve dispatch params (kwarg > apex_cfg > JSON > hardcode) ----
-    _p = _load_apex_params()
-    _cfg_override = dict(apex_cfg or {})
+    # ---- LaD: resolve dispatch params (kwarg > mimir_cfg > JSON > hardcode) ----
+    _p = _load_mimir_params()
+    _cfg_override = dict(mimir_cfg or {})
     _d = _p["dispatch"]
     _o = _p["owl_kwargs"]
     _r = _p["reigen_kwargs"]
@@ -352,4 +352,4 @@ def apex(
     return result
 
 
-__all__ = ["apex"]
+__all__ = ["mimir"]
