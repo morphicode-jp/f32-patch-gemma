@@ -77,7 +77,7 @@ def run_reigen(fn, ranges, seed=42):
     tb = max(3, min(EVAL_BUDGET // 5, TIME_LIMIT))
     try:
         r = reigen(c, lambda p: 0.0, user_param_ranges=ranges,
-            experience_id=f"bhrei_{seed}",
+            experience_id=f"bhrei_{fn.__name__}_{seed}",
             time_budget=tb, inner_time_budget=1, wall_time_factor=1.5,
             self_dim_preset="kathara_17_adaptive", verbose=False)
         return {"best_score": r["user_best_score"],
@@ -102,7 +102,7 @@ def run_owl(fn, ranges, seed=42):
     try:
         r = owl(measurements=curated, verify_fn=c, param_ranges=ranges,
             autonomous=True, max_iterations=30, time_budget=TIME_LIMIT,
-            min_r_squared=0.1, experience_id=f"bhowl_{seed}",
+            min_r_squared=0.1, experience_id=f"bhowl_{fn.__name__}_{seed}",
             use_lbfgs_refinement=True, use_multistart_fallback=True,
             random_restart_count=5, verbose=False)
         vs = r.get("verified_score"); bs = r.get("best_score")
@@ -120,7 +120,7 @@ def run_apex(fn, ranges, seed=42):
     c = Counter(fn); t0 = time.time()
     try:
         r = mimir(c, ranges, time_budget=TIME_LIMIT,
-            experience_id=f"bhhgn_{seed}", verbose=False)
+            experience_id=f"bhmim_{fn.__name__}_{seed}", verbose=False)
         return {"best_score": r["best_score"], "eval_count": c.n,
                 "wall_s": time.time() - t0, "tool_used": r.get("tool_used")}
     except Exception as e:

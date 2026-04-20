@@ -267,9 +267,12 @@ def mimir(
     # ---- Phase 2: decide whether to escalate ----
     elapsed = time.time() - t_start
     remaining = max(0.0, time_budget - elapsed)
-    # LaD escalation gate: use proxy_r2 continuous value (was categorical "high").
-    # proxy_r2 ≥ confidence_skip_threshold → trust owl, skip Reigen.
-    # Lower threshold = more aggressive cascade (Reigen fires more often).
+    # LaD escalation gate: cascade if proxy_r2 < threshold.
+    # Default threshold raised to 0.95 (from 0.7) because multimodal
+    # landscapes (Styblinski, Rosenbrock) can produce proxy_r2 in the
+    # 0.8-0.9 range while the best_params is stuck in a wrong basin.
+    # Only truly smooth near-perfect proxies (quadratic, near-convex)
+    # reach 0.95+, so this threshold reliably triggers cascade where needed.
     _owl_proxy_r2 = r_owl.get("proxy_r2") or 0.0
     _proxy_good_enough = (_owl_proxy_r2 >= _confidence_skip_threshold)
     escalate = (
@@ -324,8 +327,11 @@ def mimir(
             inner_time_budget=_reigen_inner,
             verbose=verbose,
         )
-        # wall_time_factor from LaD (default 1.0 keeps total wall close to
-        # time_budget; Reigen's native default 3.0 would blow user's budget).
+        # Reigen gets full remaining budget. wall_time_factor=1.0 keeps
+        # soft cap at time_budget; Reigen's graceful-finish will overshoot
+        # by ~20-30% on cheap-eval cascade routes, which is acceptable
+        # trade-off vs quality loss observed when we tried clamping below
+        # remaining (Rosenbrock 0.08 → 3.98 on clamped budget).
         r_reigen = reigen_obj.run(
             time_budget=max(5.0, remaining),
             wall_time_factor=_reigen_wtf,

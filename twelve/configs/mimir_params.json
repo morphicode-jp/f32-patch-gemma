@@ -1,11 +1,11 @@
 {
-    "_comment": "hagen dispatch parameters (LaD). kwarg > JSON > hardcode. Meta-optimizable via K² pattern.",
-    "_version": "2026-04-20-v1",
+    "_comment": "mimir dispatch parameters (LaD). kwarg > JSON > hardcode. Benchmark-validated on 2026-04-20.",
+    "_version": "2026-04-20-v2",
     "dispatch": {
         "eval_cost_threshold": 0.5,
         "owl_share": 0.4,
         "escalation_min_remaining": 5.0,
-        "confidence_skip_threshold": 0.7
+        "confidence_skip_threshold": 0.95
     },
     "owl_kwargs": {
         "random_restart_count": 5,
