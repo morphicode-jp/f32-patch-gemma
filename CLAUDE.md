@@ -58,13 +58,17 @@ mimir(fn, ranges, time_budget) 呼出し
 ├── mode="structure_only"          → owl autonomous=False, max 30s
 ├── eval > 0.5s or curated あり     → expensive_single: owl 100% + 全強化
 └── eval ≤ 0.5s + curated なし      → cheap_cascade
-        ├── owl 40% budget (proxy_r2 ≥ 0.95 なら即終了)
-        └── Reigen 残 budget (owl best を warm-start)
+        ├── Phase 1: owl 40% budget
+        │   └── proxy_r2 ≥ 0.95 かつ conf=="high" なら即終了
+        └── Phase 2 (並列実行): reigen || scipy.basinhopping
+              ├── reigen: 全 remaining budget (構造探索 + cross-task)
+              ├── scipy:  並列起動 (dim ≥ 10 かつ owl 失敗時のみ)
+              └── 3 者 {owl, reigen, scipy} から最高スコアを採用
 ```
 
 ## mimir LaD 設定 (JSON 制御)
 
-`twelve/configs/mimir_params.json` に 6 個の dispatch 値がある。precedence は kwarg > JSON > hardcode。benchmark 駆動で最適値に設定済。
+`twelve/configs/mimir_params.json` に 8 個の dispatch 値がある。precedence は kwarg > JSON > hardcode。benchmark 駆動で最適値に設定済。
 
 | key | default | 意味 |
 |---|---|---|
@@ -74,6 +78,8 @@ mimir(fn, ranges, time_budget) 呼出し
 | `confidence_skip_threshold` | 0.95 | Reigen skip の proxy_r2 閾値 |
 | `random_restart_count` | 5 | owl の uniform random 再起動数 |
 | `reigen_inner_time_budget` | 2.0s | Reigen inner Sentinel の 1 回分 |
+| `scipy_cascade_dim_threshold` | 10 | scipy.basinhopping 発火の最小次元 |
+| `scipy_cascade_budget_share` | 0.5 | scipy の budget 割合 (remaining × X) |
 
 ## mimir の全パラメータ
 
@@ -183,28 +189,40 @@ v3 で修正した点は 2 つ。confidence_skip_threshold を 0.7 → 0.95 に�
 
 `benchmark_mimir_dimscale.py` で計測した高次元挙動。mimir は Rastrigin 系 (格子多峰) では次元増加で更に優位拡大、**Styblinski と Rosenbrock の 10d+ で崩壊する**。これは正直に記録する。
 
-| 問題 | dim | cma_es gap | basinhopping gap | **mimir gap** | 勝者 |
+2026-04-20 の 2 段階追加で mimir の高次元弱点は概ね解消された。Phase 1 (scipy cascade 追加) と Phase 2 (parallel 化) を経て、mimir は Rastrigin 支配 + Rosenbrock 高次元 solve + Styblinski 高次元大幅改善を達成している。
+
+### v7 時点 (scipy cascade + parallel、60s budget 推奨)
+
+| 問題 | dim | cma_es | basin | **mimir** | 勝者 |
 |---|---|---|---|---|---|
 | Rastrigin | 5 | +5.97 | +5.97 | **0** | mimir |
 | Rastrigin | 10 | +17.9 | +21.9 | **0** | mimir |
 | Rastrigin | 20 | +128.9 | +93.5 | **0** | **mimir (128×)** |
-| Ackley | 5 | 0 | 0 | 0 | 全員同着 |
-| Ackley | 10 | 0 | 0 | 0 | 全員同着 |
+| Ackley | 5-10 | 0 | 0 | 0 | 全員 |
 | Ackley | 20 | +0.004 | +8.1 | **0** | mimir |
 | Styblinski | 5 | +28.3 | +28.3 | **-0.00** | mimir |
-| Styblinski | 10 | **+28.3** | +42.4 | +333 ❌ | cma |
-| Styblinski | 20 | **+99.0** | +99.0 | +711 ❌ | cma/basin |
-| Rosenbrock | 5 | 0 | 0 | +0.09 | cma/basin |
-| Rosenbrock | 10 | +3.4 | **0** | +29.7 ❌ | basinhopping |
-| Rosenbrock | 20 | +17.7 | **0** | +2041 ❌❌ | **basinhopping** |
+| Styblinski | 10 | +28.3 | +42.4 | +85 (cascade前 +333) | cma |
+| Styblinski | 20 | +99.0 | +99.0 | +106 (cascade前 +711) | cma/basin |
+| Rosenbrock | 5 | 0 | 0 | +0.08 | 同着圏 |
+| **Rosenbrock** | **10** | +3.4 | **0** | **0 ✅** (cascade前 +29.7) | **mimir + basin 同着** |
+| **Rosenbrock** | **20** | +17.7 | **0** | **0 ✅** (cascade前 +2041) | **mimir + basin 同着** |
 
-mimir の強みは**格子状多峰 (Rastrigin)** で決定的に出る。20d Rastrigin で cma_es の 128 倍の精度。構造発見 + proxy + direct-HC fallback が「規則的な多峰の底」を効率的に掴むからである。
+### 何が直り、何が残るか
 
-mimir の弱点は 2 つ判明した。第1は **curved valley (Rosenbrock) の高次元**。basinhopping の `niter=200 × L-BFGS-B` は gradient で谷を滑るが、mimir の Reigen cascade は warm-start なしで valley を見つけられない。第2は **Styblinski の 10d+**。owl と Reigen の両方が小さな basin (score ~60) に引き込まれ、global basin (score ~783) に到達できない。
+**解消**: Rosenbrock 10d/20d は scipy.basinhopping cascade で gap=0 達成。curved valley を gradient で滑る能力を mimir が獲得した。
 
-解釈すると、mimir は**構造が対称的で proxy が真の形を捕まえられる問題**で圧勝する。非対称な basin 分布 (Styblinski) や gradient 支配 (Rosenbrock) では高次元で苦しむ。この事実は CLAUDE.md を読む Claude 自身にとっても重要で、実問題の性質に応じて mimir が prime choice か basinhopping や cma が prime choice か判断する材料になる。
+**改善**: Styblinski 10d/20d は大幅改善 (333→85, 711→106) だが cma/basin にまだ届かない。2^n basin 問題で、scipy.basinhopping の niter=200 でも basin 発見効率は dim 指数。本質的な高次元 discrete optimization 問題の難しさ。
 
-実用 guidance: **多峰・格子的・対称的な landscape** (MLP hyper tuning, scale calibration, LLM 層重要度など) は mimir を使え。**curved valley / gradient 重要** (continuous control, PID tuning) は scipy basinhopping を使え。**混在** なら mimir で構造発見 → 有望次元を特定 → 各次元は scipy で細部追込、が最強。
+**維持**: Rastrigin 全次元圧勝 (20d で 128× 優位)。これが mimir の core strength。格子状多峰で proxy が smooth envelope を捕捉 + direct-HC fallback の構造利用。
+
+### 実用 guidance
+
+mimir を default で選べばよい。内部で 3 アルゴリズム並列 cascade が動く:
+- 構造ある問題 (LLM 層重要度、scale calibration) → owl Phase 1 だけで解ける
+- deceptive 多峰 → Reigen が brute-force で救う  
+- curved valley / gradient 支配 → scipy.basinhopping が救う
+
+手動で scipy / basinhopping / cma_es を選ぶ場面はほぼ消えた。**例外は Styblinski-like の 2^n basin 問題の高次元** だけ、これは cma_es や専用アルゴリズムが依然有利。
 
 ## experience_id の扱い
 
@@ -902,8 +920,8 @@ so that accidental `.env` or credential commits are avoided.
 | **Numerology bound NB1-NB3** (near-match の統計的棄却基準; α⁻¹, m_p/m_e マッチが NB3 再現性で失敗 = numerology 判定、spacetime=4 のみ principled 残存) | `@docs/ZENRON_NUMEROLOGY_BOUND.md` |
 | **Hierarchy + Discovery (H1, D1)** (Kathara^n 階層は OP3 を解決せず; 3-stage 公式発見は statistical consistent = 未知法則の discoverer) | `@docs/ZENRON_HIERARCHY_DISCOVERY.md` |
 | **Final open problems** (OP3 系統 framework 見つからず honest null; **OP4: Type C が K-minimum, Type B は sub-optimal**; OP-S3 局所接触条件 L1-L4) | `@docs/ZENRON_FINAL_OPEN_PROBLEMS.md` |
-| **Russell 深層 15 項** (R1-R10 の奥、#1 Breathing / #7 Desire=OP6 候補 / #15 Pulse=Planck×12^n / Octave 4 Carbon; 73% Zenron 対応、pulse は statistical null) | `@docs/ZENRON_RUSSELL_DEEP.md` |
-| Verification scripts (`python <file>`) | `@zenron_proof_verify.py`, `@zenron_void_verify.py`, `@zenron_time_space_verify.py`, `@zenron_mult_mixing_verify.py`, `@zenron_noether_verify.py`, `@zenron_kuramoto_verify.py`, `@zenron_parallelism_verify.py`, `@zenron_circuits_verify.py`, `@zenron_self_reference_verify.py`, `@zenron_uniqueness_search.py`, `@zenron_op3_op4_search.py`, `@zenron_pulse_hierarchy.py` |
+| **Russell 深層 15 項** (R1-R10 の奥、#1 Breathing / #7 Desire=OP6 ✅解決 / #15 Pulse=Planck×12^n / Octave 4 Carbon; 80% Zenron 対応、OP6 は Bernoulli shift で支持) | `@docs/ZENRON_RUSSELL_DEEP.md` |
+| Verification scripts (`python <file>`) | `@zenron_proof_verify.py`, `@zenron_void_verify.py`, `@zenron_time_space_verify.py`, `@zenron_mult_mixing_verify.py`, `@zenron_noether_verify.py`, `@zenron_kuramoto_verify.py`, `@zenron_parallelism_verify.py`, `@zenron_circuits_verify.py`, `@zenron_self_reference_verify.py`, `@zenron_uniqueness_search.py`, `@zenron_op3_op4_search.py`, `@zenron_pulse_hierarchy.py`, `@zenron_op6_chaos_origin.py`, `@zenron_op6_sweep.py` |
 
 ## Source files
 
