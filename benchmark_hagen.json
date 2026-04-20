@@ -1,0 +1,614 @@
+[
+  {
+    "best_score": -1.1023848960334561,
+    "eval_count": 504,
+    "wall_s": 0.039002180099487305,
+    "problem": "rastrigin_5d",
+    "tool": "cma_es",
+    "rep": 0,
+    "gap": 1.1023848960334561,
+    "optimum": 0.0
+  },
+  {
+    "best_score": -12.351300476495695,
+    "eval_count": 504,
+    "wall_s": 0.03399968147277832,
+    "problem": "rastrigin_5d",
+    "tool": "cma_es",
+    "rep": 1,
+    "gap": 12.351300476495695,
+    "optimum": 0.0
+  },
+  {
+    "best_score": -5.9776131661935565,
+    "eval_count": 504,
+    "wall_s": 0.03499579429626465,
+    "problem": "rastrigin_5d",
+    "tool": "cma_es",
+    "rep": 2,
+    "gap": 5.9776131661935565,
+    "optimum": 0.0
+  },
+  {
+    "best_score": -22.883952154313306,
+    "eval_count": 546,
+    "wall_s": 0.025995731353759766,
+    "problem": "rastrigin_5d",
+    "tool": "basinhopping",
+    "rep": 0,
+    "gap": 22.883952154313306,
+    "optimum": 0.0
+  },
+  {
+    "best_score": -29.848635281596124,
+    "eval_count": 576,
+    "wall_s": 0.015003681182861328,
+    "problem": "rastrigin_5d",
+    "tool": "basinhopping",
+    "rep": 1,
+    "gap": 29.848635281596124,
+    "optimum": 0.0
+  },
+  {
+    "best_score": -13.929411685848898,
+    "eval_count": 528,
+    "wall_s": 0.012997150421142578,
+    "problem": "rastrigin_5d",
+    "tool": "basinhopping",
+    "rep": 2,
+    "gap": 13.929411685848898,
+    "optimum": 0.0
+  },
+  {
+    "best_score": 0.0,
+    "eval_count": 7784443,
+    "wall_s": 50.22504901885986,
+    "problem": "rastrigin_5d",
+    "tool": "reigen_k17",
+    "rep": 0,
+    "gap": 0.0,
+    "optimum": 0.0
+  },
+  {
+    "best_score": 0.0,
+    "eval_count": 7784435,
+    "wall_s": 49.4803831577301,
+    "problem": "rastrigin_5d",
+    "tool": "reigen_k17",
+    "rep": 1,
+    "gap": 0.0,
+    "optimum": 0.0
+  },
+  {
+    "best_score": 0.0,
+    "eval_count": 7784439,
+    "wall_s": 49.33460545539856,
+    "problem": "rastrigin_5d",
+    "tool": "reigen_k17",
+    "rep": 2,
+    "gap": 0.0,
+    "optimum": 0.0
+  },
+  {
+    "best_score": -0.0,
+    "eval_count": 742,
+    "wall_s": 25.014657258987427,
+    "problem": "rastrigin_5d",
+    "tool": "owl_direct",
+    "rep": 0,
+    "gap": 0.0,
+    "optimum": 0.0
+  },
+  {
+    "best_score": -1.4210854715202004e-14,
+    "eval_count": 514748,
+    "wall_s": 25.05951476097107,
+    "problem": "rastrigin_5d",
+    "tool": "owl_direct",
+    "rep": 1,
+    "gap": 1.4210854715202004e-14,
+    "optimum": 0.0
+  },
+  {
+    "best_score": -0.0,
+    "eval_count": 636,
+    "wall_s": 25.126592874526978,
+    "problem": "rastrigin_5d",
+    "tool": "owl_direct",
+    "rep": 2,
+    "gap": 0.0,
+    "optimum": 0.0
+  },
+  {
+    "best_score": 0.0,
+    "eval_count": 2919503,
+    "wall_s": 31.62731099128723,
+    "tool_used": "owl+reigen",
+    "problem": "rastrigin_5d",
+    "tool": "hagen",
+    "rep": 0,
+    "gap": 0.0,
+    "optimum": 0.0
+  },
+  {
+    "best_score": 0.0,
+    "eval_count": 2919503,
+    "wall_s": 31.56317973136902,
+    "tool_used": "owl+reigen",
+    "problem": "rastrigin_5d",
+    "tool": "hagen",
+    "rep": 1,
+    "gap": 0.0,
+    "optimum": 0.0
+  },
+  {
+    "best_score": 0.0,
+    "eval_count": 2919498,
+    "wall_s": 31.51200270652771,
+    "tool_used": "owl+reigen",
+    "problem": "rastrigin_5d",
+    "tool": "hagen",
+    "rep": 2,
+    "gap": 0.0,
+    "optimum": 0.0
+  },
+  {
+    "best_score": -0.0006073409618214676,
+    "eval_count": 504,
+    "wall_s": 0.03499794006347656,
+    "problem": "ackley_5d",
+    "tool": "cma_es",
+    "rep": 0,
+    "gap": 0.0006073409618214676,
+    "optimum": 0.0
+  },
+  {
+    "best_score": -0.0015703570245162446,
+    "eval_count": 504,
+    "wall_s": 0.03400135040283203,
+    "problem": "ackley_5d",
+    "tool": "cma_es",
+    "rep": 1,
+    "gap": 0.0015703570245162446,
+    "optimum": 0.0
+  },
+  {
+    "best_score": -0.005820097369948929,
+    "eval_count": 504,
+    "wall_s": 0.03399395942687988,
+    "problem": "ackley_5d",
+    "tool": "cma_es",
+    "rep": 2,
+    "gap": 0.005820097369948929,
+    "optimum": 0.0
+  },
+  {
+    "best_score": -1.082217737646829e-08,
+    "eval_count": 858,
+    "wall_s": 0.020295143127441406,
+    "problem": "ackley_5d",
+    "tool": "basinhopping",
+    "rep": 0,
+    "gap": 1.082217737646829e-08,
+    "optimum": 0.0
+  },
+  {
+    "best_score": -8.851404919033953,
+    "eval_count": 504,
+    "wall_s": 0.012000083923339844,
+    "problem": "ackley_5d",
+    "tool": "basinhopping",
+    "rep": 1,
+    "gap": 8.851404919033953,
+    "optimum": 0.0
+  },
+  {
+    "best_score": -1.6462236331116817,
+    "eval_count": 558,
+    "wall_s": 0.013998985290527344,
+    "problem": "ackley_5d",
+    "tool": "basinhopping",
+    "rep": 2,
+    "gap": 1.6462236331116817,
+    "optimum": 0.0
+  },
+  {
+    "best_score": -4.440892098500626e-16,
+    "eval_count": 6811393,
+    "wall_s": 48.06396842002869,
+    "problem": "ackley_5d",
+    "tool": "reigen_k17",
+    "rep": 0,
+    "gap": 4.440892098500626e-16,
+    "optimum": 0.0
+  },
+  {
+    "best_score": -4.440892098500626e-16,
+    "eval_count": 6811389,
+    "wall_s": 47.784661054611206,
+    "problem": "ackley_5d",
+    "tool": "reigen_k17",
+    "rep": 1,
+    "gap": 4.440892098500626e-16,
+    "optimum": 0.0
+  },
+  {
+    "best_score": -4.440892098500626e-16,
+    "eval_count": 6811389,
+    "wall_s": 48.0250301361084,
+    "problem": "ackley_5d",
+    "tool": "reigen_k17",
+    "rep": 2,
+    "gap": 4.440892098500626e-16,
+    "optimum": 0.0
+  },
+  {
+    "best_score": -4.440892098500626e-16,
+    "eval_count": 746,
+    "wall_s": 25.09826970100403,
+    "problem": "ackley_5d",
+    "tool": "owl_direct",
+    "rep": 0,
+    "gap": 4.440892098500626e-16,
+    "optimum": 0.0
+  },
+  {
+    "best_score": -2.4101744289239946e-07,
+    "eval_count": 2172808,
+    "wall_s": 25.126094818115234,
+    "problem": "ackley_5d",
+    "tool": "owl_direct",
+    "rep": 1,
+    "gap": 2.4101744289239946e-07,
+    "optimum": 0.0
+  },
+  {
+    "best_score": -4.0629474229447737e-07,
+    "eval_count": 2174283,
+    "wall_s": 25.119566202163696,
+    "problem": "ackley_5d",
+    "tool": "owl_direct",
+    "rep": 2,
+    "gap": 4.0629474229447737e-07,
+    "optimum": 0.0
+  },
+  {
+    "best_score": -4.440892098500626e-16,
+    "eval_count": 2919453,
+    "wall_s": 32.93056130409241,
+    "tool_used": "owl+reigen",
+    "problem": "ackley_5d",
+    "tool": "hagen",
+    "rep": 0,
+    "gap": 4.440892098500626e-16,
+    "optimum": 0.0
+  },
+  {
+    "best_score": -4.440892098500626e-16,
+    "eval_count": 2919449,
+    "wall_s": 32.8178186416626,
+    "tool_used": "owl+reigen",
+    "problem": "ackley_5d",
+    "tool": "hagen",
+    "rep": 1,
+    "gap": 4.440892098500626e-16,
+    "optimum": 0.0
+  },
+  {
+    "best_score": -4.440892098500626e-16,
+    "eval_count": 2919449,
+    "wall_s": 32.9170343875885,
+    "tool_used": "owl+reigen",
+    "problem": "ackley_5d",
+    "tool": "hagen",
+    "rep": 2,
+    "gap": 4.440892098500626e-16,
+    "optimum": 0.0
+  },
+  {
+    "best_score": 181.69406810039112,
+    "eval_count": 504,
+    "wall_s": 0.03499913215637207,
+    "problem": "styblinski_5d",
+    "tool": "cma_es",
+    "rep": 0,
+    "gap": 14.135931899608892,
+    "optimum": 195.83
+  },
+  {
+    "best_score": 167.55717040719298,
+    "eval_count": 504,
+    "wall_s": 0.03499960899353027,
+    "problem": "styblinski_5d",
+    "tool": "cma_es",
+    "rep": 1,
+    "gap": 28.272829592807028,
+    "optimum": 195.83
+  },
+  {
+    "best_score": 167.55398127065337,
+    "eval_count": 504,
+    "wall_s": 0.04189252853393555,
+    "problem": "styblinski_5d",
+    "tool": "cma_es",
+    "rep": 2,
+    "gap": 28.276018729346646,
+    "optimum": 195.83
+  },
+  {
+    "best_score": 167.55739042187807,
+    "eval_count": 522,
+    "wall_s": 0.012999773025512695,
+    "problem": "styblinski_5d",
+    "tool": "basinhopping",
+    "rep": 0,
+    "gap": 28.272609578121944,
+    "optimum": 195.83
+  },
+  {
+    "best_score": 181.69410947036528,
+    "eval_count": 546,
+    "wall_s": 0.012998104095458984,
+    "problem": "styblinski_5d",
+    "tool": "basinhopping",
+    "rep": 1,
+    "gap": 14.135890529634736,
+    "optimum": 195.83
+  },
+  {
+    "best_score": 167.5573904218811,
+    "eval_count": 516,
+    "wall_s": 0.012229681015014648,
+    "problem": "styblinski_5d",
+    "tool": "basinhopping",
+    "rep": 2,
+    "gap": 28.272609578118903,
+    "optimum": 195.83
+  },
+  {
+    "best_score": 195.83082851640916,
+    "eval_count": 6811622,
+    "wall_s": 48.3183217048645,
+    "problem": "styblinski_5d",
+    "tool": "reigen_k17",
+    "rep": 0,
+    "gap": -0.0008285164091432762,
+    "optimum": 195.83
+  },
+  {
+    "best_score": 195.83082851321592,
+    "eval_count": 6811437,
+    "wall_s": 46.41627502441406,
+    "problem": "styblinski_5d",
+    "tool": "reigen_k17",
+    "rep": 1,
+    "gap": -0.0008285132159073783,
+    "optimum": 195.83
+  },
+  {
+    "best_score": 195.83082850816174,
+    "eval_count": 6811501,
+    "wall_s": 47.44338512420654,
+    "problem": "styblinski_5d",
+    "tool": "reigen_k17",
+    "rep": 2,
+    "gap": -0.0008285081617316337,
+    "optimum": 195.83
+  },
+  {
+    "best_score": 167.55739040433374,
+    "eval_count": 375,
+    "wall_s": 25.15533447265625,
+    "problem": "styblinski_5d",
+    "tool": "owl_direct",
+    "rep": 0,
+    "gap": 28.272609595666268,
+    "optimum": 195.83
+  },
+  {
+    "best_score": 189.72077883262898,
+    "eval_count": 336,
+    "wall_s": 25.035518407821655,
+    "problem": "styblinski_5d",
+    "tool": "owl_direct",
+    "rep": 1,
+    "gap": 6.109221167371032,
+    "optimum": 195.83
+  },
+  {
+    "best_score": 177.43219849131,
+    "eval_count": 286,
+    "wall_s": 25.10372519493103,
+    "problem": "styblinski_5d",
+    "tool": "owl_direct",
+    "rep": 2,
+    "gap": 18.39780150869001,
+    "optimum": 195.83
+  },
+  {
+    "best_score": 195.83082851115458,
+    "eval_count": 2919466,
+    "wall_s": 32.44475269317627,
+    "tool_used": "owl+reigen",
+    "problem": "styblinski_5d",
+    "tool": "hagen",
+    "rep": 0,
+    "gap": -0.0008285111545660584,
+    "optimum": 195.83
+  },
+  {
+    "best_score": 195.8308285157243,
+    "eval_count": 2919466,
+    "wall_s": 32.43154525756836,
+    "tool_used": "owl+reigen",
+    "problem": "styblinski_5d",
+    "tool": "hagen",
+    "rep": 1,
+    "gap": -0.0008285157242937657,
+    "optimum": 195.83
+  },
+  {
+    "best_score": 195.8308285017048,
+    "eval_count": 2919466,
+    "wall_s": 32.55895781517029,
+    "tool_used": "owl+reigen",
+    "problem": "styblinski_5d",
+    "tool": "hagen",
+    "rep": 2,
+    "gap": -0.0008285017047739984,
+    "optimum": 195.83
+  },
+  {
+    "best_score": -2.7378153513711054,
+    "eval_count": 504,
+    "wall_s": 0.03399825096130371,
+    "problem": "rosenbrock_5d",
+    "tool": "cma_es",
+    "rep": 0,
+    "gap": 2.7378153513711054,
+    "optimum": 0.0
+  },
+  {
+    "best_score": -4.231065733353833,
+    "eval_count": 504,
+    "wall_s": 0.03499937057495117,
+    "problem": "rosenbrock_5d",
+    "tool": "cma_es",
+    "rep": 1,
+    "gap": 4.231065733353833,
+    "optimum": 0.0
+  },
+  {
+    "best_score": -1.2806022921583597,
+    "eval_count": 504,
+    "wall_s": 0.03400087356567383,
+    "problem": "rosenbrock_5d",
+    "tool": "cma_es",
+    "rep": 2,
+    "gap": 1.2806022921583597,
+    "optimum": 0.0
+  },
+  {
+    "best_score": -2.4765873481356617e-11,
+    "eval_count": 666,
+    "wall_s": 0.019000768661499023,
+    "problem": "rosenbrock_5d",
+    "tool": "basinhopping",
+    "rep": 0,
+    "gap": 2.4765873481356617e-11,
+    "optimum": 0.0
+  },
+  {
+    "best_score": -2.32948880489965e-11,
+    "eval_count": 534,
+    "wall_s": 0.014003515243530273,
+    "problem": "rosenbrock_5d",
+    "tool": "basinhopping",
+    "rep": 1,
+    "gap": 2.32948880489965e-11,
+    "optimum": 0.0
+  },
+  {
+    "best_score": -2.3181311137214227e-11,
+    "eval_count": 630,
+    "wall_s": 0.017000675201416016,
+    "problem": "rosenbrock_5d",
+    "tool": "basinhopping",
+    "rep": 2,
+    "gap": 2.3181311137214227e-11,
+    "optimum": 0.0
+  },
+  {
+    "best_score": -0.08188729236606718,
+    "eval_count": 6811395,
+    "wall_s": 45.248769760131836,
+    "problem": "rosenbrock_5d",
+    "tool": "reigen_k17",
+    "rep": 0,
+    "gap": 0.08188729236606718,
+    "optimum": 0.0
+  },
+  {
+    "best_score": -0.08062890079457091,
+    "eval_count": 6811406,
+    "wall_s": 45.63231563568115,
+    "problem": "rosenbrock_5d",
+    "tool": "reigen_k17",
+    "rep": 1,
+    "gap": 0.08062890079457091,
+    "optimum": 0.0
+  },
+  {
+    "best_score": -0.07843058804873984,
+    "eval_count": 6811401,
+    "wall_s": 45.478482723236084,
+    "problem": "rosenbrock_5d",
+    "tool": "reigen_k17",
+    "rep": 2,
+    "gap": 0.07843058804873984,
+    "optimum": 0.0
+  },
+  {
+    "best_score": -4.325596614604505,
+    "eval_count": 298,
+    "wall_s": 25.11881947517395,
+    "problem": "rosenbrock_5d",
+    "tool": "owl_direct",
+    "rep": 0,
+    "gap": 4.325596614604505,
+    "optimum": 0.0
+  },
+  {
+    "best_score": -3.1895172712803372,
+    "eval_count": 302,
+    "wall_s": 25.15690326690674,
+    "problem": "rosenbrock_5d",
+    "tool": "owl_direct",
+    "rep": 1,
+    "gap": 3.1895172712803372,
+    "optimum": 0.0
+  },
+  {
+    "best_score": -0.16072571617734066,
+    "eval_count": 290,
+    "wall_s": 25.131547927856445,
+    "problem": "rosenbrock_5d",
+    "tool": "owl_direct",
+    "rep": 2,
+    "gap": 0.16072571617734066,
+    "optimum": 0.0
+  },
+  {
+    "best_score": -0.09173374966398762,
+    "eval_count": 2919483,
+    "wall_s": 31.954806566238403,
+    "tool_used": "owl+reigen",
+    "problem": "rosenbrock_5d",
+    "tool": "hagen",
+    "rep": 0,
+    "gap": 0.09173374966398762,
+    "optimum": 0.0
+  },
+  {
+    "best_score": -0.0782688721058183,
+    "eval_count": 2919488,
+    "wall_s": 31.942679166793823,
+    "tool_used": "owl+reigen",
+    "problem": "rosenbrock_5d",
+    "tool": "hagen",
+    "rep": 1,
+    "gap": 0.0782688721058183,
+    "optimum": 0.0
+  },
+  {
+    "best_score": -0.0814095643095851,
+    "eval_count": 2919497,
+    "wall_s": 32.05240607261658,
+    "tool_used": "owl+reigen",
+    "problem": "rosenbrock_5d",
+    "tool": "hagen",
+    "rep": 2,
+    "gap": 0.0814095643095851,
+    "optimum": 0.0
+  }
+]

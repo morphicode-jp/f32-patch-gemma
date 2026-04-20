@@ -1721,6 +1721,7 @@ def owl(
     safe_dim_analysis=False,     # If True + guard_fn + guard fails, run multi-observer analysis to surface safe_dims.
     use_lbfgs_refinement=False,  # 2026-04-20: opt-in scipy L-BFGS-B local refinement at the end (crushes smooth curved valleys like Rosenbrock; uses finite-diff gradient, ~50 extra evals).
     use_multistart_fallback=False,  # 2026-04-20: opt-in diversified warm-starts in direct-HC fallback (rescues wrong-basin failures like Styblinski).
+    random_restart_count=0,  # 2026-04-20 v3: opt-in K uniform-random warm-starts added to multi-start fallback (basinhopping-style random hop → rescues curved-valley Rosenbrock).
 ):
     """Owl — 見えない構造を見つけて最適化する。
 
@@ -2214,11 +2215,36 @@ def owl(
                     _best_m = max(growing_data, key=lambda m: m["score"])
                     _warm_candidates = [_to_list(_best_m["params"])]
 
-                # Budget: split among warm-starts
+                # Tag which candidates are random restarts (skip optimize(),
+                # go straight to L-BFGS-B basinhopping-style). Data-warm
+                # candidates still get full optimize() + L-BFGS-B pipeline.
+                _warm_tags = ["data"] * len(_warm_candidates)
+
+                # Random-restart injection (2026-04-20 v3): K uniform random
+                # warm-starts from full range. Each gets L-BFGS-B ONLY
+                # (skips optimize()) — basinhopping-style random hop. Rescues
+                # curved-valley problems (Rosenbrock) where growing_data's
+                # top-K all sit in one basin.
+                if random_restart_count and int(random_restart_count) > 0:
+                    import random as _rr_rand
+                    _rr_rng = _rr_rand.Random(
+                        42 + len(growing_data))
+                    for _ in range(int(random_restart_count)):
+                        _warm_candidates.append(
+                            [_rr_rng.uniform(lo, hi) for lo, hi in ranges])
+                        _warm_tags.append("random")
+                    if verbose:
+                        print(f"  [Fallback/random-restart] +{int(random_restart_count)} uniform random "
+                              f"warm-starts (total {len(_warm_candidates)})")
+
+                # Budget: split optimize() budget among DATA warm-starts only.
+                # Random restarts don't consume optimize() budget (they use
+                # cheap L-BFGS-B only, maxfun=50 ≈ 50 evals each).
                 _elapsed = time.time() - _global_t0
                 _remaining = max(1.0, time_budget - _elapsed)
                 _total_fb_budget = min(_inner_budget, _remaining / 2.0)
-                _per_warm_budget = max(0.5, _total_fb_budget / max(1, len(_warm_candidates)))
+                _n_data_warms = max(1, sum(1 for t in _warm_tags if t == "data"))
+                _per_warm_budget = max(0.5, _total_fb_budget / _n_data_warms)
                 if verbose and not use_multistart_fallback:
                     print(f"  [Fallback] proxy weak (R²={proxy_r2:.2f}) + "
                           f"measurement-winning ({_max_measured:.3f} > verified "
@@ -2227,17 +2253,26 @@ def owl(
 
                 _fb_best_score = _max_measured
                 _fb_best_params = None
-                for _w_idx, _warm in enumerate(_warm_candidates):
+                for _w_idx, (_warm, _wtag) in enumerate(zip(_warm_candidates, _warm_tags)):
                     try:
-                        _fb_bp, _fb_bs, _ = optimize(
-                            eval_fn=verify_fn,
-                            param_ranges=ranges,
-                            initial_params=_warm,
-                            time_budget=_per_warm_budget,
-                            learn=True,
-                            experience_id=experience_id or "owl_fallback",
-                            verbose=False,
-                        )
+                        if _wtag == "random":
+                            # Random restart: skip optimize(), use L-BFGS-B
+                            # directly from the random point (basinhopping).
+                            _fb_bp = list(_warm)
+                            try:
+                                _fb_bs = float(verify_fn(list(_warm)))
+                            except Exception:
+                                _fb_bs = _max_measured
+                        else:
+                            _fb_bp, _fb_bs, _ = optimize(
+                                eval_fn=verify_fn,
+                                param_ranges=ranges,
+                                initial_params=_warm,
+                                time_budget=_per_warm_budget,
+                                learn=True,
+                                experience_id=experience_id or "owl_fallback",
+                                verbose=False,
+                            )
                         # Per-warm-start L-BFGS-B polish: fire gradient refinement
                         # in-place so each basin gets its own gradient descent, not
                         # just the overall best at the end. Rosenbrock-type curved
@@ -2259,13 +2294,17 @@ def owl(
                                         _pw_best[0] = v
                                         _pw_bp[0] = [float(x) for x in p]
                                     return -v
+                                # Random restarts get larger maxfun (they
+                                # skip optimize(), rely on L-BFGS-B alone to
+                                # traverse the basin — Rosenbrock needs this).
+                                _pw_maxfun = 100 if _wtag == "random" else 30
                                 try:
                                     _sp_min2(
                                         _pw_neg,
                                         x0=_np2.array(_fb_bp, dtype=float),
                                         method="L-BFGS-B",
                                         bounds=list(ranges),
-                                        options={"maxfun": 30, "ftol": 1e-8,
+                                        options={"maxfun": _pw_maxfun, "ftol": 1e-8,
                                                  "gtol": 1e-6},
                                     )
                                 except Exception:
