@@ -267,14 +267,19 @@ def mimir(
     # ---- Phase 2: decide whether to escalate ----
     elapsed = time.time() - t_start
     remaining = max(0.0, time_budget - elapsed)
-    # LaD escalation gate: cascade if proxy_r2 < threshold.
-    # Default threshold raised to 0.95 (from 0.7) because multimodal
-    # landscapes (Styblinski, Rosenbrock) can produce proxy_r2 in the
-    # 0.8-0.9 range while the best_params is stuck in a wrong basin.
-    # Only truly smooth near-perfect proxies (quadratic, near-convex)
-    # reach 0.95+, so this threshold reliably triggers cascade where needed.
+    # LaD escalation gate: AND check (confidence AND proxy_r2).
+    # Skip Reigen only when BOTH conditions hold:
+    #   (a) confidence == "high" — owl's proxy succeeded standalone
+    #   (b) proxy_r2 >= threshold — cross-check continuous value
+    # This fixes 20d Rosenbrock failure where proxy_r2=0.9996 (very high)
+    # but owl's L-BFGS improved the result (confidence="lbfgs_refined"),
+    # indicating the proxy was insufficient. AND check catches this case
+    # because "lbfgs_refined" ≠ "high" triggers cascade.
     _owl_proxy_r2 = r_owl.get("proxy_r2") or 0.0
-    _proxy_good_enough = (_owl_proxy_r2 >= _confidence_skip_threshold)
+    _proxy_good_enough = (
+        owl_conf == "high"
+        and _owl_proxy_r2 >= _confidence_skip_threshold
+    )
     escalate = (
         not expensive_route
         and (force_cascade or not _proxy_good_enough)
@@ -307,9 +312,14 @@ def mimir(
     # Reigen needs guard_fn; if user didn't provide, use eval_fn as guard (single-metric case)
     _guard = guard_fn if guard_fn is not None else eval_fn
 
-    # Use owl's best as warm-start for user params
+    # Warm-start Reigen from owl's best ONLY when owl succeeded (conf="high").
+    # If owl fell back (lbfgs_refined / direct / insufficient), its best may
+    # be in a wrong basin — warm-starting Reigen there traps it (observed on
+    # 5d Rosenbrock: warm-start from owl's -4 kept Reigen at -4, while
+    # fresh _collect Reigen reached -0.08).
     _init_user_params = None
-    if owl_best_params is not None:
+    _owl_succeeded = (owl_conf == "high")
+    if _owl_succeeded and owl_best_params is not None:
         if isinstance(owl_best_params, dict):
             names_ = param_names or list(owl_best_params.keys())
             _init_user_params = [float(owl_best_params.get(n, 0.0)) for n in names_]

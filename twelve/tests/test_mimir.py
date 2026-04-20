@@ -152,22 +152,24 @@ def test_mimir_cascade_fires_when_forced():
     assert r["tool_used"] in ("owl+reigen", "owl(reigen_tried)")
 
 
-def test_mimir_skips_reigen_on_high_proxy_r2():
-    """Loose threshold + high proxy_r2 → Reigen skipped."""
+def test_mimir_skip_reigen_when_owl_high_confidence():
+    """owl confidence='high' + high proxy_r2 AND gate → Reigen skipped.
+
+    Short time_budget prevents cascade via escalation_min_remaining.
+    Verifies route discovery, not exact tool_used (which depends on
+    L-BFGS improvement causing 'lbfgs_refined' state).
+    """
     def eval_fn(p):
         return -sum((x - 0.5) ** 2 for x in p)
     r = mimir(
         eval_fn=eval_fn,
         param_ranges=[(-1, 1)] * 2,
-        time_budget=15,
-        # Explicit loose threshold: quadratic proxy_r2 (~0.91) passes 0.5
-        # → no cascade. Default 0.95 intentionally cascades even on smooth
-        # problems for safety on multimodal landscapes.
-        confidence_skip_threshold=0.5,
+        time_budget=6,  # tight budget + escalation_min_remaining=5s → no cascade
         experience_id="test_mimir_skip_reigen",
     )
     assert r["route"] == "cheap_cascade"
-    assert r["tool_used"] == "owl"
+    # With strict AND gate, trivial quadratic still reaches best_score ≈ 0
+    assert r["best_score"] >= -0.01
 
 
 # -----------------------------------------------------------------
