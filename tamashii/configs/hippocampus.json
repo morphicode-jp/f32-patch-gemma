@@ -1,0 +1,16 @@
+{
+  "shell_name": "hippocampus",
+  "tick_ms": 500,
+  "gain": 1.0,
+  "params": {
+    "query_start": 19,
+    "query_end": 35,
+    "trace_start": 83,
+    "trace_end": 147,
+    "n_slots": 8,
+    "slot_dim": 8,
+    "recall_threshold": 0.8,
+    "store_threshold": 0.6,
+    "recall_strength": 0.2
+  }
+}

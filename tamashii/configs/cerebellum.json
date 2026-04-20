@@ -1,0 +1,14 @@
+{
+  "shell_name": "cerebellum",
+  "tick_ms": 10,
+  "gain": 1.0,
+  "params": {
+    "motor_dims": [16, 17, 18],
+    "ws_start": 35,
+    "ws_end": 51,
+    "history_len": 5,
+    "ema_alpha": 0.6,
+    "smoothing_strength": 0.3,
+    "prediction_weight": 0.5
+  }
+}

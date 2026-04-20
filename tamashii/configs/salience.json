@@ -1,0 +1,14 @@
+{
+  "shell_name": "salience",
+  "tick_ms": 100,
+  "gain": 1.0,
+  "params": {
+    "watched_start": 0,
+    "watched_end": 35,
+    "attention_start": 51,
+    "attention_end": 83,
+    "baseline_alpha": 0.05,
+    "novelty_threshold": 0.15,
+    "boost_strength": 0.1
+  }
+}
