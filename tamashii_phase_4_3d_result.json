@@ -1,0 +1,177 @@
+{
+  "shells": [
+    "core_brain",
+    "brainstem",
+    "cerebellum",
+    "salience",
+    "hippocampus",
+    "prefrontal",
+    "dmn"
+  ],
+  "use_hebbian": true,
+  "world_config": {
+    "size": 16,
+    "n_food": 5,
+    "n_walls": 30
+  },
+  "episodes": 5,
+  "n_steps": 500,
+  "elapsed_s": 1.9,
+  "per_episode": [
+    {
+      "food_eaten": 0,
+      "food_events": [],
+      "n_cells_explored": 1,
+      "total_cells": 256,
+      "exploration_ratio": 0.00390625,
+      "heading_autocorr": 0.53618127369254,
+      "S_traj_variance": 0.1899830839947008,
+      "steps_run": 500,
+      "final_state": {
+        "agent_pos": [
+          14.50006834666114,
+          7.500043119674792,
+          0.5
+        ],
+        "agent_heading": 4.068717114470106,
+        "food_eaten": 0,
+        "n_food_remaining": 5,
+        "steps": 500
+      },
+      "hebbian_stats": {
+        "w_adapt_mean_abs": 0.2865152534300381,
+        "w_adapt_max_abs": 2.0,
+        "n_changed_edges": 18,
+        "total_edges": 48,
+        "cumulative_reward": 421.5731412002189,
+        "mean_reward": 0.28104876080014596
+      }
+    },
+    {
+      "food_eaten": 1,
+      "food_events": [
+        [
+          0,
+          1
+        ]
+      ],
+      "n_cells_explored": 1,
+      "total_cells": 256,
+      "exploration_ratio": 0.00390625,
+      "heading_autocorr": 0.5793449377663601,
+      "S_traj_variance": 0.26766844387471017,
+      "steps_run": 500,
+      "final_state": {
+        "agent_pos": [
+          3.4997571555472935,
+          9.499521966988906,
+          0.5
+        ],
+        "agent_heading": 0.31485864950270354,
+        "food_eaten": 1,
+        "n_food_remaining": 5,
+        "steps": 500
+      },
+      "hebbian_stats": {
+        "w_adapt_mean_abs": 0.10212468743876292,
+        "w_adapt_max_abs": 1.7471598364323782,
+        "n_changed_edges": 18,
+        "total_edges": 48,
+        "cumulative_reward": 102.57954305675872,
+        "mean_reward": 0.06838636203783915
+      }
+    },
+    {
+      "food_eaten": 0,
+      "food_events": [],
+      "n_cells_explored": 1,
+      "total_cells": 256,
+      "exploration_ratio": 0.00390625,
+      "heading_autocorr": 0.567981882050298,
+      "S_traj_variance": 0.20286973346366807,
+      "steps_run": 500,
+      "final_state": {
+        "agent_pos": [
+          8.500053579930258,
+          5.4998638206644745,
+          0.5
+        ],
+        "agent_heading": 4.332542296130966,
+        "food_eaten": 0,
+        "n_food_remaining": 5,
+        "steps": 500
+      },
+      "hebbian_stats": {
+        "w_adapt_mean_abs": 0.09672985871835892,
+        "w_adapt_max_abs": 1.6761558446928204,
+        "n_changed_edges": 18,
+        "total_edges": 48,
+        "cumulative_reward": 64.06728634911735,
+        "mean_reward": 0.0427115242327449
+      }
+    },
+    {
+      "food_eaten": 0,
+      "food_events": [],
+      "n_cells_explored": 1,
+      "total_cells": 256,
+      "exploration_ratio": 0.00390625,
+      "heading_autocorr": 0.5732085268482667,
+      "S_traj_variance": 0.23234335105380285,
+      "steps_run": 500,
+      "final_state": {
+        "agent_pos": [
+          4.499913370782071,
+          13.499774116359085,
+          0.5
+        ],
+        "agent_heading": 5.291749411479873,
+        "food_eaten": 0,
+        "n_food_remaining": 5,
+        "steps": 500
+      },
+      "hebbian_stats": {
+        "w_adapt_mean_abs": 0.08703538472474093,
+        "w_adapt_max_abs": 1.5160618882716501,
+        "n_changed_edges": 18,
+        "total_edges": 48,
+        "cumulative_reward": 60.21247672544276,
+        "mean_reward": 0.04014165115029517
+      }
+    },
+    {
+      "food_eaten": 0,
+      "food_events": [],
+      "n_cells_explored": 1,
+      "total_cells": 256,
+      "exploration_ratio": 0.00390625,
+      "heading_autocorr": 0.5762931400390576,
+      "S_traj_variance": 0.1982282861313213,
+      "steps_run": 500,
+      "final_state": {
+        "agent_pos": [
+          9.499979932389472,
+          13.499968009863668,
+          0.5
+        ],
+        "agent_heading": 2.522442406603866,
+        "food_eaten": 0,
+        "n_food_remaining": 5,
+        "steps": 500
+      },
+      "hebbian_stats": {
+        "w_adapt_mean_abs": 0.07537196692825676,
+        "w_adapt_max_abs": 1.3127483274627,
+        "n_changed_edges": 18,
+        "total_edges": 48,
+        "cumulative_reward": 51.90180087551005,
+        "mean_reward": 0.034601200583673365
+      }
+    }
+  ],
+  "aggregate": {
+    "total_food": 1,
+    "total_cells_explored": 5,
+    "mean_heading_coherence": 0.5666019520793044
+  }
+}
