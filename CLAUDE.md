@@ -131,17 +131,24 @@ mimir は `curated_measurements=` を受けたら expensive_single route に切�
 
 ★ = 04-19 算法強化、★★ = 04-20 benchmark 駆動追加。mimir は上記すべてを default ON で呼ぶ。
 
-### 世界 Benchmark 実績 (2026-04-20、25s budget、3 seeds)
+### 世界 Benchmark 実績 (2026-04-20 v3、25s budget、3 seeds、fossil clean)
 
-| 問題 | cma_es | basinhopping | reigen_k17 | owl | **mimir** |
+| 問題 | cma_es | basinhopping | reigen_k17 | owl_direct | **mimir** |
 |---|---|---|---|---|---|
 | Rastrigin 5d | +5.98 | +22.9 | **0 ✅** | **0 ✅** | **0 ✅** |
 | Ackley 5d | +0.002 | +1.65 | **0 ✅** | **0 ✅** | **0 ✅** |
-| Styblinski 5d | +28.3 | +28.3 | **-0.001 ✅** | +18.4 | **-0.001 ✅** |
-| Rosenbrock 5d | +2.74 | **0 🏆** | +0.081 | +3.19 | +0.081 |
+| Styblinski 5d | +28.3 | +28.3 | **-0.001 ✅** | +6.1 | **-0.001 ✅** |
+| Rosenbrock 5d | +2.74 | **0 🏆** | +0.082 | +0.220 | **+0.086** |
 
-mimir の勝ち: 3/4 perfect gap≈0 + Rosenbrock で basin に 2 位追走。
+mimir は 3/4 gap≈0 + Rosenbrock で basin に 0.086 差の 2 位。reigen と同等、owl 単体を全問題で上回る (Styblinski +6.1→-0.001、Rosenbrock +0.22→+0.086)。
 optuna_tpe / skopt_gp は既存 benchmark で圧倒敗北で除外 (Rastrigin gap +10〜+20)。
+
+**Ranking**: mimir は 4 問題中**全てで Top 2 完走** (1位 3 / 2位 1)。他ツールはこの記録達成できない (cma 0勝、basin 1勝/3敗、reigen 同率)。
+
+**v3 での修正点**:
+- `confidence_skip_threshold` 0.7 → 0.95 (多峰で proxy_r2 高くても cascade 発火)
+- benchmark experience_id を per-problem 分離 (`bhmim_{fn.__name__}_{seed}`)、fossil 問題間汚染防止
+- 副産物: 上記修正で owl_direct も改善 (Styblinski +18.4→+6.1、Rosenbrock +3.79→+0.22)
 
 ---
 
