@@ -9,6 +9,7 @@
     "history_len": 5,
     "ema_alpha": 0.6,
     "smoothing_strength": 0.3,
-    "prediction_weight": 0.5
+    "prediction_weight": 0.5,
+    "prediction_error_idx": 50
   }
 }

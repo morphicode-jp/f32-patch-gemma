@@ -1,0 +1,30 @@
+{
+  "shell_name": "hebbian_core",
+  "tick_ms": 50,
+  "gain": 1.0,
+  "params": {
+    "dale_law": true,
+    "sensor_start": 0,
+    "sensor_end": 16,
+    "motor_nav": 16,
+    "motor_speed": 17,
+    "motor_voice": 18,
+    "firing_start": 19,
+    "firing_end": 35,
+    "motor_node_nav": 5,
+    "motor_node_speed": 11,
+    "motor_node_voice": 1,
+    "hebbian_lr": 0.05,
+    "hebbian_decay": 0.005,
+    "hebbian_k": 3,
+    "w_clip": 2.0,
+    "reward_scale": 5.0,
+    "salience_start": 51,
+    "salience_end": 83,
+    "salience_weight": 0.15,
+    "sensor_novelty_weight": 0.15,
+    "pred_error_idx": 50,
+    "pred_error_weight": 3.0,
+    "w_adapt_carry_over": true
+  }
+}

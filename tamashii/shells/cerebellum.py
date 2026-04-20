@@ -60,7 +60,17 @@ class Cerebellum(Shell):
         pred_blended = (blend_weight * prediction
                         + (1 - blend_weight) * self._ema)
 
+        # Prediction error (cerebellum's hallmark signal: |actual - predicted|)
+        # Use PREVIOUS tick's prediction vs current motor
+        pred_error = float(np.mean(np.abs(motor - self._ema)))
+        self._state["last_prediction_error"] = pred_error
+
         delta = np.zeros_like(S_snapshot)
+
+        # Write prediction_error to a dedicated slot (always ws_end - 1)
+        # This gives a single scalar that other shells can read as "curiosity signal"
+        pred_err_idx = int(self.params.get("prediction_error_idx", self.ws_end - 1))
+        delta[pred_err_idx] = pred_error - S_snapshot[pred_err_idx]
 
         # Smoothing: push motor toward EMA (damp oscillation)
         for idx, m in zip(self.motor_dims, motor):

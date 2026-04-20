@@ -1,0 +1,249 @@
+{
+  "use_trained_base": true,
+  "episodes": 5,
+  "n_steps": 200,
+  "window": 50,
+  "elapsed_s": 0.8,
+  "all_episodes": [
+    {
+      "reached": false,
+      "approach": 8.685984097637472e-06,
+      "n_steps": 200,
+      "reached_at": -1,
+      "windows": [
+        {
+          "window": 0,
+          "motor_std": 0.25717738716681354,
+          "unique_bins": 84,
+          "w_adapt_mean": 0.07592594068864318,
+          "n_changed_edges_mean": 17.76,
+          "reward_mean": 0.16049456378181962
+        },
+        {
+          "window": 1,
+          "motor_std": 0.046703000201878994,
+          "unique_bins": 90,
+          "w_adapt_mean": 0.06789409431415891,
+          "n_changed_edges_mean": 18.0,
+          "reward_mean": 0.06077345590712672
+        },
+        {
+          "window": 2,
+          "motor_std": 0.04637785675511879,
+          "unique_bins": 81,
+          "w_adapt_mean": 0.046097668560838335,
+          "n_changed_edges_mean": 17.3,
+          "reward_mean": 0.03961277480865054
+        },
+        {
+          "window": 3,
+          "motor_std": 0.04663566221483548,
+          "unique_bins": 33,
+          "w_adapt_mean": 0.034436338563849735,
+          "n_changed_edges_mean": 17.0,
+          "reward_mean": 0.030626294238630784
+        }
+      ],
+      "final_hebbian_stats": {
+        "w_adapt_mean_abs": 0.03111090493050715,
+        "w_adapt_max_abs": 0.5133428349569794,
+        "n_changed_edges": 17,
+        "total_edges": 48,
+        "cumulative_reward": 16.670525053689524,
+        "mean_reward": 0.027784208422815874
+      }
+    },
+    {
+      "reached": false,
+      "approach": 7.071739465834985e-06,
+      "n_steps": 200,
+      "reached_at": -1,
+      "windows": [
+        {
+          "window": 0,
+          "motor_std": 0.22457037196437413,
+          "unique_bins": 89,
+          "w_adapt_mean": 0.10223987997525207,
+          "n_changed_edges_mean": 17.98,
+          "reward_mean": 0.17420233324005494
+        },
+        {
+          "window": 1,
+          "motor_std": 0.04661361163698313,
+          "unique_bins": 91,
+          "w_adapt_mean": 0.08332647703897403,
+          "n_changed_edges_mean": 18.0,
+          "reward_mean": 0.06594599200894317
+        },
+        {
+          "window": 2,
+          "motor_std": 0.04652081752690543,
+          "unique_bins": 78,
+          "w_adapt_mean": 0.05369714446500172,
+          "n_changed_edges_mean": 17.86,
+          "reward_mean": 0.04285520418271428
+        },
+        {
+          "window": 3,
+          "motor_std": 0.04656388794054674,
+          "unique_bins": 35,
+          "w_adapt_mean": 0.038742046361069635,
+          "n_changed_edges_mean": 16.76,
+          "reward_mean": 0.0330465928875326
+        }
+      ],
+      "final_hebbian_stats": {
+        "w_adapt_mean_abs": 0.03399558924703119,
+        "w_adapt_max_abs": 0.5576729635314938,
+        "n_changed_edges": 16,
+        "total_edges": 48,
+        "cumulative_reward": 17.93988170982067,
+        "mean_reward": 0.029899802849701118
+      }
+    },
+    {
+      "reached": false,
+      "approach": 1.0289779872113732e-07,
+      "n_steps": 200,
+      "reached_at": -1,
+      "windows": [
+        {
+          "window": 0,
+          "motor_std": 0.20295842521404447,
+          "unique_bins": 80,
+          "w_adapt_mean": 0.0948056104319817,
+          "n_changed_edges_mean": 17.98,
+          "reward_mean": 0.16824701789913515
+        },
+        {
+          "window": 1,
+          "motor_std": 0.046911715311771615,
+          "unique_bins": 86,
+          "w_adapt_mean": 0.07446558337239857,
+          "n_changed_edges_mean": 18.0,
+          "reward_mean": 0.06002128727679486
+        },
+        {
+          "window": 2,
+          "motor_std": 0.04672833110747893,
+          "unique_bins": 88,
+          "w_adapt_mean": 0.04904892887519365,
+          "n_changed_edges_mean": 17.48,
+          "reward_mean": 0.03918546741600292
+        },
+        {
+          "window": 3,
+          "motor_std": 0.04665873319493117,
+          "unique_bins": 28,
+          "w_adapt_mean": 0.03600509276341214,
+          "n_changed_edges_mean": 16.0,
+          "reward_mean": 0.030335354108076088
+        }
+      ],
+      "final_hebbian_stats": {
+        "w_adapt_mean_abs": 0.03214211528877701,
+        "w_adapt_max_abs": 0.5086346873059477,
+        "n_changed_edges": 16,
+        "total_edges": 48,
+        "cumulative_reward": 16.522027457948155,
+        "mean_reward": 0.027536712429913592
+      }
+    },
+    {
+      "reached": false,
+      "approach": 5.428418631922291e-06,
+      "n_steps": 200,
+      "reached_at": -1,
+      "windows": [
+        {
+          "window": 0,
+          "motor_std": 0.2243170411447924,
+          "unique_bins": 85,
+          "w_adapt_mean": 0.0997755438481543,
+          "n_changed_edges_mean": 17.96,
+          "reward_mean": 0.16391477208852195
+        },
+        {
+          "window": 1,
+          "motor_std": 0.04678428545555262,
+          "unique_bins": 94,
+          "w_adapt_mean": 0.08128013428145414,
+          "n_changed_edges_mean": 18.0,
+          "reward_mean": 0.06183632351331018
+        },
+        {
+          "window": 2,
+          "motor_std": 0.046674519143529346,
+          "unique_bins": 91,
+          "w_adapt_mean": 0.05265701853207506,
+          "n_changed_edges_mean": 17.74,
+          "reward_mean": 0.04038477311616985
+        },
+        {
+          "window": 3,
+          "motor_std": 0.046281565771343416,
+          "unique_bins": 33,
+          "w_adapt_mean": 0.038102796207894994,
+          "n_changed_edges_mean": 16.76,
+          "reward_mean": 0.03126665726984801
+        }
+      ],
+      "final_hebbian_stats": {
+        "w_adapt_mean_abs": 0.03400545436598488,
+        "w_adapt_max_abs": 0.5635157138770993,
+        "n_changed_edges": 16,
+        "total_edges": 48,
+        "cumulative_reward": 17.041481845424354,
+        "mean_reward": 0.028402469742373922
+      }
+    },
+    {
+      "reached": false,
+      "approach": 0.0,
+      "n_steps": 200,
+      "reached_at": -1,
+      "windows": [
+        {
+          "window": 0,
+          "motor_std": 0.22561083502326998,
+          "unique_bins": 97,
+          "w_adapt_mean": 0.10238006744473148,
+          "n_changed_edges_mean": 17.98,
+          "reward_mean": 0.1671696751804577
+        },
+        {
+          "window": 1,
+          "motor_std": 0.046341420841116275,
+          "unique_bins": 83,
+          "w_adapt_mean": 0.07866184626486199,
+          "n_changed_edges_mean": 18.0,
+          "reward_mean": 0.0619818277469653
+        },
+        {
+          "window": 2,
+          "motor_std": 0.046694928340477615,
+          "unique_bins": 97,
+          "w_adapt_mean": 0.05123593888346881,
+          "n_changed_edges_mean": 17.72,
+          "reward_mean": 0.04037360444891238
+        },
+        {
+          "window": 3,
+          "motor_std": 0.04638831580378704,
+          "unique_bins": 32,
+          "w_adapt_mean": 0.038044283527290494,
+          "n_changed_edges_mean": 16.9,
+          "reward_mean": 0.03136157030097008
+        }
+      ],
+      "final_hebbian_stats": {
+        "w_adapt_mean_abs": 0.03405768841210228,
+        "w_adapt_max_abs": 0.5591130646511578,
+        "n_changed_edges": 16,
+        "total_edges": 48,
+        "cumulative_reward": 17.104721685140966,
+        "mean_reward": 0.028507869475234943
+      }
+    }
+  ]
+}
