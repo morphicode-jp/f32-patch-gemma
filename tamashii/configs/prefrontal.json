@@ -1,0 +1,17 @@
+{
+  "shell_name": "prefrontal",
+  "tick_ms": 200,
+  "gain": 1.0,
+  "params": {
+    "attention_start": 51,
+    "attention_end": 83,
+    "watched_start": 0,
+    "watched_end": 35,
+    "wm_start": 163,
+    "wm_end": 176,
+    "n_slots": 3,
+    "decay_rate": 0.05,
+    "lock_threshold": 0.5,
+    "bias_strength": 0.08
+  }
+}

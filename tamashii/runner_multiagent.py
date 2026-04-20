@@ -25,7 +25,9 @@ from tamashii.shell_base import load_shell_from_config
 from tamashii.shells.brainstem import Brainstem
 from tamashii.shells.cerebellum import Cerebellum
 from tamashii.shells.core_brain import CoreBrain
+from tamashii.shells.dmn import DMN
 from tamashii.shells.hippocampus import Hippocampus
+from tamashii.shells.prefrontal import Prefrontal
 from tamashii.shells.salience import Salience
 
 
@@ -35,6 +37,8 @@ SHELL_REGISTRY = {
     "cerebellum": Cerebellum,
     "salience": Salience,
     "hippocampus": Hippocampus,
+    "prefrontal": Prefrontal,
+    "dmn": DMN,
 }
 
 

@@ -1,0 +1,16 @@
+{
+  "shell_name": "dmn",
+  "tick_ms": 1000,
+  "gain": 1.0,
+  "params": {
+    "hippo_start": 83,
+    "hippo_end": 147,
+    "scratch_start": 176,
+    "scratch_end": 192,
+    "motor_dims": [16, 17, 18],
+    "engagement_threshold": 0.3,
+    "replay_strength": 0.15,
+    "decay": 0.9,
+    "slot_dim": 8
+  }
+}
