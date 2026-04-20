@@ -25,6 +25,8 @@
     "sensor_novelty_weight": 0.15,
     "pred_error_idx": 50,
     "pred_error_weight": 3.0,
+    "violation_slot": 190,
+    "violation_penalty_weight": 25.0,
     "w_adapt_carry_over": true
   }
 }

@@ -55,6 +55,10 @@ class HebbianCoreBrain(CoreBrain):
         # Prediction error reward (from cerebellum)
         self.pred_error_idx = int(self.params.get("pred_error_idx", 50))
         self.pred_error_weight = float(self.params.get("pred_error_weight", 0.0))
+        # Taboo violation penalty (from taboo shell, ACC-like)
+        self.violation_slot = int(self.params.get("violation_slot", 190))
+        self.violation_penalty_weight = float(
+            self.params.get("violation_penalty_weight", 5.0))
 
         self.w_adapt_carry_over = bool(self.params.get("w_adapt_carry_over", False))
 
@@ -90,10 +94,13 @@ class HebbianCoreBrain(CoreBrain):
 
         # 3. Prediction error (from cerebellum, scalar at pred_error_idx)
         pred_err = float(abs(S_snapshot[self.pred_error_idx]))
+        # 4. Taboo violation penalty (from taboo shell, ACC-like error signal)
+        violation = float(S_snapshot[self.violation_slot])
 
         reward = (self.salience_weight * sal_mean
                   + self.sensor_novelty_weight * sensor_nov
-                  + self.pred_error_weight * pred_err)
+                  + self.pred_error_weight * pred_err
+                  - self.violation_penalty_weight * violation)
         self._cumulative_reward += reward
         self._step_count += 1
         # Track recent reward (EMA over last ~20 steps)
@@ -101,7 +108,10 @@ class HebbianCoreBrain(CoreBrain):
 
         # Exploration noise: scale INVERSELY to recent reward
         # Low reward → high noise (explore); high reward → low noise (exploit)
-        noise_scale = self.noise_base / (1.0 + self.noise_reward_gate * self._recent_reward_ema)
+        # Clamp denominator to avoid negative scale when reward_ema goes negative
+        denom = max(0.1, 1.0 + self.noise_reward_gate *
+                    max(0.0, self._recent_reward_ema))
+        noise_scale = max(0.0, self.noise_base / denom)
         sensor_with_noise = sensor + self._noise_rng.normal(
             0, noise_scale, size=sensor.shape)
 

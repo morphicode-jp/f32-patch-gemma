@@ -23,6 +23,8 @@
     "hoarding_olf_threshold": 1.0,
     "hoarding_retreat_strength": 0.4,
     "mandatory_voice_prox": 0.5,
-    "mandatory_voice_min": 0.3
+    "mandatory_voice_min": 0.3,
+    "violation_slot": 190,
+    "violation_write_strength": 3.0
   }
 }

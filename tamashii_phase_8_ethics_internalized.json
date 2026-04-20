@@ -1,0 +1,268 @@
+{
+  "per_episode": [
+    {
+      "episode": 0,
+      "seed": 42,
+      "food_eaten": 7,
+      "violations": {
+        "crowding": 3,
+        "hoarding": 0,
+        "silence": 17
+      },
+      "total_violations": 20,
+      "mean_w_adapt": 0.208307473067424,
+      "per_agent_food": [
+        1,
+        4,
+        2
+      ]
+    },
+    {
+      "episode": 1,
+      "seed": 49,
+      "food_eaten": 1,
+      "violations": {
+        "crowding": 0,
+        "hoarding": 0,
+        "silence": 0
+      },
+      "total_violations": 0,
+      "mean_w_adapt": 0.19693211128576615,
+      "per_agent_food": [
+        0,
+        0,
+        1
+      ]
+    },
+    {
+      "episode": 2,
+      "seed": 56,
+      "food_eaten": 0,
+      "violations": {
+        "crowding": 0,
+        "hoarding": 0,
+        "silence": 5
+      },
+      "total_violations": 5,
+      "mean_w_adapt": 0.24606460475319017,
+      "per_agent_food": [
+        0,
+        0,
+        0
+      ]
+    },
+    {
+      "episode": 3,
+      "seed": 63,
+      "food_eaten": 1,
+      "violations": {
+        "crowding": 0,
+        "hoarding": 0,
+        "silence": 0
+      },
+      "total_violations": 0,
+      "mean_w_adapt": 0.18887537478730324,
+      "per_agent_food": [
+        0,
+        1,
+        0
+      ]
+    },
+    {
+      "episode": 4,
+      "seed": 70,
+      "food_eaten": 0,
+      "violations": {
+        "crowding": 0,
+        "hoarding": 0,
+        "silence": 49
+      },
+      "total_violations": 49,
+      "mean_w_adapt": 0.20092146942382985,
+      "per_agent_food": [
+        0,
+        0,
+        0
+      ]
+    },
+    {
+      "episode": 5,
+      "seed": 77,
+      "food_eaten": 11,
+      "violations": {
+        "crowding": 12,
+        "hoarding": 0,
+        "silence": 5
+      },
+      "total_violations": 17,
+      "mean_w_adapt": 0.17781641902012324,
+      "per_agent_food": [
+        10,
+        0,
+        1
+      ]
+    },
+    {
+      "episode": 6,
+      "seed": 84,
+      "food_eaten": 16,
+      "violations": {
+        "crowding": 31,
+        "hoarding": 1,
+        "silence": 0
+      },
+      "total_violations": 32,
+      "mean_w_adapt": 0.17550503274123605,
+      "per_agent_food": [
+        15,
+        0,
+        1
+      ]
+    },
+    {
+      "episode": 7,
+      "seed": 91,
+      "food_eaten": 12,
+      "violations": {
+        "crowding": 24,
+        "hoarding": 0,
+        "silence": 1
+      },
+      "total_violations": 25,
+      "mean_w_adapt": 0.1828183024019133,
+      "per_agent_food": [
+        10,
+        0,
+        2
+      ]
+    },
+    {
+      "episode": 8,
+      "seed": 98,
+      "food_eaten": 3,
+      "violations": {
+        "crowding": 12,
+        "hoarding": 0,
+        "silence": 0
+      },
+      "total_violations": 12,
+      "mean_w_adapt": 0.17453712090505116,
+      "per_agent_food": [
+        3,
+        0,
+        0
+      ]
+    },
+    {
+      "episode": 9,
+      "seed": 105,
+      "food_eaten": 11,
+      "violations": {
+        "crowding": 21,
+        "hoarding": 2,
+        "silence": 13
+      },
+      "total_violations": 36,
+      "mean_w_adapt": 0.23509685426132676,
+      "per_agent_food": [
+        11,
+        0,
+        0
+      ]
+    },
+    {
+      "episode": 10,
+      "seed": 112,
+      "food_eaten": 14,
+      "violations": {
+        "crowding": 20,
+        "hoarding": 1,
+        "silence": 5
+      },
+      "total_violations": 26,
+      "mean_w_adapt": 0.18770462443496636,
+      "per_agent_food": [
+        13,
+        1,
+        0
+      ]
+    },
+    {
+      "episode": 11,
+      "seed": 119,
+      "food_eaten": 7,
+      "violations": {
+        "crowding": 12,
+        "hoarding": 0,
+        "silence": 4
+      },
+      "total_violations": 16,
+      "mean_w_adapt": 0.17911446187777305,
+      "per_agent_food": [
+        5,
+        1,
+        1
+      ]
+    },
+    {
+      "episode": 12,
+      "seed": 126,
+      "food_eaten": 16,
+      "violations": {
+        "crowding": 14,
+        "hoarding": 0,
+        "silence": 0
+      },
+      "total_violations": 14,
+      "mean_w_adapt": 0.1880429905783838,
+      "per_agent_food": [
+        11,
+        2,
+        3
+      ]
+    },
+    {
+      "episode": 13,
+      "seed": 133,
+      "food_eaten": 11,
+      "violations": {
+        "crowding": 21,
+        "hoarding": 0,
+        "silence": 0
+      },
+      "total_violations": 21,
+      "mean_w_adapt": 0.1879204756410369,
+      "per_agent_food": [
+        11,
+        0,
+        0
+      ]
+    },
+    {
+      "episode": 14,
+      "seed": 140,
+      "food_eaten": 13,
+      "violations": {
+        "crowding": 17,
+        "hoarding": 2,
+        "silence": 5
+      },
+      "total_violations": 24,
+      "mean_w_adapt": 0.17784452456852337,
+      "per_agent_food": [
+        11,
+        2,
+        0
+      ]
+    }
+  ],
+  "early_violations": 17.571428571428573,
+  "late_violations": 21.75,
+  "reduction_pct": -23.78048780487804,
+  "food_retention": 2.114583333333333,
+  "pass_reduction": false,
+  "pass_food": true,
+  "pass_hebbian": true,
+  "criterion_6_pass": false,
+  "elapsed_s": 10.9
+}

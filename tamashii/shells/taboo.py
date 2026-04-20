@@ -75,6 +75,12 @@ class Taboo(Shell):
         self.mandatory_voice_min = float(
             self.params.get("mandatory_voice_min", 0.3))
 
+        # Violation signal output: ACC-like error signal for hebbian_core
+        # Written to S[violation_slot]; hebbian_core subtracts from reward
+        self.violation_slot = int(self.params.get("violation_slot", 190))
+        self.violation_write_strength = float(
+            self.params.get("violation_write_strength", 1.0))
+
         # Violation counters (reset each episode)
         self._state = {
             "crowding_violations": 0,
@@ -86,6 +92,7 @@ class Taboo(Shell):
     def step(self, S_snapshot: np.ndarray, external=None) -> np.ndarray:
         delta = np.zeros_like(S_snapshot)
         self._state["total_checks"] += 1
+        violation_magnitude = 0.0  # accumulated this tick
 
         current_speed = float(S_snapshot[self.motor_speed])
         current_voice = float(S_snapshot[self.motor_voice])
@@ -106,6 +113,7 @@ class Taboo(Shell):
                 delta[self.motor_speed] += (target_speed - current_speed) * 0.7
                 if current_speed > self.crowding_speed_threshold:
                     self._state["crowding_violations"] += 1
+                    violation_magnitude += peer_prox * current_speed  # violation intensity
 
         # --- Rule 2: anti-food-hoarding ---
         # If peer near AND I smell food → force low speed (sharing)
@@ -117,6 +125,7 @@ class Taboo(Shell):
                 delta[self.motor_speed] += (target_speed - current_speed)
                 if current_speed > 0.4:
                     self._state["hoarding_violations"] += 1
+                    violation_magnitude += peer_prox * olf * 0.5
 
         # --- Rule 3: mandatory voice ---
         # If peer close and I'm silent → force voice well above threshold
@@ -127,6 +136,14 @@ class Taboo(Shell):
                 target_voice = self.mandatory_voice_min + 0.3  # =0.6 default
                 delta[self.motor_voice] += (target_voice - current_voice)
                 self._state["voice_violations"] += 1
+                violation_magnitude += (
+                    self.mandatory_voice_min - current_voice) * peer_prox
+
+        # Emit violation signal to S[violation_slot] for hebbian_core to read.
+        # Absolute write (decay + current), so it doesn't accumulate indefinitely.
+        prev_signal = float(S_snapshot[self.violation_slot])
+        target_signal = 0.7 * prev_signal + self.violation_write_strength * violation_magnitude
+        delta[self.violation_slot] = target_signal - prev_signal
 
         return delta
 
