@@ -1,0 +1,296 @@
+{
+  "shells": [
+    "core_brain",
+    "brainstem",
+    "cerebellum"
+  ],
+  "n_agents": 3,
+  "episodes": [
+    {
+      "episode": 0,
+      "seed": 42,
+      "reach_rate": 0.0,
+      "reached": [
+        false,
+        false,
+        false
+      ],
+      "n_steps": 60,
+      "metrics_per_agent": [
+        {
+          "coupling_off_diag_mean": 0.1524736155665665,
+          "shell_names": [
+            "brainstem",
+            "cerebellum",
+            "core_brain"
+          ],
+          "state_diversity": {
+            "explained_variance": [
+              0.7873264638291225,
+              0.1591032204978747,
+              0.03612276074377816,
+              0.007631975622714475
+            ],
+            "trajectory_length": 13.491626903857936,
+            "unique_bins": 11
+          },
+          "behavioral_coherence": {
+            "autocorr_lag1": 0.21184360287140291,
+            "smoothness": 0.9988558748150552,
+            "std": 0.44521903356695897
+          },
+          "novelty_response": {
+            "response_ratio": 0.21891512464335677
+          }
+        },
+        {
+          "coupling_off_diag_mean": 0.16023777184552845,
+          "shell_names": [
+            "brainstem",
+            "cerebellum",
+            "core_brain"
+          ],
+          "state_diversity": {
+            "explained_variance": [
+              0.7679788880339224,
+              0.18869034847316016,
+              0.026228424029318406,
+              0.008914955604862931
+            ],
+            "trajectory_length": 11.316503240793317,
+            "unique_bins": 11
+          },
+          "behavioral_coherence": {
+            "autocorr_lag1": 0.21184360287140291,
+            "smoothness": 0.9988558748150552,
+            "std": 0.44521903356695897
+          },
+          "novelty_response": {
+            "response_ratio": 0.25672808378702133
+          }
+        },
+        {
+          "coupling_off_diag_mean": 0.15971216489023057,
+          "shell_names": [
+            "brainstem",
+            "cerebellum",
+            "core_brain"
+          ],
+          "state_diversity": {
+            "explained_variance": [
+              0.7768026625900692,
+              0.1817108990214467,
+              0.025194257289837485,
+              0.008628850211485272
+            ],
+            "trajectory_length": 11.317673591029125,
+            "unique_bins": 11
+          },
+          "behavioral_coherence": {
+            "autocorr_lag1": 0.21184360287140291,
+            "smoothness": 0.9988558748150552,
+            "std": 0.44521903356695897
+          },
+          "novelty_response": {
+            "response_ratio": 0.2349889242371189
+          }
+        }
+      ]
+    },
+    {
+      "episode": 1,
+      "seed": 49,
+      "reach_rate": 0.0,
+      "reached": [
+        false,
+        false,
+        false
+      ],
+      "n_steps": 60,
+      "metrics_per_agent": [
+        {
+          "coupling_off_diag_mean": 0.15357265565176628,
+          "shell_names": [
+            "brainstem",
+            "cerebellum",
+            "core_brain"
+          ],
+          "state_diversity": {
+            "explained_variance": [
+              0.8028058850058578,
+              0.1335795560197561,
+              0.0430249908432847,
+              0.011649966785151645
+            ],
+            "trajectory_length": 15.521726315343017,
+            "unique_bins": 12
+          },
+          "behavioral_coherence": {
+            "autocorr_lag1": 0.21184360287140291,
+            "smoothness": 0.9988558748150552,
+            "std": 0.44521903356695897
+          },
+          "novelty_response": {
+            "response_ratio": 0.15433745994738834
+          }
+        },
+        {
+          "coupling_off_diag_mean": 0.15386725304845114,
+          "shell_names": [
+            "brainstem",
+            "cerebellum",
+            "core_brain"
+          ],
+          "state_diversity": {
+            "explained_variance": [
+              0.7855242544678586,
+              0.16151515228650534,
+              0.035807173113240845,
+              0.008025279808275497
+            ],
+            "trajectory_length": 13.638068757888181,
+            "unique_bins": 11
+          },
+          "behavioral_coherence": {
+            "autocorr_lag1": 0.21184360287140291,
+            "smoothness": 0.9988558748150552,
+            "std": 0.44521903356695897
+          },
+          "novelty_response": {
+            "response_ratio": 0.21184909171383406
+          }
+        },
+        {
+          "coupling_off_diag_mean": 0.1587467850513636,
+          "shell_names": [
+            "brainstem",
+            "cerebellum",
+            "core_brain"
+          ],
+          "state_diversity": {
+            "explained_variance": [
+              0.7838975755342531,
+              0.1714739290664752,
+              0.028174776752190354,
+              0.008140374058918633
+            ],
+            "trajectory_length": 11.866927679055587,
+            "unique_bins": 11
+          },
+          "behavioral_coherence": {
+            "autocorr_lag1": 0.21184360287140291,
+            "smoothness": 0.9988558748150552,
+            "std": 0.44521903356695897
+          },
+          "novelty_response": {
+            "response_ratio": 0.24131923572845945
+          }
+        }
+      ]
+    },
+    {
+      "episode": 2,
+      "seed": 56,
+      "reach_rate": 0.0,
+      "reached": [
+        false,
+        false,
+        false
+      ],
+      "n_steps": 60,
+      "metrics_per_agent": [
+        {
+          "coupling_off_diag_mean": 0.1620970697855365,
+          "shell_names": [
+            "brainstem",
+            "cerebellum",
+            "core_brain"
+          ],
+          "state_diversity": {
+            "explained_variance": [
+              0.7598326313015263,
+              0.19549997050620777,
+              0.027209310783124368,
+              0.009314827949709031
+            ],
+            "trajectory_length": 11.877422386655102,
+            "unique_bins": 11
+          },
+          "behavioral_coherence": {
+            "autocorr_lag1": 0.21184360287140291,
+            "smoothness": 0.9988558748150552,
+            "std": 0.44521903356695897
+          },
+          "novelty_response": {
+            "response_ratio": 0.2449440855087076
+          }
+        },
+        {
+          "coupling_off_diag_mean": 0.16506976245364977,
+          "shell_names": [
+            "brainstem",
+            "cerebellum",
+            "core_brain"
+          ],
+          "state_diversity": {
+            "explained_variance": [
+              0.7497053565096935,
+              0.20305047531627982,
+              0.030075087090308494,
+              0.009037349712442333
+            ],
+            "trajectory_length": 11.50564103517743,
+            "unique_bins": 12
+          },
+          "behavioral_coherence": {
+            "autocorr_lag1": 0.21184360287140291,
+            "smoothness": 0.9988558748150552,
+            "std": 0.44521903356695897
+          },
+          "novelty_response": {
+            "response_ratio": 0.2493238789793178
+          }
+        },
+        {
+          "coupling_off_diag_mean": 0.1621842127070242,
+          "shell_names": [
+            "brainstem",
+            "cerebellum",
+            "core_brain"
+          ],
+          "state_diversity": {
+            "explained_variance": [
+              0.7602913716628431,
+              0.19661517519351307,
+              0.026481000297264155,
+              0.009190960162126794
+            ],
+            "trajectory_length": 11.7722752572143,
+            "unique_bins": 11
+          },
+          "behavioral_coherence": {
+            "autocorr_lag1": 0.21184360287140291,
+            "smoothness": 0.9988558748150552,
+            "std": 0.44521903356695897
+          },
+          "novelty_response": {
+            "response_ratio": 0.24590601834839912
+          }
+        }
+      ]
+    }
+  ],
+  "aggregate": {
+    "reach_rate_mean": 0.0,
+    "coupling_mean": 0.15866236566667968,
+    "coupling_std": 0.0041639367467049574,
+    "unique_bins_mean": 11.222222222222221,
+    "coherence_mean": 0.21184360287140291,
+    "novelty_mean": 0.22870132254373368,
+    "pass_coupling": "True",
+    "pass_diversity": "True",
+    "pass_coherence": "True",
+    "total_pass": 3
+  },
+  "elapsed_s": 0.3
+}

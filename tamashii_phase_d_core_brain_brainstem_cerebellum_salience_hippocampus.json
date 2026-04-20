@@ -1,0 +1,316 @@
+{
+  "shells": [
+    "core_brain",
+    "brainstem",
+    "cerebellum",
+    "salience",
+    "hippocampus"
+  ],
+  "n_agents": 3,
+  "episodes": [
+    {
+      "episode": 0,
+      "seed": 42,
+      "reach_rate": 0.0,
+      "reached": [
+        false,
+        false,
+        false
+      ],
+      "n_steps": 60,
+      "metrics_per_agent": [
+        {
+          "coupling_off_diag_mean": 0.36498036702851555,
+          "shell_names": [
+            "brainstem",
+            "cerebellum",
+            "core_brain",
+            "hippocampus",
+            "salience"
+          ],
+          "state_diversity": {
+            "explained_variance": [
+              0.5063867241290375,
+              0.268146653334166,
+              0.0660681474486676,
+              0.04379304458065464
+            ],
+            "trajectory_length": 44.72018075986493,
+            "unique_bins": 56
+          },
+          "behavioral_coherence": {
+            "autocorr_lag1": 0.13487372576769405,
+            "smoothness": 0.9988551242575405,
+            "std": 0.44616056303456564
+          },
+          "novelty_response": {
+            "response_ratio": 1.5291051309352661
+          }
+        },
+        {
+          "coupling_off_diag_mean": 0.35890501422713383,
+          "shell_names": [
+            "brainstem",
+            "cerebellum",
+            "core_brain",
+            "hippocampus",
+            "salience"
+          ],
+          "state_diversity": {
+            "explained_variance": [
+              0.5651763989997304,
+              0.2163896605400952,
+              0.06670095082002243,
+              0.04877292986555266
+            ],
+            "trajectory_length": 42.66754770452333,
+            "unique_bins": 60
+          },
+          "behavioral_coherence": {
+            "autocorr_lag1": 0.13487372576769405,
+            "smoothness": 0.9988551242575405,
+            "std": 0.44616056303456564
+          },
+          "novelty_response": {
+            "response_ratio": 1.8883321207896813
+          }
+        },
+        {
+          "coupling_off_diag_mean": 0.36852032430597664,
+          "shell_names": [
+            "brainstem",
+            "cerebellum",
+            "core_brain",
+            "hippocampus",
+            "salience"
+          ],
+          "state_diversity": {
+            "explained_variance": [
+              0.6170773527098035,
+              0.19567311514881172,
+              0.06255613252612657,
+              0.04069135177685994
+            ],
+            "trajectory_length": 40.340523990915,
+            "unique_bins": 57
+          },
+          "behavioral_coherence": {
+            "autocorr_lag1": 0.13487372576769405,
+            "smoothness": 0.9988551242575405,
+            "std": 0.44616056303456564
+          },
+          "novelty_response": {
+            "response_ratio": 1.822688360599936
+          }
+        }
+      ]
+    },
+    {
+      "episode": 1,
+      "seed": 49,
+      "reach_rate": 0.0,
+      "reached": [
+        false,
+        false,
+        false
+      ],
+      "n_steps": 60,
+      "metrics_per_agent": [
+        {
+          "coupling_off_diag_mean": 0.36199377241391406,
+          "shell_names": [
+            "brainstem",
+            "cerebellum",
+            "core_brain",
+            "hippocampus",
+            "salience"
+          ],
+          "state_diversity": {
+            "explained_variance": [
+              0.5210354469193855,
+              0.26637549837601154,
+              0.06998625285022016,
+              0.04098124531635195
+            ],
+            "trajectory_length": 49.08431017506768,
+            "unique_bins": 56
+          },
+          "behavioral_coherence": {
+            "autocorr_lag1": 0.13487372576769405,
+            "smoothness": 0.9988551242575405,
+            "std": 0.44616056303456564
+          },
+          "novelty_response": {
+            "response_ratio": 0.9229074341800326
+          }
+        },
+        {
+          "coupling_off_diag_mean": 0.3689497127344386,
+          "shell_names": [
+            "brainstem",
+            "cerebellum",
+            "core_brain",
+            "hippocampus",
+            "salience"
+          ],
+          "state_diversity": {
+            "explained_variance": [
+              0.5196150552595404,
+              0.26124774898059255,
+              0.06757438066837722,
+              0.04279526591665114
+            ],
+            "trajectory_length": 44.348427005202,
+            "unique_bins": 56
+          },
+          "behavioral_coherence": {
+            "autocorr_lag1": 0.13487372576769405,
+            "smoothness": 0.9988551242575405,
+            "std": 0.44616056303456564
+          },
+          "novelty_response": {
+            "response_ratio": 1.4036083208967027
+          }
+        },
+        {
+          "coupling_off_diag_mean": 0.37006698335591826,
+          "shell_names": [
+            "brainstem",
+            "cerebellum",
+            "core_brain",
+            "hippocampus",
+            "salience"
+          ],
+          "state_diversity": {
+            "explained_variance": [
+              0.5790516512233584,
+              0.21735364234377164,
+              0.0629867256457592,
+              0.04289520753441489
+            ],
+            "trajectory_length": 41.674779164102446,
+            "unique_bins": 58
+          },
+          "behavioral_coherence": {
+            "autocorr_lag1": 0.13487372576769405,
+            "smoothness": 0.9988551242575405,
+            "std": 0.44616056303456564
+          },
+          "novelty_response": {
+            "response_ratio": 1.7207140538691434
+          }
+        }
+      ]
+    },
+    {
+      "episode": 2,
+      "seed": 56,
+      "reach_rate": 0.0,
+      "reached": [
+        false,
+        false,
+        false
+      ],
+      "n_steps": 60,
+      "metrics_per_agent": [
+        {
+          "coupling_off_diag_mean": 0.36657688687366774,
+          "shell_names": [
+            "brainstem",
+            "cerebellum",
+            "core_brain",
+            "hippocampus",
+            "salience"
+          ],
+          "state_diversity": {
+            "explained_variance": [
+              0.6100440209199715,
+              0.19752765207639633,
+              0.06941909671818805,
+              0.036431832986394075
+            ],
+            "trajectory_length": 40.39791833787499,
+            "unique_bins": 56
+          },
+          "behavioral_coherence": {
+            "autocorr_lag1": 0.13487372576769405,
+            "smoothness": 0.9988551242575405,
+            "std": 0.44616056303456564
+          },
+          "novelty_response": {
+            "response_ratio": 1.653721460230595
+          }
+        },
+        {
+          "coupling_off_diag_mean": 0.36811713224972825,
+          "shell_names": [
+            "brainstem",
+            "cerebellum",
+            "core_brain",
+            "hippocampus",
+            "salience"
+          ],
+          "state_diversity": {
+            "explained_variance": [
+              0.6526291947894406,
+              0.1710754905667478,
+              0.0667867722858562,
+              0.03378260073280529
+            ],
+            "trajectory_length": 40.05852526632778,
+            "unique_bins": 53
+          },
+          "behavioral_coherence": {
+            "autocorr_lag1": 0.13487372576769405,
+            "smoothness": 0.9988551242575405,
+            "std": 0.44616056303456564
+          },
+          "novelty_response": {
+            "response_ratio": 1.6723377429026314
+          }
+        },
+        {
+          "coupling_off_diag_mean": 0.36673483152120745,
+          "shell_names": [
+            "brainstem",
+            "cerebellum",
+            "core_brain",
+            "hippocampus",
+            "salience"
+          ],
+          "state_diversity": {
+            "explained_variance": [
+              0.6136970582818699,
+              0.1936289905362472,
+              0.06894535690461215,
+              0.0368003541605065
+            ],
+            "trajectory_length": 40.71989560526864,
+            "unique_bins": 56
+          },
+          "behavioral_coherence": {
+            "autocorr_lag1": 0.13487372576769405,
+            "smoothness": 0.9988551242575405,
+            "std": 0.44616056303456564
+          },
+          "novelty_response": {
+            "response_ratio": 1.648790596034223
+          }
+        }
+      ]
+    }
+  ],
+  "aggregate": {
+    "reach_rate_mean": 0.0,
+    "coupling_mean": 0.3660938916345,
+    "coupling_std": 0.0034042002073696046,
+    "unique_bins_mean": 56.44444444444444,
+    "coherence_mean": 0.13487372576769405,
+    "novelty_mean": 1.584689468937579,
+    "pass_coupling": "True",
+    "pass_diversity": "True",
+    "pass_coherence": "False",
+    "total_pass": 2
+  },
+  "elapsed_s": 0.3
+}

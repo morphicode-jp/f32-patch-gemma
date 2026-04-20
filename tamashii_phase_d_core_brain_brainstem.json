@@ -1,0 +1,286 @@
+{
+  "shells": [
+    "core_brain",
+    "brainstem"
+  ],
+  "n_agents": 3,
+  "episodes": [
+    {
+      "episode": 0,
+      "seed": 42,
+      "reach_rate": 0.0,
+      "reached": [
+        false,
+        false,
+        false
+      ],
+      "n_steps": 60,
+      "metrics_per_agent": [
+        {
+          "coupling_off_diag_mean": 0.0,
+          "shell_names": [
+            "brainstem",
+            "core_brain"
+          ],
+          "state_diversity": {
+            "explained_variance": [
+              0.8482757018105428,
+              0.09889204738901389,
+              0.03763562678649928,
+              0.00640934373095411
+            ],
+            "trajectory_length": 12.90267953580773,
+            "unique_bins": 10
+          },
+          "behavioral_coherence": {
+            "autocorr_lag1": 0.16967287258662056,
+            "smoothness": 0.9990179739744994,
+            "std": 0.44559992304781726
+          },
+          "novelty_response": {
+            "response_ratio": 0.16156744652418642
+          }
+        },
+        {
+          "coupling_off_diag_mean": 0.0,
+          "shell_names": [
+            "brainstem",
+            "core_brain"
+          ],
+          "state_diversity": {
+            "explained_variance": [
+              0.8379479987865234,
+              0.11871483891331358,
+              0.028866418348165526,
+              0.007491216920943942
+            ],
+            "trajectory_length": 11.144197561218101,
+            "unique_bins": 10
+          },
+          "behavioral_coherence": {
+            "autocorr_lag1": 0.16967287258662056,
+            "smoothness": 0.9990179739744994,
+            "std": 0.44559992304781726
+          },
+          "novelty_response": {
+            "response_ratio": 0.18445509155168646
+          }
+        },
+        {
+          "coupling_off_diag_mean": 0.0,
+          "shell_names": [
+            "brainstem",
+            "core_brain"
+          ],
+          "state_diversity": {
+            "explained_variance": [
+              0.831789545509517,
+              0.11235333645952156,
+              0.04044702034355575,
+              0.007147580101112283
+            ],
+            "trajectory_length": 11.096488505589438,
+            "unique_bins": 11
+          },
+          "behavioral_coherence": {
+            "autocorr_lag1": 0.16967287258662056,
+            "smoothness": 0.9990179739744994,
+            "std": 0.44559992304781726
+          },
+          "novelty_response": {
+            "response_ratio": 0.17376013815371052
+          }
+        }
+      ]
+    },
+    {
+      "episode": 1,
+      "seed": 49,
+      "reach_rate": 0.0,
+      "reached": [
+        false,
+        false,
+        false
+      ],
+      "n_steps": 60,
+      "metrics_per_agent": [
+        {
+          "coupling_off_diag_mean": 0.0,
+          "shell_names": [
+            "brainstem",
+            "core_brain"
+          ],
+          "state_diversity": {
+            "explained_variance": [
+              0.8490687496758502,
+              0.08812171168126744,
+              0.04238920458520718,
+              0.012874964009895098
+            ],
+            "trajectory_length": 14.953159249409563,
+            "unique_bins": 12
+          },
+          "behavioral_coherence": {
+            "autocorr_lag1": 0.16967287258662056,
+            "smoothness": 0.9990179739744994,
+            "std": 0.44559992304781726
+          },
+          "novelty_response": {
+            "response_ratio": 0.1165876234701623
+          }
+        },
+        {
+          "coupling_off_diag_mean": 0.0,
+          "shell_names": [
+            "brainstem",
+            "core_brain"
+          ],
+          "state_diversity": {
+            "explained_variance": [
+              0.846365490720376,
+              0.10009476844433104,
+              0.037546071950726505,
+              0.007256788981854952
+            ],
+            "trajectory_length": 12.996378093862361,
+            "unique_bins": 10
+          },
+          "behavioral_coherence": {
+            "autocorr_lag1": 0.16967287258662056,
+            "smoothness": 0.9990179739744994,
+            "std": 0.44559992304781726
+          },
+          "novelty_response": {
+            "response_ratio": 0.15694326536701508
+          }
+        },
+        {
+          "coupling_off_diag_mean": 0.0,
+          "shell_names": [
+            "brainstem",
+            "core_brain"
+          ],
+          "state_diversity": {
+            "explained_variance": [
+              0.8486122967297881,
+              0.10655380792616942,
+              0.03053594080609229,
+              0.006821221580756853
+            ],
+            "trajectory_length": 11.218850948772534,
+            "unique_bins": 10
+          },
+          "behavioral_coherence": {
+            "autocorr_lag1": 0.16967287258662056,
+            "smoothness": 0.9990179739744994,
+            "std": 0.44559992304781726
+          },
+          "novelty_response": {
+            "response_ratio": 0.1755351838319362
+          }
+        }
+      ]
+    },
+    {
+      "episode": 2,
+      "seed": 56,
+      "reach_rate": 0.0,
+      "reached": [
+        false,
+        false,
+        false
+      ],
+      "n_steps": 60,
+      "metrics_per_agent": [
+        {
+          "coupling_off_diag_mean": 0.0,
+          "shell_names": [
+            "brainstem",
+            "core_brain"
+          ],
+          "state_diversity": {
+            "explained_variance": [
+              0.8261544119234926,
+              0.1229304485284329,
+              0.034941642523754604,
+              0.007801881866340623
+            ],
+            "trajectory_length": 11.474083566328757,
+            "unique_bins": 11
+          },
+          "behavioral_coherence": {
+            "autocorr_lag1": 0.16967287258662056,
+            "smoothness": 0.9990179739744994,
+            "std": 0.44559992304781726
+          },
+          "novelty_response": {
+            "response_ratio": 0.17475337455483086
+          }
+        },
+        {
+          "coupling_off_diag_mean": 0.0,
+          "shell_names": [
+            "brainstem",
+            "core_brain"
+          ],
+          "state_diversity": {
+            "explained_variance": [
+              0.8160994842946926,
+              0.12856164430671546,
+              0.03926464923505825,
+              0.007784271800089554
+            ],
+            "trajectory_length": 11.10980211556333,
+            "unique_bins": 11
+          },
+          "behavioral_coherence": {
+            "autocorr_lag1": 0.16967287258662056,
+            "smoothness": 0.9990179739744994,
+            "std": 0.44559992304781726
+          },
+          "novelty_response": {
+            "response_ratio": 0.1745471343502112
+          }
+        },
+        {
+          "coupling_off_diag_mean": 0.0,
+          "shell_names": [
+            "brainstem",
+            "core_brain"
+          ],
+          "state_diversity": {
+            "explained_variance": [
+              0.8321954131135509,
+              0.1248174644231351,
+              0.028005843573094477,
+              0.007782626451427369
+            ],
+            "trajectory_length": 11.152260297643092,
+            "unique_bins": 10
+          },
+          "behavioral_coherence": {
+            "autocorr_lag1": 0.16967287258662056,
+            "smoothness": 0.9990179739744994,
+            "std": 0.44559992304781726
+          },
+          "novelty_response": {
+            "response_ratio": 0.17602644107514281
+          }
+        }
+      ]
+    }
+  ],
+  "aggregate": {
+    "reach_rate_mean": 0.0,
+    "coupling_mean": 0.0,
+    "coupling_std": 0.0,
+    "unique_bins_mean": 10.555555555555555,
+    "coherence_mean": 0.16967287258662056,
+    "novelty_mean": 0.16601952209765358,
+    "pass_coupling": "False",
+    "pass_diversity": "True",
+    "pass_coherence": "False",
+    "total_pass": 1
+  },
+  "elapsed_s": 0.2
+}
