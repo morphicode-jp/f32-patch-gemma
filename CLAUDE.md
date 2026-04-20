@@ -6,212 +6,200 @@ All responses in Japanese.
 
 ## Quick Reference
 
-### 2026-04-20 以降: `hagen()` が表舞台、owl/Reigen は裏方
+### 2026-04-20 以降: `apex()` 1 呼出しが基本
 
-**`hagen()` が新しい推奨エントリーポイント** (commit 62d20c1)。内部で owl → Reigen cascade を自動分岐。benchmark 4/4 問題で gap≈0 達成 (3/4 perfect、Rosenbrock 0.08 で basinhopping 追走)。ユーザーはこの 1 関数呼ぶだけ。
+**`apex()` が全ての入口**。内部で eval コストを計測、`owl` (精鋭) → `Reigen` (cascade) を自動分岐。BBOB 4 問題で **gap≈0 達成** (3/4 perfect、Rosenbrock 0.08 で basinhopping に 2 位)。
 
 ```python
-from twelve.agent.hagen import hagen
-r = hagen(eval_fn, param_ranges, time_budget=300)
-# r["best_params"], r["best_score"], r["tool_used"], r["dead_dims"] ...
+from twelve.agent.apex import apex
+
+r = apex(eval_fn, param_ranges, time_budget=300)
+# r["best_params"]   : 最適パラメータ
+# r["best_score"]    : 最高スコア
+# r["tool_used"]     : "owl" | "owl+reigen" | "owl(reigen_tried)"
+# r["dead_dims"]     : 効果のない次元 (owl 構造発見)
+# r["fragility"]     : 脆い次元
+# r["proxy_r2"]      : proxy 信頼度
+# r["route"]         : "expensive_single" | "cheap_cascade" | "structure_only"
 ```
 
-### ツール役割分担 (2026-04-20)
+### 使用例 3 パターン
+
+```python
+# (1) 何も知らない、とりあえず最適化
+r = apex(my_eval_fn, [(-5, 5)] * 8, time_budget=300)
+
+# (2) ドメイン知識 (過去実験 20 点あり) — 高 proxy R² 期待、直接 owl 路線
+r = apex(my_eval_fn, [(0.5, 2.0)] * 61,
+         curated_measurements=past_lab_results,
+         time_budget=600)
+
+# (3) LLM キャリブ等 eval コスト重い場合 — 自動検出、owl 全力 (L-BFGS + multi + random-restart)
+r = apex(ppl_eval_fn, [(0.5, 1.5)] * 60, time_budget=1800)
+# 自動で eval_cost_hint > 0.5s → expensive_single route
+
+# (4) 分析だけしたい (高次元で dead_dims 知るため) — 最適化 skip
+r = apex(my_eval_fn, [(0.5, 1.5)] * 60,
+         curated_measurements=past_data,
+         mode="structure_only",        # 最適化スキップ、構造情報のみ 15-30s で返す
+         time_budget=30)
+
+# (5) 安全指標を守りたい (2 指標)
+r = apex(my_eval_fn, ranges, guard_fn=my_guard_fn, time_budget=300)
+```
+
+### apex 内部分岐ロジック
+
+```
+eval コスト 1-call 実測 (midpoint で 1 回呼んで time.time 差分)
+│
+├── mode="structure_only"
+│      └── owl autonomous=False、max 30s → 構造情報のみ return
+│
+├── eval > 0.5s OR curated_measurements あり → expensive_single route
+│      └── owl 100% budget + 全強化 ON (L-BFGS + multi-start + random-restart=5)
+│
+└── eval ≤ 0.5s → cheap_cascade route
+        ├── Phase 1: owl 40% budget
+        │      ├── proxy_r2 ≥ 0.7 → 即終了 (tool_used="owl")
+        │      └── proxy_r2 < 0.7 → Phase 2 へ
+        └── Phase 2: Reigen 残 budget、wall_time_factor=1.0
+               owl best を initial_user_params で warm-start、
+               winner 選んで tool_used="owl+reigen"
+```
+
+### LaD (dispatch 閾値の JSON 制御)
+
+`twelve/configs/apex_params.json` で以下 6 値を制御可能。precedence: **kwarg > JSON > hardcode**。
+
+```json
+{
+    "dispatch": {
+        "eval_cost_threshold": 0.5,
+        "owl_share": 0.4,
+        "escalation_min_remaining": 5.0,
+        "confidence_skip_threshold": 0.7
+    },
+    "owl_kwargs": {"random_restart_count": 5, "max_iterations": 30, "min_r_squared": 0.1},
+    "reigen_kwargs": {"inner_time_budget": 2.0, "wall_time_factor": 1.0}
+}
+```
+
+### ツール役割階層
+
+```
+apex()              ← 表舞台 (ユーザー呼び口)
+  │
+  ├── owl()         ← Phase 1 + 構造発見専用でも直呼び可
+  │    └── optimize()  ← primitive HC engine
+  │
+  └── Reigen        ← Phase 2 cascade + cross-task 学習
+       └── Sentinel    ← legacy、互換維持
+            └── owl
+```
 
 | 層 | 用途 | いつ直呼び? |
 |---|---|---|
-| **`hagen()`** | 表舞台・総合最適化 | **ほぼ全てのケース** (新 default) |
-| `owl()` | Phase 1 精鋭部隊 + 構造発見 | dead_dims/importance/fragility 読みたい時 |
-| `reigen()` | Phase 2 cascade 部隊 + cross-task 学習 | 複数 task で meta_knowledge 累積させたい時のみ |
-| `optimize()` | プリミティブ HC engine | hagen/owl で包めない特殊事情のみ |
+| **`apex()`** | 表舞台 | **全 new code で default** |
+| `owl()` | 構造発見精鋭 | dead_dims/fragility/importance/proxy_fn だけ欲しい時 (apex mode="structure_only" でも OK) |
+| `reigen()` | cross-task 学習累積 | 複数 task で meta_knowledge 蓄積を明示的に指定したい時のみ |
+| `Sentinel` | 2 指標 legacy | 新規ほぼ不要、apex の guard_fn 経由で代替可 |
+| `optimize()` | primitive | apex/owl で包めない特殊事情のみ |
 
-### hagen 内部分岐
+### experience_id
 
-```
-eval コスト 1-call 測定
-├── > 0.5s or curated data あり → owl 直行 (L-BFGS-B + multi-start + random-restart=5)
-└── 安 eval
-     ├── owl 40% budget → confidence="high" なら終了
-     └── Reigen 60% cascade (owl best を warm-start、wall_time_factor=1.0 で予算厳守)
-```
-
-### 選択フロー (legacy、2026-04-19 以前)
-
-| 状況 | 使うやつ | A/B 実証 |
-|---|---|---|
-| **eval 高コスト** (LLM 等、> 0.5s/call) | `owl(measurements=data, verify_fn=..., autonomous=True)` | owl は **5-16× 少ない eval** で reigen と同等/近似品質。LLM 換算で reigen = 数時間、owl = 数分 |
-| **過去実測データがある** (ドメイン知識) | `owl(measurements=curated_data, ...)` | curated 20 点は random 20 点の 10-100× 情報量。Reigen は _collect で捨てる |
-| **cheap eval + 多峰 / deceptive** | `reigen(eval_fn, guard_fn, ranges)` | reigen のブルートフォース optimize() が有利 (A/B: Ackley / Schwefel で勝ち) |
-| **smooth landscape** | `owl(..., autonomous=True)` | direct-HC fallback で Rastrigin 5d も解ける (gap=0) |
-| **cross-task 学習累積したい** | `reigen(..., experience_id="...")` | meta_knowledge が自動で prior 継承 |
-| **guard_fn (安全指標) 要** | `owl(..., guard_fn=..., safe_dim_analysis=True)` | Sentinel wrap 不要、owl 内で直接 |
-
-```python
-from twelve.optimize import owl                    # 2026-04-19 以降の主軸
-from twelve.agent.reigen import reigen            # cross-task / cheap+多峰 特化
-```
-
-`experience_id`: 任意の task 名札を付ける。self_params cross-task 学習は `reigen_meta_knowledge.json` 経由で自動共有される (2026-04-19 以降、ID 共有不要)。fossil は per-ID 分離で並列時の衝突回避。
+任意の task 名札。self_params cross-task 学習は `reigen_meta_knowledge.json` 経由で自動共有される (ID 共有不要、preset 別 key で分離)。fossil は per-ID 分離で並列衝突回避。apex は内部で `{experience_id}_owl` と `{experience_id}_reigen` に suffix 付けて分離管理。
 
 ### 実測値問題 (最重要)
 
 **curated 20 点 ≈ random 200-2000 点の情報量**。ドメインエキスパートの 20 点は proxy R² を 0.5→0.85 に引き上げる。
-Sentinel の `_collect` は uniform random で **この価値を捨てる**。owl 直使いが 99% 正解。
+apex は `curated_measurements=` を受けたら expensive_single route に切替、owl に直接渡す。random `_collect` でこの価値を捨てない。
 
-### `owl()` 使用例 — curated data + 自律成長
-
-```python
-# 過去実験の結果が手元にある: owl に直接投入
-past_results = [
-    {"params": [0.8, 1.2, 1.5], "score": 0.71},
-    {"params": [1.0, 1.3, 1.4], "score": 0.68},
-    ...  # 15-30 点のドメイン curated data
-]
-r = owl(
-    measurements=past_results,          # curated なので高 R² 期待
-    param_ranges=[(0.5, 2.0)] * 3,
-    verify_fn=my_eval_fn,                # 最適点の verify 実測 + direct-HC fallback
-    guard_fn=my_guard_fn,                # safety (任意)
-    autonomous=True,                     # 停滞時 range 拡張 + budget-aware loop
-    experience_id="my_task_v1",
-)
-print(r["best_params"], r["confidence"], r.get("guard_verdict"))
-# confidence: "high"/"low"/"direct"/"insufficient"
-#   "direct" = proxy 不能で real eval_fn に対する直接 HC が走った (algorithmic win)
-```
-
-### `reigen()` 使用例 — cross-task 累積 or deceptive 多峰
-
-```python
-# cheap eval + 多峰 landscape で brute-force 安心したい時
-r = reigen(eval_fn, guard_fn, [(0.8, 1.5)] * 5, experience_id="my_task_v1")
-# kathara_17_adaptive default、meta_knowledge 自動累積
-```
-
-### owl の 2026-04-19 〜 04-20 強化まとめ
+### owl 2026-04-19〜04-20 強化まとめ (apex 内で常時 ON)
 
 | kwarg / 機能 | 分類 | 説明 |
 |---|---|---|
-| `measurements=[]` + `verify_fn=` + `param_ranges=` | usability | 空データ → owl が自動で N 点 seed |
-| `curated_measurements=` | usability | `measurements=` の明示 alias (intent 可視化) |
-| `guard_fn=` / `guard_threshold=` / `safe_dim_analysis=` | usability + Sentinel 移植 | 安全ゲート + multi-observer pivot を owl 内で |
-| `n_seed_samples=` / `seed_rng_state=` | usability | 空データ seed 数・seed 制御 |
-| **budget-aware autonomous loop** | **algorithm** | `time_budget` 厳守、cheap eval では max_iterations 超え |
-| **direct-HC fallback (Step 5b + insufficient branch)** | **algorithm** ★ | proxy 不能時 `optimize(eval_fn=verify_fn)` 直接起動、warm-start from best measurement。**Rastrigin 5d で gap 45→0 達成の主犯** |
-| **`use_lbfgs_refinement=True` (04-20)** | **algorithm** ★★ | scipy L-BFGS-B gradient refinement を末尾 1-shot。smooth curved valley 制覇。**Styblinski 5d score -6→195.83 (gap 201→-0.11)**、**Rosenbrock gap 173→3 (57× 改善)**。opt-in default OFF |
-| **`use_multistart_fallback=True` (04-20)** | **algorithm** | direct-HC fallback の warm-start を L2 diverse top-3 に。wrong-basin 脱出。opt-in default OFF |
-| **`random_restart_count=K` (04-20 v3)** | **algorithm** ★★ | multi-start fallback に K 個の uniform random warm-start を注入。basinhopping-style random hop (optimize() 省略、L-BFGS-B 直行、maxfun=100)。curved-valley Rosenbrock 救済。opt-in default 0 |
+| `measurements=[]` + `verify_fn=` + `param_ranges=` | usability | 空データ → 自動で N 点 seed |
+| `curated_measurements=` | usability | intent-明示 alias |
+| `guard_fn=` / `guard_threshold=` / `safe_dim_analysis=` | safety | Sentinel 秘密兵器を owl 内に移植 |
+| `n_seed_samples=` / `seed_rng_state=` | usability | 空データ seed 数・RNG 制御 |
+| **budget-aware autonomous loop** | **algorithm** | `time_budget` 厳守、cheap eval で max_iterations 超え可 |
+| **direct-HC fallback** | **algorithm** ★ | proxy 不能時に `optimize(eval_fn=verify_fn)` 発動、Rastrigin 5d gap 45→0 の主犯 |
+| **`use_lbfgs_refinement=True`** | **algorithm** ★★ | scipy L-BFGS-B 1-shot、Styblinski score -6→195.83、Rosenbrock gap 173→3 |
+| **`use_multistart_fallback=True`** | **algorithm** | direct-HC fallback の warm-start を L2 diverse top-3 に |
+| **`random_restart_count=K`** | **algorithm** ★★ | K 個の random warm-start 注入、basinhopping-style、Rosenbrock 救済 |
 
-★ = 2026-04-19 の真の算法強化。★★ = 2026-04-20 benchmark 結果を受けた追加強化。
+★ = 04-19 算法強化、★★ = 04-20 benchmark 駆動追加。apex は上記すべてを default ON で呼ぶ。
 
-**世界 benchmark 実績 (2026-04-20)**: Reigen_k17 4 問題中 3 問題で世界 SOTA (optuna/skopt/cma/basinhopping) 圧勝。`hagen()` (owl+Reigen cascade) は**4 問題全て gap≈0 達成** (3/4 perfect、Rosenbrock 0.08 basin 追走)。
+### 世界 Benchmark 実績 (2026-04-20、25s budget、3 seeds)
+
+| 問題 | cma_es | basinhopping | reigen_k17 | owl | **apex** |
+|---|---|---|---|---|---|
+| Rastrigin 5d | +5.98 | +22.9 | **0 ✅** | **0 ✅** | **0 ✅** |
+| Ackley 5d | +0.002 | +1.65 | **0 ✅** | **0 ✅** | **0 ✅** |
+| Styblinski 5d | +28.3 | +28.3 | **-0.001 ✅** | +18.4 | **-0.001 ✅** |
+| Rosenbrock 5d | +2.74 | **0 🏆** | +0.081 | +3.19 | +0.081 |
+
+apex の勝ち: 3/4 perfect gap≈0 + Rosenbrock で basin に 2 位追走。
+optuna_tpe / skopt_gp は既存 benchmark で圧倒敗北で除外 (Rastrigin gap +10〜+20)。
 
 ---
 
-## hagen (覇玄) — meta-dispatcher (新 default、2026-04-20)
-
-`twelve/agent/hagen.py` の `hagen()` は owl と Reigen の上位層。問題の eval コストを自動測定、cascade 分岐する。
-
-### 使い方
+## apex — 全パラメータリファレンス
 
 ```python
-from twelve.agent.hagen import hagen
-
-# 最小
-r = hagen(eval_fn, param_ranges, time_budget=300)
-
-# 全指定
-r = hagen(
-    eval_fn=my_eval,
-    param_ranges=[(-5, 5)] * 8,
-    param_names=["x1", ..., "x8"],
-    curated_measurements=past_data,   # optional; あれば owl 直行 route
-    guard_fn=my_guard,                 # optional; safety metric
-    experience_id="my_task_v1",        # cross-call learning namespace
-    time_budget=300.0,
-    eval_cost_hint=None,               # None = auto-measure (1 call tick)
-    owl_share=0.4,                     # budget fraction for Phase 1 owl
-    force_cascade=False,               # True で confidence 無視して必ず Reigen escalate
+apex(
+    eval_fn,                    # f(params: list[float]) -> float, higher is better
+    param_ranges,               # [(lo, hi), ...]
+    *,
+    # 基本
+    param_names=None,           # 次元名 (optional)
+    curated_measurements=None,  # 過去実験データ [{"params":..., "score":...}]; 提供時 expensive_single
+    guard_fn=None,              # 安全指標 f(params) -> float、owl に safe_dim_analysis=True 経由
+    experience_id="apex",       # cross-call 学習 namespace
+    time_budget=300.0,          # wall 予算 (秒)
+    eval_cost_hint=None,        # None = 1-call 自動測定
+    mode="optimize",            # "optimize" | "structure_only"
+    # LaD 個別 override (None = JSON→hardcode で解決)
+    eval_cost_threshold=None,         # expensive route 切替閾値 (default 0.5s)
+    owl_share=None,                    # cheap cascade の Phase 1 share (default 0.4)
+    escalation_min_remaining=None,     # Reigen 起動最小残時間 (default 5s)
+    confidence_skip_threshold=None,    # Reigen skip の proxy_r2 閾値 (default 0.7)
+    random_restart_count=None,         # owl の random restart 数 (default 5)
+    reigen_inner_time_budget=None,     # Reigen inner Sentinel budget (default 2s)
+    reigen_wall_time_factor=None,      # Reigen wall cap factor (default 1.0)
+    # 稀に使う
+    force_cascade=False,        # True で confidence 無視し必ず Reigen 走らせる
+    n_seed_samples=None,        # 空データ seed 数
+    apex_cfg=None,              # 上記 LaD 値を dict でまとめて指定
     verbose=False,
-)
+) -> dict
 ```
 
-### 返り値
-
+返り値 dict:
 ```python
 {
-    "best_params":        list|dict,
-    "best_score":         float,
-    "tool_used":          "owl" | "owl+reigen" | "owl(reigen_tried)",
-    "route":              "expensive_single" | "cheap_cascade",
-    "eval_cost_s":        float,            # 測定 or hint
-    "confidence":         str,              # owl's confidence
-    "dead_dims":          list,             # owl's structure info
-    "active_dims":        list,
-    "fragility":          list,
-    "proxy_type":         str,
-    "proxy_r2":           float,
-    "owl_result":         dict,             # raw owl return
-    "reigen_result":      dict,             # only when escalated
-    "elapsed_s":          float,
+    "best_params":   list|dict,
+    "best_score":    float,
+    "tool_used":     "owl" | "owl+reigen" | "owl(reigen_tried)" | "owl_structure_only",
+    "route":         "expensive_single" | "cheap_cascade" | "structure_only",
+    "mode":          "optimize" | "structure_only",   # structure_only の時のみ
+    "eval_cost_s":   float,                           # 自動測定 or hint
+    "confidence":    str,                             # owl の confidence
+    "dead_dims":     list,
+    "active_dims":   list,
+    "fragility":     list,
+    "proxy_type":    str,
+    "proxy_r2":      float,
+    "owl_result":    dict,                            # 生の owl 返り値
+    "reigen_result": dict,                            # escalation 時のみ
+    "elapsed_s":     float,
 }
 ```
 
-### 内部分岐ロジック
-
-| 条件 | Route | Phase 1 (owl) | Phase 2 (Reigen) |
-|---|---|---|---|
-| `mode="structure_only"` | structure_only | autonomous=False, max 30s | skip |
-| eval cost > 0.5s | expensive_single | **100% budget**、L-BFGS+multi+random=5 全部 ON | skip |
-| curated_measurements あり | expensive_single | 同上 | skip |
-| 安 eval + owl proxy_r2 ≥ threshold (0.7) | cheap_cascade | 40% budget | skip |
-| 安 eval + proxy_r2 低 | cheap_cascade | 40% budget | **remaining budget、wall_time_factor=1.0** |
-
-### structure_only モード (分析専用)
-
-最適化せず、owl の構造発見出力 (dead_dims / importance / fragility / proxy_r2) だけ返す高速経路。
-```python
-r = hagen(eval_fn, param_ranges,
-          mode="structure_only",
-          curated_measurements=past_data,  # optional
-          time_budget=15)
-# r["dead_dims"], r["fragility"], r["proxy_type"], r["proxy_r2"]
-# autonomous=False、L-BFGS skip、max 30s cap → 高次元 LLM の事前分析に最適
-```
-
-### benchmark 実績 (2026-04-20、25s budget × 3 seeds)
-
-```
-問題              cma    basin   reigen   owl    hagen
-Rastrigin 5d      +5.98  +22.9   0 ✅     0 ✅   0 ✅
-Ackley 5d         +0.002 +1.65   0 ✅     0 ✅   0 ✅
-Styblinski 5d     +28.3  +28.3   -0.001   +18.4  -0.001 ✅
-Rosenbrock 5d     +2.74  0 🏆    +0.081   +3.19  +0.081
-```
-
-- hagen は **owl 単体の弱点 (Styblinski +18.4)** を Reigen cascade で**-0.001** に改善
-- Rosenbrock だけ basinhopping の niter=100 exhaustive に 0.08 届かず
-- Wall median 32s (budget 25s、+28% 超過は Reigen escalation 時)
-
-### hagen と既存ツールの関係
-
-```
-          hagen() = 表舞台
-         /     \
-        owl     Reigen
-         |      (cross-task 学習、escalation 下流)
-      optimize
-     (primitive HC)
-```
-
-- 既存 `owl()` / `reigen()` コードは全く変更されていない。hagen は**呼び出しのみ**
-- 新規コード書く時は `hagen()` を default で選ぶこと
-- `owl()` 直呼びは「構造発見だけ読みたい」「eval 激安で分岐オーバーヘッド回避」場面のみ
-- `reigen()` 直呼びは cross-task meta_knowledge を**明示的に共有**したい場面のみ
-
 ---
 
-## Reigen (零玄) — default tool (集大成)
+## Reigen (零玄) — apex の Phase 2 cascade 実行体
 
 Dimension-additive self-application: one outer Sentinel over (N_user + N_self)-dim joint space (N_self = 17 for kathara_17_adaptive default, 12 for kathara_12 legacy).
 Internally composes Sentinel → owl → MS → multi-observer → Kathara K² → optimize → UnifiedExperience.
@@ -851,6 +839,10 @@ r = owl(data)   # finds stable_active / observer_dependent / stable_dead
 | 04-20 | **世界 benchmark: Reigen 3/4 勝利** | Rastrigin/Ackley/Styblinski で Reigen_k17 が optuna/skopt/cma/basinhopping 全てを圧倒 gap=0。Rosenbrock のみ basinhopping に僅差負け (gap 0.08 vs 0). owl_direct は Rastrigin/Ackley で eval 効率最強 (332 eval で gap=0) |
 | 04-20 | **owl L-BFGS-B refinement** | scipy L-BFGS-B を owl 末尾 1-shot で発動、`use_lbfgs_refinement=True` opt-in。Styblinski 5d で score -6→195.83 (global optimum 到達)、Rosenbrock で gap 173→3 (57× 改善) (commit edef9f5) |
 | 04-20 | **owl multi-start fallback** | direct-HC fallback の warm-start を L2 diverse top-3 に、`use_multistart_fallback=True` opt-in。wrong-basin 脱出機構 (commit a3c8a4c) |
+| 04-20 | **owl random_restart_count** | multi-start に K 個の uniform random warm-start を注入 (basinhopping 模倣、L-BFGS-B 直行)。curved-valley 救済 (commit 62d20c1) |
+| 04-20 | **apex 上位層誕生** | owl+Reigen cascade の meta-dispatcher。eval コスト 1-call 測定 → 自動分岐。BBOB 3/4 gap=0 + Rosenbrock 0.08 (basin 追走)。新 default (commit 62d20c1 + 8472c6d + rename) |
+| 04-20 | **apex LaD 化** | dispatch 6 閾値を `apex_params.json` で制御可能、kwarg > JSON > hardcode 優先度。K² 自己最適化は病的 runtime で失敗 (Ch17 self-application は turnkey でない、remediation 必要) |
+| 04-20 | **apex mode="structure_only"** | 最適化 skip、owl の dead_dims/fragility/proxy_r2 のみ返す高速分析経路 (max 30s cap)。高次元 LLM 事前分析用 |
 | failures | scale=0 → PPL=262144 | Rule 7. verify_fn catches hallucination |
 | failures | single-obs on internal model state | fix: multi-observer + fast eval (Rule 11) |
 
@@ -910,17 +902,18 @@ so that accidental `.env` or credential commits are avoided.
 
 | module | path |
 |---|---|
-| **hagen (new default, 2026-04-20)** | `@twelve/agent/hagen.py` |
+| **apex (new default, 2026-04-20)** | `@twelve/agent/apex.py` |
+| apex params (LaD JSON) | `@twelve/configs/apex_params.json` |
 | Reigen (cascade backend) | `@twelve/agent/reigen.py` |
 | Sentinel | `@twelve/agent/sentinel.py` |
 | owl / optimize | `@twelve/optimize.py` |
 | MirrorAgent / MS | `@twelve/agent/mirror_agent.py` |
 | UnifiedExperience | `@twelve/agent/unified_experience.py` |
-| **hagen tests** | `@twelve/tests/test_hagen.py` (smoke / cascade / guard / curated / structure / wall-time) |
+| **apex tests** | `@twelve/tests/test_apex.py` (smoke / cascade / guard / curated / structure_only / wall-time, 10/10 green) |
 | Reigen tests | `@twelve/tests/test_reigen.py` · `@twelve/tests/test_reigen_params.py` · `@twelve/tests/test_reigen_adaptive.py` · `@twelve/tests/test_reigen_meta_knowledge.py` |
 | owl enhancements tests | `@twelve/tests/test_owl_enhancements.py` (empty-data / curated / guard_fn / safe_dim) |
 | owl refinements tests | `@twelve/tests/test_owl_refinements.py` (L-BFGS-B / multi-start、2026-04-20) |
-| World benchmark scripts | `@benchmark_hagen.py` (hagen vs cma/basin/reigen/owl、2026-04-20) · `@benchmark_owl_vs_world.py` (legacy、vs optuna/skopt) · `@benchmark_refinements.py` (04-20 refinement 効果測定) |
+| World benchmark scripts | `@benchmark_apex.py` (apex vs cma/basin/reigen/owl、2026-04-20) · `@benchmark_apex_meta.py` (K² self-opt 試作、⚠ 病的 runtime で失敗) · `@benchmark_owl_vs_world.py` (legacy、vs optuna/skopt) · `@benchmark_refinements.py` (04-20 refinement 効果測定) |
 | Sentinel curated-data tests | `@twelve/tests/test_sentinel_curated.py` (initial_measurements) |
 | Reigen params JSON | `@twelve/configs/reigen_params.json` (static defaults) |
 | Reigen meta_knowledge | `@twelve/configs/reigen_meta_knowledge.json` (learned cross-task) |
