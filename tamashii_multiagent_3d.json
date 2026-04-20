@@ -1,0 +1,99 @@
+{
+  "shells": [
+    "core_brain",
+    "brainstem",
+    "cerebellum",
+    "salience",
+    "hippocampus",
+    "prefrontal",
+    "dmn"
+  ],
+  "use_hebbian": false,
+  "world_config": {
+    "size": 16,
+    "n_food": 5,
+    "n_walls": 30
+  },
+  "episodes": 3,
+  "n_steps": 400,
+  "elapsed_s": 2.3,
+  "per_episode": [
+    {
+      "n_steps": 400,
+      "per_agent_food": [
+        18,
+        16,
+        20
+      ],
+      "total_food": 54,
+      "per_agent_cells_explored": [
+        161,
+        160,
+        157
+      ],
+      "min_food_dists": [
+        0.5611321238779858,
+        1.012018349343443,
+        0.9295605342782501
+      ],
+      "initial_food_dists": [
+        2.0,
+        2.23606797749979,
+        2.8284271247461903
+      ]
+    },
+    {
+      "n_steps": 400,
+      "per_agent_food": [
+        13,
+        10,
+        10
+      ],
+      "total_food": 33,
+      "per_agent_cells_explored": [
+        149,
+        149,
+        156
+      ],
+      "min_food_dists": [
+        1.0,
+        0.946214297485244,
+        1.0053261824302577
+      ],
+      "initial_food_dists": [
+        1.0,
+        3.605551275463989,
+        2.0
+      ]
+    },
+    {
+      "n_steps": 400,
+      "per_agent_food": [
+        15,
+        18,
+        22
+      ],
+      "total_food": 55,
+      "per_agent_cells_explored": [
+        162,
+        168,
+        168
+      ],
+      "min_food_dists": [
+        1.0237486289628261,
+        0.04766918178029814,
+        0.7948482699482516
+      ],
+      "initial_food_dists": [
+        3.1622776601683795,
+        3.1622776601683795,
+        3.1622776601683795
+      ]
+    }
+  ],
+  "aggregate": {
+    "total_food": 142,
+    "total_cells_explored": 1430,
+    "mean_heading_coherence": 0.0
+  }
+}

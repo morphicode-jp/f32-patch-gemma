@@ -1,0 +1,98 @@
+{
+  "shells": [
+    "core_brain",
+    "brainstem",
+    "cerebellum",
+    "salience",
+    "hippocampus",
+    "prefrontal",
+    "dmn"
+  ],
+  "use_hebbian": false,
+  "world_config": {
+    "size": 16,
+    "n_food": 5,
+    "n_walls": 30
+  },
+  "episodes": 3,
+  "n_steps": 500,
+  "elapsed_s": 0.9,
+  "per_episode": [
+    {
+      "food_eaten": 0,
+      "food_events": [],
+      "n_cells_explored": 1,
+      "total_cells": 256,
+      "exploration_ratio": 0.00390625,
+      "heading_autocorr": 0.478938963129027,
+      "S_traj_variance": 0.1127498830410047,
+      "steps_run": 500,
+      "final_state": {
+        "agent_pos": [
+          14.50079693399762,
+          7.500445570628656,
+          0.5
+        ],
+        "agent_heading": 2.7250558387418042,
+        "food_eaten": 0,
+        "n_food_remaining": 5,
+        "steps": 500
+      },
+      "hebbian_stats": null
+    },
+    {
+      "food_eaten": 1,
+      "food_events": [
+        [
+          0,
+          1
+        ]
+      ],
+      "n_cells_explored": 1,
+      "total_cells": 256,
+      "exploration_ratio": 0.00390625,
+      "heading_autocorr": 0.4768331847503494,
+      "S_traj_variance": 0.11326323430238482,
+      "steps_run": 500,
+      "final_state": {
+        "agent_pos": [
+          3.499549865328869,
+          9.49932981842658,
+          0.5
+        ],
+        "agent_heading": 0.18891088662534727,
+        "food_eaten": 1,
+        "n_food_remaining": 5,
+        "steps": 500
+      },
+      "hebbian_stats": null
+    },
+    {
+      "food_eaten": 0,
+      "food_events": [],
+      "n_cells_explored": 1,
+      "total_cells": 256,
+      "exploration_ratio": 0.00390625,
+      "heading_autocorr": 0.4796199794426012,
+      "S_traj_variance": 0.16769014159056153,
+      "steps_run": 500,
+      "final_state": {
+        "agent_pos": [
+          8.499844061929611,
+          5.499095404514049,
+          0.5
+        ],
+        "agent_heading": 0.7154878798920647,
+        "food_eaten": 0,
+        "n_food_remaining": 5,
+        "steps": 500
+      },
+      "hebbian_stats": null
+    }
+  ],
+  "aggregate": {
+    "total_food": 1,
+    "total_cells_explored": 3,
+    "mean_heading_coherence": 0.4784640424406592
+  }
+}

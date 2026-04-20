@@ -38,11 +38,41 @@ from tamashii.shells.hebbian_core import HebbianCoreBrain
 
 def build_fluctlight(shells: list[str], configs_dir: str,
                      trained_dir: str | None = None,
-                     use_hebbian_core: bool = False) -> Tamashii:
-    """Build a 7-shell Fluctlight. Optionally replace core with Hebbian variant."""
-    # Clone normal builder, then swap core if requested
+                     use_hebbian_core: bool = False,
+                     use_3d_brain: bool = False) -> Tamashii:
+    """Build a 7-shell Fluctlight.
+
+    use_3d_brain: if True, load kathara_params from core_brain_3d_trained.json
+      (3D-specific training) instead of core_brain_trained.json (2D).
+    use_hebbian_core: if True, replace CoreBrain with HebbianCoreBrain for
+      runtime plasticity (can compose with 3D brain).
+    """
+    core_trained_filename = (
+        "core_brain_3d_trained.json" if use_3d_brain
+        else "core_brain_trained.json")
+
+    def _load_core_brain_params():
+        """Return trained kathara params from chosen file, or None."""
+        if trained_dir:
+            path = os.path.join(trained_dir, core_trained_filename)
+            if os.path.exists(path):
+                with open(path, "r", encoding="utf-8") as f:
+                    td = json.load(f)
+                return td.get("params", {}).get("kathara_params")
+        return None
+
     if not use_hebbian_core:
-        return build_agent(shells, configs_dir, trained_dir=trained_dir, D=192)
+        # Static CoreBrain: build normally, then potentially swap to 3D-trained
+        agent = build_agent(shells, configs_dir, trained_dir=trained_dir, D=192)
+        if use_3d_brain:
+            kp = _load_core_brain_params()
+            if kp is not None:
+                for s in agent.shells:
+                    if s.name == "core_brain":
+                        import numpy as np
+                        s.kathara_params = np.asarray(kp, dtype=np.float64)
+                        break
+        return agent
 
     # Hebbian version: hand-build
     shell_instances = []
@@ -51,14 +81,9 @@ def build_fluctlight(shells: list[str], configs_dir: str,
             base = os.path.join(configs_dir, "hebbian_core.json")
             with open(base, "r", encoding="utf-8") as f:
                 hcfg = json.load(f)
-            if trained_dir:
-                tc = os.path.join(trained_dir, "core_brain_trained.json")
-                if os.path.exists(tc):
-                    with open(tc, "r", encoding="utf-8") as f:
-                        td = json.load(f)
-                    kp = td.get("params", {}).get("kathara_params")
-                    if kp is not None:
-                        hcfg["params"]["kathara_params"] = kp
+            kp = _load_core_brain_params()
+            if kp is not None:
+                hcfg["params"]["kathara_params"] = kp
             shell_instances.append(HebbianCoreBrain(hcfg))
         else:
             cls = SHELL_REGISTRY.get(name)
@@ -73,6 +98,63 @@ def build_fluctlight(shells: list[str], configs_dir: str,
             shell_instances.append(
                 load_shell_from_config(cls, base_json, trained_json))
     return Tamashii(shells=shell_instances, D=192)
+
+
+def run_3d_multi_agent_episode(agents: list, world,
+                                n_steps: int = 500, ticks_per_step: int = 3,
+                                verbose_every: int = 100) -> dict:
+    """Run multiple Fluctlights in one shared 3D world."""
+    N = world.n_agents
+    assert len(agents) == N
+    sensors_list = world.reset()
+    for a in agents:
+        a.reset_episode()
+
+    initial_food_dists = [world.get_food_dist(i) for i in range(N)]
+    min_food_dists = list(initial_food_dists)
+    pos_visited_per_agent = [set() for _ in range(N)]
+
+    for step in range(n_steps):
+        # Inject sensors per agent
+        for i, agent in enumerate(agents):
+            with agent._lock:
+                agent.S[0:16] = np.asarray(sensors_list[i], dtype=np.float64)
+        # Tick all agents
+        for _ in range(ticks_per_step):
+            for agent in agents:
+                agent.tick_once()
+        # Extract actions
+        actions = []
+        for agent in agents:
+            S = agent.read_state()
+            actions.append((
+                float(np.clip(S[16], 0.0, 1.0)),
+                float(np.clip(S[17], 0.0, 1.0)),
+                float(np.clip(S[18], 0.0, 1.0)),
+            ))
+        # World step
+        sensors_list, ate_total, done = world.step(actions)
+        # Track
+        for i in range(N):
+            d = world.get_food_dist(i)
+            if d < min_food_dists[i]:
+                min_food_dists[i] = d
+            pos_visited_per_agent[i].add(
+                (int(world.agent_positions[i][0]),
+                 int(world.agent_positions[i][1])))
+        if verbose_every and step % verbose_every == 0 and step > 0:
+            print(f"    step {step}: per-agent food={world.agent_food_eaten} "
+                  f"world_total={world.food_eaten}", flush=True)
+        if done:
+            break
+    return {
+        "n_steps": step + 1,
+        "per_agent_food": list(world.agent_food_eaten),
+        "total_food": world.food_eaten,
+        "per_agent_cells_explored": [len(s) for s in pos_visited_per_agent],
+        "min_food_dists": min_food_dists,
+        "initial_food_dists": initial_food_dists,
+    }
 
 
 def run_3d_episode(agent: Tamashii, world,
@@ -162,9 +244,13 @@ def main():
     ap.add_argument("--world_size", type=int, default=16)
     ap.add_argument("--n_food", type=int, default=5)
     ap.add_argument("--n_walls", type=int, default=30)
+    ap.add_argument("--n_agents", type=int, default=1,
+                    help="multi-agent mode when >1")
     ap.add_argument("--seed_base", type=int, default=42)
     ap.add_argument("--use_hebbian", action="store_true",
                     help="Replace core_brain with HebbianCoreBrain")
+    ap.add_argument("--use_3d_brain", action="store_true",
+                    help="Load core_brain_3d_trained.json (3D-specific brain)")
     ap.add_argument("--trained_dir", type=str, default="tamashii/configs")
     ap.add_argument("--output", type=str,
                     default="tamashii_phase_4_3d_result.json")
@@ -184,47 +270,71 @@ def main():
     print("=" * 70, flush=True)
 
     configs_dir = os.path.join(THIS_DIR, "configs")
-    # ONE agent, episodes share it (so Hebbian w_adapt accumulates if enabled)
-    agent = build_fluctlight(
-        shells, configs_dir, trained_dir=args.trained_dir,
-        use_hebbian_core=args.use_hebbian,
-    )
+    # Build N agents (each own Tamashii)
+    agents = [
+        build_fluctlight(
+            shells, configs_dir, trained_dir=args.trained_dir,
+            use_hebbian_core=args.use_hebbian,
+            use_3d_brain=args.use_3d_brain,
+        )
+        for _ in range(args.n_agents)
+    ]
+    if args.use_3d_brain:
+        print(f"  Using 3D-trained core_brain (core_brain_3d_trained.json)",
+              flush=True)
+    print(f"  N_AGENTS={args.n_agents}", flush=True)
 
     episodes = []
     t0 = time.time()
     for ep in range(args.episodes):
         world = VoxelWorld3D(
             size=args.world_size, n_food=args.n_food, n_walls=args.n_walls,
-            seed=args.seed_base + ep * 7,
+            seed=args.seed_base + ep * 7, n_agents=args.n_agents,
         )
         print(f"\n[Episode {ep} seed={args.seed_base + ep * 7}]", flush=True)
-        result = run_3d_episode(
-            agent, world, n_steps=args.n_steps,
-            verbose_every=100 if args.verbose else 0)
-        episodes.append(result)
-        print(f"  END: food_eaten={result['food_eaten']} "
-              f"explored={result['n_cells_explored']}/{result['total_cells']}"
-              f" ({result['exploration_ratio']*100:.1f}%) "
-              f"heading_coherence={result['heading_autocorr']:.3f} "
-              f"S_var={result['S_traj_variance']:.3f}", flush=True)
-        if result["hebbian_stats"]:
-            h = result["hebbian_stats"]
-            print(f"  Hebbian: |w|={h['w_adapt_mean_abs']:.4f} "
-                  f"changed={h['n_changed_edges']}/48 "
-                  f"cumul_reward={h['cumulative_reward']:.2f}", flush=True)
+        if args.n_agents == 1:
+            result = run_3d_episode(
+                agents[0], world, n_steps=args.n_steps,
+                verbose_every=100 if args.verbose else 0)
+            episodes.append(result)
+            print(f"  END: food_eaten={result['food_eaten']} "
+                  f"explored={result['n_cells_explored']}/{result['total_cells']}"
+                  f" ({result['exploration_ratio']*100:.1f}%) "
+                  f"heading_coherence={result['heading_autocorr']:.3f} "
+                  f"S_var={result['S_traj_variance']:.3f}", flush=True)
+            if result.get("hebbian_stats"):
+                h = result["hebbian_stats"]
+                print(f"  Hebbian: |w|={h['w_adapt_mean_abs']:.4f} "
+                      f"changed={h['n_changed_edges']}/48 "
+                      f"cumul_reward={h['cumulative_reward']:.2f}", flush=True)
+        else:
+            result = run_3d_multi_agent_episode(
+                agents, world, n_steps=args.n_steps,
+                verbose_every=100 if args.verbose else 0)
+            episodes.append(result)
+            print(f"  END: total_food={result['total_food']} "
+                  f"per-agent={result['per_agent_food']} "
+                  f"explored={result['per_agent_cells_explored']}",
+                  flush=True)
 
     elapsed = time.time() - t0
-    total_food = sum(e["food_eaten"] for e in episodes)
-    total_explored = sum(e["n_cells_explored"] for e in episodes)
-    mean_coh = float(np.mean([e["heading_autocorr"] for e in episodes]))
+    if args.n_agents == 1:
+        total_food = sum(e["food_eaten"] for e in episodes)
+        total_explored = sum(e["n_cells_explored"] for e in episodes)
+        mean_coh = float(np.mean([e.get("heading_autocorr", 0) for e in episodes]))
+    else:
+        total_food = sum(e["total_food"] for e in episodes)
+        total_explored = sum(sum(e["per_agent_cells_explored"]) for e in episodes)
+        mean_coh = 0.0
 
     print(f"\n{'='*70}", flush=True)
     print(f"  UNDERWORLD Phase 4 SUMMARY ({elapsed:.1f}s)", flush=True)
     print(f"{'='*70}", flush=True)
     print(f"  Total food eaten:     {total_food} across {args.episodes} eps", flush=True)
     print(f"  Total unique cells:   {total_explored}", flush=True)
-    print(f"  Mean heading coh:     {mean_coh:.3f}", flush=True)
-    if episodes[-1]["hebbian_stats"]:
+    if args.n_agents == 1:
+        print(f"  Mean heading coh:     {mean_coh:.3f}", flush=True)
+    if args.n_agents == 1 and episodes[-1].get("hebbian_stats"):
         h = episodes[-1]["hebbian_stats"]
         print(f"  Final Hebbian |w|:    {h['w_adapt_mean_abs']:.4f}  "
               f"(edges changed {h['n_changed_edges']}/48)", flush=True)

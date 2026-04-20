@@ -449,10 +449,92 @@ def train_dmn(budget: float):
 
 
 # ---------------------------------------------------------------
+# core_brain_3d: 129D Kathara params, trained in 3D voxel world
+# ---------------------------------------------------------------
+def train_core_brain_3d(budget: float):
+    """Train core_brain for 3D voxel world navigation + food reach."""
+    from kathara16_brain import PARAM_RANGES_16, TOTAL_PARAMS_16
+    from twelve.agent.mimir import mimir
+    from world_3d import VoxelWorld3D
+
+    param_ranges = list(PARAM_RANGES_16)
+
+    def fitness(params_list: list[float]) -> float:
+        # Build 1-agent Tamashii for 3D: core + brainstem + cerebellum (minimal)
+        agent = _build_tamashii_with_override(
+            [(CoreBrain, "core_brain"), (Brainstem, "brainstem"),
+             (Cerebellum, "cerebellum")],
+            "core_brain",
+            {"kathara_params": list(params_list)},
+        )
+        scores = []
+        for ep in range(2):
+            world = VoxelWorld3D(size=12, n_food=4, n_walls=15,
+                                 seed=ep * 7 + 3)
+            sensors = world.reset()
+            agent.reset_episode()
+            pos_visited = set()
+            initial_food_dist = world.get_food_dist()
+            min_food_dist = initial_food_dist
+
+            for step in range(80):  # 80 steps per eval episode
+                with agent._lock:
+                    agent.S[0:16] = np.asarray(sensors, dtype=np.float64)
+                for _ in range(2):
+                    agent.tick_once()
+                S = agent.read_state()
+                nav = float(np.clip(S[16], 0.0, 1.0))
+                speed = float(np.clip(S[17], 0.0, 1.0))
+                voice = float(np.clip(S[18], 0.0, 1.0))
+                sensors, ate, done = world.step(nav, speed, voice)
+                pos_visited.add(
+                    (int(world.agent_pos[0]), int(world.agent_pos[1])))
+                d = world.get_food_dist()
+                if d < min_food_dist:
+                    min_food_dist = d
+                if done:
+                    break
+
+            food_eaten = world.food_eaten
+            exploration = len(pos_visited) / (world.size * world.size)
+            approach = max(0.0, initial_food_dist - min_food_dist) / (
+                initial_food_dist + 1e-6)
+            score = food_eaten * 50 + exploration * 50 + approach * 30
+            scores.append(score)
+        return float(np.mean(scores))
+
+    print(f"\n[train core_brain_3d] 129D, budget={budget}s", flush=True)
+    result = mimir(
+        eval_fn=fitness,
+        param_ranges=param_ranges,
+        experience_id="tamashii_core_brain_3d",
+        time_budget=budget,
+        verbose=True,
+    )
+    best_params = list(result["best_params"])
+    meta = {
+        "best_score": float(result["best_score"]),
+        "tool_used": result.get("tool_used"),
+        "eval_cost_s": result.get("eval_cost_s"),
+        "proxy_r2": result.get("proxy_r2"),
+        "dead_dims": result.get("dead_dims", [])[:10],
+        "environment": "VoxelWorld3D",
+    }
+    # Save to SEPARATE file to avoid clobbering 2D-trained params
+    path = os.path.join(CONFIGS, "core_brain_3d_trained.json")
+    with open(path, "w", encoding="utf-8") as f:
+        json.dump({"params": {"kathara_params": best_params}, "_meta": meta},
+                  f, indent=2, default=str)
+    print(f"  Saved trained params: {path}", flush=True)
+    return meta
+
+
+# ---------------------------------------------------------------
 # CLI
 # ---------------------------------------------------------------
 TRAINERS = {
     "core_brain": train_core_brain,
+    "core_brain_3d": train_core_brain_3d,
     "cerebellum": train_cerebellum,
     "salience": train_salience,
     "hippocampus": train_hippocampus,
@@ -462,7 +544,8 @@ TRAINERS = {
 
 # Reasonable budgets per shell
 DEFAULT_BUDGETS = {
-    "core_brain": 600,  # 129D, needs lots of time
+    "core_brain": 600,      # 129D 2D training
+    "core_brain_3d": 900,   # 129D 3D training, slower (world step ~3x cost)
     "cerebellum": 60,
     "salience": 60,
     "hippocampus": 60,

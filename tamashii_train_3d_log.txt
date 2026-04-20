@@ -1,0 +1,789 @@
+======================================================================
+  TAMASHII offline shell training via mimir()
+  shells to train: ['core_brain_3d']
+======================================================================
+
+[train core_brain_3d] 129D, budget=900.0s
+  [owl empty-start] seeding 131 points in 129d via verify_fn
+
+==================================================
+  [Round 1/30] 131件のデータ
+==================================================
+  [Measurements] 131件, 129次元
+  [MS] active=125, dead=4
+  [MS Proxy] zenron R2=0.958, linear R2=0.958, zenron_log R2=0.750, linear_log R2=0.750 -> zenron selected
+  [Proxy] R²=0.958
+Twelve optimize (Run #1): 129パラメータ, 11.74357042312622秒
+  eval速度: 100000/秒, ベースライン: 111.2568
+  Phase 2: KatharaParamOptimizer (129パラメータ, 11秒)
+  [学習] 経験保存: Run #1, 化石ベスト: 3599.0852
+  完了: 111.2568 → 3599.0852 (11.7秒, 334584eval)
+  [Verify] proxy=3599.0852 → real=21.8851
+  [Auto] stagnant=0/3, best=21.8851
+
+==================================================
+  [Round 2/30] 135件のデータ
+==================================================
+  [Measurements] 135件, 129次元
+  [MS] active=114, dead=15
+  [MS Proxy] zenron R2=0.863, linear R2=0.863, zenron_log R2=-0.134, linear_log R2=-0.134 -> zenron selected
+  [Proxy] R²=0.863
+  [学習] 経験ロード: 1回目, 歴代ベスト: 3599.085223
+  [学習] ウォームスタート: 化石記録から初期値復元
+Twelve optimize (Run #2): 129パラメータ, 11.69675926504464秒
+  eval速度: 999/秒, ベースライン: 47.2587
+  Phase 2: KatharaParamOptimizer (129パラメータ, 11秒)
+  [学習] 経験保存: Run #2, 化石ベスト: 3599.0852
+  [学習] 戦略重み: small=0.64, medium=0.80, large=0.87, reset=0.79
+  [学習] 次回Phase1配分: 72%
+  完了: 47.2587 → 3131.1085 (5.3秒, 156444eval)
+  [Verify] proxy=3131.1085 → real=105.9553
+  [Auto] stagnant=0/3, best=105.9553
+
+==================================================
+  [Round 3/30] 139件のデータ
+==================================================
+  [Measurements] 139件, 129次元
+  [MS] active=108, dead=21
+  [MS Proxy] linear R2=0.805, zenron R2=0.805, linear_log R2=-0.371, zenron_log R2=-0.371 -> linear selected
+  [Proxy] R²=0.805
+  [学習] 経験ロード: 2回目, 歴代ベスト: 3599.085223
+  [学習] ウォームスタート: 化石記録から初期値復元
+Twelve optimize (Run #3): 129パラメータ, 11.88357549905777秒
+  eval速度: 100000/秒, ベースライン: 53.7180
+  Phase 2: KatharaParamOptimizer (129パラメータ, 12秒)
+  [学習] 経験保存: Run #3, 化石ベスト: 3599.0852
+  [学習] 戦略重み: small=0.64, medium=0.80, large=0.87, reset=0.79
+  [学習] 次回Phase1配分: 72%
+  完了: 53.7180 → 2597.4204 (9.5秒, 377076eval)
+  [Verify] proxy=2597.4204 → real=2.4672
+  [Auto] stagnant=1/3, best=131.4116
+
+==================================================
+  [Round 4/30] 143件のデータ
+==================================================
+  [Measurements] 143件, 129次元
+  [MS] active=116, dead=13
+  [MS Proxy] zenron R2=0.788, linear R2=0.788, zenron_log R2=-4.601, linear_log R2=-4.601 -> zenron selected
+  [Proxy] R²=0.788
+  [学習] 経験ロード: 3回目, 歴代ベスト: 3599.085223
+  [学習] ウォームスタート: 化石記録から初期値復元
+Twelve optimize (Run #4): 129パラメータ, 11.91330388740257秒
+  eval速度: 100000/秒, ベースライン: 59.2557
+  Phase 2: KatharaParamOptimizer (129パラメータ, 12秒)
+  [学習] 経験保存: Run #4, 化石ベスト: 3599.0852
+  [学習] 戦略重み: small=0.64, medium=0.80, large=0.87, reset=0.79
+  [学習] 次回Phase1配分: 72%
+  完了: 59.2557 → 3194.8168 (11.9秒, 350124eval)
+  [Verify] proxy=3194.8168 → real=155.7261
+  [Auto] stagnant=0/3, best=155.7261
+
+==================================================
+  [Round 5/30] 147件のデータ
+==================================================
+  [Measurements] 147件, 129次元
+  [MS] active=108, dead=21
+  [MS Proxy] zenron R2=0.656, linear R2=0.656, linear_log R2=-3.191, zenron_log R2=-3.191 -> zenron selected
+  [Proxy] R²=0.656
+  [学習] 経験ロード: 4回目, 歴代ベスト: 3599.085223
+  [学習] ウォームスタート: 化石記録から初期値復元
+Twelve optimize (Run #5): 129パラメータ, 11.871839211537289秒
+  eval速度: 100000/秒, ベースライン: 46.6586
+  Phase 2: KatharaParamOptimizer (129パラメータ, 12秒)
+  [学習] 経験保存: Run #5, 化石ベスト: 3599.0852
+  [学習] 戦略重み: small=0.64, medium=0.80, large=0.87, reset=0.79
+  [学習] 次回Phase1配分: 72%
+  完了: 46.6586 → 2240.9573 (11.9秒, 367536eval)
+  [Verify] proxy=2240.9573 → real=81.7290
+  [Auto] stagnant=1/3, best=158.3537
+
+==================================================
+  [Round 6/30] 151件のデータ
+==================================================
+  [Measurements] 151件, 129次元
+  [MS] active=111, dead=18
+  [MS Proxy] zenron R2=0.750, linear R2=0.750, linear_log R2=-1.600, zenron_log R2=-1.600 -> zenron selected
+  [Proxy] R²=0.750
+  [学習] 経験ロード: 5回目, 歴代ベスト: 3599.085223
+  [学習] ウォームスタート: 化石記録から初期値復元
+Twelve optimize (Run #6): 129パラメータ, 11.825839366912842秒
+  eval速度: 100000/秒, ベースライン: 19.9555
+  Phase 2: KatharaParamOptimizer (129パラメータ, 12秒)
+  [学習] 経験保存: Run #6, 化石ベスト: 3649.2996
+  [学習] 戦略重み: small=0.64, medium=0.80, large=0.87, reset=0.79
+  [学習] 次回Phase1配分: 72%
+  完了: 19.9555 → 3649.2996 (11.8秒, 366840eval)
+  [Verify] proxy=3649.2996 → real=211.0120
+  [Auto] stagnant=0/3, best=211.0120
+
+==================================================
+  [Round 7/30] 155件のデータ
+==================================================
+  [Measurements] 155件, 129次元
+  [MS] active=128, dead=1
+  [MS Proxy] zenron R2=0.791, linear R2=0.791, linear_log R2=-0.716, zenron_log R2=-0.716 -> zenron selected
+  [Proxy] R²=0.791
+  [学習] 経験ロード: 6回目, 歴代ベスト: 3649.299606
+  [学習] ウォームスタート: 化石記録から初期値復元
+Twelve optimize (Run #7): 129パラメータ, 11.757727295160294秒
+  eval速度: 100000/秒, ベースライン: 242.0518
+  Phase 2: KatharaParamOptimizer (129パラメータ, 11秒)
+  [学習] 経験保存: Run #7, 化石ベスト: 7226.3122
+  [学習] 戦略重み: small=0.64, medium=0.80, large=0.87, reset=0.79
+  [学習] 次回Phase1配分: 72%
+  完了: 242.0518 → 7226.3122 (11.8秒, 321120eval)
+  [Verify] proxy=7226.3122 → real=133.8242
+  [Auto] stagnant=1/3, best=236.6592
+
+==================================================
+  [Round 8/30] 159件のデータ
+==================================================
+  [Measurements] 159件, 129次元
+  [MS] active=115, dead=14
+  [MS Proxy] zenron R2=0.602, linear R2=0.602, zenron_log R2=-0.517, linear_log R2=-0.517 -> zenron selected
+  [Proxy] R²=0.602
+  [学習] 経験ロード: 7回目, 歴代ベスト: 7226.312229
+  [学習] ウォームスタート: 化石記録から初期値復元
+Twelve optimize (Run #8): 129パラメータ, 11.704591460849928秒
+  eval速度: 100000/秒, ベースライン: 205.3329
+  Phase 2: KatharaParamOptimizer (129パラメータ, 11秒)
+  [学習] 経験保存: Run #8, 化石ベスト: 7226.3122
+  [学習] 戦略重み: small=0.64, medium=0.80, large=0.87, reset=0.79
+  [学習] 次回Phase1配分: 72%
+  完了: 205.3329 → 2348.7965 (11.7秒, 350784eval)
+  [Verify] proxy=2348.7965 → real=2.9150
+  [Auto] stagnant=2/3, best=309.1225
+
+==================================================
+  [Round 9/30] 163件のデータ
+==================================================
+  [Measurements] 163件, 129次元
+  [MS] active=116, dead=13
+  [MS Proxy] zenron R2=0.584, linear R2=0.584, zenron_log R2=-1.525, linear_log R2=-1.525 -> zenron selected
+  [Proxy] R²=0.584
+  [学習] 経験ロード: 8回目, 歴代ベスト: 7226.312229
+  [学習] ウォームスタート: 化石記録から初期値復元
+Twelve optimize (Run #9): 129パラメータ, 11.644688216122715秒
+  eval速度: 100000/秒, ベースライン: 200.2403
+  Phase 2: KatharaParamOptimizer (129パラメータ, 11秒)
+  [学習] 経験保存: Run #9, 化石ベスト: 7226.3122
+  [学習] 戦略重み: small=0.64, medium=0.80, large=0.87, reset=0.79
+  [学習] 次回Phase1配分: 72%
+  完了: 200.2403 → 3068.4378 (11.6秒, 338436eval)
+  [Verify] proxy=3068.4378 → real=6.0520
+  [Auto] stagnant=3/3, best=309.1225
+  [Auto] Stagnation -> range perturbation
+
+==================================================
+  [Round 10/30] 167件のデータ
+==================================================
+  [Measurements] 167件, 129次元
+  [MS] active=111, dead=18
+  [MS Proxy] zenron R2=0.519, linear R2=0.519, linear_log R2=-1.316, zenron_log R2=-1.316 -> zenron selected
+  [Proxy] R²=0.519
+  [学習] 経験ロード: 9回目, 歴代ベスト: 7226.312229
+  [学習] ウォームスタート: 化石記録から初期値復元
+Twelve optimize (Run #10): 129パラメータ, 11.580449944450741秒
+  eval速度: 100000/秒, ベースライン: 199.3656
+  Phase 2: KatharaParamOptimizer (129パラメータ, 11秒)
+  [学習] 経験保存: Run #10, 化石ベスト: 7226.3122
+  [学習] 戦略重み: small=0.64, medium=0.80, large=0.87, reset=0.79
+  [学習] 次回Phase1配分: 72%
+  完了: 199.3656 → 2133.2552 (11.6秒, 347988eval)
+  [Verify] proxy=2133.2552 → real=161.6937
+  [Auto] stagnant=1/3, best=309.1225
+
+==================================================
+  [Round 11/30] 171件のデータ
+==================================================
+  [Measurements] 171件, 129次元
+  [MS] active=105, dead=24
+  [MS Proxy] zenron R2=0.465, linear R2=0.465, zenron_log R2=-0.934, linear_log R2=-0.934 -> zenron selected
+  [Proxy] R²=0.465
+  [学習] 経験ロード: 10回目, 歴代ベスト: 7226.312229
+  [学習] ウォームスタート: 化石記録から初期値復元
+Twelve optimize (Run #11): 129パラメータ, 11.523030483722687秒
+  eval速度: 100000/秒, ベースライン: 202.4723
+  Phase 2: KatharaParamOptimizer (129パラメータ, 11秒)
+  [学習] 経験保存: Run #11, 化石ベスト: 7226.3122
+  [学習] 戦略重み: small=0.64, medium=0.80, large=0.87, reset=0.79
+  [学習] 次回Phase1配分: 72%
+  完了: 202.4723 → 1715.1643 (11.5秒, 353520eval)
+  [Verify] proxy=1715.1643 → real=286.2720
+  [Auto] stagnant=2/3, best=309.1225
+
+==================================================
+  [Round 12/30] 175件のデータ
+==================================================
+  [Measurements] 175件, 129次元
+  [MS] active=106, dead=23
+  [MS Proxy] zenron R2=0.457, linear R2=0.457, zenron_log R2=-0.891, linear_log R2=-0.891 -> zenron selected
+  [Proxy] R²=0.457
+  [学習] 経験ロード: 11回目, 歴代ベスト: 7226.312229
+  [学習] ウォームスタート: 化石記録から初期値復元
+Twelve optimize (Run #12): 129パラメータ, 11.463046952297812秒
+  eval速度: 100000/秒, ベースライン: 203.2276
+  Phase 2: KatharaParamOptimizer (129パラメータ, 11秒)
+  [学習] 経験保存: Run #12, 化石ベスト: 7226.3122
+  [学習] 戦略重み: small=0.64, medium=0.80, large=0.87, reset=0.79
+  [学習] 次回Phase1配分: 72%
+  完了: 203.2276 → 1477.4270 (11.5秒, 345096eval)
+  [Verify] proxy=1477.4270 → real=20.2187
+  [Auto] stagnant=3/3, best=309.1225
+  [Auto] Stagnation -> range perturbation
+
+==================================================
+  [Round 13/30] 179件のデータ
+==================================================
+  [Measurements] 179件, 129次元
+  [MS] active=3, dead=126
+  [MS Proxy] zenron R2=0.187, linear R2=0.187, linear_log R2=-0.236, zenron_log R2=-0.236 -> zenron selected
+  [Proxy] R²=0.187
+  [Proxy] R²=0.187 < 0.3: 構造発見できず。
+  [Fallback-low-R²] direct optimize on verify_fn from warm-start, 11.5s
+  [Fallback-low-R²] direct best=436.6593
+
+==================================================
+  [Round 14/30] 183件のデータ
+==================================================
+  [Measurements] 183件, 129次元
+  [MS] active=128, dead=1
+  [MS Proxy] zenron R2=0.488, linear R2=0.488, linear_log R2=-0.637, zenron_log R2=-0.637 -> zenron selected
+  [Proxy] R²=0.488
+  [学習] 経験ロード: 13回目, 歴代ベスト: 7226.312229
+  [学習] ウォームスタート: 化石記録から初期値復元
+Twelve optimize (Run #14): 129パラメータ, 11.338188956765567秒
+  eval速度: 100000/秒, ベースライン: 213.2500
+  Phase 2: KatharaParamOptimizer (129パラメータ, 11秒)
+  [学習] 経験保存: Run #14, 化石ベスト: 7226.3122
+  [学習] 戦略重み: small=0.64, medium=0.80, large=0.87, reset=0.79
+  [学習] 次回Phase1配分: 72%
+  完了: 213.2500 → 3533.7823 (11.3秒, 306840eval)
+  [Verify] proxy=3533.7823 → real=2.8833
+  [Auto] stagnant=1/3, best=309.1225
+
+==================================================
+  [Round 15/30] 187件のデータ
+==================================================
+  [Measurements] 187件, 129次元
+  [MS] active=2, dead=127
+  [MS Proxy] zenron R2=0.185, linear R2=0.185, linear_log R2=-0.228, zenron_log R2=-0.228 -> zenron selected
+  [Proxy] R²=0.185
+  [Proxy] R²=0.185 < 0.3: 構造発見できず。
+  [Fallback-low-R²] direct optimize on verify_fn from warm-start, 11.3s
+  [Fallback-low-R²] direct best=463.8588
+
+==================================================
+  [Round 16/30] 191件のデータ
+==================================================
+  [Measurements] 191件, 129次元
+  [MS] active=2, dead=127
+  [MS Proxy] zenron R2=0.178, linear R2=0.178, zenron_log R2=-0.236, linear_log R2=-0.236 -> zenron selected
+  [Proxy] R²=0.178
+  [Proxy] R²=0.178 < 0.3: 構造発見できず。
+  [Fallback-low-R²] direct optimize on verify_fn from warm-start, 11.3s
+  [Fallback-low-R²] direct best=537.7753
+
+==================================================
+  [Round 17/30] 195件のデータ
+==================================================
+  [Measurements] 195件, 129次元
+  [MS] active=2, dead=127
+  [MS Proxy] zenron R2=0.180, linear R2=0.180, zenron_log R2=-0.231, linear_log R2=-0.231 -> zenron selected
+  [Proxy] R²=0.180
+  [Proxy] R²=0.180 < 0.3: 構造発見できず。
+  [Fallback-low-R²] direct optimize on verify_fn from warm-start, 11.3s
+  [Fallback-low-R²] direct best=537.7773
+
+==================================================
+  [Round 18/30] 199件のデータ
+==================================================
+  [Measurements] 199件, 129次元
+  [MS] active=2, dead=127
+  [MS Proxy] zenron R2=0.176, linear R2=0.176, zenron_log R2=-0.223, linear_log R2=-0.223 -> zenron selected
+  [Proxy] R²=0.176
+  [Proxy] R²=0.176 < 0.3: 構造発見できず。
+  [Fallback-low-R²] direct optimize on verify_fn from warm-start, 11.3s
+  [Fallback-low-R²] direct best=537.7787
+
+==================================================
+  [Round 19/30] 203件のデータ
+==================================================
+  [Measurements] 203件, 129次元
+  [MS] active=128, dead=1
+  [MS Proxy] zenron R2=0.559, linear R2=0.559, zenron_log R2=-0.285, linear_log R2=-0.285 -> zenron selected
+  [Proxy] R²=0.559
+  [学習] 経験ロード: 18回目, 歴代ベスト: 7226.312229
+  [学習] ウォームスタート: 化石記録から初期値復元
+Twelve optimize (Run #19): 129パラメータ, 10.96108223994573秒
+  eval速度: 100000/秒, ベースライン: 199.4073
+  Phase 2: KatharaParamOptimizer (129パラメータ, 11秒)
+  [学習] 経験保存: Run #19, 化石ベスト: 7226.3122
+  [学習] 戦略重み: small=0.64, medium=0.80, large=0.87, reset=0.79
+  [学習] 次回Phase1配分: 72%
+  完了: 199.4073 → 1860.4171 (11.0秒, 287700eval)
+  [Verify] proxy=1860.4171 → real=234.8770
+  [Auto] stagnant=2/3, best=309.1225
+
+==================================================
+  [Round 20/30] 207件のデータ
+==================================================
+  [Measurements] 207件, 129次元
+  [MS] active=128, dead=1
+  [MS Proxy] zenron R2=0.520, linear R2=0.520, zenron_log R2=-0.359, linear_log R2=-0.359 -> zenron selected
+  [Proxy] R²=0.520
+  [学習] 経験ロード: 19回目, 歴代ベスト: 7226.312229
+  [学習] ウォームスタート: 化石記録から初期値復元
+Twelve optimize (Run #20): 129パラメータ, 10.801832589236172秒
+  eval速度: 100000/秒, ベースライン: 210.3090
+  Phase 2: KatharaParamOptimizer (129パラメータ, 11秒)
+  [学習] 経験保存: Run #20, 化石ベスト: 7226.3122
+  [学習] 戦略重み: small=0.64, medium=0.80, large=0.87, reset=0.79
+  [学習] 次回Phase1配分: 72%
+  完了: 210.3090 → 1533.9893 (10.8秒, 293892eval)
+  [Verify] proxy=1533.9893 → real=11.5583
+  [Auto] stagnant=3/3, best=386.7325
+  [Auto] Stagnation -> range perturbation
+
+==================================================
+  [Round 21/30] 211件のデータ
+==================================================
+  [Measurements] 211件, 129次元
+  [MS] active=127, dead=2
+  [MS Proxy] zenron R2=0.492, linear R2=0.492, zenron_log R2=-0.472, linear_log R2=-0.472 -> zenron selected
+  [Proxy] R²=0.492
+  [学習] 経験ロード: 20回目, 歴代ベスト: 7226.312229
+  [学習] ウォームスタート: 化石記録から初期値復元
+Twelve optimize (Run #21): 129パラメータ, 10.630833053588868秒
+  eval速度: 100000/秒, ベースライン: 219.2304
+  Phase 2: KatharaParamOptimizer (129パラメータ, 10秒)
+  [学習] 経験保存: Run #21, 化石ベスト: 7226.3122
+  [学習] 戦略重み: small=0.64, medium=0.80, large=0.87, reset=0.79
+  [学習] 次回Phase1配分: 72%
+  完了: 219.2304 → 1370.5562 (10.6秒, 294204eval)
+  [Verify] proxy=1370.5562 → real=182.6319
+  [Auto] stagnant=1/3, best=386.7325
+
+==================================================
+  [Round 22/30] 215件のデータ
+==================================================
+  [Measurements] 215件, 129次元
+  [MS] active=5, dead=124
+  [MS Proxy] zenron_interact R2=0.276, linear R2=0.276, zenron R2=0.276, linear_log R2=-0.218, zenron_log R2=-0.218, zenron_interact_log R2=-0.335 -> zenron_interact selected
+  [Proxy] R²=0.276
+  [Proxy] R²=0.276 < 0.3: 構造発見できず。
+  [Fallback-low-R²] direct optimize on verify_fn from warm-start, 10.6s
+  [Fallback-low-R²] direct best=537.7835
+
+==================================================
+  [Round 23/30] 219件のデータ
+==================================================
+  [Measurements] 219件, 129次元
+  [MS] active=5, dead=124
+  [MS Proxy] zenron_interact R2=0.283, linear R2=0.280, zenron R2=0.280, zenron_log R2=-0.248, linear_log R2=-0.248, zenron_interact_log R2=-0.362 -> zenron_interact selected
+  [Proxy] R²=0.283
+  [Proxy] R²=0.283 < 0.3: 構造発見できず。
+  [Fallback-low-R²] direct optimize on verify_fn from warm-start, 10.6s
+  [Fallback-low-R²] direct best=537.7837
+
+==================================================
+  [Round 24/30] 223件のデータ
+==================================================
+  [Measurements] 223件, 129次元
+  [MS] active=5, dead=124
+  [MS Proxy] zenron_interact R2=0.290, zenron R2=0.287, linear R2=0.287, linear_log R2=-0.245, zenron_log R2=-0.245, zenron_interact_log R2=-0.374 -> zenron_interact selected
+  [Proxy] R²=0.290
+  [Proxy] R²=0.290 < 0.3: 構造発見できず。
+  [Fallback-low-R²] direct optimize on verify_fn from warm-start, 10.6s
+  [Fallback-low-R²] direct best=537.7858
+
+==================================================
+  [Round 25/30] 227件のデータ
+==================================================
+  [Measurements] 227件, 129次元
+  [MS] active=127, dead=2
+  [MS Proxy] zenron R2=0.531, linear R2=0.531, linear_log R2=-0.314, zenron_log R2=-0.314 -> zenron selected
+  [Proxy] R²=0.531
+  [学習] 経験ロード: 24回目, 歴代ベスト: 7226.312229
+  [学習] ウォームスタート: 化石記録から初期値復元
+Twelve optimize (Run #25): 129パラメータ, 10.046319524447123秒
+  eval速度: 100000/秒, ベースライン: 210.4488
+  Phase 2: KatharaParamOptimizer (129パラメータ, 10秒)
+  [学習] 経験保存: Run #25, 化石ベスト: 7226.3122
+  [学習] 戦略重み: small=0.64, medium=0.80, large=0.87, reset=0.79
+  [学習] 次回Phase1配分: 72%
+  完了: 210.4488 → 1298.6372 (10.1秒, 255084eval)
+  [Verify] proxy=1298.6372 → real=129.8557
+  [Auto] stagnant=2/3, best=386.7325
+
+==================================================
+  [Round 26/30] 231件のデータ
+==================================================
+  [Measurements] 231件, 129次元
+  [MS] active=5, dead=124
+  [MS Proxy] zenron_interact R2=0.290, linear R2=0.285, zenron R2=0.285, zenron_log R2=-0.249, linear_log R2=-0.249, zenron_interact_log R2=-0.276 -> zenron_interact selected
+  [Proxy] R²=0.290
+  [Proxy] R²=0.290 < 0.3: 構造発見できず。
+  [Fallback-low-R²] direct optimize on verify_fn from warm-start, 10.0s
+  [Fallback-low-R²] direct best=537.7864
+
+==================================================
+  [Round 27/30] 235件のデータ
+==================================================
+  [Measurements] 235件, 129次元
+  [MS] active=5, dead=124
+  [MS Proxy] zenron_interact R2=0.296, zenron R2=0.290, linear R2=0.290, zenron_log R2=-0.253, linear_log R2=-0.253, zenron_interact_log R2=-0.264 -> zenron_interact selected
+  [Proxy] R²=0.296
+  [Proxy] R²=0.296 < 0.3: 構造発見できず。
+  [Fallback-low-R²] direct optimize on verify_fn from warm-start, 10.0s
+  [Fallback-low-R²] direct best=537.7940
+
+==================================================
+  [Round 28/30] 239件のデータ
+==================================================
+  [Measurements] 239件, 129次元
+  [MS] active=118, dead=11
+  [MS Proxy] zenron R2=0.543, linear R2=0.543, linear_log R2=-0.282, zenron_log R2=-0.282 -> zenron selected
+  [Proxy] R²=0.543
+  [学習] 経験ロード: 27回目, 歴代ベスト: 7226.312229
+  [学習] ウォームスタート: 化石記録から初期値復元
+Twelve optimize (Run #28): 129パラメータ, 9.404439449310303秒
+  eval速度: 100000/秒, ベースライン: 199.8560
+  Phase 2: KatharaParamOptimizer (129パラメータ, 9秒)
+  [学習] 経験保存: Run #28, 化石ベスト: 7226.3122
+  [学習] 戦略重み: small=0.64, medium=0.80, large=0.87, reset=0.79
+  [学習] 次回Phase1配分: 72%
+  完了: 199.8560 → 1200.1024 (9.4秒, 261348eval)
+  [Verify] proxy=1200.1024 → real=160.3460
+  [Auto] stagnant=3/3, best=386.7325
+  [Auto] Stagnation -> range perturbation
+
+==================================================
+  [Round 29/30] 243件のデータ
+==================================================
+  [Measurements] 243件, 129次元
+  [MS] active=128, dead=1
+  [MS Proxy] zenron R2=0.532, linear R2=0.532, linear_log R2=-0.411, zenron_log R2=-0.411 -> zenron selected
+  [Proxy] R²=0.532
+  [学習] 経験ロード: 28回目, 歴代ベスト: 7226.312229
+  [学習] ウォームスタート: 化石記録から初期値復元
+Twelve optimize (Run #29): 129パラメータ, 8.444232821464539秒
+  eval速度: 100000/秒, ベースライン: 201.6418
+  Phase 2: KatharaParamOptimizer (129パラメータ, 8秒)
+  [学習] 経験保存: Run #29, 化石ベスト: 7226.3122
+  [学習] 戦略重み: small=0.64, medium=0.80, large=0.87, reset=0.79
+  [学習] 次回Phase1配分: 72%
+  完了: 201.6418 → 1130.9903 (8.4秒, 226608eval)
+  [Verify] proxy=1130.9903 → real=81.9471
+  [Auto] stagnant=1/3, best=386.7325
+
+==================================================
+  [Round 30/30] 247件のデータ
+==================================================
+  [Measurements] 247件, 129次元
+  [MS] active=126, dead=3
+  [MS Proxy] zenron R2=0.504, linear R2=0.504, linear_log R2=-0.424, zenron_log R2=-0.424 -> zenron selected
+  [Proxy] R²=0.504
+  [学習] 経験ロード: 29回目, 歴代ベスト: 7226.312229
+  [学習] ウォームスタート: 化石記録から初期値復元
+Twelve optimize (Run #30): 129パラメータ, 6.89159369468689秒
+  eval速度: 100000/秒, ベースライン: 199.3273
+  Phase 2: KatharaParamOptimizer (129パラメータ, 7秒)
+  [学習] 経験保存: Run #30, 化石ベスト: 7226.3122
+  [学習] 戦略重み: small=0.64, medium=0.80, large=0.87, reset=0.79C:\新しいフォルダー (2)\パイプラインオートメーション\twelve\agent\reigen.py:848: UserWarning: n_user + n_self = 146 > 20; Sentinel collects max(20, N+M) samples which may violate Rule 5. Consider reducing dims or increasing collect_min_ratio.
+  warnings.warn(
+
+  [学習] 次回Phase1配分: 72%
+  完了: 199.3273 → 1062.6117 (6.9秒, 188184eval)
+  [Verify] proxy=1062.6117 → real=157.0063
+  [Auto] stagnant=2/3, best=386.7325
+  [Auto] total time_budget 360.0s exhausted at round 30 (360.6s elapsed)
+  [L-BFGS-B] refinement improved: 157.0063 → 181.8348
+============================================================
+  Reigen | N_user=129, N_self=17
+  total_budget=482.5404109954834s, inner_budget=2s
+  experience_id=tamashii_core_brain_3d_reigen
+============================================================
+============================================================
+  Sentinel | 146D, 482.5404109954834s
+  eval_fn:  Reigen._make_combined_eval.<locals>.combined_eval
+  guard_fn: Reigen._make_combined_guard.<locals>.combined_guard
+  initial_params: [0.0, 0.0, 0.0, 0.0, 0.0, 0.0]...
+============================================================
+  [MS Proxy] zenron_interact R2=0.699, zenron R2=0.540, linear R2=0.540, zenron_interact_log R2=-1.460, linear_log R2=-2.023, zenron_log R2=-2.023 -> linear selected
+  [MS Proxy] zenron_interact R2=0.722, zenron R2=0.640, linear R2=0.640, zenron_interact_log R2=-3.290, zenron_log R2=-8.702, linear_log R2=-8.702 -> zenron_interact selected
+  [MS Proxy] zenron_interact R2=0.710, zenron R2=0.464, linear R2=0.464, zenron_interact_log R2=-1.130, zenron_log R2=-2.546, linear_log R2=-2.546 -> zenron_interact selected
+  [MS Proxy] zenron_interact R2=0.705, zenron R2=0.704, linear R2=0.704, linear_log R2=-12.854, zenron_log R2=-12.854, zenron_interact_log R2=-18.778 -> zenron_interact selected
+  [MS Proxy] zenron_interact R2=0.733, linear R2=0.619, zenron R2=0.619, zenron_interact_log R2=-1.565, linear_log R2=-5.981, zenron_log R2=-5.981 -> linear selected
+  [MS Proxy] zenron_interact R2=0.586, zenron R2=0.448, linear R2=0.448, zenron_log R2=-1.519, linear_log R2=-1.519, zenron_interact_log R2=-2.140 -> zenron_interact selected
+  [MS Proxy] zenron R2=0.274, linear R2=0.274, zenron_log R2=-0.070, linear_log R2=-0.070 -> zenron selected
+  [Collect] 146 measurements
+  [Optimize] owl(eval_fn, autonomous, 145s)
+
+==================================================
+  [Round 1/10] 146件のデータ
+==================================================
+  [Measurements] 146件, 146次元
+  [MS] active=144, dead=2
+  [MS Proxy] zenron R2=0.986, linear R2=0.986, zenron_log R2=0.984, linear_log R2=0.984 -> zenron selected
+  [Proxy] R²=0.986
+Twelve optimize (Run #1): 146パラメータ, 14.238113565444944秒
+  eval速度: 100000/秒, ベースライン: 463.6716
+  Phase 2: KatharaParamOptimizer (146パラメータ, 12秒)
+  [学習] 経験保存: Run #1, 化石ベスト: 1426.4941
+  完了: 463.6716 → 1426.4941 (14.2秒, 275376eval)
+  [Verify] proxy=1426.4941 → real=462.2768
+  [Auto] stagnant=0/3, best=462.2768
+
+==================================================
+  [Round 2/10] 150件のデータ
+==================================================
+  [Measurements] 150件, 146次元
+  [MS] active=142, dead=4
+  [MS Proxy] zenron R2=0.948, linear R2=0.948, linear_log R2=0.939, zenron_log R2=0.939 -> zenron selected
+  [Proxy] R²=0.948
+  [学習] 経験ロード: 1回目, 歴代ベスト: 1426.494071
+  [学習] ウォームスタート: 化石記録から初期値復元
+Twelve optimize (Run #2): 146パラメータ, 13.785153992970784秒
+  eval速度: 100000/秒, ベースライン: 463.5604
+  Phase 2: KatharaParamOptimizer (146パラメータ, 12秒)
+  [学習] 経験保存: Run #2, 化石ベスト: 1426.4941
+  [学習] 戦略重み: small=0.64, medium=0.80, large=0.87, reset=0.79
+  [学習] 次回Phase1配分: 72%
+  完了: 463.5604 → 1074.0635 (13.8秒, 273228eval)
+  [Verify] proxy=1074.0635 → real=462.2768
+  [Auto] stagnant=1/3, best=462.2768
+
+==================================================
+  [Round 3/10] 154件のデータ
+==================================================
+  [Measurements] 154件, 146次元
+  [MS] active=145, dead=1
+  [MS Proxy] zenron R2=0.962, linear R2=0.962, linear_log R2=0.955, zenron_log R2=0.955 -> zenron selected
+  [Proxy] R²=0.962
+  [学習] 経験ロード: 2回目, 歴代ベスト: 1426.494071
+  [学習] ウォームスタート: 化石記録から初期値復元
+Twelve optimize (Run #3): 146パラメータ, 13.268827164173125秒
+  eval速度: 100000/秒, ベースライン: 463.4749
+  Phase 2: KatharaParamOptimizer (146パラメータ, 11秒)
+  [学習] 経験保存: Run #3, 化石ベスト: 1426.4941
+  [学習] 戦略重み: small=0.64, medium=0.80, large=0.87, reset=0.79
+  [学習] 次回Phase1配分: 72%
+  完了: 463.4749 → 1344.2269 (13.3秒, 261660eval)
+  [Verify] proxy=1344.2269 → real=462.2768
+  [Auto] stagnant=2/3, best=462.2768
+
+==================================================
+  [Round 4/10] 158件のデータ
+==================================================
+  [Measurements] 158件, 146次元
+  [MS] active=144, dead=2
+  [MS Proxy] zenron R2=0.888, linear R2=0.888, linear_log R2=0.871, zenron_log R2=0.871 -> zenron selected
+  [Proxy] R²=0.888
+  [学習] 経験ロード: 3回目, 歴代ベスト: 1426.494071
+  [学習] ウォームスタート: 化石記録から初期値復元
+Twelve optimize (Run #4): 146パラメータ, 12.658263369968958秒
+  eval速度: 100000/秒, ベースライン: 464.7724
+  Phase 2: KatharaParamOptimizer (146パラメータ, 11秒)
+  [学習] 経験保存: Run #4, 化石ベスト: 1426.4941
+  [学習] 戦略重み: small=0.64, medium=0.80, large=0.87, reset=0.79
+  [学習] 次回Phase1配分: 72%
+  完了: 464.7724 → 913.8866 (12.7秒, 249408eval)
+  [Verify] proxy=913.8866 → real=462.2768
+  [Auto] stagnant=3/3, best=462.2768
+  [Auto] Stagnation -> range perturbation
+
+==================================================
+  [Round 5/10] 162件のデータ
+==================================================
+  [Measurements] 162件, 146次元
+  [MS] active=145, dead=1
+  [MS Proxy] linear R2=0.854, zenron R2=0.854, zenron_log R2=0.832, linear_log R2=0.832 -> linear selected
+  [Proxy] R²=0.854
+  [学習] 経験ロード: 4回目, 歴代ベスト: 1426.494071
+  [学習] ウォームスタート: 化石記録から初期値復元
+Twelve optimize (Run #5): 146パラメータ, 11.955510369936624秒
+  eval速度: 100000/秒, ベースライン: 465.6722
+  Phase 2: KatharaParamOptimizer (146パラメータ, 10秒)
+  [学習] 経験保存: Run #5, 化石ベスト: 1426.4941
+  [学習] 戦略重み: small=0.64, medium=0.80, large=0.87, reset=0.79
+  [学習] 次回Phase1配分: 72%
+  完了: 465.6722 → 778.0736 (12.0秒, 305220eval)
+  [Verify] proxy=778.0736 → real=462.2768
+  [Auto] stagnant=1/3, best=462.2768
+
+==================================================
+  [Round 6/10] 166件のデータ
+==================================================
+  [Measurements] 166件, 146次元
+  [MS] active=144, dead=2
+  [MS Proxy] linear R2=0.790, zenron R2=0.790, linear_log R2=0.764, zenron_log R2=0.764 -> linear selected
+  [Proxy] R²=0.790
+  [学習] 経験ロード: 5回目, 歴代ベスト: 1426.494071
+  [学習] ウォームスタート: 化石記録から初期値復元
+Twelve optimize (Run #6): 146パラメータ, 11.113057556152341秒
+  eval速度: 100000/秒, ベースライン: 462.4725
+  Phase 2: KatharaParamOptimizer (146パラメータ, 9秒)
+  [学習] 経験保存: Run #6, 化石ベスト: 1426.4941
+  [学習] 戦略重み: small=0.64, medium=0.80, large=0.87, reset=0.79
+  [学習] 次回Phase1配分: 72%
+  完了: 462.4725 → 819.2966 (11.1秒, 282936eval)
+  [Verify] proxy=819.2966 → real=462.2768
+  [Auto] stagnant=2/3, best=462.2768
+
+==================================================
+  [Round 7/10] 170件のデータ
+==================================================
+  [Measurements] 170件, 146次元
+  [MS] active=145, dead=1
+  [MS Proxy] linear R2=0.816, zenron R2=0.816, zenron_log R2=0.792, linear_log R2=0.792 -> linear selected
+  [Proxy] R²=0.816
+  [学習] 経験ロード: 6回目, 歴代ベスト: 1426.494071
+  [学習] ウォームスタート: 化石記録から初期値復元
+Twelve optimize (Run #7): 146パラメータ, 10.076619017124173秒
+  eval速度: 999/秒, ベースライン: 464.8542
+  Phase 2: KatharaParamOptimizer (146パラメータ, 8秒)
+  [学習] 経験保存: Run #7, 化石ベスト: 1426.4941
+  [学習] 戦略重み: small=0.64, medium=0.80, large=0.87, reset=0.79
+  [学習] 次回Phase1配分: 72%
+  完了: 464.8542 → 825.3836 (7.3秒, 156444eval)
+  [Verify] proxy=825.3836 → real=462.2768
+  [Auto] stagnant=3/3, best=462.2768
+  [Auto] Stagnation -> range perturbation
+
+==================================================
+  [Round 8/10] 174件のデータ
+==================================================
+  [Measurements] 174件, 146次元
+  [MS] active=144, dead=2
+  [MS Proxy] zenron R2=0.727, linear R2=0.727, linear_log R2=0.699, zenron_log R2=0.699 -> zenron selected
+  [Proxy] R²=0.727
+  [学習] 経験ロード: 7回目, 歴代ベスト: 1426.494071
+  [学習] ウォームスタート: 化石記録から初期値復元
+Twelve optimize (Run #8): 146パラメータ, 9.54954288800557秒
+  eval速度: 100000/秒, ベースライン: 463.2936
+  Phase 2: KatharaParamOptimizer (146パラメータ, 8秒)
+  [学習] 経験保存: Run #8, 化石ベスト: 1426.4941
+  [学習] 戦略重み: small=0.64, medium=0.80, large=0.87, reset=0.79
+  [学習] 次回Phase1配分: 72%
+  完了: 463.2936 → 693.6293 (9.5秒, 178512eval)
+  [Verify] proxy=693.6293 → real=462.2768
+  [Auto] stagnant=1/3, best=462.2768
+
+==================================================
+  [Round 9/10] 178件のデータ
+==================================================
+  [Measurements] 178件, 146次元
+  [MS] active=145, dead=1
+  [MS Proxy] zenron R2=0.658, linear R2=0.658, linear_log R2=0.629, zenron_log R2=0.629 -> zenron selected
+  [Proxy] R²=0.658
+  [学習] 経験ロード: 8回目, 歴代ベスト: 1426.494071
+  [学習] ウォームスタート: 化石記録から初期値復元
+Twelve optimize (Run #9): 146パラメータ, 7.389874792098993秒
+  eval速度: 100000/秒, ベースライン: 463.4972
+  Phase 2: KatharaParamOptimizer (146パラメータ, 6秒)
+  [学習] 経験保存: Run #9, 化石ベスト: 1426.4941
+  [学習] 戦略重み: small=0.64, medium=0.80, large=0.87, reset=0.79
+  [学習] 次回Phase1配分: 72%
+  完了: 463.4972 → 722.7748 (7.4秒, 126816eval)
+  [Verify] proxy=722.7748 → real=462.2768
+  [Auto] stagnant=2/3, best=462.2768
+
+==================================================
+  [Round 10/10] 182件のデータ
+==================================================
+  [Measurements] 182件, 146次元
+  [MS] active=145, dead=1
+  [MS Proxy] zenron R2=0.564, linear R2=0.564, zenron_log R2=0.536, linear_log R2=0.536 -> zenron selected
+  [Proxy] R²=0.564
+  [学習] 経験ロード: 9回目, 歴代ベスト: 1426.494071
+  [学習] ウォームスタート: 化石記録から初期値復元
+Twelve optimize (Run #10): 146パラメータ, 3.085207891464222秒
+  eval速度: 100000/秒, ベースライン: 462.0157
+  [学習] 経験保存: Run #10, 化石ベスト: 1426.4941
+  [学習] 戦略重み: small=0.64, medium=0.80, large=0.87, reset=0.79
+  [学習] 次回Phase1配分: 72%
+  完了: 462.0157 → 462.0157 (1.9秒, 0eval)
+  [Verify] proxy=462.0157 → real=462.2768
+  [Auto] stagnant=3/3, best=462.2768
+  [Auto] Stagnation -> range perturbation
+  [Auto] total time_budget 144.762123298645s exhausted at round 10 (145.5s elapsed)
+
+  [Guard] baseline=15.4308, optimized=0.3474
+  [Verdict] NG — guard dropped (0.3474 < 15.4308)
+  [Diagnose] multi-observer分析中...
+  [Owl-MultiObs] 2 observers: ['eval', 'guard'], 146 measurements
+  [MS Proxy] zenron R2=0.986, linear R2=0.986, zenron_log R2=0.984, linear_log R2=0.984 -> zenron selected
+  [MS Proxy] zenron R2=0.971, linear R2=0.971, linear_log R2=0.912, zenron_log R2=0.912 -> zenron selected
+  [Owl-MultiObs] stable_active=['u0', 'u1', 'u2', 'u3', 'u4', 'u5', 'u6', 'u7', 'u8', 'u11', 'u14', 'u15', 'u16', 'u17', 'u18', 'u19', 'u20', 'u21', 'u23', 'u24', 'u25', 'u26', 'u27', 'u28', 'u29', 'u30', 'u31', 'u32', 'u33', 'u34', 'u35', 'u36', 'u37', 'u38', 'u39', 'u40', 'u41', 'u43', 'u45', 'u46', 'u47', 'u48', 'u49', 'u50', 'u51', 'u52', 'u53', 'u54', 'u55', 'u56', 'u57', 'u58', 'u59', 'u60', 'u61', 'u62', 'u63', 'u64', 'u65', 'u66', 'u67', 'u68', 'u69', 'u70', 'u71', 'u72', 'u73', 'u74', 'u75', 'u76', 'u77', 'u78', 'u80', 'u81', 'u82', 'u83', 'u84', 'u85', 'u86', 'u87', 'u88', 'u89', 'u90', 'u92', 'u93', 'u94', 'u95', 'u96', 'u97', 'u98', 'u99', 'u100', 'u101', 'u102', 'u103', 'u104', 'u105', 'u106', 'u107', 'u109', 'u110', 'u111', 'u112', 'u113', 'u114', 'u115', 'u116', 'u117', 'u118', 'u119', 'u120', 'u121', 'u122', 'u123', 'u124', 'u125', 'u126', 'u127', 'u128', 'self_min_r_squared', 'self_owl_budget_ratio', 'self_pivot_budget_ratio', 'self_collect_min_ratio', 'self_owl_max_iterations', 'self_owl_n_rounds', 'self_stagnation_threshold', 'self_proxy_pref', 'self_ms_exp', 'self_ms_floor', 'self_dead_threshold_ratio', 'self_dead_threshold_floor', 'self_batch_size', 'self_hebbian_lr', 'self_hebbian_min_history', 'self_hebbian_percentile_gate', 'self_hebbian_k_winners']
+  [Owl-MultiObs] stable_dead=['u44']
+  [Owl-MultiObs] observer_dependent=['u9', 'u10', 'u12', 'u13', 'u22', 'u42', 'u79', 'u91', 'u108']
+  [Pivot] 136 dims, guard_fn re-optimize, 30s
+
+==================================================
+  [Round 1/10] 146件のデータ
+==================================================
+  [Measurements] 146件, 136次元
+  [MS] active=136, dead=0
+  [MS Proxy] linear R2=0.968, zenron R2=0.968, zenron_log R2=0.839, linear_log R2=0.839 -> linear selected
+  [Proxy] R²=0.968
+Twelve optimize (Run #1): 136パラメータ, 1.3411022901535035秒
+  eval速度: 100000/秒, ベースライン: 106.1662
+  [学習] 経験保存: Run #1, 化石ベスト: 106.1662
+  完了: 106.1662 → 106.1662 (1.8秒, 0eval)
+  [Verify] proxy=106.1662 → real=15.4308
+  [Auto] stagnant=0/3, best=15.4308
+
+==================================================
+  [Round 2/10] 150件のデータ
+==================================================
+  [Measurements] 150件, 136次元
+  [MS] active=135, dead=1
+  [MS Proxy] zenron R2=0.952, linear R2=0.952, zenron_log R2=0.581, linear_log R2=0.581 -> zenron selected
+  [Proxy] R²=0.952
+  [学習] 経験ロード: 1回目, 歴代ベスト: 106.166248
+  [学習] ウォームスタート: 化石記録から初期値復元
+Twelve optimize (Run #2): 136パラメータ, 1.0秒
+  eval速度: 100000/秒, ベースライン: 99.0711
+  [学習] 経験保存: Run #2, 化石ベスト: 106.1662
+  [学習] 戦略重み: small=0.64, medium=0.80, large=0.87, reset=0.79
+  [学習] 次回Phase1配分: 72%
+  完了: 99.0711 → 99.0711 (1.8秒, 0eval)
+  [Verify] proxy=99.0711 → real=15.4308
+  [Auto] stagnant=1/3, best=207.2991
+
+==================================================
+  [Round 3/10] 154件のデータ
+==================================================
+  [Measurements] 154件, 136次元
+  [MS] active=135, dead=1
+  [MS Proxy] zenron R2=0.940, linear R2=0.940, linear_log R2=0.596, zenron_log R2=0.596 -> zenron selected
+  [Proxy] R²=0.940
+  [学習] 経験ロード: 2回目, 歴代ベスト: 106.166248
+  [学習] ウォームスタート: 化石記録から初期値復元
+Twelve optimize (Run #3): 136パラメータ, 1.0秒
+  eval速度: 100000/秒, ベースライン: 104.0240
+  [学習] 経験保存: Run #3, 化石ベスト: 106.1662
+  [学習] 戦略重み: small=0.64, medium=0.80, large=0.87, reset=0.79
+  [学習] 次回Phase1配分: 72%
+  完了: 104.0240 → 104.0240 (1.9秒, 0eval)
+  [Verify] proxy=104.0240 → real=15.4308
+  [Auto] stagnant=2/3, best=207.2991
+  [Auto] total time_budget 15.0s exhausted at round 3 (17.7s elapsed)
+
+  [Pivot] guard=313.0178 (baseline=15.4308)
+  [Pivot] safe=136, conflict=9
+  [Verdict] PIVOTED
+============================================================
+  Reigen DONE (722.2s)
+  user_best_score: 313.0178
+  self_best: {'self_min_r_squared': 0.45, 'self_owl_budget_ratio': 0.6, 'self_pivot_budget_ratio': 0.525, 'self_collect_min_ratio': 2.5, 'self_owl_max_iterations': 12.5, 'self_owl_n_rounds': 8.0, 'self_stagnation_threshold': 5.0, 'self_proxy_pref': 0.505, 'self_ms_exp': 0.35, 'self_ms_floor': 0.175, 'self_dead_threshold_ratio': 0.225, 'self_dead_threshold_floor': 0.13, 'self_batch_size': 16.5, 'self_hebbian_lr': 0.1505, 'self_hebbian_min_history': 11.0, 'self_hebbian_percentile_gate': 0.725, 'self_hebbian_k_winners': 3.5}
+  self_diagnostic: {'self_informative': True, 'self_dead_ratio': 0.0, 'recommend_freeze': False, 'drift_from_defaults': 0.484}
+============================================================
+  Saved trained params: C:\新しいフォルダー (2)\パイプラインオートメーション\tamashii\configs\core_brain_3d_trained.json
+  [core_brain_3d] done in 2226s score=313.02
+
+======================================================================
+  TRAINING COMPLETE (2226s = 37.1min)
+======================================================================
+  core_brain_3d: score=313.02, 2226s
