@@ -1,0 +1,18 @@
+{
+  "shell_name": "core_brain",
+  "tick_ms": 50,
+  "gain": 1.0,
+  "params": {
+    "dale_law": true,
+    "sensor_start": 0,
+    "sensor_end": 16,
+    "motor_nav": 16,
+    "motor_speed": 17,
+    "motor_voice": 18,
+    "firing_start": 19,
+    "firing_end": 35,
+    "motor_node_nav": 5,
+    "motor_node_speed": 11,
+    "motor_node_voice": 1
+  }
+}

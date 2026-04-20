@@ -1,0 +1,12 @@
+{
+  "shell_name": "brainstem",
+  "tick_ms": 10,
+  "gain": 1.0,
+  "output_indices": [16, 17, 18, 147, 148, 149, 150, 151, 152, 153, 154, 155, 156, 157, 158, 159, 160, 161, 162],
+  "params": {
+    "s_min": -3.0,
+    "s_max": 3.0,
+    "pull_strength": 0.15,
+    "vital_indices": [147, 148, 149, 150, 151]
+  }
+}
