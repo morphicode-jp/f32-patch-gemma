@@ -1,0 +1,111 @@
+{
+  "per_episode": [
+    {
+      "episode": 0,
+      "seed": 42,
+      "food_eaten": 3,
+      "n_stored_before": 0,
+      "n_stored_after": 6,
+      "n_stored_growth": 6,
+      "recall_events": 451,
+      "recall_rate": 1.5033333333333334
+    },
+    {
+      "episode": 1,
+      "seed": 42,
+      "food_eaten": 3,
+      "n_stored_before": 6,
+      "n_stored_after": 7,
+      "n_stored_growth": 1,
+      "recall_events": 525,
+      "recall_rate": 1.75
+    },
+    {
+      "episode": 2,
+      "seed": 42,
+      "food_eaten": 3,
+      "n_stored_before": 7,
+      "n_stored_after": 8,
+      "n_stored_growth": 1,
+      "recall_events": 525,
+      "recall_rate": 1.75
+    },
+    {
+      "episode": 3,
+      "seed": 42,
+      "food_eaten": 3,
+      "n_stored_before": 8,
+      "n_stored_after": 8,
+      "n_stored_growth": 0,
+      "recall_events": 525,
+      "recall_rate": 1.75
+    },
+    {
+      "episode": 4,
+      "seed": 42,
+      "food_eaten": 3,
+      "n_stored_before": 8,
+      "n_stored_after": 8,
+      "n_stored_growth": 0,
+      "recall_events": 525,
+      "recall_rate": 1.75
+    },
+    {
+      "episode": 5,
+      "seed": 42,
+      "food_eaten": 3,
+      "n_stored_before": 8,
+      "n_stored_after": 8,
+      "n_stored_growth": 0,
+      "recall_events": 525,
+      "recall_rate": 1.75
+    },
+    {
+      "episode": 6,
+      "seed": 42,
+      "food_eaten": 3,
+      "n_stored_before": 8,
+      "n_stored_after": 8,
+      "n_stored_growth": 0,
+      "recall_events": 525,
+      "recall_rate": 1.75
+    },
+    {
+      "episode": 7,
+      "seed": 42,
+      "food_eaten": 3,
+      "n_stored_before": 8,
+      "n_stored_after": 8,
+      "n_stored_growth": 0,
+      "recall_events": 525,
+      "recall_rate": 1.75
+    },
+    {
+      "episode": 8,
+      "seed": 42,
+      "food_eaten": 3,
+      "n_stored_before": 8,
+      "n_stored_after": 8,
+      "n_stored_growth": 0,
+      "recall_events": 525,
+      "recall_rate": 1.75
+    },
+    {
+      "episode": 9,
+      "seed": 42,
+      "food_eaten": 3,
+      "n_stored_before": 8,
+      "n_stored_after": 8,
+      "n_stored_growth": 0,
+      "recall_events": 525,
+      "recall_rate": 1.75
+    }
+  ],
+  "final_stored": 8,
+  "total_recalls": 5176,
+  "early_recalls": 2551,
+  "late_recalls": 2625,
+  "total_food": 30,
+  "criterion_5_pass": true,
+  "elapsed_s": 2.0
+}

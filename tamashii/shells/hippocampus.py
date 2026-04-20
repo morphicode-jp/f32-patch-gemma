@@ -34,12 +34,16 @@ class Hippocampus(Shell):
         self.recall_threshold = float(self.params.get("recall_threshold", 0.8))
         self.store_threshold = float(self.params.get("store_threshold", 0.6))
         self.recall_strength = float(self.params.get("recall_strength", 0.2))
+        # Autobiographical memory: if True, slots persist across reset_episode
+        self.persistent_memory = bool(self.params.get("persistent_memory", False))
 
         # Per-shell memory (not in S): slot vectors (query space) + payloads (S-slice)
         self._slot_queries: list[np.ndarray] = []  # stored query vectors
         self._slot_payloads: list[np.ndarray] = []  # stored payloads (slot_dim each)
         self._usage: list[int] = []  # access count for LRU-ish
         self._step_count = 0
+        # Recall event counter (how many times a stored slot was reactivated)
+        self._recall_events = 0
 
     def step(self, S_snapshot: np.ndarray, external=None) -> np.ndarray:
         self._step_count += 1
@@ -60,6 +64,7 @@ class Hippocampus(Shell):
         # Recall: if best match > recall_threshold, reactivate payload
         if max_sim > self.recall_threshold and best_idx >= 0:
             self._usage[best_idx] = self._step_count
+            self._recall_events += 1
             payload = self._slot_payloads[best_idx]
             # Write payload to first slot of trace region (= currently active recall)
             t_start = self.trace_slice.start
@@ -95,13 +100,19 @@ class Hippocampus(Shell):
 
     def reset(self):
         super().reset()
-        self._slot_queries = []
-        self._slot_payloads = []
-        self._usage = []
+        # Autobiographical: preserve slot contents across episode reset
+        if not self.persistent_memory:
+            self._slot_queries = []
+            self._slot_payloads = []
+            self._usage = []
+        # Step count always resets (within-episode reference)
         self._step_count = 0
+        self._recall_events = 0
 
     def memory_stats(self) -> dict:
         return {
             "n_stored": len(self._slot_queries),
             "step_count": self._step_count,
+            "recall_events": self._recall_events,
+            "persistent": self.persistent_memory,
         }
