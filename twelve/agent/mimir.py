@@ -345,56 +345,49 @@ def mimir(
         else:
             _init_user_params = [float(x) for x in owl_best_params]
 
-    try:
-        reigen_obj = Reigen(
-            eval_fn=eval_fn,
-            guard_fn=_guard,
-            user_param_ranges=list(param_ranges),
-            user_param_names=param_names,
-            initial_user_params=_init_user_params,
-            experience_id=f"{experience_id}_reigen",
-            inner_time_budget=_reigen_inner,
-            verbose=verbose,
-        )
-        # Reigen gets full remaining budget. wall_time_factor=1.0 keeps
-        # soft cap at time_budget; Reigen's graceful-finish will overshoot
-        # by ~20-30% on cheap-eval cascade routes, which is acceptable
-        # trade-off vs quality loss observed when we tried clamping below
-        # remaining (Rosenbrock 0.08 → 3.98 on clamped budget).
-        r_reigen = reigen_obj.run(
-            time_budget=max(5.0, remaining),
-            wall_time_factor=_reigen_wtf,
-        )
-    except Exception as e:
-        r_reigen = {"error": f"{type(e).__name__}: {e}",
-                    "user_best_score": float("-inf"),
-                    "user_best_params": None}
+    # ---- Phase 3 + 3b: parallel cascade (reigen || scipy) ----
+    # Previously sequential: owl → reigen → scipy. Wall = owl + reigen + scipy.
+    # Now parallel: owl → (reigen || scipy concurrently). Wall = owl + max(r, s).
+    # Each algorithm gets the FULL remaining budget (not split), since they
+    # run in separate threads. For pure Python eval_fn GIL limits parallelism
+    # but scipy/numpy internal operations release GIL, giving partial overlap.
+    import concurrent.futures as _cf
 
-    reigen_best = r_reigen.get("user_best_score", float("-inf"))
-    reigen_params = r_reigen.get("user_best_params")
-
-    # ---- Phase 3b: scipy.basinhopping parallel cascade at high dim ----
-    # Rationale: Reigen handles structured problems (Rastrigin 20d gap=0),
-    # but fails on curved valleys (Rosenbrock 20d gap=2041) and asymmetric
-    # basins (Styblinski 20d gap=711). scipy.basinhopping with niter=200 +
-    # L-BFGS-B per hop excels on these, using gradient + exhaustive restart.
-    # Fire when: dim >= threshold AND owl didn't succeed (confidence != "high").
-    scipy_best = float("-inf")
-    scipy_params = None
-    r_scipy = None
     _dim = len(list(param_ranges))
     _scipy_trigger = (
         enable_scipy_cascade
         and _dim >= _scipy_dim_thresh
         and owl_conf != "high"
     )
-    if _scipy_trigger:
+    _cascade_budget = max(5.0, remaining)
+
+    def _reigen_worker():
+        try:
+            reigen_obj = Reigen(
+                eval_fn=eval_fn,
+                guard_fn=_guard,
+                user_param_ranges=list(param_ranges),
+                user_param_names=param_names,
+                initial_user_params=_init_user_params,
+                experience_id=f"{experience_id}_reigen",
+                inner_time_budget=_reigen_inner,
+                verbose=verbose,
+            )
+            return reigen_obj.run(
+                time_budget=_cascade_budget,
+                wall_time_factor=_reigen_wtf,
+            )
+        except Exception as e:
+            return {"error": f"{type(e).__name__}: {e}",
+                    "user_best_score": float("-inf"),
+                    "user_best_params": None}
+
+    def _scipy_worker():
+        if not _scipy_trigger:
+            return None
         try:
             from scipy.optimize import basinhopping as _bh
             import numpy as _np
-            _elapsed2 = time.time() - t_start
-            _remaining2 = max(2.0, time_budget - _elapsed2)
-            _scipy_budget = _remaining2 * _scipy_budget_share
             _scipy_t0 = time.time()
             _rng_np = _np.random.default_rng(hash(experience_id) & 0xFFFFFFFF)
             _x0 = _np.array([_rng_np.uniform(lo, hi) for lo, hi in param_ranges])
@@ -411,7 +404,7 @@ def mimir(
                 return -v
 
             def _scipy_cb(x, v, accepted):
-                return time.time() - _scipy_t0 >= _scipy_budget
+                return time.time() - _scipy_t0 >= _cascade_budget * _scipy_budget_share
 
             _r_bh = _bh(
                 _scipy_neg, _x0,
@@ -423,21 +416,46 @@ def mimir(
                 seed=hash(experience_id) & 0xFFFFFFFF,
                 callback=_scipy_cb,
             )
-            scipy_best = _scipy_best_tracker[0]
-            scipy_params = _scipy_best_tracker[1]
-            if scipy_best == float("-inf"):
-                scipy_best = -float(_r_bh.fun)
-                scipy_params = [float(x) for x in _r_bh.x]
-            r_scipy = {
-                "best_score": scipy_best,
-                "best_params": scipy_params,
+            _sb = _scipy_best_tracker[0]
+            _sp = _scipy_best_tracker[1]
+            if _sb == float("-inf"):
+                _sb = -float(_r_bh.fun)
+                _sp = [float(x) for x in _r_bh.x]
+            return {
+                "best_score": _sb, "best_params": _sp,
                 "n_iter": int(_HARDCODE_DEFAULTS["scipy_kwargs"]["niter"]),
                 "elapsed_s": time.time() - _scipy_t0,
             }
         except ImportError:
-            r_scipy = {"error": "scipy.optimize unavailable"}
+            return {"error": "scipy.optimize unavailable"}
         except Exception as e:
-            r_scipy = {"error": f"{type(e).__name__}: {e}"}
+            return {"error": f"{type(e).__name__}: {e}"}
+
+    # Launch both in parallel threads
+    with _cf.ThreadPoolExecutor(max_workers=2) as _ex:
+        _f_reigen = _ex.submit(_reigen_worker)
+        _f_scipy = _ex.submit(_scipy_worker) if _scipy_trigger else None
+        try:
+            r_reigen = _f_reigen.result(timeout=_cascade_budget * 2.0)
+        except _cf.TimeoutError:
+            r_reigen = {"error": "reigen timeout",
+                        "user_best_score": float("-inf"),
+                        "user_best_params": None}
+        if _f_scipy is not None:
+            try:
+                r_scipy = _f_scipy.result(timeout=_cascade_budget * 2.0)
+            except _cf.TimeoutError:
+                r_scipy = {"error": "scipy timeout"}
+        else:
+            r_scipy = None
+
+    reigen_best = r_reigen.get("user_best_score", float("-inf"))
+    reigen_params = r_reigen.get("user_best_params")
+    scipy_best = float("-inf")
+    scipy_params = None
+    if r_scipy is not None and not r_scipy.get("error"):
+        scipy_best = r_scipy.get("best_score", float("-inf"))
+        scipy_params = r_scipy.get("best_params")
 
     # Pick winner among {owl, reigen, scipy}
     owl_score_val = owl_best_score if owl_best_score is not None else float("-inf")
