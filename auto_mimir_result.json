@@ -1,0 +1,711 @@
+{
+  "total_elapsed_s": 308.3,
+  "n_universes": 5,
+  "n_epochs": 3,
+  "time_per_problem_s": 5.0,
+  "default_hp": {
+    "random_restart_count": 5,
+    "owl_share": 0.4,
+    "eval_cost_threshold": 0.5,
+    "confidence_skip_threshold": 0.7,
+    "reigen_inner_time_budget": 2.0,
+    "reigen_wall_time_factor": 1.0
+  },
+  "discovered_hp": {
+    "random_restart_count": 5,
+    "owl_share": 0.4,
+    "eval_cost_threshold": 0.5,
+    "confidence_skip_threshold": 0.7,
+    "reigen_inner_time_budget": 2.0,
+    "reigen_wall_time_factor": 1.0
+  },
+  "default_result": {
+    "quality": -1.9381244933542203,
+    "mean_log_gap": 1.9381244933542203,
+    "per_problem": [
+      {
+        "name": "rastrigin_5d",
+        "gap": 20.89409524772316,
+        "best_score": -20.89409524772316,
+        "time_s": 5.3
+      },
+      {
+        "name": "ackley_5d",
+        "gap": 3.3831370628941824,
+        "best_score": -3.3831370628941824,
+        "time_s": 5.01
+      },
+      {
+        "name": "styblinski_5d",
+        "gap": -69.64238913628245,
+        "best_score": 167.55738913628244,
+        "time_s": 5.3
+      },
+      {
+        "name": "rosenbrock_5d",
+        "gap": 23.252417518856486,
+        "best_score": -23.252417518856486,
+        "time_s": 5.26
+      }
+    ],
+    "total_time_s": 20.9
+  },
+  "discovered_result": {
+    "quality": -1.9381243606722736,
+    "mean_log_gap": 1.9381243606722736,
+    "per_problem": [
+      {
+        "name": "rastrigin_5d",
+        "gap": 20.89409524772316,
+        "best_score": -20.89409524772316,
+        "time_s": 5.19
+      },
+      {
+        "name": "ackley_5d",
+        "gap": 3.383134736642163,
+        "best_score": -3.383134736642163,
+        "time_s": 5.19
+      },
+      {
+        "name": "styblinski_5d",
+        "gap": -69.6422928394432,
+        "best_score": 167.5572928394432,
+        "time_s": 5.19
+      },
+      {
+        "name": "rosenbrock_5d",
+        "gap": 23.252417518856486,
+        "best_score": -23.252417518856486,
+        "time_s": 5.18
+      }
+    ],
+    "total_time_s": 20.8
+  },
+  "improvement": 1.3268194676285816e-07,
+  "history": [
+    {
+      "epoch": 0,
+      "results": [
+        {
+          "u_id": 0,
+          "hp": {
+            "random_restart_count": 5,
+            "owl_share": 0.4,
+            "eval_cost_threshold": 0.5,
+            "confidence_skip_threshold": 0.7,
+            "reigen_inner_time_budget": 2.0,
+            "reigen_wall_time_factor": 1.0
+          },
+          "quality": -1.9381244933542203,
+          "mean_log_gap": 1.9381244933542203,
+          "per_problem": [
+            {
+              "name": "rastrigin_5d",
+              "gap": 20.89409524772316,
+              "best_score": -20.89409524772316,
+              "time_s": 5.82
+            },
+            {
+              "name": "ackley_5d",
+              "gap": 3.3831370628941824,
+              "best_score": -3.3831370628941824,
+              "time_s": 5.15
+            },
+            {
+              "name": "styblinski_5d",
+              "gap": -69.64238913628245,
+              "best_score": 167.55738913628244,
+              "time_s": 5.13
+            },
+            {
+              "name": "rosenbrock_5d",
+              "gap": 23.252417518856486,
+              "best_score": -23.252417518856486,
+              "time_s": 5.06
+            }
+          ]
+        },
+        {
+          "u_id": 1,
+          "hp": {
+            "random_restart_count": 4,
+            "owl_share": 0.5559303561018394,
+            "eval_cost_threshold": 0.8447054027319553,
+            "confidence_skip_threshold": 0.7118496428383068,
+            "reigen_inner_time_budget": 3.451166042256984,
+            "reigen_wall_time_factor": 0.5339646541950491
+          },
+          "quality": -1.9381244933542203,
+          "mean_log_gap": 1.9381244933542203,
+          "per_problem": [
+            {
+              "name": "rastrigin_5d",
+              "gap": 20.89409524772316,
+              "best_score": -20.89409524772316,
+              "time_s": 5.06
+            },
+            {
+              "name": "ackley_5d",
+              "gap": 3.3831370628941824,
+              "best_score": -3.3831370628941824,
+              "time_s": 5.07
+            },
+            {
+              "name": "styblinski_5d",
+              "gap": -69.64238913628245,
+              "best_score": 167.55738913628244,
+              "time_s": 5.14
+            },
+            {
+              "name": "rosenbrock_5d",
+              "gap": 23.252417518856486,
+              "best_score": -23.252417518856486,
+              "time_s": 5.08
+            }
+          ]
+        },
+        {
+          "u_id": 2,
+          "hp": {
+            "random_restart_count": 8,
+            "owl_share": 0.2101416886871859,
+            "eval_cost_threshold": 1.963522028761624,
+            "confidence_skip_threshold": 0.7623021060619002,
+            "reigen_inner_time_budget": 2.948954715542226,
+            "reigen_wall_time_factor": 1.0890508556675425
+          },
+          "quality": -1.9381244933542203,
+          "mean_log_gap": 1.9381244933542203,
+          "per_problem": [
+            {
+              "name": "rastrigin_5d",
+              "gap": 20.89409524772316,
+              "best_score": -20.89409524772316,
+              "time_s": 5.08
+            },
+            {
+              "name": "ackley_5d",
+              "gap": 3.3831370628941824,
+              "best_score": -3.3831370628941824,
+              "time_s": 5.09
+            },
+            {
+              "name": "styblinski_5d",
+              "gap": -69.64238913628245,
+              "best_score": 167.55738913628244,
+              "time_s": 5.08
+            },
+            {
+              "name": "rosenbrock_5d",
+              "gap": 23.252417518856486,
+              "best_score": -23.252417518856486,
+              "time_s": 5.09
+            }
+          ]
+        },
+        {
+          "u_id": 3,
+          "hp": {
+            "random_restart_count": 6,
+            "owl_share": 0.7953553213157745,
+            "eval_cost_threshold": 0.4737060150521494,
+            "confidence_skip_threshold": 0.6526438061113083,
+            "reigen_inner_time_budget": 1.40170598869539,
+            "reigen_wall_time_factor": 0.9308202645405085
+          },
+          "quality": -1.9381244933542203,
+          "mean_log_gap": 1.9381244933542203,
+          "per_problem": [
+            {
+              "name": "rastrigin_5d",
+              "gap": 20.89409524772316,
+              "best_score": -20.89409524772316,
+              "time_s": 5.11
+            },
+            {
+              "name": "ackley_5d",
+              "gap": 3.3831370628941824,
+              "best_score": -3.3831370628941824,
+              "time_s": 5.1
+            },
+            {
+              "name": "styblinski_5d",
+              "gap": -69.64238913628245,
+              "best_score": 167.55738913628244,
+              "time_s": 5.08
+            },
+            {
+              "name": "rosenbrock_5d",
+              "gap": 23.252417518856486,
+              "best_score": -23.252417518856486,
+              "time_s": 5.1
+            }
+          ]
+        },
+        {
+          "u_id": 4,
+          "hp": {
+            "random_restart_count": 4,
+            "owl_share": 0.6342835105472027,
+            "eval_cost_threshold": 0.7121597198673594,
+            "confidence_skip_threshold": 0.8826119781973041,
+            "reigen_inner_time_budget": 3.831559852066914,
+            "reigen_wall_time_factor": 1.6454949810803257
+          },
+          "quality": -1.9381244933542203,
+          "mean_log_gap": 1.9381244933542203,
+          "per_problem": [
+            {
+              "name": "rastrigin_5d",
+              "gap": 20.89409524772316,
+              "best_score": -20.89409524772316,
+              "time_s": 5.11
+            },
+            {
+              "name": "ackley_5d",
+              "gap": 3.3831370628941824,
+              "best_score": -3.3831370628941824,
+              "time_s": 5.14
+            },
+            {
+              "name": "styblinski_5d",
+              "gap": -69.64238913628245,
+              "best_score": 167.55738913628244,
+              "time_s": 5.1
+            },
+            {
+              "name": "rosenbrock_5d",
+              "gap": 23.252417518856486,
+              "best_score": -23.252417518856486,
+              "time_s": 5.11
+            }
+          ]
+        }
+      ],
+      "best_this_epoch": {
+        "random_restart_count": 5,
+        "owl_share": 0.4,
+        "eval_cost_threshold": 0.5,
+        "confidence_skip_threshold": 0.7,
+        "reigen_inner_time_budget": 2.0,
+        "reigen_wall_time_factor": 1.0
+      }
+    },
+    {
+      "epoch": 1,
+      "results": [
+        {
+          "u_id": 0,
+          "hp": {
+            "random_restart_count": 5,
+            "owl_share": 0.4,
+            "eval_cost_threshold": 0.5,
+            "confidence_skip_threshold": 0.7,
+            "reigen_inner_time_budget": 2.0,
+            "reigen_wall_time_factor": 1.0
+          },
+          "quality": -1.9381244933542203,
+          "mean_log_gap": 1.9381244933542203,
+          "per_problem": [
+            {
+              "name": "rastrigin_5d",
+              "gap": 20.89409524772316,
+              "best_score": -20.89409524772316,
+              "time_s": 5.12
+            },
+            {
+              "name": "ackley_5d",
+              "gap": 3.3831370628941824,
+              "best_score": -3.3831370628941824,
+              "time_s": 5.11
+            },
+            {
+              "name": "styblinski_5d",
+              "gap": -69.64238913628245,
+              "best_score": 167.55738913628244,
+              "time_s": 5.11
+            },
+            {
+              "name": "rosenbrock_5d",
+              "gap": 23.252417518856486,
+              "best_score": -23.252417518856486,
+              "time_s": 5.14
+            }
+          ]
+        },
+        {
+          "u_id": 1,
+          "hp": {
+            "random_restart_count": 4,
+            "owl_share": 0.5559303561018394,
+            "eval_cost_threshold": 0.8447054027319553,
+            "confidence_skip_threshold": 0.7118496428383068,
+            "reigen_inner_time_budget": 3.451166042256984,
+            "reigen_wall_time_factor": 0.5339646541950491
+          },
+          "quality": -1.9381244933542203,
+          "mean_log_gap": 1.9381244933542203,
+          "per_problem": [
+            {
+              "name": "rastrigin_5d",
+              "gap": 20.89409524772316,
+              "best_score": -20.89409524772316,
+              "time_s": 5.14
+            },
+            {
+              "name": "ackley_5d",
+              "gap": 3.3831370628941824,
+              "best_score": -3.3831370628941824,
+              "time_s": 5.14
+            },
+            {
+              "name": "styblinski_5d",
+              "gap": -69.64238913628245,
+              "best_score": 167.55738913628244,
+              "time_s": 5.18
+            },
+            {
+              "name": "rosenbrock_5d",
+              "gap": 23.252417518856486,
+              "best_score": -23.252417518856486,
+              "time_s": 5.14
+            }
+          ]
+        },
+        {
+          "u_id": 2,
+          "hp": {
+            "random_restart_count": 8,
+            "owl_share": 0.2101416886871859,
+            "eval_cost_threshold": 1.963522028761624,
+            "confidence_skip_threshold": 0.7623021060619002,
+            "reigen_inner_time_budget": 2.948954715542226,
+            "reigen_wall_time_factor": 1.0890508556675425
+          },
+          "quality": -1.9381244933542203,
+          "mean_log_gap": 1.9381244933542203,
+          "per_problem": [
+            {
+              "name": "rastrigin_5d",
+              "gap": 20.89409524772316,
+              "best_score": -20.89409524772316,
+              "time_s": 5.16
+            },
+            {
+              "name": "ackley_5d",
+              "gap": 3.3831370628941824,
+              "best_score": -3.3831370628941824,
+              "time_s": 5.15
+            },
+            {
+              "name": "styblinski_5d",
+              "gap": -69.64238913628245,
+              "best_score": 167.55738913628244,
+              "time_s": 5.16
+            },
+            {
+              "name": "rosenbrock_5d",
+              "gap": 23.252417518856486,
+              "best_score": -23.252417518856486,
+              "time_s": 5.16
+            }
+          ]
+        },
+        {
+          "u_id": 3,
+          "hp": {
+            "random_restart_count": 4,
+            "owl_share": 0.5012683112568033,
+            "eval_cost_threshold": 0.5997438371053805,
+            "confidence_skip_threshold": 0.7689807299869751,
+            "reigen_inner_time_budget": 2.0,
+            "reigen_wall_time_factor": 0.9911061857749276
+          },
+          "quality": -1.9381244933542203,
+          "mean_log_gap": 1.9381244933542203,
+          "per_problem": [
+            {
+              "name": "rastrigin_5d",
+              "gap": 20.89409524772316,
+              "best_score": -20.89409524772316,
+              "time_s": 5.18
+            },
+            {
+              "name": "ackley_5d",
+              "gap": 3.3831370628941824,
+              "best_score": -3.3831370628941824,
+              "time_s": 5.14
+            },
+            {
+              "name": "styblinski_5d",
+              "gap": -69.64238913628245,
+              "best_score": 167.55738913628244,
+              "time_s": 5.13
+            },
+            {
+              "name": "rosenbrock_5d",
+              "gap": 23.252417518856486,
+              "best_score": -23.252417518856486,
+              "time_s": 5.15
+            }
+          ]
+        },
+        {
+          "u_id": 4,
+          "hp": {
+            "random_restart_count": 7,
+            "owl_share": 0.4,
+            "eval_cost_threshold": 0.1,
+            "confidence_skip_threshold": 0.7,
+            "reigen_inner_time_budget": 1.5969867195235627,
+            "reigen_wall_time_factor": 1.2626477965033323
+          },
+          "quality": -1.9381244933542203,
+          "mean_log_gap": 1.9381244933542203,
+          "per_problem": [
+            {
+              "name": "rastrigin_5d",
+              "gap": 20.89409524772316,
+              "best_score": -20.89409524772316,
+              "time_s": 5.2
+            },
+            {
+              "name": "ackley_5d",
+              "gap": 3.3831370628941824,
+              "best_score": -3.3831370628941824,
+              "time_s": 5.08
+            },
+            {
+              "name": "styblinski_5d",
+              "gap": -69.6422928394432,
+              "best_score": 167.5572928394432,
+              "time_s": 5.04
+            },
+            {
+              "name": "rosenbrock_5d",
+              "gap": 23.252417518856486,
+              "best_score": -23.252417518856486,
+              "time_s": 5.03
+            }
+          ]
+        }
+      ],
+      "best_this_epoch": {
+        "random_restart_count": 5,
+        "owl_share": 0.4,
+        "eval_cost_threshold": 0.5,
+        "confidence_skip_threshold": 0.7,
+        "reigen_inner_time_budget": 2.0,
+        "reigen_wall_time_factor": 1.0
+      }
+    },
+    {
+      "epoch": 2,
+      "results": [
+        {
+          "u_id": 0,
+          "hp": {
+            "random_restart_count": 5,
+            "owl_share": 0.4,
+            "eval_cost_threshold": 0.5,
+            "confidence_skip_threshold": 0.7,
+            "reigen_inner_time_budget": 2.0,
+            "reigen_wall_time_factor": 1.0
+          },
+          "quality": -1.9381244933542203,
+          "mean_log_gap": 1.9381244933542203,
+          "per_problem": [
+            {
+              "name": "rastrigin_5d",
+              "gap": 20.89409524772316,
+              "best_score": -20.89409524772316,
+              "time_s": 5.04
+            },
+            {
+              "name": "ackley_5d",
+              "gap": 3.3831370628941824,
+              "best_score": -3.3831370628941824,
+              "time_s": 5.25
+            },
+            {
+              "name": "styblinski_5d",
+              "gap": -69.64238913628245,
+              "best_score": 167.55738913628244,
+              "time_s": 5.22
+            },
+            {
+              "name": "rosenbrock_5d",
+              "gap": 23.252417518856486,
+              "best_score": -23.252417518856486,
+              "time_s": 5.06
+            }
+          ]
+        },
+        {
+          "u_id": 1,
+          "hp": {
+            "random_restart_count": 4,
+            "owl_share": 0.5559303561018394,
+            "eval_cost_threshold": 0.8447054027319553,
+            "confidence_skip_threshold": 0.7118496428383068,
+            "reigen_inner_time_budget": 3.451166042256984,
+            "reigen_wall_time_factor": 0.5339646541950491
+          },
+          "quality": -1.9381244933542203,
+          "mean_log_gap": 1.9381244933542203,
+          "per_problem": [
+            {
+              "name": "rastrigin_5d",
+              "gap": 20.89409524772316,
+              "best_score": -20.89409524772316,
+              "time_s": 5.05
+            },
+            {
+              "name": "ackley_5d",
+              "gap": 3.3831370628941824,
+              "best_score": -3.3831370628941824,
+              "time_s": 5.08
+            },
+            {
+              "name": "styblinski_5d",
+              "gap": -69.64238913628245,
+              "best_score": 167.55738913628244,
+              "time_s": 5.3
+            },
+            {
+              "name": "rosenbrock_5d",
+              "gap": 23.252417518856486,
+              "best_score": -23.252417518856486,
+              "time_s": 5.02
+            }
+          ]
+        },
+        {
+          "u_id": 2,
+          "hp": {
+            "random_restart_count": 8,
+            "owl_share": 0.2101416886871859,
+            "eval_cost_threshold": 1.963522028761624,
+            "confidence_skip_threshold": 0.7623021060619002,
+            "reigen_inner_time_budget": 2.948954715542226,
+            "reigen_wall_time_factor": 1.0890508556675425
+          },
+          "quality": -1.9381244933542203,
+          "mean_log_gap": 1.9381244933542203,
+          "per_problem": [
+            {
+              "name": "rastrigin_5d",
+              "gap": 20.89409524772316,
+              "best_score": -20.89409524772316,
+              "time_s": 5.02
+            },
+            {
+              "name": "ackley_5d",
+              "gap": 3.3831370628941824,
+              "best_score": -3.3831370628941824,
+              "time_s": 5.04
+            },
+            {
+              "name": "styblinski_5d",
+              "gap": -69.6422928394432,
+              "best_score": 167.5572928394432,
+              "time_s": 5.05
+            },
+            {
+              "name": "rosenbrock_5d",
+              "gap": 23.252417518856486,
+              "best_score": -23.252417518856486,
+              "time_s": 5.24
+            }
+          ]
+        },
+        {
+          "u_id": 3,
+          "hp": {
+            "random_restart_count": 8,
+            "owl_share": 0.4608287751553637,
+            "eval_cost_threshold": 0.5,
+            "confidence_skip_threshold": 0.7,
+            "reigen_inner_time_budget": 3.290588517262076,
+            "reigen_wall_time_factor": 1.0
+          },
+          "quality": -1.9381244933542203,
+          "mean_log_gap": 1.9381244933542203,
+          "per_problem": [
+            {
+              "name": "rastrigin_5d",
+              "gap": 20.89409524772316,
+              "best_score": -20.89409524772316,
+              "time_s": 5.22
+            },
+            {
+              "name": "ackley_5d",
+              "gap": 3.3831370628941824,
+              "best_score": -3.3831370628941824,
+              "time_s": 5.25
+            },
+            {
+              "name": "styblinski_5d",
+              "gap": -69.6422928394432,
+              "best_score": 167.5572928394432,
+              "time_s": 5.12
+            },
+            {
+              "name": "rosenbrock_5d",
+              "gap": 23.252417518856486,
+              "best_score": -23.252417518856486,
+              "time_s": 5.26
+            }
+          ]
+        },
+        {
+          "u_id": 4,
+          "hp": {
+            "random_restart_count": 4,
+            "owl_share": 0.4,
+            "eval_cost_threshold": 0.5,
+            "confidence_skip_threshold": 0.7,
+            "reigen_inner_time_budget": 2.0,
+            "reigen_wall_time_factor": 1.5331794060599204
+          },
+          "quality": -1.9381244933542203,
+          "mean_log_gap": 1.9381244933542203,
+          "per_problem": [
+            {
+              "name": "rastrigin_5d",
+              "gap": 20.89409524772316,
+              "best_score": -20.89409524772316,
+              "time_s": 5.3
+            },
+            {
+              "name": "ackley_5d",
+              "gap": 3.3831370628941824,
+              "best_score": -3.3831370628941824,
+              "time_s": 5.07
+            },
+            {
+              "name": "styblinski_5d",
+              "gap": -69.6422928394432,
+              "best_score": 167.5572928394432,
+              "time_s": 5.01
+            },
+            {
+              "name": "rosenbrock_5d",
+              "gap": 23.252417518856486,
+              "best_score": -23.252417518856486,
+              "time_s": 5.27
+            }
+          ]
+        }
+      ],
+      "best_this_epoch": {
+        "random_restart_count": 5,
+        "owl_share": 0.4,
+        "eval_cost_threshold": 0.5,
+        "confidence_skip_threshold": 0.7,
+        "reigen_inner_time_budget": 2.0,
+        "reigen_wall_time_factor": 1.0
+      }
+    }
+  ]
+}
