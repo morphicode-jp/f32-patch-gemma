@@ -1,0 +1,27 @@
+{
+  "A_level1": {
+    "label": "A_level1",
+    "final_mean_sigma": 0.05324259824370365,
+    "final_max_sigma": 0.0863160401378636,
+    "final_mean_tau": 0.18133294606669295,
+    "final_max_tau": 0.31747625203863306,
+    "final_mean_quality": 12.834487034786525,
+    "final_max_quality": 15.60896740240358
+  },
+  "B_level2": {
+    "label": "B_level2",
+    "final_mean_sigma": 0.05321169636031408,
+    "final_max_sigma": 0.0863160401378636,
+    "final_mean_tau": 0.16947669966091047,
+    "final_max_tau": 0.31747625203863306,
+    "final_mean_quality": 12.797220740927253,
+    "final_max_quality": 15.60896740240358
+  },
+  "comparison": {
+    "tau_diverged": true,
+    "quality_boost": 0.0,
+    "level2_wins_on_sigma": false
+  },
+  "elapsed_A_s": 406.1,
+  "elapsed_B_s": 385.0
+}
