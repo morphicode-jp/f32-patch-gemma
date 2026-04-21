@@ -1,0 +1,279 @@
+{
+  "A_baseline": {
+    "label": "A. Sensitive taboo, NO penalty (baseline)",
+    "total_elapsed_s": 4.0,
+    "history": [
+      {
+        "epoch": 0,
+        "snapshots": [
+          {
+            "id": 0,
+            "quality": 6.448283602610671,
+            "n_alive": 8,
+            "n_births": 2,
+            "n_deaths": 0,
+            "max_gen": 1,
+            "dna_div": 0.12751142551476297,
+            "mean_z": 0.5,
+            "gravity": -0.054875454692978165,
+            "vert_food": 0.32802949665458053,
+            "mut_rate": 0.029417734788764954,
+            "violations_total": 1866,
+            "violations_crowding": 0,
+            "violations_hoarding": 1660,
+            "violations_voice": 206,
+            "violation_rate_per_agent": 233.25
+          },
+          {
+            "id": 1,
+            "quality": 4.8209079157301,
+            "n_alive": 7,
+            "n_births": 1,
+            "n_deaths": 0,
+            "max_gen": 1,
+            "dna_div": 0.035243945887629156,
+            "mean_z": 0.5,
+            "gravity": -0.05585345533749278,
+            "vert_food": 0.2619256044584565,
+            "mut_rate": 0.03862623501432937,
+            "violations_total": 2280,
+            "violations_crowding": 0,
+            "violations_hoarding": 1800,
+            "violations_voice": 480,
+            "violation_rate_per_agent": 325.7142857142857
+          }
+        ],
+        "best": 0,
+        "worst": 1
+      },
+      {
+        "epoch": 1,
+        "snapshots": [
+          {
+            "id": 0,
+            "quality": 7.1108475967658755,
+            "n_alive": 8,
+            "n_births": 3,
+            "n_deaths": 1,
+            "max_gen": 1,
+            "dna_div": 0.14259838155875734,
+            "mean_z": 0.5,
+            "gravity": -0.054875454692978165,
+            "vert_food": 0.32802949665458053,
+            "mut_rate": 0.029417734788764954,
+            "violations_total": 3296,
+            "violations_crowding": 0,
+            "violations_hoarding": 2916,
+            "violations_voice": 380,
+            "violation_rate_per_agent": 412.0
+          },
+          {
+            "id": 1,
+            "quality": 4.771408624060523,
+            "n_alive": 7,
+            "n_births": 1,
+            "n_deaths": 0,
+            "max_gen": 1,
+            "dna_div": 0.03529818964852068,
+            "mean_z": 0.5,
+            "gravity": -0.0511353799549618,
+            "vert_food": 0.32503394199540536,
+            "mut_rate": 0.02908171163867918,
+            "violations_total": 2209,
+            "violations_crowding": 0,
+            "violations_hoarding": 1786,
+            "violations_voice": 423,
+            "violation_rate_per_agent": 315.57142857142856
+          }
+        ],
+        "best": 0,
+        "worst": 1
+      }
+    ],
+    "final_snapshots": [
+      {
+        "id": 0,
+        "quality": 7.1108475967658755,
+        "n_alive": 8,
+        "n_births": 3,
+        "n_deaths": 1,
+        "max_gen": 1,
+        "dna_div": 0.14259838155875734,
+        "mean_z": 0.5,
+        "gravity": -0.054875454692978165,
+        "vert_food": 0.32802949665458053,
+        "mut_rate": 0.029417734788764954,
+        "violations_total": 3296,
+        "violations_crowding": 0,
+        "violations_hoarding": 2916,
+        "violations_voice": 380,
+        "violation_rate_per_agent": 412.0
+      },
+      {
+        "id": 1,
+        "quality": 4.771408624060523,
+        "n_alive": 7,
+        "n_births": 1,
+        "n_deaths": 0,
+        "max_gen": 1,
+        "dna_div": 0.03529818964852068,
+        "mean_z": 0.5,
+        "gravity": -0.0511353799549618,
+        "vert_food": 0.32503394199540536,
+        "mut_rate": 0.02908171163867918,
+        "violations_total": 2209,
+        "violations_crowding": 0,
+        "violations_hoarding": 1786,
+        "violations_voice": 423,
+        "violation_rate_per_agent": 315.57142857142856
+      }
+    ],
+    "final_mean_quality": 5.941128110413199,
+    "final_max_quality": 7.1108475967658755,
+    "final_mean_violation_rate": 363.7857142857143,
+    "final_total_violations": 5505
+  },
+  "B_taboo_aware": {
+    "label": "B. Sensitive taboo + penalty in quality",
+    "total_elapsed_s": 4.0,
+    "history": [
+      {
+        "epoch": 0,
+        "snapshots": [
+          {
+            "id": 0,
+            "quality": 5.282033602610671,
+            "n_alive": 8,
+            "n_births": 2,
+            "n_deaths": 0,
+            "max_gen": 1,
+            "dna_div": 0.12751142551476297,
+            "mean_z": 0.5,
+            "gravity": -0.054875454692978165,
+            "vert_food": 0.32802949665458053,
+            "mut_rate": 0.029417734788764954,
+            "violations_total": 1866,
+            "violations_crowding": 0,
+            "violations_hoarding": 1660,
+            "violations_voice": 206,
+            "violation_rate_per_agent": 233.25
+          },
+          {
+            "id": 1,
+            "quality": 3.1923364871586712,
+            "n_alive": 7,
+            "n_births": 1,
+            "n_deaths": 0,
+            "max_gen": 1,
+            "dna_div": 0.035243945887629156,
+            "mean_z": 0.5,
+            "gravity": -0.05585345533749278,
+            "vert_food": 0.2619256044584565,
+            "mut_rate": 0.03862623501432937,
+            "violations_total": 2280,
+            "violations_crowding": 0,
+            "violations_hoarding": 1800,
+            "violations_voice": 480,
+            "violation_rate_per_agent": 325.7142857142857
+          }
+        ],
+        "best": 0,
+        "worst": 1
+      },
+      {
+        "epoch": 1,
+        "snapshots": [
+          {
+            "id": 0,
+            "quality": 5.050847596765875,
+            "n_alive": 8,
+            "n_births": 3,
+            "n_deaths": 1,
+            "max_gen": 1,
+            "dna_div": 0.14259838155875734,
+            "mean_z": 0.5,
+            "gravity": -0.054875454692978165,
+            "vert_food": 0.32802949665458053,
+            "mut_rate": 0.029417734788764954,
+            "violations_total": 3296,
+            "violations_crowding": 0,
+            "violations_hoarding": 2916,
+            "violations_voice": 380,
+            "violation_rate_per_agent": 412.0
+          },
+          {
+            "id": 1,
+            "quality": 3.1935514812033805,
+            "n_alive": 7,
+            "n_births": 1,
+            "n_deaths": 0,
+            "max_gen": 1,
+            "dna_div": 0.03529818964852068,
+            "mean_z": 0.5,
+            "gravity": -0.0511353799549618,
+            "vert_food": 0.32503394199540536,
+            "mut_rate": 0.02908171163867918,
+            "violations_total": 2209,
+            "violations_crowding": 0,
+            "violations_hoarding": 1786,
+            "violations_voice": 423,
+            "violation_rate_per_agent": 315.57142857142856
+          }
+        ],
+        "best": 0,
+        "worst": 1
+      }
+    ],
+    "final_snapshots": [
+      {
+        "id": 0,
+        "quality": 5.050847596765875,
+        "n_alive": 8,
+        "n_births": 3,
+        "n_deaths": 1,
+        "max_gen": 1,
+        "dna_div": 0.14259838155875734,
+        "mean_z": 0.5,
+        "gravity": -0.054875454692978165,
+        "vert_food": 0.32802949665458053,
+        "mut_rate": 0.029417734788764954,
+        "violations_total": 3296,
+        "violations_crowding": 0,
+        "violations_hoarding": 2916,
+        "violations_voice": 380,
+        "violation_rate_per_agent": 412.0
+      },
+      {
+        "id": 1,
+        "quality": 3.1935514812033805,
+        "n_alive": 7,
+        "n_births": 1,
+        "n_deaths": 0,
+        "max_gen": 1,
+        "dna_div": 0.03529818964852068,
+        "mean_z": 0.5,
+        "gravity": -0.0511353799549618,
+        "vert_food": 0.32503394199540536,
+        "mut_rate": 0.02908171163867918,
+        "violations_total": 2209,
+        "violations_crowding": 0,
+        "violations_hoarding": 1786,
+        "violations_voice": 423,
+        "violation_rate_per_agent": 315.57142857142856
+      }
+    ],
+    "final_mean_quality": 4.122199538984628,
+    "final_max_quality": 5.050847596765875,
+    "final_mean_violation_rate": 363.7857142857143,
+    "final_total_violations": 5505
+  },
+  "reduction_pct": 0.0,
+  "config": {
+    "n_universes": 2,
+    "agents": 6,
+    "epoch_steps": 200,
+    "n_epochs": 2,
+    "seed": 42,
+    "output": "phase_11_7_taboo_guard_v3.json"
+  }
+}
