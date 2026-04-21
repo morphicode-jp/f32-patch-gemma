@@ -1,0 +1,386 @@
+<!DOCTYPE html>
+<html lang="ja">
+<head>
+<meta charset="UTF-8">
+<title>Cardinal Live Viewer</title>
+<style>
+  * { box-sizing: border-box; }
+  body {
+    font-family: -apple-system, "Segoe UI", sans-serif;
+    background: #0a0a12;
+    color: #e8e8f0;
+    margin: 0;
+    padding: 16px;
+  }
+  h1 {
+    margin: 0 0 12px;
+    font-size: 18px;
+    font-weight: 500;
+    letter-spacing: 0.3px;
+  }
+  .status-bar {
+    background: #14141f;
+    padding: 8px 12px;
+    margin-bottom: 16px;
+    border-radius: 4px;
+    font-size: 12px;
+    color: #a0a0b8;
+    border-left: 3px solid #5a8cff;
+  }
+  .universes {
+    display: grid;
+    grid-template-columns: repeat(auto-fit, minmax(320px, 1fr));
+    gap: 12px;
+    margin-bottom: 16px;
+  }
+  .universe {
+    background: #14141f;
+    border-radius: 6px;
+    padding: 12px;
+    border: 1px solid #26263a;
+    transition: all 0.3s;
+  }
+  .universe.best {
+    border-color: #fbbf24;
+    box-shadow: 0 0 20px rgba(251, 191, 36, 0.15);
+  }
+  .universe.worst {
+    opacity: 0.6;
+    border-color: #7f1d1d;
+  }
+  .universe-header {
+    display: flex;
+    justify-content: space-between;
+    align-items: center;
+    margin-bottom: 8px;
+  }
+  .universe-id {
+    font-weight: 600;
+    font-size: 14px;
+  }
+  .universe-id.best::after {
+    content: "  ★ WINNER";
+    font-size: 10px;
+    color: #fbbf24;
+    margin-left: 6px;
+  }
+  .quality {
+    font-variant-numeric: tabular-nums;
+    font-size: 18px;
+    color: #5a8cff;
+  }
+  .stats-grid {
+    display: grid;
+    grid-template-columns: 1fr 1fr;
+    gap: 4px 12px;
+    font-size: 11px;
+    color: #a0a0b8;
+    margin-top: 8px;
+  }
+  .stat-row { display: flex; justify-content: space-between; }
+  .stat-val { color: #e8e8f0; font-variant-numeric: tabular-nums; }
+  canvas.world {
+    width: 100%;
+    height: 140px;
+    background: #05050a;
+    border-radius: 4px;
+    margin-top: 8px;
+  }
+  .hp-list {
+    font-size: 10px;
+    color: #808098;
+    margin-top: 6px;
+    font-family: "SF Mono", Consolas, monospace;
+    line-height: 1.6;
+  }
+  .hp-row { display: flex; justify-content: space-between; }
+  .hp-key { color: #707090; }
+  .hp-val { color: #a8b0e0; }
+  #history-chart {
+    background: #14141f;
+    border-radius: 6px;
+    padding: 12px;
+    margin-bottom: 16px;
+  }
+  canvas#historyCanvas {
+    width: 100%;
+    height: 220px;
+    display: block;
+  }
+  .legend {
+    display: flex;
+    gap: 12px;
+    font-size: 11px;
+    margin-top: 6px;
+    flex-wrap: wrap;
+  }
+  .legend-item {
+    display: flex;
+    align-items: center;
+    gap: 4px;
+  }
+  .legend-swatch {
+    width: 12px; height: 12px; border-radius: 2px;
+  }
+  .section-title {
+    font-size: 12px;
+    color: #707090;
+    margin-bottom: 6px;
+    text-transform: uppercase;
+    letter-spacing: 0.5px;
+  }
+</style>
+</head>
+<body>
+
+<h1>Cardinal Live Viewer — 多世界メタ進化</h1>
+<div class="status-bar" id="status">Loading...</div>
+
+<div id="history-chart">
+  <div class="section-title">品質 (quality) の推移 — 高いほど良い</div>
+  <canvas id="historyCanvas"></canvas>
+  <div class="legend" id="legend"></div>
+</div>
+
+<div class="section-title" style="margin-bottom:8px;">宇宙ごとの状況</div>
+<div class="universes" id="universes"></div>
+
+<script>
+const UNIVERSE_COLORS = ["#5a8cff","#fbbf24","#34d399","#f87171","#a78bfa","#60a5fa","#fb923c"];
+
+function colorFor(id){ return UNIVERSE_COLORS[id % UNIVERSE_COLORS.length]; }
+
+let historyByUniverse = {};  // id -> [{step, quality}]
+let historySteps = [];       // matches timing of samples
+
+function fmtNum(v, digits=2) {
+  if (v === null || v === undefined || !isFinite(v)) return "—";
+  if (Math.abs(v) >= 100) return v.toFixed(0);
+  if (Math.abs(v) >= 10)  return v.toFixed(1);
+  return v.toFixed(digits);
+}
+
+function renderUniverse(u, bestId, worstId) {
+  const el = document.createElement("div");
+  el.className = "universe"
+    + (u.id === bestId ? " best" : "")
+    + (u.id === worstId ? " worst" : "");
+
+  // Header
+  const header = document.createElement("div");
+  header.className = "universe-header";
+  const idSpan = document.createElement("div");
+  idSpan.className = "universe-id" + (u.id === bestId ? " best" : "");
+  idSpan.style.color = colorFor(u.id);
+  idSpan.textContent = `Universe #${u.id}`;
+  header.appendChild(idSpan);
+  const qSpan = document.createElement("div");
+  qSpan.className = "quality";
+  qSpan.textContent = fmtNum(u.quality, 2);
+  header.appendChild(qSpan);
+  el.appendChild(header);
+
+  // World canvas
+  const canvas = document.createElement("canvas");
+  canvas.className = "world";
+  canvas.width = 400;
+  canvas.height = 160;
+  el.appendChild(canvas);
+  drawWorld(canvas, u);
+
+  // Stats grid
+  const grid = document.createElement("div");
+  grid.className = "stats-grid";
+  const st = u.stats;
+  const statPairs = [
+    ["alive", st.n_alive],
+    ["births", st.n_births],
+    ["deaths", st.n_deaths],
+    ["max gen", st.max_generation],
+    ["DNA div", fmtNum(st.dna_diversity, 3)],
+    ["energy", fmtNum(st.mean_energy, 1)],
+    ["food", st.n_food_voxels],
+    ["light", fmtNum(st.light_level, 2)],
+  ];
+  for (const [k, v] of statPairs) {
+    const row = document.createElement("div");
+    row.className = "stat-row";
+    row.innerHTML = `<span>${k}</span><span class="stat-val">${v}</span>`;
+    grid.appendChild(row);
+  }
+  el.appendChild(grid);
+
+  // HP list
+  const hpDiv = document.createElement("div");
+  hpDiv.className = "hp-list";
+  const wp = u.world_params;
+  const keysOfInterest = ["mutation_rate", "food_respawn_rate", "energy_decay",
+                           "repro_energy_threshold", "vision_range", "repro_cost"];
+  for (const k of keysOfInterest) {
+    if (wp[k] === undefined) continue;
+    const row = document.createElement("div");
+    row.className = "hp-row";
+    row.innerHTML = `<span class="hp-key">${k}</span><span class="hp-val">${fmtNum(wp[k], 3)}</span>`;
+    hpDiv.appendChild(row);
+  }
+  el.appendChild(hpDiv);
+
+  return el;
+}
+
+function drawWorld(canvas, u) {
+  const ctx = canvas.getContext("2d");
+  const W = canvas.width, H = canvas.height;
+  ctx.fillStyle = "#05050a";
+  ctx.fillRect(0, 0, W, H);
+  const size = u.world_size || 20;
+  const scaleX = W / size;
+  const scaleY = H / size;
+
+  // Food (tiny green dots)
+  ctx.fillStyle = "#2d5";
+  for (const f of (u.food || [])) {
+    ctx.fillRect(f.x * scaleX - 1, f.y * scaleY - 1, 2, 2);
+  }
+
+  // Agents (circles colored by generation)
+  for (const a of (u.positions || [])) {
+    const gen = a.g || 0;
+    const hue = 200 + gen * 30;
+    ctx.beginPath();
+    ctx.fillStyle = `hsl(${hue}, 70%, 60%)`;
+    const r = 3 + Math.min(a.e / 50, 3);
+    ctx.arc(a.x * scaleX, a.y * scaleY, r, 0, Math.PI * 2);
+    ctx.fill();
+  }
+}
+
+function drawHistory(canvas, universes, history) {
+  const ctx = canvas.getContext("2d");
+  const W = canvas.clientWidth * devicePixelRatio;
+  const H = canvas.clientHeight * devicePixelRatio;
+  if (canvas.width !== W || canvas.height !== H) {
+    canvas.width = W; canvas.height = H;
+  }
+  ctx.clearRect(0, 0, W, H);
+
+  // Build series from streaming snapshots
+  const snapshotsByUid = {};
+  for (const u of universes) {
+    if (!historyByUniverse[u.id]) historyByUniverse[u.id] = [];
+    const arr = historyByUniverse[u.id];
+    const last = arr[arr.length - 1];
+    if (!last || Math.abs(last.q - u.quality) > 1e-9 || arr.length < 2) {
+      arr.push({ t: historyByUniverse._t || 0, q: u.quality });
+      if (arr.length > 200) arr.shift();
+    }
+  }
+  historyByUniverse._t = (historyByUniverse._t || 0) + 1;
+
+  // Bounds
+  const allQ = Object.keys(historyByUniverse)
+    .filter(k => !k.startsWith("_"))
+    .flatMap(k => historyByUniverse[k].map(s => s.q));
+  if (allQ.length === 0) return;
+  const qMin = Math.min(...allQ, 0);
+  const qMax = Math.max(...allQ, 1);
+  const qRange = qMax - qMin || 1;
+  const tMax = historyByUniverse._t;
+
+  // Axes
+  ctx.strokeStyle = "#26263a";
+  ctx.lineWidth = 1;
+  ctx.beginPath();
+  ctx.moveTo(40, 10); ctx.lineTo(40, H - 30);
+  ctx.lineTo(W - 10, H - 30);
+  ctx.stroke();
+
+  // Gridlines with values
+  ctx.fillStyle = "#707090";
+  ctx.font = `${11 * devicePixelRatio}px system-ui, sans-serif`;
+  ctx.textAlign = "right";
+  for (let i = 0; i <= 4; i++) {
+    const q = qMin + (qRange * i / 4);
+    const y = H - 30 - (H - 40) * (i / 4);
+    ctx.fillText(fmtNum(q, 1), 36, y + 4);
+    ctx.strokeStyle = "#1c1c2a";
+    ctx.beginPath();
+    ctx.moveTo(40, y); ctx.lineTo(W - 10, y);
+    ctx.stroke();
+  }
+  ctx.textAlign = "start";
+
+  // Lines per universe
+  for (const u of universes) {
+    const arr = historyByUniverse[u.id] || [];
+    if (arr.length < 2) continue;
+    ctx.strokeStyle = colorFor(u.id);
+    ctx.lineWidth = 2 * devicePixelRatio;
+    ctx.beginPath();
+    arr.forEach((s, i) => {
+      const x = 40 + (W - 50) * (s.t / Math.max(tMax, 1));
+      const y = H - 30 - (H - 40) * ((s.q - qMin) / qRange);
+      if (i === 0) ctx.moveTo(x, y); else ctx.lineTo(x, y);
+    });
+    ctx.stroke();
+    // Dot at latest
+    const last = arr[arr.length - 1];
+    const x = 40 + (W - 50) * (last.t / Math.max(tMax, 1));
+    const y = H - 30 - (H - 40) * ((last.q - qMin) / qRange);
+    ctx.fillStyle = colorFor(u.id);
+    ctx.beginPath(); ctx.arc(x, y, 4, 0, Math.PI * 2); ctx.fill();
+  }
+}
+
+function renderLegend(universes) {
+  const legend = document.getElementById("legend");
+  legend.innerHTML = "";
+  for (const u of universes) {
+    const item = document.createElement("div");
+    item.className = "legend-item";
+    item.innerHTML = `<div class="legend-swatch" style="background:${colorFor(u.id)}"></div>
+                      Universe #${u.id}`;
+    legend.appendChild(item);
+  }
+}
+
+async function poll() {
+  try {
+    const r = await fetch("/state.json", { cache: "no-store" });
+    if (!r.ok) throw new Error("bad response");
+    const state = await r.json();
+
+    document.getElementById("status").textContent =
+      `[${Math.floor(state.elapsed_s)}s] epoch ${state.epoch} step ${state.step} — ${state.status}`;
+
+    const universes = state.universes || [];
+    const bestId = state.best_id;
+    let worstId = -1;
+    if (universes.length > 0) {
+      const sorted = [...universes].sort((a, b) => a.quality - b.quality);
+      worstId = sorted[0].id;
+    }
+
+    // Render universes
+    const container = document.getElementById("universes");
+    container.innerHTML = "";
+    for (const u of universes) {
+      container.appendChild(renderUniverse(u, bestId, worstId));
+    }
+
+    // History chart
+    const canvas = document.getElementById("historyCanvas");
+    drawHistory(canvas, universes, state.history);
+    renderLegend(universes);
+
+  } catch (e) {
+    document.getElementById("status").textContent = "connection error: " + e.message;
+  }
+}
+
+setInterval(poll, 800);
+poll();
+</script>
+
+</body>
+</html>
