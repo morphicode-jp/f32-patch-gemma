@@ -1,0 +1,195 @@
+{
+  "total_elapsed_s": 601.3,
+  "results": [
+    {
+      "name": "A_balanced",
+      "weights": {
+        "alive": 1.0,
+        "births": 1.5,
+        "dna_diversity": 10.0,
+        "food": 0.5,
+        "generation": 0.8
+      },
+      "trajectory": [
+        {
+          "epoch": 0,
+          "best_u_id": 3,
+          "best_mut_rate": 0.0863160401378636,
+          "best_quality": 15.102554669958698,
+          "best_dna_div": 0.4205911322933722
+        },
+        {
+          "epoch": 1,
+          "best_u_id": 3,
+          "best_mut_rate": 0.0863160401378636,
+          "best_quality": 15.352822996410497,
+          "best_dna_div": 0.4205911322933722
+        },
+        {
+          "epoch": 2,
+          "best_u_id": 3,
+          "best_mut_rate": 0.0863160401378636,
+          "best_quality": 15.585224892605956,
+          "best_dna_div": 0.4205911322933722
+        }
+      ],
+      "final_mean_mut_rate": 0.07198645656618714,
+      "final_max_mut_rate": 0.0863160401378636,
+      "final_mean_dna_div": 0.20995118850061426,
+      "final_max_dna_div": 0.4205911322933722,
+      "elapsed_s": 130.3
+    },
+    {
+      "name": "B_alive_only",
+      "weights": {
+        "alive": 10.0,
+        "births": 0.0,
+        "dna_diversity": 0.0,
+        "food": 0.0,
+        "generation": 0.0
+      },
+      "trajectory": [
+        {
+          "epoch": 0,
+          "best_u_id": 0,
+          "best_mut_rate": 0.029417734788764954,
+          "best_quality": 32.58096538021482,
+          "best_dna_div": 0.15656171687985693
+        },
+        {
+          "epoch": 1,
+          "best_u_id": 0,
+          "best_mut_rate": 0.029417734788764954,
+          "best_quality": 32.58096538021482,
+          "best_dna_div": 0.15656171687985693
+        },
+        {
+          "epoch": 2,
+          "best_u_id": 0,
+          "best_mut_rate": 0.029417734788764954,
+          "best_quality": 32.58096538021482,
+          "best_dna_div": 0.15656171687985693
+        }
+      ],
+      "final_mean_mut_rate": 0.03161485261075425,
+      "final_max_mut_rate": 0.03862623501432937,
+      "final_mean_dna_div": 0.17210009831408932,
+      "final_max_dna_div": 0.4079780078890685,
+      "elapsed_s": 116.8
+    },
+    {
+      "name": "C_births_only",
+      "weights": {
+        "alive": 0.0,
+        "births": 10.0,
+        "dna_diversity": 0.0,
+        "food": 0.0,
+        "generation": 0.0
+      },
+      "trajectory": [
+        {
+          "epoch": 0,
+          "best_u_id": 0,
+          "best_mut_rate": 0.029417734788764954,
+          "best_quality": 23.978952727983707,
+          "best_dna_div": 0.15656171687985693
+        },
+        {
+          "epoch": 1,
+          "best_u_id": 0,
+          "best_mut_rate": 0.029417734788764954,
+          "best_quality": 23.978952727983707,
+          "best_dna_div": 0.15656171687985693
+        },
+        {
+          "epoch": 2,
+          "best_u_id": 0,
+          "best_mut_rate": 0.029417734788764954,
+          "best_quality": 23.978952727983707,
+          "best_dna_div": 0.15656171687985693
+        }
+      ],
+      "final_mean_mut_rate": 0.03131827597677006,
+      "final_max_mut_rate": 0.03862623501432937,
+      "final_mean_dna_div": 0.17501137231811928,
+      "final_max_dna_div": 0.4079780078890685,
+      "elapsed_s": 117.5
+    },
+    {
+      "name": "D_diversity_only",
+      "weights": {
+        "alive": 0.0,
+        "births": 0.0,
+        "dna_diversity": 30.0,
+        "food": 0.0,
+        "generation": 0.0
+      },
+      "trajectory": [
+        {
+          "epoch": 0,
+          "best_u_id": 3,
+          "best_mut_rate": 0.0863160401378636,
+          "best_quality": 12.617733968801165,
+          "best_dna_div": 0.4205911322933722
+        },
+        {
+          "epoch": 1,
+          "best_u_id": 3,
+          "best_mut_rate": 0.0863160401378636,
+          "best_quality": 12.617733968801165,
+          "best_dna_div": 0.4205911322933722
+        },
+        {
+          "epoch": 2,
+          "best_u_id": 3,
+          "best_mut_rate": 0.0863160401378636,
+          "best_quality": 12.617733968801165,
+          "best_dna_div": 0.4205911322933722
+        }
+      ],
+      "final_mean_mut_rate": 0.07198645656618714,
+      "final_max_mut_rate": 0.0863160401378636,
+      "final_mean_dna_div": 0.1857405692711901,
+      "final_max_dna_div": 0.4205911322933722,
+      "elapsed_s": 118.3
+    },
+    {
+      "name": "E_food_only",
+      "weights": {
+        "alive": 0.0,
+        "births": 0.0,
+        "dna_diversity": 0.0,
+        "food": 10.0,
+        "generation": 0.0
+      },
+      "trajectory": [
+        {
+          "epoch": 0,
+          "best_u_id": 3,
+          "best_mut_rate": 0.0863160401378636,
+          "best_quality": 48.83407799611873,
+          "best_dna_div": 0.4205911322933722
+        },
+        {
+          "epoch": 1,
+          "best_u_id": 3,
+          "best_mut_rate": 0.0863160401378636,
+          "best_quality": 53.83944452515473,
+          "best_dna_div": 0.4205911322933722
+        },
+        {
+          "epoch": 2,
+          "best_u_id": 3,
+          "best_mut_rate": 0.0863160401378636,
+          "best_quality": 58.67826906649804,
+          "best_dna_div": 0.4205911322933722
+        }
+      ],
+      "final_mean_mut_rate": 0.060169012519705384,
+      "final_max_mut_rate": 0.0863160401378636,
+      "final_mean_dna_div": 0.17780845338425227,
+      "final_max_dna_div": 0.4205911322933722,
+      "elapsed_s": 118.5
+    }
+  ]
+}

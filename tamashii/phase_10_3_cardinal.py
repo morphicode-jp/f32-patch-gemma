@@ -202,17 +202,21 @@ class Universe:
         # Final snapshot
         self.trajectory.append({"step": n_steps, **self.world.stats(), "final": True})
 
+    # Default quality weights (original composite)
+    DEFAULT_QUALITY_WEIGHTS = {
+        "alive": 1.0,
+        "births": 1.5,
+        "dna_diversity": 10.0,
+        "food": 0.5,
+        "generation": 0.8,
+    }
+
+    # Class-level override (for ablation studies)
+    quality_weights: dict | None = None
+
     def quality(self) -> float:
-        """Universe quality metric.
-
-        Composite:
-          - longevity: log(n_alive + 1)
-          - creativity: log(n_births + 1)
-          - diversity: dna_diversity (0-1)
-          - food_productivity: mean food_eaten per alive agent
-
-        Higher = richer, more interesting universe (more likely to be
-        preserved in meta-evolution).
+        """Universe quality metric. Weights controlled by self.quality_weights
+        or class-level override (used by ablation studies).
         """
         s = self.world.stats()
         n_alive = s["n_alive"]
@@ -220,19 +224,19 @@ class Universe:
             return 0.0
         n_births = s["n_births"]
         dna_div = s["dna_diversity"]
-        # Food per alive
         alive_food = [self.world.agent_food_eaten[i]
                       for i in range(self.world.n_agents)
                       if self.world.agent_alive[i]]
         mean_food = float(np.mean(alive_food)) if alive_food else 0.0
         gen_max = s["max_generation"]
 
+        w = self.quality_weights or self.DEFAULT_QUALITY_WEIGHTS
         quality = (
-            np.log1p(n_alive) * 1.0 +
-            np.log1p(n_births) * 1.5 +
-            dna_div * 10.0 +
-            np.log1p(mean_food) * 0.5 +
-            gen_max * 0.8
+            np.log1p(n_alive) * float(w.get("alive", 0.0)) +
+            np.log1p(n_births) * float(w.get("births", 0.0)) +
+            dna_div * float(w.get("dna_diversity", 0.0)) +
+            np.log1p(mean_food) * float(w.get("food", 0.0)) +
+            gen_max * float(w.get("generation", 0.0))
         )
         return float(quality)
 
