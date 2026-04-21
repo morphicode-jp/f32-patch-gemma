@@ -107,9 +107,10 @@ def run_cardinal_opt(problem_eval, ranges, budget, seed=42):
     t0 = time.time()
     rng = np.random.default_rng(seed)
 
-    N_universes = 4
-    pop_size = 8
-    epochs = 5
+    # Adaptive sizing: use most of budget
+    N_universes = int(os.environ.get("CARDINAL_N_UNIV", 4))
+    pop_size = int(os.environ.get("CARDINAL_POP", 8))
+    epochs = int(os.environ.get("CARDINAL_EPOCHS", 5))
 
     # Initialize universes with random mut_rates
     universes = []
