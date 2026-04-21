@@ -232,3 +232,57 @@ def test_mimir_structure_only_is_fast():
     wall = time.time() - t0
     # structure_only caps owl_budget at min(time_budget, 30s). Should be fast.
     assert wall < 35, f"structure_only wall {wall:.1f}s unexpectedly slow"
+
+
+# -----------------------------------------------------------------
+# batch_eval_fn: pre-batched seed collection + Reigen passthrough
+# -----------------------------------------------------------------
+
+def test_mimir_batch_eval_fn_used_for_seed():
+    """batch_eval_fn provided → pre-batch seed collection replaces sequential.
+
+    Verify batch_eval_fn gets called at least once with a list of params,
+    and that mimir still returns a valid result.
+    """
+    def eval_fn(p):
+        return -sum(x * x for x in p)
+
+    batch_call_count = [0]
+    def batch_eval_fn(params_list):
+        batch_call_count[0] += 1
+        return [eval_fn(p) for p in params_list]
+
+    r = mimir(
+        eval_fn=eval_fn,
+        param_ranges=[(-1, 1)] * 3,
+        time_budget=8,
+        batch_eval_fn=batch_eval_fn,
+        batch_size=8,
+        eval_cost_hint=1.0,  # force expensive route (so cascade skipped, tight path)
+        experience_id="test_mimir_batch_seed",
+    )
+    # batch_eval_fn called at least once (for seed)
+    assert batch_call_count[0] >= 1, (
+        "batch_eval_fn was not called; pre-batch seed logic failed")
+    assert r["best_params"] is not None
+
+
+def test_mimir_batch_eval_fn_failure_falls_back():
+    """batch_eval_fn raising exception → mimir continues via eval_fn."""
+    def eval_fn(p):
+        return -sum(x * x for x in p)
+
+    def broken_batch(_):
+        raise RuntimeError("intentional failure")
+
+    r = mimir(
+        eval_fn=eval_fn,
+        param_ranges=[(-1, 1)] * 2,
+        time_budget=6,
+        batch_eval_fn=broken_batch,
+        batch_size=4,
+        eval_cost_hint=1.0,
+        experience_id="test_mimir_batch_fail",
+    )
+    # Should still succeed via fallback to eval_fn
+    assert r["best_params"] is not None

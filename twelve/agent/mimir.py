@@ -125,6 +125,8 @@ def mimir(
     mimir_cfg: Optional[dict] = None,
     mode: str = "optimize",  # "optimize" | "structure_only"
     thread_safe_eval: bool = True,  # False: eval_fn touches global state (Rule 11); forces sequential cascade
+    batch_eval_fn: Optional[Callable] = None,  # f(params_list) -> scores_list, for GPU/vectorized eval
+    batch_size: int = 8,                        # batch size for batch_eval_fn (5090 LLM sweet spot)
     verbose: bool = False,
 ) -> dict:
     """Meta-dispatcher routing to owl or cascading owl→Reigen.
@@ -203,6 +205,34 @@ def mimir(
         t_eval = float(eval_cost_hint)
     else:
         t_eval = _measure_eval_cost(eval_fn, param_ranges)
+
+    # ---- Phase 0b: pre-batched seed collection (batch_eval_fn + no curated) ----
+    # GPU/vectorized eval path: collect N=batch_size*2 initial points in ONE
+    # batched call instead of N sequential calls. For LLM (~1s/call), this
+    # turns ~20s seed collection into ~3s. Resulting seed becomes curated
+    # for owl — routes to expensive_single with rich initial data.
+    if batch_eval_fn is not None and curated_measurements is None:
+        try:
+            import random as _rr
+            _batch_rng = _rr.Random(hash(experience_id) & 0xFFFFFFFF)
+            _n_seed = max(int(batch_size) * 2,
+                          max(20, len(list(param_ranges)) + 2))
+            _seed_params = [
+                [_batch_rng.uniform(lo, hi) for lo, hi in param_ranges]
+                for _ in range(_n_seed)
+            ]
+            _seed_scores = batch_eval_fn(_seed_params)
+            _seed_measurements = [
+                {"params": list(p), "score": float(s)}
+                for p, s in zip(_seed_params, _seed_scores)
+            ]
+            # Replace curated_measurements so owl gets batched seed
+            curated_measurements = _seed_measurements
+            if verbose:
+                print(f"  [batch seed] {_n_seed} points via batch_eval_fn")
+        except Exception as _bsc_e:
+            if verbose:
+                print(f"  [batch seed] failed: {type(_bsc_e).__name__}; falling back to eval_fn path")
 
     # Expensive eval OR curated data provided → owl single-shot with full enhancements
     expensive_route = (t_eval > _eval_cost_threshold) or (
@@ -364,7 +394,7 @@ def mimir(
 
     def _reigen_worker():
         try:
-            reigen_obj = Reigen(
+            reigen_kwargs = dict(
                 eval_fn=eval_fn,
                 guard_fn=_guard,
                 user_param_ranges=list(param_ranges),
@@ -374,6 +404,12 @@ def mimir(
                 inner_time_budget=_reigen_inner,
                 verbose=verbose,
             )
+            # Passthrough batch_eval_fn for GPU/vectorized speedup inside
+            # Reigen's inner Sentinel._collect (20 pts per inner → batch).
+            if batch_eval_fn is not None:
+                reigen_kwargs["batch_eval_fn"] = batch_eval_fn
+                reigen_kwargs["batch_size"] = int(batch_size)
+            reigen_obj = Reigen(**reigen_kwargs)
             return reigen_obj.run(
                 time_budget=_cascade_budget,
                 wall_time_factor=_reigen_wtf,
