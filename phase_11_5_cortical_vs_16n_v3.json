@@ -1,0 +1,385 @@
+{
+  "A_16N": {
+    "label": "A. 16N Kathara (3D)",
+    "total_elapsed_s": 27.0,
+    "history": [
+      {
+        "epoch": 0,
+        "snapshots": [
+          {
+            "id": 0,
+            "quality": 7.690840141488334,
+            "n_alive": 9,
+            "n_births": 5,
+            "n_deaths": 1,
+            "mean_agent_z": 0.5,
+            "max_agent_z": 0.5,
+            "gravity": -0.054875454692978165,
+            "vert_food": 0.32802949665458053,
+            "max_gen": 2,
+            "dna_div": 0.030713331636118505
+          },
+          {
+            "id": 1,
+            "quality": 6.786385045442464,
+            "n_alive": 6,
+            "n_births": 5,
+            "n_deaths": 4,
+            "mean_agent_z": 0.5,
+            "max_agent_z": 0.5,
+            "gravity": -0.05585345533749278,
+            "vert_food": 0.2619256044584565,
+            "max_gen": 1,
+            "dna_div": 0.027309356786838143
+          },
+          {
+            "id": 2,
+            "quality": 9.704601859568733,
+            "n_alive": 13,
+            "n_births": 8,
+            "n_deaths": 0,
+            "mean_agent_z": 0.5,
+            "max_agent_z": 0.5,
+            "gravity": -0.05107182108902183,
+            "vert_food": 0.06701303716949576,
+            "max_gen": 3,
+            "dna_div": 0.026684003044708096
+          }
+        ],
+        "best": 2,
+        "worst": 1
+      },
+      {
+        "epoch": 1,
+        "snapshots": [
+          {
+            "id": 0,
+            "quality": 8.801136586222958,
+            "n_alive": 5,
+            "n_births": 7,
+            "n_deaths": 7,
+            "mean_agent_z": 0.5,
+            "max_agent_z": 0.5,
+            "gravity": -0.054875454692978165,
+            "vert_food": 0.32802949665458053,
+            "max_gen": 3,
+            "dna_div": 0.04894748043700874
+          },
+          {
+            "id": 1,
+            "quality": 9.404796846097037,
+            "n_alive": 11,
+            "n_births": 7,
+            "n_deaths": 1,
+            "mean_agent_z": 0.5,
+            "max_agent_z": 0.5,
+            "gravity": -0.04733174635100546,
+            "vert_food": 0.06401748251032059,
+            "max_gen": 3,
+            "dna_div": 0.043430885004530316
+          },
+          {
+            "id": 2,
+            "quality": 9.486746055034317,
+            "n_alive": 9,
+            "n_births": 12,
+            "n_deaths": 8,
+            "mean_agent_z": 0.5,
+            "max_agent_z": 0.5,
+            "gravity": -0.05107182108902183,
+            "vert_food": 0.06701303716949576,
+            "max_gen": 2,
+            "dna_div": 0.0310421210891306
+          }
+        ],
+        "best": 2,
+        "worst": 0
+      },
+      {
+        "epoch": 2,
+        "snapshots": [
+          {
+            "id": 0,
+            "quality": 6.709881643228056,
+            "n_alive": 5,
+            "n_births": 3,
+            "n_deaths": 3,
+            "mean_agent_z": 0.5,
+            "max_agent_z": 0.5,
+            "gravity": -0.045660299401581665,
+            "vert_food": 0.11499099210359606,
+            "max_gen": 1,
+            "dna_div": 0.10802193262291346
+          },
+          {
+            "id": 1,
+            "quality": 10.770027598323736,
+            "n_alive": 9,
+            "n_births": 11,
+            "n_deaths": 7,
+            "mean_agent_z": 0.5,
+            "max_agent_z": 0.5,
+            "gravity": -0.04733174635100546,
+            "vert_food": 0.06401748251032059,
+            "max_gen": 4,
+            "dna_div": 0.03832650660573734
+          },
+          {
+            "id": 2,
+            "quality": 10.847623777770142,
+            "n_alive": 10,
+            "n_births": 18,
+            "n_deaths": 13,
+            "mean_agent_z": 0.5,
+            "max_agent_z": 0.5,
+            "gravity": -0.05107182108902183,
+            "vert_food": 0.06701303716949576,
+            "max_gen": 3,
+            "dna_div": 0.02994559329311331
+          }
+        ],
+        "best": 2,
+        "worst": 0
+      }
+    ],
+    "final_snapshots": [
+      {
+        "id": 0,
+        "quality": 6.709881643228056,
+        "n_alive": 5,
+        "n_births": 3,
+        "n_deaths": 3,
+        "mean_agent_z": 0.5,
+        "max_agent_z": 0.5,
+        "gravity": -0.045660299401581665,
+        "vert_food": 0.11499099210359606,
+        "max_gen": 1,
+        "dna_div": 0.10802193262291346
+      },
+      {
+        "id": 1,
+        "quality": 10.770027598323736,
+        "n_alive": 9,
+        "n_births": 11,
+        "n_deaths": 7,
+        "mean_agent_z": 0.5,
+        "max_agent_z": 0.5,
+        "gravity": -0.04733174635100546,
+        "vert_food": 0.06401748251032059,
+        "max_gen": 4,
+        "dna_div": 0.03832650660573734
+      },
+      {
+        "id": 2,
+        "quality": 10.847623777770142,
+        "n_alive": 10,
+        "n_births": 18,
+        "n_deaths": 13,
+        "mean_agent_z": 0.5,
+        "max_agent_z": 0.5,
+        "gravity": -0.05107182108902183,
+        "vert_food": 0.06701303716949576,
+        "max_gen": 3,
+        "dna_div": 0.02994559329311331
+      }
+    ],
+    "final_best_quality": 10.847623777770142,
+    "final_mean_quality": 9.442511006440645
+  },
+  "B_60N_cortical": {
+    "label": "B. 60N Cortical (3D)",
+    "total_elapsed_s": 20.0,
+    "history": [
+      {
+        "epoch": 0,
+        "snapshots": [
+          {
+            "id": 0,
+            "quality": 2.783257582451487,
+            "n_alive": 4,
+            "n_births": 0,
+            "n_deaths": 1,
+            "mean_agent_z": 0.5,
+            "max_agent_z": 0.5,
+            "gravity": -0.054875454692978165,
+            "vert_food": 0.32802949665458053,
+            "max_gen": 0,
+            "dna_div": 0.04806724894574413
+          },
+          {
+            "id": 1,
+            "quality": 2.067707465250182,
+            "n_alive": 2,
+            "n_births": 0,
+            "n_deaths": 3,
+            "mean_agent_z": 0.5,
+            "max_agent_z": 0.5,
+            "gravity": -0.05585345533749278,
+            "vert_food": 0.2619256044584565,
+            "max_gen": 0,
+            "dna_div": 0.00732154419680446
+          },
+          {
+            "id": 2,
+            "quality": 2.8708464099369655,
+            "n_alive": 4,
+            "n_births": 0,
+            "n_deaths": 1,
+            "mean_agent_z": 0.5,
+            "max_agent_z": 0.5,
+            "gravity": -0.05107182108902183,
+            "vert_food": 0.06701303716949576,
+            "max_gen": 0,
+            "dna_div": 0.016279620883475517
+          }
+        ],
+        "best": 2,
+        "worst": 1
+      },
+      {
+        "epoch": 1,
+        "snapshots": [
+          {
+            "id": 0,
+            "quality": 1.4978661367769954,
+            "n_alive": 1,
+            "n_births": 0,
+            "n_deaths": 4,
+            "mean_agent_z": 0.5,
+            "max_agent_z": 0.5,
+            "gravity": -0.054875454692978165,
+            "vert_food": 0.32802949665458053,
+            "max_gen": 0,
+            "dna_div": 0.0
+          },
+          {
+            "id": 1,
+            "quality": 2.7434214538605177,
+            "n_alive": 4,
+            "n_births": 0,
+            "n_deaths": 1,
+            "mean_agent_z": 0.5,
+            "max_agent_z": 0.5,
+            "gravity": -0.04733174635100546,
+            "vert_food": 0.06401748251032059,
+            "max_gen": 0,
+            "dna_div": 0.016102846689876073
+          },
+          {
+            "id": 2,
+            "quality": 2.04717228111105,
+            "n_alive": 1,
+            "n_births": 0,
+            "n_deaths": 4,
+            "mean_agent_z": 0.5,
+            "max_agent_z": 0.5,
+            "gravity": -0.05107182108902183,
+            "vert_food": 0.06701303716949576,
+            "max_gen": 0,
+            "dna_div": 0.0
+          }
+        ],
+        "best": 1,
+        "worst": 0
+      },
+      {
+        "epoch": 2,
+        "snapshots": [
+          {
+            "id": 0,
+            "quality": 3.0650784616922255,
+            "n_alive": 5,
+            "n_births": 0,
+            "n_deaths": 0,
+            "mean_agent_z": 0.5,
+            "max_agent_z": 0.5,
+            "gravity": -0.0419202246635653,
+            "vert_food": 0.11199543744442089,
+            "max_gen": 0,
+            "dna_div": 0.0377439257850143
+          },
+          {
+            "id": 1,
+            "quality": 1.8444397270569683,
+            "n_alive": 1,
+            "n_births": 0,
+            "n_deaths": 4,
+            "mean_agent_z": 0.5,
+            "max_agent_z": 0.5,
+            "gravity": -0.04733174635100546,
+            "vert_food": 0.06401748251032059,
+            "max_gen": 0,
+            "dna_div": 0.0
+          },
+          {
+            "id": 2,
+            "quality": 2.282174095733918,
+            "n_alive": 1,
+            "n_births": 0,
+            "n_deaths": 4,
+            "mean_agent_z": 0.5,
+            "max_agent_z": 0.5,
+            "gravity": -0.05107182108902183,
+            "vert_food": 0.06701303716949576,
+            "max_gen": 0,
+            "dna_div": 0.0
+          }
+        ],
+        "best": 0,
+        "worst": 1
+      }
+    ],
+    "final_snapshots": [
+      {
+        "id": 0,
+        "quality": 3.0650784616922255,
+        "n_alive": 5,
+        "n_births": 0,
+        "n_deaths": 0,
+        "mean_agent_z": 0.5,
+        "max_agent_z": 0.5,
+        "gravity": -0.0419202246635653,
+        "vert_food": 0.11199543744442089,
+        "max_gen": 0,
+        "dna_div": 0.0377439257850143
+      },
+      {
+        "id": 1,
+        "quality": 1.8444397270569683,
+        "n_alive": 1,
+        "n_births": 0,
+        "n_deaths": 4,
+        "mean_agent_z": 0.5,
+        "max_agent_z": 0.5,
+        "gravity": -0.04733174635100546,
+        "vert_food": 0.06401748251032059,
+        "max_gen": 0,
+        "dna_div": 0.0
+      },
+      {
+        "id": 2,
+        "quality": 2.282174095733918,
+        "n_alive": 1,
+        "n_births": 0,
+        "n_deaths": 4,
+        "mean_agent_z": 0.5,
+        "max_agent_z": 0.5,
+        "gravity": -0.05107182108902183,
+        "vert_food": 0.06701303716949576,
+        "max_gen": 0,
+        "dna_div": 0.0
+      }
+    ],
+    "final_best_quality": 3.0650784616922255,
+    "final_mean_quality": 2.3972307614943706
+  },
+  "diff_60n_minus_16n": -7.7825453160779166,
+  "config": {
+    "n_universes": 3,
+    "n_epochs": 3,
+    "epoch_steps": 500,
+    "agents": 5,
+    "seed": 42,
+    "output": "phase_11_5_cortical_vs_16n_v3.json"
+  }
+}

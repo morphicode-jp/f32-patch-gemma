@@ -44,10 +44,13 @@ if REPO_ROOT not in sys.path:
 SENSOR_MAP_16_TO_12 = [0, 1, 2, 3, 4, 5, 6, 7, 8, 9, 10, 15]
 
 # Motor output nodes in L4 (the final "output" cortical layer)
-MOTOR_NODE_NAV   = 0   # L4 node 0 → nav
-MOTOR_NODE_SPEED = 3   # L4 node 3 → speed
-MOTOR_NODE_VOICE = 6   # L4 node 6 → voice
-MOTOR_NODE_JUMP  = 9   # L4 node 9 → jump
+# IMPORTANT: cortical_brain.py's 2D training drove L4[5] = nav and L4[11] = cen.
+# Other L4 nodes (0-4, 6-10) are UNTRAINED → random noise.
+# Use trained nodes for critical actions; untrained nodes for optional channels.
+MOTOR_NODE_NAV   = 5   # trained in 2D for nav
+MOTOR_NODE_SPEED = 11  # trained in 2D for centrifugal (≈ speed)
+MOTOR_NODE_VOICE = 1   # untrained, will be noise (OK for voice exploration)
+MOTOR_NODE_JUMP  = 8   # untrained — INHIBITORY (Dale's law node 8) → low output
 
 
 class CorticalCoreBrain(Shell):
@@ -97,10 +100,15 @@ class CorticalCoreBrain(Shell):
         l4_state = self.brain.states[-1]  # 12D
 
         # 4 motor outputs
+        # NOTE: for 2D-pretrained cortical, only nav (L4[5]) and speed (L4[11])
+        # are reliable. Voice/jump from untrained nodes cause chaotic behavior.
+        # Enable these later once cortical is trained in 3D or with jump signal.
         nav_out   = float(l4_state[MOTOR_NODE_NAV])
         speed_out = float(l4_state[MOTOR_NODE_SPEED])
         voice_out = float(l4_state[MOTOR_NODE_VOICE])
-        jump_out  = float(l4_state[MOTOR_NODE_JUMP])
+        # Jump gated: only fire if explicitly enabled (default off for 2D-pretrained)
+        enable_jump = bool(self.params.get("enable_jump", False))
+        jump_out = float(l4_state[MOTOR_NODE_JUMP]) if enable_jump else 0.0
 
         # Build delta vector (absolute-write for motors; similar to core_brain)
         delta = np.zeros_like(S_snapshot)
