@@ -1,0 +1,295 @@
+{
+  "config": {
+    "n_universes": 2,
+    "agents_per_universe": 4,
+    "epoch_steps": 200,
+    "n_epochs": 3,
+    "base_seed": 42,
+    "device": "cuda",
+    "continue_from": null,
+    "pristine_tag": null
+  },
+  "total_elapsed_s": 2.6,
+  "effective_rate_per_sec": 1872.2,
+  "history": [
+    {
+      "epoch": 0,
+      "snapshots": [
+        {
+          "u_id": 0,
+          "quality": 4.797024446119381,
+          "world_params": {
+            "gravity": -0.054875454692978165,
+            "jump_impulse": 0.6251929689477835,
+            "max_height": 4.483192096930325,
+            "vertical_food_frac": 0.32802949665458053,
+            "mutation_rate": 0.029417734788764954,
+            "n_food": 8
+          },
+          "dna": {
+            "n": 5,
+            "centroid_norm": 47.36040516873976,
+            "spread": 1.8651197499201535,
+            "centroid_first8": [
+              0.0,
+              0.0,
+              0.0,
+              0.17365986895914443,
+              0.0,
+              0.0,
+              0.0017374776946817963,
+              0.0
+            ]
+          },
+          "behavior": {
+            "n_alive": 5,
+            "mean_z": 1.3414053241537736,
+            "max_z": 2.2090531454226316,
+            "pos_spread": 6.069669257093911,
+            "mean_energy": 83.75357248987979,
+            "energy_spread": 19.456232207860985,
+            "gen_max": 1,
+            "gen_spread": 0.4,
+            "n_distinct_gens": 2
+          }
+        },
+        {
+          "u_id": 1,
+          "quality": 2.632798261878495,
+          "world_params": {
+            "gravity": -0.05585345533749278,
+            "jump_impulse": 0.8672589306522978,
+            "max_height": 4.705126353197764,
+            "vertical_food_frac": 0.2619256044584565,
+            "mutation_rate": 0.03862623501432937,
+            "n_food": 7
+          },
+          "dna": {
+            "n": 3,
+            "centroid_norm": 48.22311175283367,
+            "spread": 2.043114819600642,
+            "centroid_first8": [
+              0.0,
+              0.0,
+              -0.257244856265612,
+              0.0,
+              -0.06429266238953969,
+              0.0,
+              0.0,
+              0.0
+            ]
+          },
+          "behavior": {
+            "n_alive": 3,
+            "mean_z": 2.993219335378395,
+            "max_z": 4.186678397459305,
+            "pos_spread": 3.557703582129707,
+            "mean_energy": 68.45765607939168,
+            "energy_spread": 20.38141587761889,
+            "gen_max": 0,
+            "gen_spread": 0.0,
+            "n_distinct_gens": 1
+          }
+        }
+      ],
+      "best": 0,
+      "worst": 1,
+      "elapsed_ep_s": 0.7429056167602539
+    },
+    {
+      "epoch": 1,
+      "snapshots": [
+        {
+          "u_id": 0,
+          "quality": 7.2870855087115505,
+          "world_params": {
+            "gravity": -0.054875454692978165,
+            "jump_impulse": 0.6251929689477835,
+            "max_height": 4.483192096930325,
+            "vertical_food_frac": 0.32802949665458053,
+            "mutation_rate": 0.029417734788764954,
+            "n_food": 8
+          },
+          "dna": {
+            "n": 7,
+            "centroid_norm": 47.34712554572169,
+            "spread": 2.627671291728495,
+            "centroid_first8": [
+              0.0,
+              0.0,
+              0.0,
+              0.12404276354224601,
+              0.0,
+              0.0,
+              0.001241055496201283,
+              0.0
+            ]
+          },
+          "behavior": {
+            "n_alive": 7,
+            "mean_z": 1.6643691674379397,
+            "max_z": 2.65213763443114,
+            "pos_spread": 6.388505852523722,
+            "mean_energy": 70.68678659605324,
+            "energy_spread": 31.408584126524765,
+            "gen_max": 2,
+            "gen_spread": 0.7284313590846836,
+            "n_distinct_gens": 3
+          }
+        },
+        {
+          "u_id": 1,
+          "quality": 5.64244021205718,
+          "world_params": {
+            "gravity": -0.0511353799549618,
+            "jump_impulse": 0.6251929689477835,
+            "max_height": 3.7160860162671256,
+            "vertical_food_frac": 0.32503394199540536,
+            "mutation_rate": 0.02908171163867918,
+            "n_food": 7
+          },
+          "dna": {
+            "n": 6,
+            "centroid_norm": 47.7708330272415,
+            "spread": 2.43821256253518,
+            "centroid_first8": [
+              0.0,
+              0.0,
+              -0.128622428132806,
+              0.0,
+              -0.032146331194769846,
+              0.0,
+              0.0,
+              -0.09797773056969411
+            ]
+          },
+          "behavior": {
+            "n_alive": 6,
+            "mean_z": 2.048181848619176,
+            "max_z": 3.6438354569130604,
+            "pos_spread": 5.29386278139011,
+            "mean_energy": 68.9730760213264,
+            "energy_spread": 31.61941839844554,
+            "gen_max": 1,
+            "gen_spread": 0.4714045207910317,
+            "n_distinct_gens": 2
+          }
+        }
+      ],
+      "best": 0,
+      "worst": 1,
+      "elapsed_ep_s": 0.7740039825439453
+    },
+    {
+      "epoch": 2,
+      "snapshots": [
+        {
+          "u_id": 0,
+          "quality": 17.530195988572608,
+          "world_params": {
+            "gravity": -0.054875454692978165,
+            "jump_impulse": 0.6251929689477835,
+            "max_height": 4.483192096930325,
+            "vertical_food_frac": 0.32802949665458053,
+            "mutation_rate": 0.029417734788764954,
+            "n_food": 8
+          },
+          "dna": {
+            "n": 9,
+            "centroid_norm": 43.86919786065483,
+            "spread": 10.646117465451862,
+            "centroid_first8": [
+              0.0,
+              0.0,
+              -0.22793871908434937,
+              0.09647770497730246,
+              0.0,
+              0.0,
+              0.0019305307718686625,
+              0.0
+            ]
+          },
+          "behavior": {
+            "n_alive": 9,
+            "mean_z": 1.7502579705344157,
+            "max_z": 3.0949231068271024,
+            "pos_spread": 5.168805941164696,
+            "mean_energy": 91.60782240174707,
+            "energy_spread": 5.582623903285812,
+            "gen_max": 3,
+            "gen_spread": 1.0540925533894598,
+            "n_distinct_gens": 4
+          }
+        },
+        {
+          "u_id": 1,
+          "quality": 5.530999972217455,
+          "world_params": {
+            "gravity": -0.049463933005538,
+            "jump_impulse": 0.6251929689477835,
+            "max_height": 5.050710967206016,
+            "vertical_food_frac": 0.35,
+            "mutation_rate": 0.029417734788764954,
+            "n_food": 7
+          },
+          "dna": {
+            "n": 6,
+            "centroid_norm": 47.32862881559121,
+            "spread": 1.9167383071577284,
+            "centroid_first8": [
+              0.0,
+              0.0,
+              0.0007175608942608241,
+              0.0,
+              -0.041699925575393045,
+              -0.3721884902574451,
+              0.0,
+              0.3972898045561253
+            ]
+          },
+          "behavior": {
+            "n_alive": 6,
+            "mean_z": 1.4638412503055775,
+            "max_z": 2.4476699525651147,
+            "pos_spread": 6.04972294713241,
+            "mean_energy": 87.71086818817078,
+            "energy_spread": 16.092070958599486,
+            "gen_max": 1,
+            "gen_spread": 0.4714045207910317,
+            "n_distinct_gens": 2
+          }
+        }
+      ],
+      "best": 0,
+      "worst": 1,
+      "elapsed_ep_s": 1.0119798183441162
+    }
+  ],
+  "selection_events": [
+    {
+      "epoch": 0,
+      "replaced_uid": 1,
+      "parent_uid": 0,
+      "old_quality": 2.632798261878495,
+      "best_quality": 4.797024446119381,
+      "new_gravity": -0.0511353799549618,
+      "new_mut_rate": 0.02908171163867918
+    },
+    {
+      "epoch": 1,
+      "replaced_uid": 1,
+      "parent_uid": 0,
+      "old_quality": 5.64244021205718,
+      "best_quality": 7.2870855087115505,
+      "new_gravity": -0.049463933005538,
+      "new_mut_rate": 0.029417734788764954
+    }
+  ],
+  "summary": {
+    "max_generation_ever": 3,
+    "max_z_reached": 2.993219335378395,
+    "best_universe_tally": {
+      "0": 3
+    }
+  }
+}

@@ -87,10 +87,39 @@ def run_emergence_gpu(
     base_seed: int = 42,
     output: str = "phase_12_emergence_gpu.json",
     device: str = "cuda",
+    continue_from: str = None,   # path to prior run_dir (lineage continuation)
+    pristine_tag: str = None,    # "16N_3d" → load pristine baseline
+    save_run_dir: str = None,    # if set, persist final DNA pool here
+    run_label: str = "emergence",
 ):
     shells = SHELLS_DEFAULT
     configs_dir = os.path.join(THIS_DIR, "configs")
     trained_dir = "tamashii/configs"
+
+    # Optional lineage / pristine loading
+    if continue_from or pristine_tag:
+        sys.path.insert(0, os.path.join(REPO_ROOT, "dna_archive"))
+        from dna_io import load_dna_pool, new_run_dir, save_run
+        sources = []
+        if continue_from:
+            sources.append(continue_from)
+        if pristine_tag:
+            sources.append(f"pristine:{pristine_tag}")
+        pool = load_dna_pool(sources, n_wanted=None)
+        print(f"[lineage] Loaded {len(pool)} DNA vectors from sources: {sources}",
+              flush=True)
+        GravityUniverse.dna_pool = pool
+    else:
+        GravityUniverse.dna_pool = None
+
+    # If asked to save run, auto-create run_dir
+    if save_run_dir is None:
+        pass
+    elif save_run_dir == "auto":
+        sys.path.insert(0, os.path.join(REPO_ROOT, "dna_archive"))
+        from dna_io import new_run_dir
+        save_run_dir = new_run_dir(label=run_label)
+        print(f"[lineage] Will save DNA pool to: {save_run_dir}", flush=True)
 
     print("=" * 72, flush=True)
     print(f"  CARDINAL-GPU 3D EMERGENCE", flush=True)
@@ -270,6 +299,7 @@ def run_emergence_gpu(
             n_universes=n_universes, agents_per_universe=agents_per_universe,
             epoch_steps=epoch_steps, n_epochs=n_epochs,
             base_seed=base_seed, device=device,
+            continue_from=continue_from, pristine_tag=pristine_tag,
         ),
         "total_elapsed_s": round(total_elapsed, 1),
         "effective_rate_per_sec": round(total_agent_steps / total_elapsed, 1),
@@ -284,6 +314,25 @@ def run_emergence_gpu(
     with open(output, "w", encoding="utf-8") as f:
         json.dump(out, f, indent=2, default=str)
     print(f"\n  Saved: {output}", flush=True)
+
+    # Persist DNA pool
+    if save_run_dir is not None:
+        sys.path.insert(0, os.path.join(REPO_ROOT, "dna_archive"))
+        from dna_io import save_run as save_run_fn
+        save_run_fn(save_run_dir, universes, metadata={
+            "n_universes": n_universes,
+            "agents_per_universe": agents_per_universe,
+            "epoch_steps": epoch_steps,
+            "n_epochs": n_epochs,
+            "base_seed": base_seed,
+            "device": device,
+            "continue_from": continue_from,
+            "pristine_tag": pristine_tag,
+            "total_elapsed_s": round(total_elapsed, 1),
+            "max_generation_ever": max_gen,
+            "max_z_reached": float(max_z),
+            "results_json": output,
+        })
     return out
 
 
@@ -297,7 +346,15 @@ def main():
     ap.add_argument("--output",      type=str,
                      default="phase_12_emergence_gpu.json")
     ap.add_argument("--device",      type=str, default="cuda")
+    ap.add_argument("--continue_from", type=str, default=None,
+                     help="path to prior run_dir for lineage continuation")
+    ap.add_argument("--pristine", type=str, default=None,
+                     help="tag like '16N_3d' to load pristine baseline DNA")
+    ap.add_argument("--save_run", type=str, default="auto",
+                     help="'auto' | path | 'none' — where to archive DNA")
+    ap.add_argument("--run_label", type=str, default="emergence")
     args = ap.parse_args()
+    save_run_dir = None if args.save_run == "none" else args.save_run
     run_emergence_gpu(
         n_universes=args.n_universes,
         agents_per_universe=args.agents,
@@ -306,6 +363,10 @@ def main():
         base_seed=args.seed,
         output=args.output,
         device=args.device,
+        continue_from=args.continue_from,
+        pristine_tag=args.pristine,
+        save_run_dir=save_run_dir,
+        run_label=args.run_label,
     )
 
 

@@ -1,0 +1,296 @@
+{
+  "config": {
+    "n_universes": 2,
+    "agents_per_universe": 4,
+    "epoch_steps": 200,
+    "n_epochs": 3,
+    "base_seed": 43,
+    "device": "cuda",
+    "continue_from": "c:/\u65b0\u3057\u3044\u30d5\u30a9\u30eb\u30c0\u30fc (2)/\u30d1\u30a4\u30d7\u30e9\u30a4\u30f3\u30aa\u30fc\u30c8\u30e1\u30fc\u30b7\u30e7\u30f3/dna_archive/runs/20260422_073339_lineage_test1",
+    "pristine_tag": null
+  },
+  "total_elapsed_s": 2.2,
+  "effective_rate_per_sec": 2162.0,
+  "history": [
+    {
+      "epoch": 0,
+      "snapshots": [
+        {
+          "u_id": 0,
+          "quality": 24.86596022154551,
+          "world_params": {
+            "gravity": -0.04320088361134928,
+            "jump_impulse": 0.6255156935005545,
+            "max_height": 6.8212583168849505,
+            "vertical_food_frac": 0.3175705007549128,
+            "mutation_rate": 0.07871430475880584,
+            "n_food": 8
+          },
+          "dna": {
+            "n": 5,
+            "centroid_norm": 35.11588387437315,
+            "spread": 16.191246055425477,
+            "centroid_first8": [
+              0.0,
+              0.0,
+              -0.8205793887036578,
+              0.20424440684074577,
+              0.0,
+              -0.20496957000486854,
+              0.0017374776946817963,
+              0.0
+            ]
+          },
+          "behavior": {
+            "n_alive": 5,
+            "mean_z": 1.3998625078710618,
+            "max_z": 2.5749388024775985,
+            "pos_spread": 4.202911288400893,
+            "mean_energy": 74.79267861449875,
+            "energy_spread": 16.77309598840839,
+            "gen_max": 1,
+            "gen_spread": 0.4,
+            "n_distinct_gens": 2
+          }
+        },
+        {
+          "u_id": 1,
+          "quality": 18.61140131205984,
+          "world_params": {
+            "gravity": -0.04426982004147522,
+            "jump_impulse": 0.5597897539048373,
+            "max_height": 5.716171608261643,
+            "vertical_food_frac": 0.056187662126618965,
+            "mutation_rate": 0.10632899590175786,
+            "n_food": 5
+          },
+          "dna": {
+            "n": 4,
+            "centroid_norm": 39.58379734107039,
+            "spread": 14.550704557813289,
+            "centroid_first8": [
+              0.0,
+              0.0,
+              -0.5128621179397861,
+              -0.07121531214579208,
+              -0.026384370764508648,
+              0.0,
+              0.0034727696309871502,
+              0.0
+            ]
+          },
+          "behavior": {
+            "n_alive": 4,
+            "mean_z": 1.5245812081015524,
+            "max_z": 3.696855854320373,
+            "pos_spread": 4.957853217541935,
+            "mean_energy": 52.91377169028056,
+            "energy_spread": 23.35220645411853,
+            "gen_max": 0,
+            "gen_spread": 0.0,
+            "n_distinct_gens": 1
+          }
+        }
+      ],
+      "best": 0,
+      "worst": 1,
+      "elapsed_ep_s": 0.6601459980010986
+    },
+    {
+      "epoch": 1,
+      "snapshots": [
+        {
+          "u_id": 0,
+          "quality": 24.252237656373413,
+          "world_params": {
+            "gravity": -0.04320088361134928,
+            "jump_impulse": 0.6255156935005545,
+            "max_height": 6.8212583168849505,
+            "vertical_food_frac": 0.3175705007549128,
+            "mutation_rate": 0.07871430475880584,
+            "n_food": 8
+          },
+          "dna": {
+            "n": 7,
+            "centroid_norm": 38.5448883613701,
+            "spread": 14.990225883119686,
+            "centroid_first8": [
+              0.0,
+              0.2809311834088777,
+              -0.8791922021824904,
+              0.15681191127253316,
+              -0.0296498732615949,
+              -0.14640683571776325,
+              0.001241055496201283,
+              0.0
+            ]
+          },
+          "behavior": {
+            "n_alive": 7,
+            "mean_z": 1.1598998610800673,
+            "max_z": 2.138934464075875,
+            "pos_spread": 4.978834703940805,
+            "mean_energy": 76.70416967337565,
+            "energy_spread": 13.73771314212665,
+            "gen_max": 2,
+            "gen_spread": 0.7284313590846836,
+            "n_distinct_gens": 3
+          }
+        },
+        {
+          "u_id": 1,
+          "quality": 18.71422365798986,
+          "world_params": {
+            "gravity": -0.04320088361134928,
+            "jump_impulse": 0.6255156935005545,
+            "max_height": 6.8212583168849505,
+            "vertical_food_frac": 0.3175705007549128,
+            "mutation_rate": 0.0828289316577424,
+            "n_food": 9
+          },
+          "dna": {
+            "n": 5,
+            "centroid_norm": 41.12190504343351,
+            "spread": 13.54457624053858,
+            "centroid_first8": [
+              0.0,
+              0.0,
+              -0.4102896943518289,
+              -0.05697224971663366,
+              -0.021107496611606918,
+              0.0,
+              0.0038189537148976436,
+              0.0
+            ]
+          },
+          "behavior": {
+            "n_alive": 5,
+            "mean_z": 2.1194842867791306,
+            "max_z": 3.7518047886145123,
+            "pos_spread": 5.62035426078395,
+            "mean_energy": 70.7883600548255,
+            "energy_spread": 18.928320937205086,
+            "gen_max": 1,
+            "gen_spread": 0.4,
+            "n_distinct_gens": 2
+          }
+        }
+      ],
+      "best": 0,
+      "worst": 1,
+      "elapsed_ep_s": 0.7459845542907715
+    },
+    {
+      "epoch": 2,
+      "snapshots": [
+        {
+          "u_id": 0,
+          "quality": 23.35604033502708,
+          "world_params": {
+            "gravity": -0.04320088361134928,
+            "jump_impulse": 0.6255156935005545,
+            "max_height": 6.8212583168849505,
+            "vertical_food_frac": 0.3175705007549128,
+            "mutation_rate": 0.07871430475880584,
+            "n_food": 8
+          },
+          "dna": {
+            "n": 9,
+            "centroid_norm": 40.47424677542397,
+            "spread": 13.837486217233222,
+            "centroid_first8": [
+              0.0,
+              0.2185020315402382,
+              -0.9117548763373975,
+              0.28441764007128606,
+              -0.02306101253679603,
+              -0.11387198333603808,
+              0.0019305307718686625,
+              -0.05333264386021398
+            ]
+          },
+          "behavior": {
+            "n_alive": 9,
+            "mean_z": 1.1751280885656676,
+            "max_z": 3.1429018821188537,
+            "pos_spread": 5.779658951467656,
+            "mean_energy": 59.53504594402227,
+            "energy_spread": 21.26920889447058,
+            "gen_max": 3,
+            "gen_spread": 0.9938079899999066,
+            "n_distinct_gens": 4
+          }
+        },
+        {
+          "u_id": 1,
+          "quality": 25.761387052025743,
+          "world_params": {
+            "gravity": -0.04570044536671373,
+            "jump_impulse": 0.5337038112887285,
+            "max_height": 6.161247895338585,
+            "vertical_food_frac": 0.3175705007549128,
+            "mutation_rate": 0.08095702410025149,
+            "n_food": 7
+          },
+          "dna": {
+            "n": 5,
+            "centroid_norm": 29.02339086994979,
+            "spread": 16.544106350617007,
+            "centroid_first8": [
+              0.0,
+              0.0,
+              0.0,
+              0.0,
+              0.0,
+              -0.06296020198870377,
+              0.0,
+              -0.04335272793032775
+            ]
+          },
+          "behavior": {
+            "n_alive": 5,
+            "mean_z": 1.540738322021895,
+            "max_z": 2.9388265173988124,
+            "pos_spread": 5.210998316893474,
+            "mean_energy": 83.38509342012523,
+            "energy_spread": 17.403323501045836,
+            "gen_max": 1,
+            "gen_spread": 0.4,
+            "n_distinct_gens": 2
+          }
+        }
+      ],
+      "best": 1,
+      "worst": 0,
+      "elapsed_ep_s": 0.7809834480285645
+    }
+  ],
+  "selection_events": [
+    {
+      "epoch": 0,
+      "replaced_uid": 1,
+      "parent_uid": 0,
+      "old_quality": 18.61140131205984,
+      "best_quality": 24.86596022154551,
+      "new_gravity": -0.04320088361134928,
+      "new_mut_rate": 0.0828289316577424
+    },
+    {
+      "epoch": 1,
+      "replaced_uid": 1,
+      "parent_uid": 0,
+      "old_quality": 18.71422365798986,
+      "best_quality": 24.252237656373413,
+      "new_gravity": -0.04570044536671373,
+      "new_mut_rate": 0.08095702410025149
+    }
+  ],
+  "summary": {
+    "max_generation_ever": 3,
+    "max_z_reached": 2.1194842867791306,
+    "best_universe_tally": {
+      "0": 2,
+      "1": 1
+    }
+  }
+}

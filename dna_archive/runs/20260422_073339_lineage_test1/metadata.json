@@ -1,0 +1,27 @@
+{
+  "n_universes": 2,
+  "agents_per_universe": 4,
+  "epoch_steps": 200,
+  "n_epochs": 3,
+  "base_seed": 42,
+  "device": "cuda",
+  "continue_from": null,
+  "pristine_tag": null,
+  "total_elapsed_s": 2.6,
+  "max_generation_ever": 3,
+  "max_z_reached": 2.993219335378395,
+  "results_json": "phase_12_lineage_test1.json",
+  "timestamp": "2026-04-22 07:33:42",
+  "per_universe": {
+    "0": {
+      "file": "u0_final.json",
+      "n_alive": 9,
+      "quality": 17.530195988572608
+    },
+    "1": {
+      "file": "u1_final.json",
+      "n_alive": 6,
+      "quality": 5.530999972217455
+    }
+  }
+}

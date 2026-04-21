@@ -83,9 +83,14 @@ class GravityUniverse(Universe):
 
     When `use_cortical` is True (class attribute set by caller), builds agents
     with cortical_core_brain (60N 5-layer) instead of 16N Kathara.
+
+    `dna_pool` (class attribute): optional list of numpy DNA vectors to seed
+    agents with (instead of pristine baseline). Enables lineage continuation
+    from previous runs or social learning from multiple sources.
     """
 
     use_cortical: bool = False
+    dna_pool: list | None = None  # optional: list of DNA vectors to seed from
 
     def initialize_agents(self):
         """Rebuild using GravityVoxelWorld3D instead of EnergyVoxelWorld3D."""
@@ -97,19 +102,32 @@ class GravityUniverse(Universe):
 
         agents = []
         rng = np.random.default_rng(self.world_seed + 1000)
+        pool = self.__class__.dna_pool  # class-level, not self
         for i in range(self.agents_init):
             a = build_fluctlight(self.shells, self.configs_dir,
                                   trained_dir=self.trained_dir,
                                   use_hebbian_core=False, use_3d_brain=True,
                                   use_cortical_core=self.use_cortical)
-            # Perturb DNA for diversity
-            dna = np.asarray(a.shells[0].kathara_params,
-                             dtype=np.float64).copy()
-            for g in range(min(len(dna), len(BRAIN_RANGES))):
-                if rng.random() < 0.1:
-                    lo, hi = BRAIN_RANGES[g]
-                    dna[g] += rng.normal(0, 0.12 * (hi - lo))
-                    dna[g] = np.clip(dna[g], lo, hi)
+            if pool is not None and len(pool) > 0:
+                # Seed from lineage pool (sample with replacement, add small noise)
+                parent_dna = pool[int(rng.integers(len(pool)))]
+                dna = np.asarray(parent_dna, dtype=np.float64).copy()
+                # Small noise for diversity (equivalent to birth mutation)
+                for g in range(min(len(dna), len(BRAIN_RANGES))):
+                    if rng.random() < 0.1:
+                        lo, hi = BRAIN_RANGES[g]
+                        dna[g] += rng.normal(0, 0.05 * (hi - lo))  # small noise
+                        dna[g] = np.clip(dna[g], lo, hi)
+            else:
+                # Default: use pristine baseline from build_fluctlight
+                dna = np.asarray(a.shells[0].kathara_params,
+                                 dtype=np.float64).copy()
+                # Perturb DNA for initial diversity
+                for g in range(min(len(dna), len(BRAIN_RANGES))):
+                    if rng.random() < 0.1:
+                        lo, hi = BRAIN_RANGES[g]
+                        dna[g] += rng.normal(0, 0.12 * (hi - lo))
+                        dna[g] = np.clip(dna[g], lo, hi)
             a.shells[0].kathara_params = dna
             agents.append(a)
         self.agents = agents
