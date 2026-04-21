@@ -2,22 +2,31 @@
   "device": "cuda",
   "results": [
     {
-      "N": 300,
-      "n_steps": 200,
-      "cpu_s": 10.027,
-      "gpu_s": 5.435,
-      "speedup": 1.84,
-      "cpu_per_agent_ms": 0.1671,
-      "gpu_per_agent_ms": 0.0906
+      "N": 30,
+      "n_steps": 300,
+      "cpu_s": 1.644,
+      "gpu_s": 0.812,
+      "speedup": 2.02,
+      "cpu_per_agent_ms": 0.1827,
+      "gpu_per_agent_ms": 0.0902
     },
     {
-      "N": 500,
-      "n_steps": 200,
-      "cpu_s": 16.824,
-      "gpu_s": 8.997,
-      "speedup": 1.87,
-      "cpu_per_agent_ms": 0.1682,
-      "gpu_per_agent_ms": 0.09
+      "N": 100,
+      "n_steps": 300,
+      "cpu_s": 5.607,
+      "gpu_s": 1.988,
+      "speedup": 2.82,
+      "cpu_per_agent_ms": 0.1869,
+      "gpu_per_agent_ms": 0.0663
+    },
+    {
+      "N": 300,
+      "n_steps": 300,
+      "cpu_s": 15.972,
+      "gpu_s": 5.186,
+      "speedup": 3.08,
+      "cpu_per_agent_ms": 0.1775,
+      "gpu_per_agent_ms": 0.0576
     }
   ]
 }

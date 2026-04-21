@@ -139,13 +139,34 @@ class GPUBatchRunner:
             ag.S = ag.S + cs.gain * delta
             ag._last_delta_norms[cs.name] = float(np.linalg.norm(delta))
 
-            # Now run other shells (sequential, CPU)
-            other_shells = ag.shells[1:]
-            other_snap = ag.S.copy()
-            other_deltas = []
-            for sh in other_shells:
-                d = sh.step(other_snap, ag.external)
-                other_deltas.append((sh, d))
-            for sh, d in other_deltas:
-                ag.S = ag.S + sh.gain * d
-                ag._last_delta_norms[sh.name] = float(np.linalg.norm(d))
+            # Fallthrough — per-agent other shell runner handled outside.
+        # Now run other shells — try BATCHED impl first, fallback to per-agent
+        self._run_other_shells_batched()
+
+    def _run_other_shells_batched(self):
+        """Batch-process non-core shells across all agents where possible."""
+        from tamashii.shell_batched import has_batched_impl, apply_batched
+
+        # Determine ordering of shells (assume all agents share same shell order)
+        shell_names = [sh.name for sh in self.agents[0].shells[1:]]
+        for offset_idx, shell_name in enumerate(shell_names):
+            i_shell = offset_idx + 1  # index in agents[a].shells
+            # Take snapshot of S for all agents
+            S_batch = np.stack([ag.S for ag in self.agents])  # (N, D)
+            shells_of_kind = [ag.shells[i_shell] for ag in self.agents]
+
+            if has_batched_impl(shell_name):
+                # Batched numpy version
+                delta_batch = apply_batched(shell_name, S_batch, shells_of_kind)
+            else:
+                # Per-agent fallback for complex shells (hippocampus, prefrontal, dmn)
+                delta_batch = np.zeros_like(S_batch)
+                for i, ag in enumerate(self.agents):
+                    sh = ag.shells[i_shell]
+                    delta_batch[i] = sh.step(ag.S.copy(), ag.external)
+
+            # Apply deltas
+            for i, ag in enumerate(self.agents):
+                d = delta_batch[i]
+                ag.S = ag.S + shells_of_kind[i].gain * d
+                ag._last_delta_norms[shells_of_kind[i].name] = float(np.linalg.norm(d))
