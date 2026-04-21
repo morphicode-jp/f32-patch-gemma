@@ -27,6 +27,9 @@ sys.path.insert(0, os.path.join(REPO_ROOT, "tamashii"))
 from tamashii.phase_10_3_cardinal import (
     Universe, make_universe_params, DEFAULT_WORLD_PARAMS, mutate_universe_params,
 )
+from tamashii.phase_11_cardinal_3d import (
+    GravityUniverse, make_3d_universe_params, mutate_3d_universe_params,
+)
 from tamashii.phase_9_ecology import SHELLS_DEFAULT
 
 
@@ -48,20 +51,20 @@ def snapshot_universe(u: Universe) -> dict:
     """Extract live display state from a universe."""
     s = u.world.stats()
     alive_idx = [i for i in range(u.world.n_agents) if u.world.agent_alive[i]]
-    # Agent positions (2D projection for viz)
+    # Agent positions (3D: x, y, z)
     positions = []
     for i in alive_idx[:30]:  # cap for bandwidth
         p = u.world.agent_positions[i]
         energy = u.world.agent_energy[i]
         gen = u.world.agent_generation[i]
         positions.append({
-            "x": float(p[0]), "y": float(p[1]),
+            "x": float(p[0]), "y": float(p[1]), "z": float(p[2]),
             "e": float(energy), "g": int(gen),
         })
-    # Food positions
+    # Food positions (3D)
     food = []
     for fp in u.world.food_positions[:40]:
-        food.append({"x": float(fp[0]), "y": float(fp[1])})
+        food.append({"x": float(fp[0]), "y": float(fp[1]), "z": float(fp[2])})
     # Agent DNA samples (first 5 for display)
     dna_samples = []
     for i in alive_idx[:5]:
@@ -90,16 +93,23 @@ def snapshot_universe(u: Universe) -> dict:
         "food": food,
         "dna_samples": dna_samples,
         "world_size": int(u.world.size),
+        "max_height": float(getattr(u.world, "max_height", 1.0)),
+        "is_3d": bool(hasattr(u.world, "gravity")),
+        "mean_agent_z": float(s.get("mean_agent_z", 0.5)),
+        "max_agent_z": float(s.get("max_agent_z", 0.5)),
+        "mean_food_z": float(s.get("mean_food_z", 0.5)),
     }
 
 
 def run_cardinal_loop(n_universes: int, agents_per_u: int, seed: int,
-                      chunk_steps: int, epoch_steps: int, n_epochs: int):
+                      chunk_steps: int, epoch_steps: int, n_epochs: int,
+                      use_3d: bool = False):
     """Main Cardinal loop — runs in a background thread."""
     global STATE
 
     with STATE_LOCK:
-        STATE["status"] = "building universes..."
+        STATE["status"] = ("building 3D universes..." if use_3d
+                            else "building universes...")
     started = time.time()
     STATE["started_at"] = started
 
@@ -107,12 +117,16 @@ def run_cardinal_loop(n_universes: int, agents_per_u: int, seed: int,
     configs_dir = os.path.join(THIS_DIR, "..", "tamashii", "configs")
     trained_dir = "tamashii/configs"
 
+    U_class = GravityUniverse if use_3d else Universe
+    params_fn = make_3d_universe_params if use_3d else make_universe_params
+    mutate_fn = mutate_3d_universe_params if use_3d else mutate_universe_params
+
     # Build universes
     try:
         universes = []
         for u_id in range(n_universes):
-            wp = make_universe_params(seed + u_id * 17)
-            u = Universe(u_id, wp, agents_per_u, seed + u_id * 101,
+            wp = params_fn(seed + u_id * 17)
+            u = U_class(u_id, wp, agents_per_u, seed + u_id * 101,
                           shells, configs_dir, trained_dir)
             universes.append(u)
             with STATE_LOCK:
@@ -172,12 +186,12 @@ def run_cardinal_loop(n_universes: int, agents_per_u: int, seed: int,
         # Cardinal meta-evolve: worst gets variant of best
         if epoch < n_epochs - 1:
             best_u = next(uu for uu in universes if uu.id == best_id)
-            new_params = mutate_universe_params(best_u.world_params,
-                                                  seed=seed + epoch * 37)
+            new_params = mutate_fn(best_u.world_params,
+                                     seed=seed + epoch * 37)
             worst_u_idx = next(i for i, uu in enumerate(universes)
                                 if uu.id == worst_id)
             worst_u_old_id = universes[worst_u_idx].id
-            new_u = Universe(worst_u_old_id, new_params, agents_per_u,
+            new_u = U_class(worst_u_old_id, new_params, agents_per_u,
                               seed + worst_u_old_id * 101 + epoch * 7,
                               shells, configs_dir, trained_dir)
             universes[worst_u_idx] = new_u
@@ -232,6 +246,8 @@ def main():
     ap.add_argument("--chunk_steps", type=int, default=40,
                      help="state dump interval (agent-steps)")
     ap.add_argument("--port",        type=int, default=8765)
+    ap.add_argument("--use_3d", action="store_true",
+                     help="enable real 3D physics (gravity, jump, vertical food)")
     args = ap.parse_args()
 
     # Start Cardinal thread
@@ -244,6 +260,7 @@ def main():
             chunk_steps=args.chunk_steps,
             epoch_steps=args.epoch_steps,
             n_epochs=args.n_epochs,
+            use_3d=args.use_3d,
         ),
         daemon=True,
     )
