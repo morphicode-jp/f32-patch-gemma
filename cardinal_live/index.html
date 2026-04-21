@@ -2,7 +2,7 @@
 <html lang="ja">
 <head>
 <meta charset="UTF-8">
-<title>Cardinal Live Viewer</title>
+<title>Cardinal Live Viewer — 3D</title>
 <style>
   * { box-sizing: border-box; }
   body {
@@ -10,18 +10,18 @@
     background: #0a0a12;
     color: #e8e8f0;
     margin: 0;
-    padding: 16px;
+    padding: 12px;
   }
   h1 {
-    margin: 0 0 12px;
-    font-size: 18px;
+    margin: 0 0 10px;
+    font-size: 16px;
     font-weight: 500;
     letter-spacing: 0.3px;
   }
   .status-bar {
     background: #14141f;
     padding: 8px 12px;
-    margin-bottom: 16px;
+    margin-bottom: 12px;
     border-radius: 4px;
     font-size: 12px;
     color: #a0a0b8;
@@ -29,69 +29,56 @@
   }
   .universes {
     display: grid;
-    grid-template-columns: repeat(auto-fit, minmax(320px, 1fr));
+    grid-template-columns: repeat(auto-fit, minmax(360px, 1fr));
     gap: 12px;
-    margin-bottom: 16px;
+    margin-bottom: 12px;
   }
   .universe {
     background: #14141f;
     border-radius: 6px;
-    padding: 12px;
+    padding: 10px;
     border: 1px solid #26263a;
-    transition: all 0.3s;
   }
-  .universe.best {
-    border-color: #fbbf24;
-    box-shadow: 0 0 20px rgba(251, 191, 36, 0.15);
-  }
-  .universe.worst {
-    opacity: 0.6;
-    border-color: #7f1d1d;
-  }
+  .universe.best { border-color: #fbbf24; box-shadow: 0 0 16px rgba(251, 191, 36, 0.12); }
+  .universe.worst { opacity: 0.55; border-color: #7f1d1d; }
   .universe-header {
     display: flex;
     justify-content: space-between;
     align-items: center;
-    margin-bottom: 8px;
+    margin-bottom: 6px;
   }
-  .universe-id {
-    font-weight: 600;
-    font-size: 14px;
+  .universe-id { font-weight: 600; font-size: 13px; }
+  .universe-id .best-tag {
+    font-size: 10px; color: #fbbf24; margin-left: 6px;
   }
-  .universe-id.best::after {
-    content: "  ★ WINNER";
-    font-size: 10px;
-    color: #fbbf24;
-    margin-left: 6px;
-  }
-  .quality {
-    font-variant-numeric: tabular-nums;
-    font-size: 18px;
-    color: #5a8cff;
-  }
+  .quality { font-variant-numeric: tabular-nums; font-size: 18px; color: #5a8cff; }
   .stats-grid {
     display: grid;
-    grid-template-columns: 1fr 1fr;
-    gap: 4px 12px;
-    font-size: 11px;
+    grid-template-columns: 1fr 1fr 1fr 1fr;
+    gap: 2px 10px;
+    font-size: 10.5px;
     color: #a0a0b8;
-    margin-top: 8px;
+    margin-top: 6px;
   }
-  .stat-row { display: flex; justify-content: space-between; }
+  .stat-row { display: flex; justify-content: space-between; gap: 4px; }
   .stat-val { color: #e8e8f0; font-variant-numeric: tabular-nums; }
-  canvas.world {
+  .world-3d {
     width: 100%;
-    height: 140px;
+    height: 220px;
     background: #05050a;
     border-radius: 4px;
-    margin-top: 8px;
+    margin-top: 6px;
+    display: block;
   }
   .hp-list {
     font-size: 10px;
     color: #808098;
-    margin-top: 6px;
+    margin-top: 4px;
     font-family: "SF Mono", Consolas, monospace;
-    line-height: 1.6;
+    line-height: 1.5;
+    display: grid;
+    grid-template-columns: 1fr 1fr;
+    gap: 2px 10px;
   }
   .hp-row { display: flex; justify-content: space-between; }
   .hp-key { color: #707090; }
@@ -99,65 +86,179 @@
   #history-chart {
     background: #14141f;
     border-radius: 6px;
-    padding: 12px;
-    margin-bottom: 16px;
+    padding: 10px 12px;
+    margin-bottom: 12px;
   }
   canvas#historyCanvas {
     width: 100%;
-    height: 220px;
+    height: 180px;
     display: block;
   }
   .legend {
     display: flex;
     gap: 12px;
     font-size: 11px;
-    margin-top: 6px;
+    margin-top: 4px;
     flex-wrap: wrap;
   }
-  .legend-item {
-    display: flex;
-    align-items: center;
-    gap: 4px;
-  }
-  .legend-swatch {
-    width: 12px; height: 12px; border-radius: 2px;
-  }
+  .legend-item { display: flex; align-items: center; gap: 4px; }
+  .legend-swatch { width: 10px; height: 10px; border-radius: 2px; }
   .section-title {
-    font-size: 12px;
+    font-size: 11px;
     color: #707090;
-    margin-bottom: 6px;
+    margin-bottom: 4px;
     text-transform: uppercase;
     letter-spacing: 0.5px;
+  }
+  .axis-note {
+    font-size: 10px; color: #606080; margin-top: 2px;
   }
 </style>
 </head>
 <body>
 
-<h1>Cardinal Live Viewer — 多世界メタ進化</h1>
+<h1>Cardinal Live Viewer — 多世界メタ進化 (3D)</h1>
 <div class="status-bar" id="status">Loading...</div>
 
 <div id="history-chart">
-  <div class="section-title">品質 (quality) の推移 — 高いほど良い</div>
+  <div class="section-title">品質 (quality) の推移</div>
   <canvas id="historyCanvas"></canvas>
   <div class="legend" id="legend"></div>
 </div>
 
-<div class="section-title" style="margin-bottom:8px;">宇宙ごとの状況</div>
+<div class="section-title" style="margin-bottom:6px;">宇宙ごとの 3D 生態系</div>
 <div class="universes" id="universes"></div>
 
-<script>
+<script type="importmap">
+{
+  "imports": {
+    "three": "https://cdn.jsdelivr.net/npm/three@0.160.0/build/three.module.js",
+    "three/addons/": "https://cdn.jsdelivr.net/npm/three@0.160.0/examples/jsm/"
+  }
+}
+</script>
+
+<script type="module">
+import * as THREE from "three";
+import { OrbitControls } from "three/addons/controls/OrbitControls.js";
+
 const UNIVERSE_COLORS = ["#5a8cff","#fbbf24","#34d399","#f87171","#a78bfa","#60a5fa","#fb923c"];
+const colorFor = (id) => UNIVERSE_COLORS[id % UNIVERSE_COLORS.length];
 
-function colorFor(id){ return UNIVERSE_COLORS[id % UNIVERSE_COLORS.length]; }
+const scenes = new Map();  // universe_id → { scene, camera, renderer, ... }
+let historyByUniverse = {};
 
-let historyByUniverse = {};  // id -> [{step, quality}]
-let historySteps = [];       // matches timing of samples
-
-function fmtNum(v, digits=2) {
+function fmtNum(v, d=2) {
   if (v === null || v === undefined || !isFinite(v)) return "—";
   if (Math.abs(v) >= 100) return v.toFixed(0);
   if (Math.abs(v) >= 10)  return v.toFixed(1);
-  return v.toFixed(digits);
+  return v.toFixed(d);
+}
+
+function buildScene(canvas, worldSize) {
+  const W = canvas.clientWidth;
+  const H = canvas.clientHeight;
+  const renderer = new THREE.WebGLRenderer({ canvas, antialias: true, alpha: false });
+  renderer.setPixelRatio(window.devicePixelRatio);
+  renderer.setSize(W, H, false);
+
+  const scene = new THREE.Scene();
+  scene.background = new THREE.Color(0x05050a);
+  scene.fog = new THREE.Fog(0x05050a, worldSize * 1.5, worldSize * 3.5);
+
+  const camera = new THREE.PerspectiveCamera(45, W / H, 0.1, 500);
+  camera.position.set(worldSize * 1.2, worldSize * 1.6, worldSize * 1.2);
+  camera.lookAt(worldSize / 2, 0, worldSize / 2);
+
+  const controls = new OrbitControls(camera, canvas);
+  controls.target.set(worldSize / 2, 0, worldSize / 2);
+  controls.enableDamping = true;
+  controls.dampingFactor = 0.1;
+
+  // Ground grid
+  const gridHelper = new THREE.GridHelper(worldSize, worldSize, 0x26263a, 0x1c1c2a);
+  gridHelper.position.set(worldSize / 2, 0, worldSize / 2);
+  scene.add(gridHelper);
+
+  // Floor plane (subtle)
+  const floor = new THREE.Mesh(
+    new THREE.PlaneGeometry(worldSize, worldSize),
+    new THREE.MeshBasicMaterial({ color: 0x0f0f18, side: THREE.DoubleSide })
+  );
+  floor.rotation.x = -Math.PI / 2;
+  floor.position.set(worldSize / 2, -0.01, worldSize / 2);
+  scene.add(floor);
+
+  // Lights
+  const hemi = new THREE.HemisphereLight(0xaaaaff, 0x222222, 0.5);
+  scene.add(hemi);
+  const dir = new THREE.DirectionalLight(0xffffff, 0.7);
+  dir.position.set(worldSize, worldSize * 2, worldSize);
+  scene.add(dir);
+
+  const agentsGroup = new THREE.Group(); scene.add(agentsGroup);
+  const foodGroup = new THREE.Group(); scene.add(foodGroup);
+
+  function resize() {
+    const w = canvas.clientWidth, h = canvas.clientHeight;
+    if (w === 0 || h === 0) return;
+    renderer.setSize(w, h, false);
+    camera.aspect = w / h;
+    camera.updateProjectionMatrix();
+  }
+
+  return { scene, camera, renderer, controls, agentsGroup, foodGroup, resize };
+}
+
+function updateScene(ctx, u) {
+  const { agentsGroup, foodGroup } = ctx;
+  // Clear
+  while (agentsGroup.children.length) agentsGroup.remove(agentsGroup.children[0]);
+  while (foodGroup.children.length) foodGroup.remove(foodGroup.children[0]);
+
+  // Food as small green cubes on ground
+  const foodGeom = new THREE.BoxGeometry(0.5, 0.3, 0.5);
+  const foodMat = new THREE.MeshStandardMaterial({ color: 0x2ddd66, emissive: 0x114422 });
+  for (const f of (u.food || [])) {
+    const m = new THREE.Mesh(foodGeom, foodMat);
+    m.position.set(f.x, 0.15, f.y);
+    foodGroup.add(m);
+  }
+
+  // Agents as spheres, z-elevation = energy / 15
+  const agentGeom = new THREE.SphereGeometry(0.4, 12, 12);
+  for (const a of (u.positions || [])) {
+    const gen = a.g || 0;
+    const hue = (210 + gen * 40) % 360;
+    const color = new THREE.Color(`hsl(${hue}, 70%, 60%)`);
+    const mat = new THREE.MeshStandardMaterial({
+      color, emissive: color.clone().multiplyScalar(0.3), roughness: 0.4
+    });
+    const radius = 0.3 + Math.min(a.e / 50, 0.5);
+    const mesh = new THREE.Mesh(agentGeom, mat);
+    mesh.scale.setScalar(radius / 0.4);
+    // Elevation: energy-based (30 units high per 100 energy)
+    const z = Math.max(0.3, (a.e || 0) / 15);
+    mesh.position.set(a.x, z, a.y);
+    agentsGroup.add(mesh);
+
+    // Tiny "shadow" line down to floor
+    const lineGeom = new THREE.BufferGeometry().setFromPoints([
+      new THREE.Vector3(a.x, z, a.y),
+      new THREE.Vector3(a.x, 0.01, a.y),
+    ]);
+    const lineMat = new THREE.LineBasicMaterial({ color: 0x333344 });
+    agentsGroup.add(new THREE.Line(lineGeom, lineMat));
+  }
+}
+
+function animateAll() {
+  for (const [, ctx] of scenes) {
+    ctx.resize();
+    ctx.controls.update();
+    ctx.renderer.render(ctx.scene, ctx.camera);
+  }
+  requestAnimationFrame(animateAll);
 }
 
 function renderUniverse(u, bestId, worstId) {
@@ -166,13 +267,13 @@ function renderUniverse(u, bestId, worstId) {
     + (u.id === bestId ? " best" : "")
     + (u.id === worstId ? " worst" : "");
 
-  // Header
   const header = document.createElement("div");
   header.className = "universe-header";
   const idSpan = document.createElement("div");
-  idSpan.className = "universe-id" + (u.id === bestId ? " best" : "");
+  idSpan.className = "universe-id";
   idSpan.style.color = colorFor(u.id);
-  idSpan.textContent = `Universe #${u.id}`;
+  idSpan.innerHTML = `Universe #${u.id}`
+    + (u.id === bestId ? ' <span class="best-tag">★ WINNER</span>' : "");
   header.appendChild(idSpan);
   const qSpan = document.createElement("div");
   qSpan.className = "quality";
@@ -180,29 +281,26 @@ function renderUniverse(u, bestId, worstId) {
   header.appendChild(qSpan);
   el.appendChild(header);
 
-  // World canvas
   const canvas = document.createElement("canvas");
-  canvas.className = "world";
-  canvas.width = 400;
-  canvas.height = 160;
+  canvas.className = "world-3d";
+  canvas.dataset.uid = u.id;
   el.appendChild(canvas);
-  drawWorld(canvas, u);
 
-  // Stats grid
+  const axisNote = document.createElement("div");
+  axisNote.className = "axis-note";
+  axisNote.textContent = "agent の高さ = エネルギー, 色 = 世代 (青→黄→赤) / ドラッグで視点回転";
+  el.appendChild(axisNote);
+
   const grid = document.createElement("div");
   grid.className = "stats-grid";
   const st = u.stats;
-  const statPairs = [
-    ["alive", st.n_alive],
-    ["births", st.n_births],
-    ["deaths", st.n_deaths],
-    ["max gen", st.max_generation],
-    ["DNA div", fmtNum(st.dna_diversity, 3)],
-    ["energy", fmtNum(st.mean_energy, 1)],
-    ["food", st.n_food_voxels],
-    ["light", fmtNum(st.light_level, 2)],
+  const pairs = [
+    ["alive", st.n_alive], ["births", st.n_births],
+    ["deaths", st.n_deaths], ["gen", st.max_generation],
+    ["DNA", fmtNum(st.dna_diversity, 3)], ["E", fmtNum(st.mean_energy, 1)],
+    ["food", st.n_food_voxels], ["light", fmtNum(st.light_level, 2)],
   ];
-  for (const [k, v] of statPairs) {
+  for (const [k, v] of pairs) {
     const row = document.createElement("div");
     row.className = "stat-row";
     row.innerHTML = `<span>${k}</span><span class="stat-val">${v}</span>`;
@@ -210,17 +308,17 @@ function renderUniverse(u, bestId, worstId) {
   }
   el.appendChild(grid);
 
-  // HP list
   const hpDiv = document.createElement("div");
   hpDiv.className = "hp-list";
   const wp = u.world_params;
-  const keysOfInterest = ["mutation_rate", "food_respawn_rate", "energy_decay",
-                           "repro_energy_threshold", "vision_range", "repro_cost"];
-  for (const k of keysOfInterest) {
+  const keys = ["mutation_rate", "energy_decay_per_step", "food_energy_gain",
+                 "repro_energy_threshold", "max_population", "n_food"];
+  for (const k of keys) {
     if (wp[k] === undefined) continue;
     const row = document.createElement("div");
     row.className = "hp-row";
-    row.innerHTML = `<span class="hp-key">${k}</span><span class="hp-val">${fmtNum(wp[k], 3)}</span>`;
+    row.innerHTML = `<span class="hp-key">${k.replace(/_/g, ' ')}</span>`
+                  + `<span class="hp-val">${fmtNum(wp[k], 3)}</span>`;
     hpDiv.appendChild(row);
   }
   el.appendChild(hpDiv);
@@ -228,34 +326,7 @@ function renderUniverse(u, bestId, worstId) {
   return el;
 }
 
-function drawWorld(canvas, u) {
-  const ctx = canvas.getContext("2d");
-  const W = canvas.width, H = canvas.height;
-  ctx.fillStyle = "#05050a";
-  ctx.fillRect(0, 0, W, H);
-  const size = u.world_size || 20;
-  const scaleX = W / size;
-  const scaleY = H / size;
-
-  // Food (tiny green dots)
-  ctx.fillStyle = "#2d5";
-  for (const f of (u.food || [])) {
-    ctx.fillRect(f.x * scaleX - 1, f.y * scaleY - 1, 2, 2);
-  }
-
-  // Agents (circles colored by generation)
-  for (const a of (u.positions || [])) {
-    const gen = a.g || 0;
-    const hue = 200 + gen * 30;
-    ctx.beginPath();
-    ctx.fillStyle = `hsl(${hue}, 70%, 60%)`;
-    const r = 3 + Math.min(a.e / 50, 3);
-    ctx.arc(a.x * scaleX, a.y * scaleY, r, 0, Math.PI * 2);
-    ctx.fill();
-  }
-}
-
-function drawHistory(canvas, universes, history) {
+function drawHistory(canvas, universes) {
   const ctx = canvas.getContext("2d");
   const W = canvas.clientWidth * devicePixelRatio;
   const H = canvas.clientHeight * devicePixelRatio;
@@ -264,8 +335,6 @@ function drawHistory(canvas, universes, history) {
   }
   ctx.clearRect(0, 0, W, H);
 
-  // Build series from streaming snapshots
-  const snapshotsByUid = {};
   for (const u of universes) {
     if (!historyByUniverse[u.id]) historyByUniverse[u.id] = [];
     const arr = historyByUniverse[u.id];
@@ -277,7 +346,6 @@ function drawHistory(canvas, universes, history) {
   }
   historyByUniverse._t = (historyByUniverse._t || 0) + 1;
 
-  // Bounds
   const allQ = Object.keys(historyByUniverse)
     .filter(k => !k.startsWith("_"))
     .flatMap(k => historyByUniverse[k].map(s => s.q));
@@ -287,15 +355,11 @@ function drawHistory(canvas, universes, history) {
   const qRange = qMax - qMin || 1;
   const tMax = historyByUniverse._t;
 
-  // Axes
-  ctx.strokeStyle = "#26263a";
-  ctx.lineWidth = 1;
+  ctx.strokeStyle = "#26263a"; ctx.lineWidth = 1;
   ctx.beginPath();
   ctx.moveTo(40, 10); ctx.lineTo(40, H - 30);
   ctx.lineTo(W - 10, H - 30);
   ctx.stroke();
-
-  // Gridlines with values
   ctx.fillStyle = "#707090";
   ctx.font = `${11 * devicePixelRatio}px system-ui, sans-serif`;
   ctx.textAlign = "right";
@@ -310,7 +374,6 @@ function drawHistory(canvas, universes, history) {
   }
   ctx.textAlign = "start";
 
-  // Lines per universe
   for (const u of universes) {
     const arr = historyByUniverse[u.id] || [];
     if (arr.length < 2) continue;
@@ -323,7 +386,6 @@ function drawHistory(canvas, universes, history) {
       if (i === 0) ctx.moveTo(x, y); else ctx.lineTo(x, y);
     });
     ctx.stroke();
-    // Dot at latest
     const last = arr[arr.length - 1];
     const x = 40 + (W - 50) * (last.t / Math.max(tMax, 1));
     const y = H - 30 - (H - 40) * ((last.q - qMin) / qRange);
@@ -361,23 +423,71 @@ async function poll() {
       worstId = sorted[0].id;
     }
 
-    // Render universes
+    // Build / update scene DOM
     const container = document.getElementById("universes");
-    container.innerHTML = "";
-    for (const u of universes) {
-      container.appendChild(renderUniverse(u, bestId, worstId));
+    const existingIds = new Set(Array.from(container.children).map(
+      el => parseInt(el.querySelector("canvas").dataset.uid)));
+    const newIds = new Set(universes.map(u => u.id));
+
+    // Rebuild if set changed
+    if (existingIds.size !== newIds.size ||
+        [...existingIds].some(id => !newIds.has(id))) {
+      container.innerHTML = "";
+      scenes.clear();
     }
 
-    // History chart
-    const canvas = document.getElementById("historyCanvas");
-    drawHistory(canvas, universes, state.history);
-    renderLegend(universes);
+    for (const u of universes) {
+      let el = Array.from(container.children).find(
+        e => parseInt(e.querySelector("canvas").dataset.uid) === u.id);
+      if (!el) {
+        el = renderUniverse(u, bestId, worstId);
+        container.appendChild(el);
+        const canvas = el.querySelector("canvas");
+        // Wait a tick for layout
+        requestAnimationFrame(() => {
+          const ctx = buildScene(canvas, u.world_size || 14);
+          scenes.set(u.id, ctx);
+          updateScene(ctx, u);
+        });
+      } else {
+        // Update class (best/worst might change)
+        el.className = "universe"
+          + (u.id === bestId ? " best" : "")
+          + (u.id === worstId ? " worst" : "");
+        // Update quality display
+        el.querySelector(".quality").textContent = fmtNum(u.quality, 2);
+        // Update winner tag
+        const idSpan = el.querySelector(".universe-id");
+        idSpan.innerHTML = `Universe #${u.id}`
+          + (u.id === bestId ? ' <span class="best-tag">★ WINNER</span>' : "");
+        idSpan.style.color = colorFor(u.id);
+        // Update stats
+        const pairs = [
+          ["alive", u.stats.n_alive], ["births", u.stats.n_births],
+          ["deaths", u.stats.n_deaths], ["gen", u.stats.max_generation],
+          ["DNA", fmtNum(u.stats.dna_diversity, 3)],
+          ["E", fmtNum(u.stats.mean_energy, 1)],
+          ["food", u.stats.n_food_voxels],
+          ["light", fmtNum(u.stats.light_level, 2)],
+        ];
+        const statRows = el.querySelectorAll(".stats-grid .stat-row");
+        pairs.forEach(([k, v], i) => {
+          if (statRows[i]) statRows[i].querySelector(".stat-val").textContent = v;
+        });
+        // Update scene
+        const ctx = scenes.get(u.id);
+        if (ctx) updateScene(ctx, u);
+      }
+    }
 
+    drawHistory(document.getElementById("historyCanvas"), universes);
+    renderLegend(universes);
   } catch (e) {
     document.getElementById("status").textContent = "connection error: " + e.message;
   }
 }
 
+animateAll();
 setInterval(poll, 800);
 poll();
 </script>
