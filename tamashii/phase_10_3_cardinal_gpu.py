@@ -87,13 +87,15 @@ def run_cardinal_gpu(
 
         # GPUBatchRunner handles core_brain GPU + other shells batched CPU
         runner = GPUBatchRunner(all_agents, device=device)
-
-        # Reset all universes + agents
-        for u in universes:
-            u.world.reset()
-            for a in u.agents:
-                a.reset_episode()
-        runner.reset()
+        # IMPORTANT: Do NOT reset universes between epochs - let evolution
+        # accumulate DNA diversity, generations, and Hebbian weights.
+        # Only the initial epoch starts fresh (via Universe.__init__).
+        # Meta-evolution replaces a universe only via Universe() recreation.
+        if epoch == 0:
+            # First epoch: universes are fresh from __init__, already reset
+            pass
+        # runner uses current shell states; don't zero brain_states between
+        # epochs either (persistent brain across epochs = continual learning).
 
         for step in range(epoch_steps):
             # 1. Gather sensors from each universe's agents
