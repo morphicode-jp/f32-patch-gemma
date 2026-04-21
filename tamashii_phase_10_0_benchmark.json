@@ -1,0 +1,50 @@
+{
+  "device": "cuda",
+  "results": [
+    {
+      "B": 1,
+      "n_steps": 500,
+      "cpu_s": 0.033,
+      "gpu_s": 0.176,
+      "speedup": 0.19,
+      "cpu_per_agent_step_ms": 0.066,
+      "gpu_per_agent_step_ms": 0.352
+    },
+    {
+      "B": 10,
+      "n_steps": 500,
+      "cpu_s": 0.34,
+      "gpu_s": 0.185,
+      "speedup": 1.84,
+      "cpu_per_agent_step_ms": 0.068,
+      "gpu_per_agent_step_ms": 0.037
+    },
+    {
+      "B": 100,
+      "n_steps": 500,
+      "cpu_s": 3.335,
+      "gpu_s": 0.235,
+      "speedup": 14.19,
+      "cpu_per_agent_step_ms": 0.0667,
+      "gpu_per_agent_step_ms": 0.0047
+    },
+    {
+      "B": 500,
+      "n_steps": 500,
+      "cpu_s": 16.7297,
+      "gpu_s": 0.247,
+      "speedup": 67.73,
+      "cpu_per_agent_step_ms": 0.0669,
+      "gpu_per_agent_step_ms": 0.001
+    },
+    {
+      "B": 1000,
+      "n_steps": 500,
+      "cpu_s": 33.1575,
+      "gpu_s": 0.179,
+      "speedup": 185.24,
+      "cpu_per_agent_step_ms": 0.0663,
+      "gpu_per_agent_step_ms": 0.0004
+    }
+  ]
+}
