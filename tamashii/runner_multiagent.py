@@ -30,10 +30,12 @@ from tamashii.shells.hippocampus import Hippocampus
 from tamashii.shells.prefrontal import Prefrontal
 from tamashii.shells.salience import Salience
 from tamashii.shells.taboo import Taboo
+from tamashii.shells.cortical_core_brain import CorticalCoreBrain
 
 
 SHELL_REGISTRY = {
     "core_brain": CoreBrain,
+    "cortical_core_brain": CorticalCoreBrain,
     "brainstem": Brainstem,
     "cerebellum": Cerebellum,
     "salience": Salience,

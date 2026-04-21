@@ -1,0 +1,14 @@
+{
+  "shell_name": "cortical_core_brain",
+  "tick_ms": 50,
+  "gain": 1.0,
+  "params": {
+    "sensor_start": 0,
+    "sensor_end": 16,
+    "motor_nav": 16,
+    "motor_speed": 17,
+    "motor_voice": 18,
+    "motor_jump": 19,
+    "firing_start": 20
+  }
+}

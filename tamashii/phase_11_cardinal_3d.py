@@ -79,32 +79,44 @@ def mutate_3d_universe_params(parent: dict, sigma: float = 0.2,
 
 
 class GravityUniverse(Universe):
-    """Universe using GravityVoxelWorld3D — real z-axis physics."""
+    """Universe using GravityVoxelWorld3D — real z-axis physics.
+
+    When `use_cortical` is True (class attribute set by caller), builds agents
+    with cortical_core_brain (60N 5-layer) instead of 16N Kathara.
+    """
+
+    use_cortical: bool = False
 
     def initialize_agents(self):
         """Rebuild using GravityVoxelWorld3D instead of EnergyVoxelWorld3D."""
-        from kathara16_brain import PARAM_RANGES_16
         from tamashii.runner_3d import build_fluctlight
+        if self.use_cortical:
+            from cortical_brain import PARAM_RANGES as BRAIN_RANGES
+        else:
+            from kathara16_brain import PARAM_RANGES_16 as BRAIN_RANGES
+
         agents = []
         rng = np.random.default_rng(self.world_seed + 1000)
         for i in range(self.agents_init):
             a = build_fluctlight(self.shells, self.configs_dir,
                                   trained_dir=self.trained_dir,
-                                  use_hebbian_core=False, use_3d_brain=True)
+                                  use_hebbian_core=False, use_3d_brain=True,
+                                  use_cortical_core=self.use_cortical)
             # Perturb DNA for diversity
             dna = np.asarray(a.shells[0].kathara_params,
                              dtype=np.float64).copy()
-            for g in range(len(dna)):
+            for g in range(min(len(dna), len(BRAIN_RANGES))):
                 if rng.random() < 0.1:
-                    lo, hi = PARAM_RANGES_16[g]
+                    lo, hi = BRAIN_RANGES[g]
                     dna[g] += rng.normal(0, 0.12 * (hi - lo))
                     dna[g] = np.clip(dna[g], lo, hi)
             a.shells[0].kathara_params = dna
             agents.append(a)
         self.agents = agents
-        child_factory = make_child_factory(self.configs_dir, self.trained_dir,
-                                             self.shells)
-        # Strip keys that are specific to GravityVoxelWorld3D and pass them as kwargs
+        # child_factory must use same brain type
+        child_factory = _make_child_factory_ext(
+            self.configs_dir, self.trained_dir, self.shells,
+            use_cortical=self.use_cortical)
         self.world = GravityVoxelWorld3D(
             n_agents=self.agents_init,
             seed=self.world_seed,
@@ -115,6 +127,30 @@ class GravityUniverse(Universe):
         self.world.reset()
         for a in agents:
             a.reset_episode()
+
+
+def _make_child_factory_ext(configs_dir, trained_dir, shells, use_cortical=False):
+    """Extended child factory that propagates use_cortical flag."""
+    from tamashii.runner_3d import build_fluctlight
+
+    def factory(parent_i, parent_j, child_dna):
+        child = build_fluctlight(shells, configs_dir,
+                                  trained_dir=trained_dir,
+                                  use_hebbian_core=False, use_3d_brain=True,
+                                  use_cortical_core=use_cortical)
+        # Apply inherited DNA to child's core brain shell
+        try:
+            child.shells[0].kathara_params = np.asarray(
+                child_dna, dtype=np.float64)
+        except Exception:
+            pass
+        return child
+    return factory
+
+
+class CorticalGravityUniverse(GravityUniverse):
+    """GravityUniverse with 60N cortical core brain instead of 16N Kathara."""
+    use_cortical = True
 
     def run_epoch(self, n_steps: int, log_every: int = 500):
         """Run with 4-action (nav, speed, voice, jump) read from S[16..19]."""
@@ -159,27 +195,42 @@ class GravityUniverse(Universe):
 
 
 if __name__ == "__main__":
-    # Smoke test: 1 universe × 3 agents × 200 steps
+    # Smoke test: compare 16N vs 60N cortical
+    import argparse
     import time
-    print("Building GravityUniverse...")
-    wp = make_3d_universe_params(42)
-    print(f"Universe params (3D): gravity={wp['gravity']:.3f} jump={wp['jump_impulse']:.2f} "
+    from tamashii.phase_9_ecology import SHELLS_DEFAULT
+
+    ap = argparse.ArgumentParser()
+    ap.add_argument("--cortical", action="store_true",
+                     help="use 60N cortical core brain (vs 16N Kathara default)")
+    ap.add_argument("--steps", type=int, default=200)
+    ap.add_argument("--agents", type=int, default=4)
+    ap.add_argument("--seed", type=int, default=42)
+    args = ap.parse_args()
+
+    U_class = CorticalGravityUniverse if args.cortical else GravityUniverse
+    brain_name = "60N cortical" if args.cortical else "16N Kathara"
+    print(f"Building {brain_name} GravityUniverse...")
+
+    wp = make_3d_universe_params(args.seed)
+    print(f"Universe params (3D): gravity={wp['gravity']:+.3f} jump={wp['jump_impulse']:.2f} "
           f"max_height={wp['max_height']:.1f} vert_food={wp['vertical_food_frac']:.2f}")
-    u = GravityUniverse(
-        universe_id=0, world_params=wp, agents_init=3,
-        world_seed=42,
-        shells=["core_brain", "brainstem", "cerebellum"],
+    u = U_class(
+        universe_id=0, world_params=wp, agents_init=args.agents,
+        world_seed=args.seed,
+        shells=SHELLS_DEFAULT,
         configs_dir="tamashii/configs",
         trained_dir="tamashii/configs",
     )
     t0 = time.time()
-    u.run_epoch(100, log_every=50)
+    u.run_epoch(args.steps, log_every=args.steps // 2)
     elapsed = time.time() - t0
     stats = u.world.stats()
-    print(f"\n100 steps in {elapsed:.1f}s")
-    print(f"n_alive: {stats['n_alive']}")
-    print(f"mean_agent_z: {stats['mean_agent_z']:.2f}")
-    print(f"max_agent_z:  {stats['max_agent_z']:.2f}")
-    print(f"mean_food_z:  {stats['mean_food_z']:.2f}")
-    print(f"n_elevated_food: {stats['n_elevated_food']}")
-    print(f"quality: {u.quality():.2f}")
+    print(f"\n{args.steps} steps × {args.agents} agents ({brain_name}) in {elapsed:.1f}s")
+    print(f"  n_alive: {stats['n_alive']}")
+    print(f"  births: {stats['n_births']}, deaths: {stats['n_deaths']}")
+    print(f"  mean_agent_z: {stats['mean_agent_z']:.2f}")
+    print(f"  max_agent_z:  {stats['max_agent_z']:.2f}")
+    print(f"  mean_food_z:  {stats['mean_food_z']:.2f}")
+    print(f"  n_elevated_food: {stats['n_elevated_food']}")
+    print(f"  quality: {u.quality():.2f}")

@@ -123,16 +123,21 @@ class GravityVoxelWorld3D(EnergyVoxelWorld3D):
             self.agent_positions[a][2] = new_z
 
     def _apply_jump(self, a: int, jump_intent: float):
-        """If agent on ground and jump_intent > 0.5, apply upward impulse."""
-        if jump_intent <= 0.5:
+        """If agent on ground and jump_intent > jump_threshold, apply upward impulse.
+
+        Threshold raised to 0.7 so default (untrained) agents don't spam jumps.
+        Only strongly signaled jumps fire → selection pressure can find them.
+        """
+        jump_threshold = getattr(self, "jump_threshold", 0.7)
+        if jump_intent <= jump_threshold:
             return
         # Extend z_velocity if children added
         while len(self.agent_z_velocity) < self.n_agents:
             self.agent_z_velocity.append(0.0)
         # Only jump if on/near ground
         if self.agent_positions[a][2] <= self.ground_z + 0.05:
-            # Scale impulse by intent strength
-            strength = (jump_intent - 0.5) * 2.0  # 0 to 1
+            # Scale impulse by intent strength above threshold
+            strength = (jump_intent - jump_threshold) / (1.0 - jump_threshold)
             self.agent_z_velocity[a] = self.jump_impulse * (0.5 + 0.5 * strength)
             # Small energy cost
             self.agent_energy[a] -= 1.0

@@ -39,14 +39,20 @@ from tamashii.shells.hebbian_core import HebbianCoreBrain
 def build_fluctlight(shells: list[str], configs_dir: str,
                      trained_dir: str | None = None,
                      use_hebbian_core: bool = False,
-                     use_3d_brain: bool = False) -> Tamashii:
+                     use_3d_brain: bool = False,
+                     use_cortical_core: bool = False) -> Tamashii:
     """Build a 7-shell Fluctlight.
 
     use_3d_brain: if True, load kathara_params from core_brain_3d_trained.json
       (3D-specific training) instead of core_brain_trained.json (2D).
     use_hebbian_core: if True, replace CoreBrain with HebbianCoreBrain for
       runtime plasticity (can compose with 3D brain).
+    use_cortical_core: if True, replace core_brain shell with cortical_core_brain
+      (60N 5-layer cortical architecture instead of 16N Kathara).
     """
+    # Swap "core_brain" for "cortical_core_brain" in shell list if cortical requested
+    if use_cortical_core:
+        shells = ["cortical_core_brain" if s == "core_brain" else s for s in shells]
     core_trained_filename = (
         "core_brain_3d_trained.json" if use_3d_brain
         else "core_brain_trained.json")
