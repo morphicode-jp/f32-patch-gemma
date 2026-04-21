@@ -4,29 +4,29 @@
     {
       "N": 30,
       "n_steps": 300,
-      "cpu_s": 1.644,
-      "gpu_s": 0.812,
-      "speedup": 2.02,
-      "cpu_per_agent_ms": 0.1827,
-      "gpu_per_agent_ms": 0.0902
+      "cpu_s": 1.79,
+      "gpu_s": 1.103,
+      "speedup": 1.62,
+      "cpu_per_agent_ms": 0.1988,
+      "gpu_per_agent_ms": 0.1225
     },
     {
       "N": 100,
       "n_steps": 300,
-      "cpu_s": 5.607,
-      "gpu_s": 1.988,
-      "speedup": 2.82,
-      "cpu_per_agent_ms": 0.1869,
-      "gpu_per_agent_ms": 0.0663
+      "cpu_s": 5.776,
+      "gpu_s": 2.03,
+      "speedup": 2.85,
+      "cpu_per_agent_ms": 0.1925,
+      "gpu_per_agent_ms": 0.0677
     },
     {
       "N": 300,
       "n_steps": 300,
-      "cpu_s": 15.972,
-      "gpu_s": 5.186,
-      "speedup": 3.08,
-      "cpu_per_agent_ms": 0.1775,
-      "gpu_per_agent_ms": 0.0576
+      "cpu_s": 17.848,
+      "gpu_s": 4.719,
+      "speedup": 3.78,
+      "cpu_per_agent_ms": 0.1983,
+      "gpu_per_agent_ms": 0.0524
     }
   ]
 }

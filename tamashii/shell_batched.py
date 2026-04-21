@@ -163,11 +163,229 @@ def salience_batched(S_batch: np.ndarray, shells: list) -> np.ndarray:
     return delta
 
 
+def hippocampus_batched(S_batch: np.ndarray, shells: list) -> np.ndarray:
+    """Vectorized hippocampus: cosine similarity across N agents × n_slots.
+
+    Per-agent slots vary in count (0..n_slots) — pad to fixed n_slots tensor,
+    mask empty slots. Recall / store decisions still per-agent (Python) but
+    cosine similarity computation is fully vectorized.
+    """
+    delta = np.zeros_like(S_batch)
+    N = S_batch.shape[0]
+    if not shells:
+        return delta
+    s0 = shells[0]
+    query_slice = slice(
+        int(s0.params.get("query_start", 19)),
+        int(s0.params.get("query_end", 35)))
+    trace_slice = slice(
+        int(s0.params.get("trace_start", 83)),
+        int(s0.params.get("trace_end", 147)))
+    n_slots = int(s0.params.get("n_slots", 8))
+    slot_dim = int(s0.params.get("slot_dim", 8))
+    recall_thr = float(s0.params.get("recall_threshold", 0.8))
+    store_thr = float(s0.params.get("store_threshold", 0.6))
+    recall_strength = float(s0.params.get("recall_strength", 0.2))
+
+    # Extract queries (N, Q) and current trace_slice state (N, trace_dim)
+    queries = S_batch[:, query_slice].astype(np.float64)       # (N, Q)
+    trace_cur = S_batch[:, trace_slice].astype(np.float64)
+    q_dim = queries.shape[1]
+
+    # Build padded slot tensor (N, n_slots, q_dim). Missing slots filled with zeros + mask.
+    slot_storage = np.zeros((N, n_slots, q_dim), dtype=np.float64)
+    slot_payload = np.zeros((N, n_slots, slot_dim), dtype=np.float64)
+    slot_valid = np.zeros((N, n_slots), dtype=bool)
+    for i, sh in enumerate(shells):
+        sh._step_count += 1
+        n = len(sh._slot_queries)
+        for k in range(min(n, n_slots)):
+            slot_storage[i, k] = sh._slot_queries[k]
+            slot_payload[i, k] = sh._slot_payloads[k]
+            slot_valid[i, k] = True
+
+    # Cosine similarity (N, n_slots)
+    # normalize queries
+    q_norm = np.linalg.norm(queries, axis=1, keepdims=True) + 1e-6  # (N,1)
+    q_unit = queries / q_norm
+    s_norm = np.linalg.norm(slot_storage, axis=2, keepdims=True) + 1e-6  # (N, n_slots, 1)
+    s_unit = slot_storage / s_norm
+    # sims[i, k] = dot(q_unit[i], s_unit[i, k])
+    sims = (s_unit * q_unit[:, None, :]).sum(axis=2)  # (N, n_slots)
+    # Mask invalid slots (sim = -inf)
+    sims = np.where(slot_valid, sims, -np.inf)
+    max_sim = sims.max(axis=1)  # (N,)
+    best_idx = sims.argmax(axis=1)  # (N,)
+
+    t_start = trace_slice.start
+    t_end = trace_slice.stop
+
+    # Recall: per-agent (hard to fully vectorize due to payload writing)
+    for i, sh in enumerate(shells):
+        if max_sim[i] > recall_thr and slot_valid[i, best_idx[i]]:
+            bi = int(best_idx[i])
+            sh._usage[bi] = sh._step_count
+            sh._recall_events += 1
+            payload = slot_payload[i, bi]
+            # Write payload to first slot of trace region
+            for j in range(min(slot_dim, t_end - t_start)):
+                delta[i, t_start + j] = recall_strength * (
+                    payload[j] - S_batch[i, t_start + j])
+
+        # Store: if novel enough
+        if max_sim[i] < store_thr:
+            pyl = queries[i, :slot_dim].copy()
+            n_stored = len(sh._slot_queries)
+            if n_stored < n_slots:
+                sh._slot_queries.append(queries[i].copy())
+                sh._slot_payloads.append(pyl)
+                sh._usage.append(sh._step_count)
+            else:
+                lru = int(np.argmin(sh._usage))
+                sh._slot_queries[lru] = queries[i].copy()
+                sh._slot_payloads[lru] = pyl
+                sh._usage[lru] = sh._step_count
+
+    # Mirror all slots to trace_slice for external visibility
+    # (N, n_slots * slot_dim) reshaped and written
+    for i, sh in enumerate(shells):
+        for s_i, payload in enumerate(sh._slot_payloads):
+            off = t_start + s_i * slot_dim
+            for j in range(slot_dim):
+                if off + j < t_end:
+                    delta[i, off + j] = 0.3 * (payload[j] - S_batch[i, off + j])
+
+    return delta
+
+
+def dmn_batched(S_batch: np.ndarray, shells: list) -> np.ndarray:
+    """Vectorized DMN: engagement EMA + replay when idle."""
+    delta = np.zeros_like(S_batch)
+    N = S_batch.shape[0]
+    if not shells:
+        return delta
+    s0 = shells[0]
+    hippo_slice = slice(
+        int(s0.params.get("hippo_start", 83)),
+        int(s0.params.get("hippo_end", 147)))
+    scratch_slice = slice(
+        int(s0.params.get("scratch_start", 176)),
+        int(s0.params.get("scratch_end", 192)))
+    motor_dims = list(s0.params.get("motor_dims", [16, 17, 18]))
+    engagement_threshold = float(s0.params.get("engagement_threshold", 0.3))
+    replay_strength = float(s0.params.get("replay_strength", 0.15))
+    decay = float(s0.params.get("decay", 0.9))
+    slot_dim = int(s0.params.get("slot_dim", 8))
+
+    motor = S_batch[:, motor_dims]  # (N, 3)
+    motor_mag = np.linalg.norm(motor, axis=1)  # (N,)
+
+    # Collect engagement per agent
+    eng_arr = np.array([sh._engagement_ema for sh in shells], dtype=np.float64)
+    alpha = 0.1  # hardcoded in original
+    new_eng = (1 - alpha) * eng_arr + alpha * motor_mag  # (N,)
+
+    sc_start = scratch_slice.start
+    sc_end = scratch_slice.stop
+    scratch_width = sc_end - sc_start
+
+    # Always decay scratch (multiplicative)
+    cur_scratch = S_batch[:, sc_start:sc_end]
+    delta[:, sc_start:sc_end] = (decay - 1.0) * cur_scratch
+
+    # Replay for agents whose engagement < threshold
+    idle_mask = new_eng < engagement_threshold  # (N,) bool
+    hp_traces = S_batch[:, hippo_slice]  # (N, trace_dim)
+    n_slots_in_trace = max(1, hp_traces.shape[1] // slot_dim)
+    for i, sh in enumerate(shells):
+        if idle_mask[i]:
+            trace_off = (sh._replay_idx % n_slots_in_trace) * slot_dim
+            trace = hp_traces[i, trace_off:trace_off + slot_dim]
+            n_write = min(trace.size, scratch_width)
+            for j in range(n_write):
+                delta[i, sc_start + j] += replay_strength * float(trace[j])
+            sh._replay_idx += 1
+        sh._engagement_ema = float(new_eng[i])
+    return delta
+
+
+def prefrontal_batched(S_batch: np.ndarray, shells: list) -> np.ndarray:
+    """Vectorized prefrontal: working memory slots + top-down bias."""
+    delta = np.zeros_like(S_batch)
+    N = S_batch.shape[0]
+    if not shells:
+        return delta
+    s0 = shells[0]
+    attention_slice = slice(
+        int(s0.params.get("attention_start", 51)),
+        int(s0.params.get("attention_end", 83)))
+    watched_slice = slice(
+        int(s0.params.get("watched_start", 0)),
+        int(s0.params.get("watched_end", 35)))
+    wm_slice = slice(
+        int(s0.params.get("wm_start", 163)),
+        int(s0.params.get("wm_end", 176)))
+    n_slots = int(s0.params.get("n_slots", 3))
+    decay_rate = float(s0.params.get("decay_rate", 0.05))
+    lock_threshold = float(s0.params.get("lock_threshold", 0.5))
+    bias_strength = float(s0.params.get("bias_strength", 0.08))
+
+    attention = S_batch[:, attention_slice]
+    watched = S_batch[:, watched_slice]
+    w_start = watched_slice.start
+    w_width = watched.shape[1]
+    att_width = attention.shape[1]
+
+    # Per-agent slot management — can't easily vectorize due to variable state
+    for i, sh in enumerate(shells):
+        # Decay
+        for slot in sh._slots:
+            slot["activation"] *= (1.0 - decay_rate)
+        # Lock candidates
+        att_trim = attention[i, :w_width] if att_width > w_width else attention[i]
+        lock_candidates = np.where(att_trim > lock_threshold)[0]
+        for c_idx in lock_candidates:
+            exists = any(s["source_idx"] == int(c_idx) for s in sh._slots)
+            if not exists and len(sh._slots) < n_slots:
+                sh._slots.append({
+                    "source_idx": int(c_idx),
+                    "target_value": float(watched[i, c_idx]),
+                    "activation": 1.0,
+                })
+        # Remove expired
+        sh._slots = [s for s in sh._slots if s["activation"] > 0.05]
+        sh._slots.sort(key=lambda s: -s["activation"])
+        sh._slots = sh._slots[:n_slots]
+        # Push bias
+        for slot in sh._slots:
+            idx = slot["source_idx"]
+            cur = watched[i, idx]
+            tgt = slot["target_value"]
+            gain = bias_strength * slot["activation"]
+            delta[i, w_start + idx] += gain * (tgt - cur)
+        # Write slot summary to wm
+        wm_start = wm_slice.start
+        wm_width = wm_slice.stop - wm_start
+        if wm_width >= 2 * n_slots:
+            for k in range(n_slots):
+                if k < len(sh._slots):
+                    act = sh._slots[k]["activation"]
+                    src = float(sh._slots[k]["source_idx"])
+                else:
+                    act, src = 0.0, 0.0
+                delta[i, wm_start + k] = act - S_batch[i, wm_start + k]
+                delta[i, wm_start + n_slots + k] = src - S_batch[i, wm_start + n_slots + k]
+    return delta
+
+
 # Name-based dispatch
 BATCHED_IMPLS = {
     "brainstem": brainstem_batched,
     "cerebellum": cerebellum_batched,
     "salience": salience_batched,
+    "hippocampus": hippocampus_batched,
+    "prefrontal": prefrontal_batched,
+    "dmn": dmn_batched,
 }
 
 
