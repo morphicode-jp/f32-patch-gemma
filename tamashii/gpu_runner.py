@@ -84,6 +84,30 @@ class GPUBatchRunner:
         self.params_tensor = torch.from_numpy(
             np.stack(params_list)).to(self.device)
 
+    def add_agent(self, tamashii_agent):
+        """Dynamically append an agent (e.g. new child from reproduction).
+
+        Grows params_tensor, brain_states, inhibit_tensor via torch.cat.
+        """
+        assert len(tamashii_agent.shells) > 0 and isinstance(
+            tamashii_agent.shells[0], CoreBrain), (
+            "agent.shells[0] must be CoreBrain")
+        cs = tamashii_agent.shells[0]
+        self.agents.append(tamashii_agent)
+        self.core_shells.append(cs)
+        # Append new row to params_tensor
+        new_params = torch.from_numpy(np.asarray(cs.kathara_params, dtype=np.float32)
+                                       ).unsqueeze(0).to(self.device)
+        self.params_tensor = torch.cat([self.params_tensor, new_params], dim=0)
+        # Append inhibit_sign row
+        new_inh = torch.from_numpy(np.asarray(cs.inhibit_sign, dtype=np.float32)
+                                    ).unsqueeze(0).to(self.device)
+        self.inhibit_tensor = torch.cat([self.inhibit_tensor, new_inh], dim=0)
+        # Append zero brain state
+        new_state = torch.zeros(1, 16, dtype=torch.float32, device=self.device)
+        self.brain_states = torch.cat([self.brain_states, new_state], dim=0)
+        self.N = len(self.agents)
+
     def reset(self):
         """Zero brain states, re-sync params from shells."""
         self.brain_states.zero_()

@@ -96,44 +96,47 @@ def run_cardinal_gpu(
         runner.reset()
 
         for step in range(epoch_steps):
-            # 1. Gather sensors from each world for each agent
-            sensors_mega = np.zeros((len(all_agents), 16), dtype=np.float64)
-            idx = 0
+            # 1. Gather sensors from each universe's agents
+            # Rebuild mega mapping because child insertions grow pools
+            agent_map = []  # (universe, idx_in_universe) per position in runner
             for u in universes:
-                N_u = u.world.n_agents
-                for i in range(N_u):
-                    if idx < len(all_agents) and u.world.agent_alive[i]:
-                        sensors_mega[idx] = u.world.get_sensors(i)
-                    idx += 1
+                for i in range(u.world.n_agents):
+                    agent_map.append((u, i))
+            current_N = len(runner.agents)
+            # Grow sensors_mega to match runner size
+            sensors_mega = np.zeros((current_N, 16), dtype=np.float64)
+            for mega_idx in range(min(current_N, len(agent_map))):
+                u_ref, local_i = agent_map[mega_idx]
+                if u_ref.world.agent_alive[local_i]:
+                    sensors_mega[mega_idx] = u_ref.world.get_sensors(local_i)
 
             # 2. Batched tick: all agents' brains tick on GPU simultaneously
             runner.tick_all(sensors_mega)
 
             # 3. Extract actions per universe, step each world
-            idx = 0
+            mega_idx = 0
             for u in universes:
                 N_u = u.world.n_agents
                 actions = []
                 for i in range(N_u):
-                    if idx < len(all_agents):
-                        S = all_agents[idx].read_state()
+                    if mega_idx < current_N:
+                        ag = runner.agents[mega_idx]
+                        S = ag.read_state()
                         actions.append((
                             float(np.clip(S[16], 0.0, 1.0)),
                             float(np.clip(S[17], 0.0, 1.0)),
                             float(np.clip(S[18], 0.0, 1.0)),
                         ))
-                        idx += 1
+                        mega_idx += 1
                     else:
                         actions.append((0.5, 0.0, 0.0))
                 u.world.step(actions)
-                # Children spawned? Add them
-                if len(u.world.agents_external) > len(u.agents):
-                    new_agents = u.world.agents_external[len(u.agents):]
-                    for na in new_agents:
-                        na.reset_episode()
-                    u.agents.extend(new_agents)
-                    # NOTE: runner does not dynamically add; children won't be
-                    # batched this epoch. They'll be included on next epoch's pool rebuild.
+                # Children spawned in this universe? Register them with runner
+                while len(u.world.agents_external) > len(u.agents):
+                    new_child = u.world.agents_external[len(u.agents)]
+                    new_child.reset_episode()
+                    u.agents.append(new_child)
+                    runner.add_agent(new_child)  # dynamically batched on GPU now
 
             if step % (epoch_steps // 4) == 0:
                 stats_str = " ".join(
