@@ -75,11 +75,16 @@ mimir(fn, ranges, time_budget) 呼出し
 ## mimir の返り値
 
 ```
-best_params, best_score, tool_used ("owl"/"owl+reigen"/"owl+scipy"/"owl(reigen_tried)"/"owl_structure_only")
-route ("expensive_single"/"cheap_cascade"/"structure_only"), eval_cost_s, confidence
+best_params, best_score, tool_used, route, eval_cost_s, confidence, elapsed_s
+# 構造発見 (owl 由来)
 dead_dims, active_dims, fragility, proxy_type, proxy_r2
-owl_result (raw), reigen_result (escalation 時), scipy_result (dim≥10 時), elapsed_s
+verified_score (実測スコア), param_names, rounds_completed, recovered_dims, n_measurements
+# raw 生 dict (詳細読み取り)
+owl_result, reigen_result (escalation 時), scipy_result (dim≥10 時)
 ```
+
+tool_used 値: `"owl"` / `"owl+reigen"` / `"owl+scipy"` / `"owl(reigen_tried)"` / `"owl(reigen_scipy_tried)"` / `"owl_structure_only"`
+route 値: `"expensive_single"` / `"cheap_cascade"` / `"structure_only"`
 
 ## ツール役割の階層
 

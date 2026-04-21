@@ -277,6 +277,12 @@ def mimir(
             "proxy_type": r_owl.get("proxy_type"),
             "proxy_r2": r_owl.get("proxy_r2"),
             "confidence": r_owl.get("confidence"),
+            # owl's 構造発見 extras (v2 2026-04-21)
+            "verified_score": r_owl.get("verified_score"),
+            "param_names": r_owl.get("param_names"),
+            "rounds_completed": r_owl.get("rounds_completed"),
+            "recovered_dims": r_owl.get("recovered_dims"),
+            "n_measurements": r_owl.get("n_measurements"),
             "owl_result": r_owl,
             "elapsed_s": time.time() - t_start,
         }
@@ -350,6 +356,12 @@ def mimir(
         "fragility": r_owl.get("fragility"),
         "proxy_type": r_owl.get("proxy_type"),
         "proxy_r2": r_owl.get("proxy_r2"),
+        # owl's 構造発見 extras (v2 2026-04-21)
+        "verified_score": r_owl.get("verified_score"),
+        "param_names": r_owl.get("param_names"),
+        "rounds_completed": r_owl.get("rounds_completed"),
+        "recovered_dims": r_owl.get("recovered_dims"),
+        "n_measurements": r_owl.get("n_measurements"),
     }
 
     if not escalate:
