@@ -1,0 +1,20 @@
+{
+  "shell_name": "inhibition_L3_b",
+  "tick_ms": 80,
+  "gain": 0.5,
+  "layer": 3,
+  "shell_sign": -1,
+  "params": {
+    "monitor_slots": {
+      "start": 35,
+      "end": 100
+    },
+    "dampen_slots": {
+      "start": 70,
+      "end": 100
+    },
+    "activation_threshold": 0.7,
+    "suppression_frac": 0.2,
+    "ema_alpha": 0.5
+  }
+}

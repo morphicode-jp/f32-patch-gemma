@@ -49,6 +49,15 @@ SHELL_REGISTRY = {
     "inhibition_L1": InhibitionShell,
     "inhibition_L3": InhibitionShell,
     "inhibition_L4": InhibitionShell,
+    # Scale-up (Phase 13d): 8 additional specialists for 20-shell variant
+    "inhibition_L0_a": InhibitionShell,
+    "inhibition_L0_b": InhibitionShell,
+    "inhibition_L2_a": InhibitionShell,
+    "inhibition_L2_b": InhibitionShell,
+    "inhibition_L3_b": InhibitionShell,
+    "inhibition_L4_a": InhibitionShell,
+    "inhibition_L4_b": InhibitionShell,
+    "inhibition_L5": InhibitionShell,
 }
 
 
