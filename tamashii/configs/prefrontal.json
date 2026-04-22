@@ -13,5 +13,7 @@
     "decay_rate": 0.05,
     "lock_threshold": 0.5,
     "bias_strength": 0.08
-  }
+  },
+  "layer": 4,
+  "shell_sign": 1
 }

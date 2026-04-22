@@ -31,6 +31,7 @@ from tamashii.shells.prefrontal import Prefrontal
 from tamashii.shells.salience import Salience
 from tamashii.shells.taboo import Taboo
 from tamashii.shells.cortical_core_brain import CorticalCoreBrain
+from tamashii.shells.mimir_shell import MimirShell
 
 
 SHELL_REGISTRY = {
@@ -43,6 +44,7 @@ SHELL_REGISTRY = {
     "prefrontal": Prefrontal,
     "dmn": DMN,
     "taboo": Taboo,
+    "mimir_shell": MimirShell,
 }
 
 

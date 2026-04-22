@@ -3,7 +3,11 @@
   "tick_ms": 10,
   "gain": 1.0,
   "params": {
-    "motor_dims": [16, 17, 18],
+    "motor_dims": [
+      16,
+      17,
+      18
+    ],
     "ws_start": 35,
     "ws_end": 51,
     "history_len": 5,
@@ -11,5 +15,7 @@
     "smoothing_strength": 0.3,
     "prediction_weight": 0.5,
     "prediction_error_idx": 50
-  }
+  },
+  "layer": 3,
+  "shell_sign": 1
 }

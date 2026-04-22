@@ -2,6 +2,8 @@
   "shell_name": "core_brain",
   "tick_ms": 50,
   "gain": 1.0,
+  "layer": 1,
+  "shell_sign": 1,
   "params": {
     "dale_law": true,
     "sensor_start": 0,

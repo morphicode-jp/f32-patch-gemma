@@ -28,5 +28,7 @@
     "violation_slot": 190,
     "violation_penalty_weight": 25.0,
     "w_adapt_carry_over": true
-  }
+  },
+  "layer": 1,
+  "shell_sign": 1
 }

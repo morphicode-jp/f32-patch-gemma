@@ -34,6 +34,11 @@ class Shell(ABC):
         self.output_indices = np.asarray(config.get("output_indices", []), dtype=int)
         self.params: dict = dict(config.get("params", {}))
         self._state: dict = {}
+        # [M1] Hierarchy layer (0..5) + Dale's law sign for ISS inhibition metric
+        # paper §4.1: H=6 deep hierarchy is required for abstract reasoning
+        self.layer: int = int(config.get("layer", 0))
+        # +1 excitatory, -1 inhibitory (applied to gain direction)
+        self.shell_sign: int = int(config.get("shell_sign", +1))
 
     @classmethod
     def from_json(cls, path: str) -> "Shell":

@@ -58,18 +58,39 @@ class Tamashii:
     # Sync mode: deterministic single-tick advance (for tests/training)
     # --------------------------------------------------------------
     def tick_once(self, external: Any = None):
-        """Advance all shells by one step synchronously (one delta each)."""
+        """Advance all shells by one step synchronously.
+
+        [M1] Layer-ordered execution (paper §4.1 H=6 hierarchy):
+          Shells are grouped by .layer (default 0). Within a layer, all step()
+          on the SAME snapshot (parallel-additive). Between layers, the lower
+          layer's writes are visible to the upper layer (hierarchical forward).
+
+        When all shells share the same layer (default 0), behavior is identical
+        to the pre-M1 flat parallel-additive execution.
+        """
         if external is not None:
             self.external = external
-        snapshot = self.S.copy()
-        deltas = []
+
+        # Group shells by layer
+        layers = {}
         for shell in self.shells:
-            delta = shell.step(snapshot, self.external)
-            deltas.append((shell, delta))
-        # Apply all deltas (additive, order-independent since on snapshot)
-        for shell, delta in deltas:
-            self._last_delta_norms[shell.name] = float(np.linalg.norm(delta))
-            self.S = self.S + shell.gain * delta
+            lyr = int(getattr(shell, "layer", 0))
+            layers.setdefault(lyr, []).append(shell)
+
+        # Execute layers in ascending order
+        for lyr in sorted(layers.keys()):
+            shells_in_layer = layers[lyr]
+            snapshot = self.S.copy()
+            deltas = []
+            for shell in shells_in_layer:
+                delta = shell.step(snapshot, self.external)
+                deltas.append((shell, delta))
+            # Apply this layer's deltas before moving to next layer
+            for shell, delta in deltas:
+                self._last_delta_norms[shell.name] = float(np.linalg.norm(delta))
+                # shell_sign (-1 for inhibitory) flips the delta direction
+                sign = float(getattr(shell, "shell_sign", +1))
+                self.S = self.S + sign * shell.gain * delta
 
     # --------------------------------------------------------------
     # Async mode: each shell runs in a thread at its own tick_ms

@@ -81,8 +81,11 @@ def extract_shell_read_write_sets(shell) -> dict:
         writes.update(range(16, 19))      # nav, speed, voice
         writes.update(range(19, 35))      # firing pattern
     elif "brainstem" in name:
-        reads.update(range(0, 192))       # reads all (homeostasis)
-        writes.update(range(0, 192))      # can correct all (range clipping)
+        # Homeostasis: reads active channels, writes mostly motor/sensor clipping
+        # Not "all 192" — only modulates observable motor/sensor ranges
+        reads.update(range(0, 35))        # sensors + motor + firing
+        writes.update(range(16, 19))      # motor clip
+        writes.update(range(0, 16))       # sensor clip
     elif "cerebellum" in name:
         reads.update(range(16, 19))       # motor (to predict)
         writes.update(range(35, 100))     # prediction workspace
@@ -90,14 +93,27 @@ def extract_shell_read_write_sets(shell) -> dict:
         reads.update(range(0, 35))        # sensors + motor + firing
         writes.update(range(100, 120))    # attention signal
     elif "hippocampus" in name:
-        reads.update(range(0, 192))       # can snapshot anything
+        # Reads context-broad but not truly all — from salience + motor + firing
+        reads.update(range(0, 35))        # sensors + motor
+        reads.update(range(100, 120))     # salience output
         writes.update(range(120, 160))    # episode slots
     elif "prefrontal" in name:
-        reads.update(range(0, 192))       # integrates everything
+        # Reads higher-level salience + episodic memory + motor
+        reads.update(range(16, 19))       # motor
+        reads.update(range(100, 120))     # salience
+        reads.update(range(120, 160))     # hippocampus
         writes.update(range(160, 180))    # goal slots
     elif "dmn" in name:
-        reads.update(range(0, 192))
+        # Default mode: replay mode, reads motor + firing for replay patterns
+        reads.update(range(16, 35))       # motor + firing
         writes.update(range(180, 192))
+    elif "mimir" in name:
+        # Layer 5: reads everything relevant, writes context classification
+        reads.update(range(0, 16))        # sensors
+        reads.update(range(100, 120))     # salience
+        reads.update(range(160, 180))     # goal (prefrontal)
+        reads.update(range(190, 191))     # violation (taboo)
+        writes.update(range(191, 192))    # context slot
     elif "taboo" in name:
         reads.update([0, 2, 10, 11, 12, 13, 14, 16, 17, 18])
         writes.update([16, 17, 18, 190])  # motor + violation slot
@@ -135,22 +151,43 @@ def build_shell_graph(agent,
             layers[s.name] = int(s.layer)
 
     # Adjacency: edge A→B if slots[A]['writes'] ∩ slots[B]['reads'] ≠ ∅
+    # [M1] Layer-aware filtering: honor hierarchical flow
+    #   - FF edge (A.layer < B.layer): full weight (paper ~63% local FF)
+    #   - Lateral (A.layer == B.layer): 0.8× weight
+    #   - FB edge (A.layer > B.layer): 0.47× (paper §3.2.8 FF:FB = 2.13:1)
+    # Restrict specific over-generous reads for realism:
+    #   - brainstem is homeostasis: only reads a modest subset, not all 192
     adj = np.zeros((N, N), dtype=np.float64)
+    use_layers = bool(layers)
     for i in range(N):
         for j in range(N):
             if i == j:
                 continue
             overlap = slots[i]["writes"] & slots[j]["reads"]
-            if overlap:
-                # Weight = fraction of slot overlap (crude measure of signal bandwidth)
-                w = len(overlap)
-                # Modulate by observed activity if available
-                if activity_weights:
-                    a = activity_weights.get(names[i], 1.0) or 0.01
-                    w = w * (a ** 0.5)  # sqrt to moderate
-                adj[i, j] = float(w)
+            if not overlap:
+                continue
+            # Bandwidth
+            w = float(len(overlap))
+            # Cap extremely-large overlaps (artifacts of "reads all")
+            w = min(w, 30.0)
+            # Layer-aware direction weight
+            if use_layers:
+                la = layers.get(names[i], 0)
+                lb = layers.get(names[j], 0)
+                if la < lb:
+                    dir_w = 1.0       # feedforward
+                elif la == lb:
+                    dir_w = 0.8       # lateral
+                else:
+                    dir_w = 0.47      # feedback (paper FF:FB = 2.13:1)
+                w *= dir_w
+            # Activity weighting
+            if activity_weights:
+                a = activity_weights.get(names[i], 1.0) or 0.01
+                w *= (a ** 0.5)
+            adj[i, j] = w
 
-    # Normalize adjacency to [0, 1] range (relative connection strength)
+    # Normalize adjacency to [0, 1] range
     if adj.max() > 0:
         adj = adj / adj.max()
 

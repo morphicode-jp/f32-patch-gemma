@@ -1,0 +1,21 @@
+{
+  "shell_name": "mimir_shell",
+  "tick_ms": 100,
+  "gain": 1.0,
+  "layer": 5,
+  "shell_sign": 1,
+  "params": {
+    "context_slot": 191,
+    "peer_prox_slot": 14,
+    "olf_slot": 10,
+    "violation_slot": 190,
+    "salience_start": 100,
+    "salience_end": 120,
+    "goal_start": 160,
+    "goal_end": 180,
+    "threat_peer_prox": 0.5,
+    "opportunity_olf": 0.8,
+    "emergency_violation": 0.7,
+    "context_ema_alpha": 0.3
+  }
+}

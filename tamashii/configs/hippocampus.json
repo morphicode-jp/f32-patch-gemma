@@ -12,5 +12,7 @@
     "recall_threshold": 0.8,
     "store_threshold": 0.6,
     "recall_strength": 0.2
-  }
+  },
+  "layer": 4,
+  "shell_sign": 1
 }

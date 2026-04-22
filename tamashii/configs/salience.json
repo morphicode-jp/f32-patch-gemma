@@ -10,5 +10,7 @@
     "baseline_alpha": 0.05,
     "novelty_threshold": 0.15,
     "boost_strength": 0.1
-  }
+  },
+  "layer": 2,
+  "shell_sign": 1
 }

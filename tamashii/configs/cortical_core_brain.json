@@ -10,5 +10,7 @@
     "motor_voice": 18,
     "motor_jump": 19,
     "firing_start": 20
-  }
+  },
+  "layer": 1,
+  "shell_sign": 1
 }

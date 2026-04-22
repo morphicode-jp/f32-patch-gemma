@@ -26,5 +26,7 @@
     "mandatory_voice_min": 0.3,
     "violation_slot": 190,
     "violation_write_strength": 3.0
-  }
+  },
+  "layer": 2,
+  "shell_sign": -1
 }
