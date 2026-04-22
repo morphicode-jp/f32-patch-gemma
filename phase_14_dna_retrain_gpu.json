@@ -1,0 +1,954 @@
+{
+  "config": {
+    "n_universes": 4,
+    "agents_per_universe": 6,
+    "epoch_steps": 800,
+    "n_epochs": 20,
+    "base_seed": 42,
+    "device": "cuda",
+    "architecture": "20-shell hierarchical"
+  },
+  "total_elapsed_s": 588.8,
+  "history": [
+    {
+      "epoch": 0,
+      "snapshots": [
+        {
+          "u_id": 0,
+          "quality": 12.530430134127627,
+          "food_total": 179,
+          "n_alive": 21,
+          "n_births": 19,
+          "n_deaths": 4,
+          "max_gen": 4,
+          "mutation_rate": 0.029417734788764954
+        },
+        {
+          "u_id": 1,
+          "quality": 10.21702024246679,
+          "food_total": 207,
+          "n_alive": 11,
+          "n_births": 9,
+          "n_deaths": 4,
+          "max_gen": 3,
+          "mutation_rate": 0.03862623501432937
+        },
+        {
+          "u_id": 2,
+          "quality": 12.94383269129835,
+          "food_total": 527,
+          "n_alive": 25,
+          "n_births": 19,
+          "n_deaths": 0,
+          "max_gen": 4,
+          "mutation_rate": 0.02781139931522098
+        },
+        {
+          "u_id": 3,
+          "quality": 12.857171641655658,
+          "food_total": 368,
+          "n_alive": 25,
+          "n_births": 19,
+          "n_deaths": 0,
+          "max_gen": 4,
+          "mutation_rate": 0.0863160401378636
+        }
+      ],
+      "best": 2,
+      "elapsed_ep_s": 18.30247974395752
+    },
+    {
+      "epoch": 1,
+      "snapshots": [
+        {
+          "u_id": 0,
+          "quality": 13.07713887002313,
+          "food_total": 562,
+          "n_alive": 21,
+          "n_births": 19,
+          "n_deaths": 4,
+          "max_gen": 4,
+          "mutation_rate": 0.029417734788764954
+        },
+        {
+          "u_id": 1,
+          "quality": 12.548568753565398,
+          "food_total": 325,
+          "n_alive": 21,
+          "n_births": 17,
+          "n_deaths": 2,
+          "max_gen": 4,
+          "mutation_rate": 0.027475376165135203
+        },
+        {
+          "u_id": 2,
+          "quality": 13.350102304809365,
+          "food_total": 1219,
+          "n_alive": 25,
+          "n_births": 19,
+          "n_deaths": 0,
+          "max_gen": 4,
+          "mutation_rate": 0.02781139931522098
+        },
+        {
+          "u_id": 3,
+          "quality": 13.177727377932701,
+          "food_total": 768,
+          "n_alive": 24,
+          "n_births": 19,
+          "n_deaths": 1,
+          "max_gen": 4,
+          "mutation_rate": 0.0863160401378636
+        }
+      ],
+      "best": 2,
+      "elapsed_ep_s": 28.74851632118225
+    },
+    {
+      "epoch": 2,
+      "snapshots": [
+        {
+          "u_id": 0,
+          "quality": 13.077290434969743,
+          "food_total": 800,
+          "n_alive": 16,
+          "n_births": 19,
+          "n_deaths": 9,
+          "max_gen": 4,
+          "mutation_rate": 0.029417734788764954
+        },
+        {
+          "u_id": 1,
+          "quality": 12.936264548620986,
+          "food_total": 372,
+          "n_alive": 25,
+          "n_births": 19,
+          "n_deaths": 0,
+          "max_gen": 4,
+          "mutation_rate": 0.02781139931522098
+        },
+        {
+          "u_id": 2,
+          "quality": 13.5752784616516,
+          "food_total": 2044,
+          "n_alive": 24,
+          "n_births": 19,
+          "n_deaths": 1,
+          "max_gen": 4,
+          "mutation_rate": 0.02781139931522098
+        },
+        {
+          "u_id": 3,
+          "quality": 13.362636262621663,
+          "food_total": 1113,
+          "n_alive": 24,
+          "n_births": 19,
+          "n_deaths": 1,
+          "max_gen": 4,
+          "mutation_rate": 0.0863160401378636
+        }
+      ],
+      "best": 2,
+      "elapsed_ep_s": 28.777225494384766
+    },
+    {
+      "epoch": 3,
+      "snapshots": [
+        {
+          "u_id": 0,
+          "quality": 13.242478747055777,
+          "food_total": 1169,
+          "n_alive": 15,
+          "n_births": 19,
+          "n_deaths": 10,
+          "max_gen": 4,
+          "mutation_rate": 0.029417734788764954
+        },
+        {
+          "u_id": 1,
+          "quality": 12.891802318990365,
+          "food_total": 458,
+          "n_alive": 25,
+          "n_births": 19,
+          "n_deaths": 0,
+          "max_gen": 4,
+          "mutation_rate": 0.02
+        },
+        {
+          "u_id": 2,
+          "quality": 13.77578163376106,
+          "food_total": 3042,
+          "n_alive": 24,
+          "n_births": 19,
+          "n_deaths": 1,
+          "max_gen": 4,
+          "mutation_rate": 0.02781139931522098
+        },
+        {
+          "u_id": 3,
+          "quality": 13.563573482610384,
+          "food_total": 1665,
+          "n_alive": 24,
+          "n_births": 19,
+          "n_deaths": 1,
+          "max_gen": 4,
+          "mutation_rate": 0.0863160401378636
+        }
+      ],
+      "best": 2,
+      "elapsed_ep_s": 29.822061777114868
+    },
+    {
+      "epoch": 4,
+      "snapshots": [
+        {
+          "u_id": 0,
+          "quality": 13.427130047459045,
+          "food_total": 1626,
+          "n_alive": 15,
+          "n_births": 19,
+          "n_deaths": 10,
+          "max_gen": 4,
+          "mutation_rate": 0.029417734788764954
+        },
+        {
+          "u_id": 1,
+          "quality": 13.039146937925196,
+          "food_total": 637,
+          "n_alive": 25,
+          "n_births": 19,
+          "n_deaths": 0,
+          "max_gen": 4,
+          "mutation_rate": 0.02
+        },
+        {
+          "u_id": 2,
+          "quality": 13.830307358026548,
+          "food_total": 3751,
+          "n_alive": 23,
+          "n_births": 19,
+          "n_deaths": 2,
+          "max_gen": 4,
+          "mutation_rate": 0.02781139931522098
+        },
+        {
+          "u_id": 3,
+          "quality": 13.707639288451208,
+          "food_total": 2222,
+          "n_alive": 24,
+          "n_births": 19,
+          "n_deaths": 1,
+          "max_gen": 4,
+          "mutation_rate": 0.0863160401378636
+        }
+      ],
+      "best": 2,
+      "elapsed_ep_s": 29.938483238220215
+    },
+    {
+      "epoch": 5,
+      "snapshots": [
+        {
+          "u_id": 0,
+          "quality": 13.54541333328222,
+          "food_total": 2021,
+          "n_alive": 15,
+          "n_births": 19,
+          "n_deaths": 10,
+          "max_gen": 4,
+          "mutation_rate": 0.029417734788764954
+        },
+        {
+          "u_id": 1,
+          "quality": 12.84695755266904,
+          "food_total": 506,
+          "n_alive": 25,
+          "n_births": 19,
+          "n_deaths": 0,
+          "max_gen": 4,
+          "mutation_rate": 0.058595600776174844
+        },
+        {
+          "u_id": 2,
+          "quality": 13.932776296685592,
+          "food_total": 4573,
+          "n_alive": 23,
+          "n_births": 19,
+          "n_deaths": 2,
+          "max_gen": 4,
+          "mutation_rate": 0.02781139931522098
+        },
+        {
+          "u_id": 3,
+          "quality": 13.805866008167119,
+          "food_total": 2705,
+          "n_alive": 24,
+          "n_births": 19,
+          "n_deaths": 1,
+          "max_gen": 4,
+          "mutation_rate": 0.0863160401378636
+        }
+      ],
+      "best": 2,
+      "elapsed_ep_s": 29.126501321792603
+    },
+    {
+      "epoch": 6,
+      "snapshots": [
+        {
+          "u_id": 0,
+          "quality": 13.657677962005476,
+          "food_total": 2493,
+          "n_alive": 15,
+          "n_births": 19,
+          "n_deaths": 10,
+          "max_gen": 4,
+          "mutation_rate": 0.029417734788764954
+        },
+        {
+          "u_id": 1,
+          "quality": 19.834029320186694,
+          "food_total": 491,
+          "n_alive": 25,
+          "n_births": 19,
+          "n_deaths": 0,
+          "max_gen": 4,
+          "mutation_rate": 0.046056671308307956
+        },
+        {
+          "u_id": 2,
+          "quality": 14.031284389626745,
+          "food_total": 5539,
+          "n_alive": 23,
+          "n_births": 19,
+          "n_deaths": 2,
+          "max_gen": 4,
+          "mutation_rate": 0.02781139931522098
+        },
+        {
+          "u_id": 3,
+          "quality": 13.871198707612589,
+          "food_total": 3083,
+          "n_alive": 24,
+          "n_births": 19,
+          "n_deaths": 1,
+          "max_gen": 4,
+          "mutation_rate": 0.0863160401378636
+        }
+      ],
+      "best": 1,
+      "elapsed_ep_s": 28.876500844955444
+    },
+    {
+      "epoch": 7,
+      "snapshots": [
+        {
+          "u_id": 0,
+          "quality": 16.13941497591125,
+          "food_total": 484,
+          "n_alive": 25,
+          "n_births": 19,
+          "n_deaths": 0,
+          "max_gen": 4,
+          "mutation_rate": 0.04919300203031849
+        },
+        {
+          "u_id": 1,
+          "quality": 20.351668769231054,
+          "food_total": 1428,
+          "n_alive": 25,
+          "n_births": 19,
+          "n_deaths": 0,
+          "max_gen": 4,
+          "mutation_rate": 0.046056671308307956
+        },
+        {
+          "u_id": 2,
+          "quality": 14.109363639842758,
+          "food_total": 6452,
+          "n_alive": 23,
+          "n_births": 19,
+          "n_deaths": 2,
+          "max_gen": 4,
+          "mutation_rate": 0.02781139931522098
+        },
+        {
+          "u_id": 3,
+          "quality": 13.92998219908193,
+          "food_total": 3468,
+          "n_alive": 24,
+          "n_births": 19,
+          "n_deaths": 1,
+          "max_gen": 4,
+          "mutation_rate": 0.0863160401378636
+        }
+      ],
+      "best": 1,
+      "elapsed_ep_s": 29.633488655090332
+    },
+    {
+      "epoch": 8,
+      "snapshots": [
+        {
+          "u_id": 0,
+          "quality": 16.86768410344184,
+          "food_total": 1454,
+          "n_alive": 23,
+          "n_births": 19,
+          "n_deaths": 2,
+          "max_gen": 4,
+          "mutation_rate": 0.04919300203031849
+        },
+        {
+          "u_id": 1,
+          "quality": 20.618377652190592,
+          "food_total": 2452,
+          "n_alive": 25,
+          "n_births": 19,
+          "n_deaths": 0,
+          "max_gen": 4,
+          "mutation_rate": 0.046056671308307956
+        },
+        {
+          "u_id": 2,
+          "quality": 14.169985248009276,
+          "food_total": 7266,
+          "n_alive": 23,
+          "n_births": 19,
+          "n_deaths": 2,
+          "max_gen": 4,
+          "mutation_rate": 0.02781139931522098
+        },
+        {
+          "u_id": 3,
+          "quality": 19.089555060313458,
+          "food_total": 440,
+          "n_alive": 20,
+          "n_births": 15,
+          "n_deaths": 1,
+          "max_gen": 4,
+          "mutation_rate": 0.056466511162302835
+        }
+      ],
+      "best": 1,
+      "elapsed_ep_s": 29.674505472183228
+    },
+    {
+      "epoch": 9,
+      "snapshots": [
+        {
+          "u_id": 0,
+          "quality": 17.1324351071331,
+          "food_total": 2439,
+          "n_alive": 23,
+          "n_births": 19,
+          "n_deaths": 2,
+          "max_gen": 4,
+          "mutation_rate": 0.04919300203031849
+        },
+        {
+          "u_id": 1,
+          "quality": 20.760753078634092,
+          "food_total": 3268,
+          "n_alive": 25,
+          "n_births": 19,
+          "n_deaths": 0,
+          "max_gen": 4,
+          "mutation_rate": 0.046056671308307956
+        },
+        {
+          "u_id": 2,
+          "quality": 13.127950229806164,
+          "food_total": 405,
+          "n_alive": 23,
+          "n_births": 17,
+          "n_deaths": 0,
+          "max_gen": 4,
+          "mutation_rate": 0.04126036630078107
+        },
+        {
+          "u_id": 3,
+          "quality": 21.594607493943364,
+          "food_total": 1360,
+          "n_alive": 24,
+          "n_births": 19,
+          "n_deaths": 1,
+          "max_gen": 5,
+          "mutation_rate": 0.056466511162302835
+        }
+      ],
+      "best": 3,
+      "elapsed_ep_s": 29.985495805740356
+    },
+    {
+      "epoch": 10,
+      "snapshots": [
+        {
+          "u_id": 0,
+          "quality": 17.309769904969663,
+          "food_total": 3459,
+          "n_alive": 23,
+          "n_births": 19,
+          "n_deaths": 2,
+          "max_gen": 4,
+          "mutation_rate": 0.04919300203031849
+        },
+        {
+          "u_id": 1,
+          "quality": 20.903948389849052,
+          "food_total": 4360,
+          "n_alive": 25,
+          "n_births": 19,
+          "n_deaths": 0,
+          "max_gen": 4,
+          "mutation_rate": 0.046056671308307956
+        },
+        {
+          "u_id": 2,
+          "quality": 13.648316474813772,
+          "food_total": 531,
+          "n_alive": 25,
+          "n_births": 19,
+          "n_deaths": 0,
+          "max_gen": 4,
+          "mutation_rate": 0.046024182948590404
+        },
+        {
+          "u_id": 3,
+          "quality": 21.865458681006036,
+          "food_total": 2355,
+          "n_alive": 24,
+          "n_births": 19,
+          "n_deaths": 1,
+          "max_gen": 5,
+          "mutation_rate": 0.056466511162302835
+        }
+      ],
+      "best": 3,
+      "elapsed_ep_s": 30.92248845100403
+    },
+    {
+      "epoch": 11,
+      "snapshots": [
+        {
+          "u_id": 0,
+          "quality": 17.447351193775063,
+          "food_total": 4541,
+          "n_alive": 23,
+          "n_births": 19,
+          "n_deaths": 2,
+          "max_gen": 4,
+          "mutation_rate": 0.04919300203031849
+        },
+        {
+          "u_id": 1,
+          "quality": 20.351757100816148,
+          "food_total": 5230,
+          "n_alive": 24,
+          "n_births": 19,
+          "n_deaths": 1,
+          "max_gen": 4,
+          "mutation_rate": 0.046056671308307956
+        },
+        {
+          "u_id": 2,
+          "quality": 13.37455542551567,
+          "food_total": 311,
+          "n_alive": 22,
+          "n_births": 18,
+          "n_deaths": 2,
+          "max_gen": 4,
+          "mutation_rate": 0.05097315751603168
+        },
+        {
+          "u_id": 3,
+          "quality": 22.019905230247744,
+          "food_total": 3216,
+          "n_alive": 24,
+          "n_births": 19,
+          "n_deaths": 1,
+          "max_gen": 5,
+          "mutation_rate": 0.056466511162302835
+        }
+      ],
+      "best": 3,
+      "elapsed_ep_s": 30.685481786727905
+    },
+    {
+      "epoch": 12,
+      "snapshots": [
+        {
+          "u_id": 0,
+          "quality": 17.543159051430106,
+          "food_total": 5491,
+          "n_alive": 23,
+          "n_births": 19,
+          "n_deaths": 2,
+          "max_gen": 4,
+          "mutation_rate": 0.04919300203031849
+        },
+        {
+          "u_id": 1,
+          "quality": 20.436740030811325,
+          "food_total": 6183,
+          "n_alive": 24,
+          "n_births": 19,
+          "n_deaths": 1,
+          "max_gen": 4,
+          "mutation_rate": 0.046056671308307956
+        },
+        {
+          "u_id": 2,
+          "quality": 12.575499181527537,
+          "food_total": 326,
+          "n_alive": 16,
+          "n_births": 12,
+          "n_deaths": 2,
+          "max_gen": 3,
+          "mutation_rate": 0.056466511162302835
+        },
+        {
+          "u_id": 3,
+          "quality": 22.13061206067494,
+          "food_total": 4019,
+          "n_alive": 24,
+          "n_births": 19,
+          "n_deaths": 1,
+          "max_gen": 5,
+          "mutation_rate": 0.056466511162302835
+        }
+      ],
+      "best": 3,
+      "elapsed_ep_s": 29.303499460220337
+    },
+    {
+      "epoch": 13,
+      "snapshots": [
+        {
+          "u_id": 0,
+          "quality": 17.628504200707653,
+          "food_total": 6505,
+          "n_alive": 23,
+          "n_births": 19,
+          "n_deaths": 2,
+          "max_gen": 4,
+          "mutation_rate": 0.04919300203031849
+        },
+        {
+          "u_id": 1,
+          "quality": 20.525407038452784,
+          "food_total": 7366,
+          "n_alive": 24,
+          "n_births": 19,
+          "n_deaths": 1,
+          "max_gen": 4,
+          "mutation_rate": 0.046056671308307956
+        },
+        {
+          "u_id": 2,
+          "quality": 12.308386458626906,
+          "food_total": 246,
+          "n_alive": 20,
+          "n_births": 15,
+          "n_deaths": 1,
+          "max_gen": 4,
+          "mutation_rate": 0.05178976562342949
+        },
+        {
+          "u_id": 3,
+          "quality": 22.226736167903915,
+          "food_total": 4876,
+          "n_alive": 24,
+          "n_births": 19,
+          "n_deaths": 1,
+          "max_gen": 5,
+          "mutation_rate": 0.056466511162302835
+        }
+      ],
+      "best": 3,
+      "elapsed_ep_s": 29.200511693954468
+    },
+    {
+      "epoch": 14,
+      "snapshots": [
+        {
+          "u_id": 0,
+          "quality": 17.699171763695386,
+          "food_total": 7486,
+          "n_alive": 23,
+          "n_births": 19,
+          "n_deaths": 2,
+          "max_gen": 4,
+          "mutation_rate": 0.04919300203031849
+        },
+        {
+          "u_id": 1,
+          "quality": 20.588190573013684,
+          "food_total": 8340,
+          "n_alive": 24,
+          "n_births": 19,
+          "n_deaths": 1,
+          "max_gen": 4,
+          "mutation_rate": 0.046056671308307956
+        },
+        {
+          "u_id": 2,
+          "quality": 11.994632890540199,
+          "food_total": 469,
+          "n_alive": 24,
+          "n_births": 19,
+          "n_deaths": 1,
+          "max_gen": 3,
+          "mutation_rate": 0.056466511162302835
+        },
+        {
+          "u_id": 3,
+          "quality": 22.306979294286204,
+          "food_total": 5729,
+          "n_alive": 24,
+          "n_births": 19,
+          "n_deaths": 1,
+          "max_gen": 5,
+          "mutation_rate": 0.056466511162302835
+        }
+      ],
+      "best": 3,
+      "elapsed_ep_s": 31.101473569869995
+    },
+    {
+      "epoch": 15,
+      "snapshots": [
+        {
+          "u_id": 0,
+          "quality": 17.765509021764746,
+          "food_total": 8542,
+          "n_alive": 23,
+          "n_births": 19,
+          "n_deaths": 2,
+          "max_gen": 4,
+          "mutation_rate": 0.04919300203031849
+        },
+        {
+          "u_id": 1,
+          "quality": 20.648063814956668,
+          "food_total": 9390,
+          "n_alive": 24,
+          "n_births": 19,
+          "n_deaths": 1,
+          "max_gen": 4,
+          "mutation_rate": 0.046056671308307956
+        },
+        {
+          "u_id": 2,
+          "quality": 13.990459777935392,
+          "food_total": 405,
+          "n_alive": 20,
+          "n_births": 17,
+          "n_deaths": 3,
+          "max_gen": 4,
+          "mutation_rate": 0.051040791612721105
+        },
+        {
+          "u_id": 3,
+          "quality": 22.372842473091417,
+          "food_total": 6539,
+          "n_alive": 24,
+          "n_births": 19,
+          "n_deaths": 1,
+          "max_gen": 5,
+          "mutation_rate": 0.056466511162302835
+        }
+      ],
+      "best": 3,
+      "elapsed_ep_s": 30.49348020553589
+    },
+    {
+      "epoch": 16,
+      "snapshots": [
+        {
+          "u_id": 0,
+          "quality": 17.92621547521263,
+          "food_total": 9569,
+          "n_alive": 22,
+          "n_births": 19,
+          "n_deaths": 3,
+          "max_gen": 4,
+          "mutation_rate": 0.04919300203031849
+        },
+        {
+          "u_id": 1,
+          "quality": 20.698525054558235,
+          "food_total": 10378,
+          "n_alive": 24,
+          "n_births": 19,
+          "n_deaths": 1,
+          "max_gen": 4,
+          "mutation_rate": 0.046056671308307956
+        },
+        {
+          "u_id": 2,
+          "quality": 13.668738387577744,
+          "food_total": 620,
+          "n_alive": 23,
+          "n_births": 19,
+          "n_deaths": 2,
+          "max_gen": 4,
+          "mutation_rate": 0.08859222318285426
+        },
+        {
+          "u_id": 3,
+          "quality": 22.44169887074308,
+          "food_total": 7508,
+          "n_alive": 24,
+          "n_births": 19,
+          "n_deaths": 1,
+          "max_gen": 5,
+          "mutation_rate": 0.056466511162302835
+        }
+      ],
+      "best": 3,
+      "elapsed_ep_s": 30.511476755142212
+    },
+    {
+      "epoch": 17,
+      "snapshots": [
+        {
+          "u_id": 0,
+          "quality": 17.9785265338659,
+          "food_total": 10600,
+          "n_alive": 22,
+          "n_births": 19,
+          "n_deaths": 3,
+          "max_gen": 4,
+          "mutation_rate": 0.04919300203031849
+        },
+        {
+          "u_id": 1,
+          "quality": 20.741512272494603,
+          "food_total": 11302,
+          "n_alive": 24,
+          "n_births": 19,
+          "n_deaths": 1,
+          "max_gen": 4,
+          "mutation_rate": 0.046056671308307956
+        },
+        {
+          "u_id": 2,
+          "quality": 12.8612209029125,
+          "food_total": 308,
+          "n_alive": 25,
+          "n_births": 19,
+          "n_deaths": 0,
+          "max_gen": 4,
+          "mutation_rate": 0.05834065579345371
+        },
+        {
+          "u_id": 3,
+          "quality": 22.501563065507252,
+          "food_total": 8466,
+          "n_alive": 24,
+          "n_births": 19,
+          "n_deaths": 1,
+          "max_gen": 5,
+          "mutation_rate": 0.056466511162302835
+        }
+      ],
+      "best": 3,
+      "elapsed_ep_s": 30.47189235687256
+    },
+    {
+      "epoch": 18,
+      "snapshots": [
+        {
+          "u_id": 0,
+          "quality": 18.029633841262687,
+          "food_total": 11717,
+          "n_alive": 22,
+          "n_births": 19,
+          "n_deaths": 3,
+          "max_gen": 4,
+          "mutation_rate": 0.04919300203031849
+        },
+        {
+          "u_id": 1,
+          "quality": 20.785930999880257,
+          "food_total": 12344,
+          "n_alive": 24,
+          "n_births": 19,
+          "n_deaths": 1,
+          "max_gen": 4,
+          "mutation_rate": 0.046056671308307956
+        },
+        {
+          "u_id": 2,
+          "quality": 12.33389120855308,
+          "food_total": 206,
+          "n_alive": 16,
+          "n_births": 15,
+          "n_deaths": 5,
+          "max_gen": 4,
+          "mutation_rate": 0.04688195042671135
+        },
+        {
+          "u_id": 3,
+          "quality": 22.556499708493895,
+          "food_total": 9452,
+          "n_alive": 24,
+          "n_births": 19,
+          "n_deaths": 1,
+          "max_gen": 5,
+          "mutation_rate": 0.056466511162302835
+        }
+      ],
+      "best": 3,
+      "elapsed_ep_s": 30.898170471191406
+    },
+    {
+      "epoch": 19,
+      "snapshots": [
+        {
+          "u_id": 0,
+          "quality": 18.078844363399945,
+          "food_total": 12906,
+          "n_alive": 22,
+          "n_births": 19,
+          "n_deaths": 3,
+          "max_gen": 4,
+          "mutation_rate": 0.04919300203031849
+        },
+        {
+          "u_id": 1,
+          "quality": 20.821774398712527,
+          "food_total": 13255,
+          "n_alive": 24,
+          "n_births": 19,
+          "n_deaths": 1,
+          "max_gen": 4,
+          "mutation_rate": 0.046056671308307956
+        },
+        {
+          "u_id": 2,
+          "quality": 12.864207454108936,
+          "food_total": 505,
+          "n_alive": 25,
+          "n_births": 19,
+          "n_deaths": 0,
+          "max_gen": 4,
+          "mutation_rate": 0.056466511162302835
+        },
+        {
+          "u_id": 3,
+          "quality": 22.5996447069114,
+          "food_total": 10306,
+          "n_alive": 24,
+          "n_births": 19,
+          "n_deaths": 1,
+          "max_gen": 5,
+          "mutation_rate": 0.056466511162302835
+        }
+      ],
+      "best": 3,
+      "elapsed_ep_s": 31.4984610080719
+    }
+  ]
+}
