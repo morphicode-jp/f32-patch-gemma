@@ -1,0 +1,975 @@
+{
+  "config": {
+    "n_universes": 4,
+    "agents_per_universe": 6,
+    "epoch_steps": 800,
+    "n_epochs_total": 20,
+    "stage1_end": 10,
+    "seed": 42
+  },
+  "total_elapsed_s": 1120.1,
+  "stage1_rate": 0.0799,
+  "stage2_rate": 0.086,
+  "history": [
+    {
+      "epoch": 0,
+      "stage": "S1 (DNA)",
+      "snapshots": [
+        {
+          "u_id": 0,
+          "quality": 9.220530135274238,
+          "food_total": 35,
+          "n_alive": 7,
+          "n_births": 5,
+          "n_deaths": 4,
+          "max_gen": 3,
+          "w_adapt_mean": 0.0
+        },
+        {
+          "u_id": 1,
+          "quality": 0.0,
+          "food_total": 8,
+          "n_alive": 0,
+          "n_births": 0,
+          "n_deaths": 6,
+          "max_gen": 0,
+          "w_adapt_mean": 0.0
+        },
+        {
+          "u_id": 2,
+          "quality": 11.360434540250687,
+          "food_total": 183,
+          "n_alive": 15,
+          "n_births": 11,
+          "n_deaths": 2,
+          "max_gen": 4,
+          "w_adapt_mean": 0.0
+        },
+        {
+          "u_id": 3,
+          "quality": 11.670942808648999,
+          "food_total": 191,
+          "n_alive": 18,
+          "n_births": 13,
+          "n_deaths": 1,
+          "max_gen": 4,
+          "w_adapt_mean": 0.0
+        }
+      ],
+      "best": 3,
+      "elapsed_ep_s": 26.84940791130066
+    },
+    {
+      "epoch": 1,
+      "stage": "S1 (DNA)",
+      "snapshots": [
+        {
+          "u_id": 0,
+          "quality": 7.100952969570498,
+          "food_total": 50,
+          "n_alive": 2,
+          "n_births": 6,
+          "n_deaths": 10,
+          "max_gen": 2,
+          "w_adapt_mean": 0.0
+        },
+        {
+          "u_id": 1,
+          "quality": 1.5890269151739727,
+          "food_total": 15,
+          "n_alive": 1,
+          "n_births": 0,
+          "n_deaths": 5,
+          "max_gen": 0,
+          "w_adapt_mean": 0.0
+        },
+        {
+          "u_id": 2,
+          "quality": 13.599736485263481,
+          "food_total": 669,
+          "n_alive": 16,
+          "n_births": 19,
+          "n_deaths": 9,
+          "max_gen": 5,
+          "w_adapt_mean": 0.0
+        },
+        {
+          "u_id": 3,
+          "quality": 13.851077595614145,
+          "food_total": 602,
+          "n_alive": 24,
+          "n_births": 19,
+          "n_deaths": 1,
+          "max_gen": 5,
+          "w_adapt_mean": 0.0
+        }
+      ],
+      "best": 3,
+      "elapsed_ep_s": 44.291362047195435
+    },
+    {
+      "epoch": 2,
+      "stage": "S1 (DNA)",
+      "snapshots": [
+        {
+          "u_id": 0,
+          "quality": 0.0,
+          "food_total": 50,
+          "n_alive": 0,
+          "n_births": 6,
+          "n_deaths": 12,
+          "max_gen": 0,
+          "w_adapt_mean": 0.0
+        },
+        {
+          "u_id": 1,
+          "quality": 10.113350299176307,
+          "food_total": 94,
+          "n_alive": 13,
+          "n_births": 9,
+          "n_deaths": 2,
+          "max_gen": 3,
+          "w_adapt_mean": 0.0
+        },
+        {
+          "u_id": 2,
+          "quality": 13.966879526298808,
+          "food_total": 1353,
+          "n_alive": 16,
+          "n_births": 19,
+          "n_deaths": 9,
+          "max_gen": 5,
+          "w_adapt_mean": 0.0
+        },
+        {
+          "u_id": 3,
+          "quality": 14.061037879665754,
+          "food_total": 1044,
+          "n_alive": 22,
+          "n_births": 19,
+          "n_deaths": 3,
+          "max_gen": 5,
+          "w_adapt_mean": 0.0
+        }
+      ],
+      "best": 3,
+      "elapsed_ep_s": 43.404109954833984
+    },
+    {
+      "epoch": 3,
+      "stage": "S1 (DNA)",
+      "snapshots": [
+        {
+          "u_id": 0,
+          "quality": 2.7058230259275198,
+          "food_total": 17,
+          "n_alive": 1,
+          "n_births": 1,
+          "n_deaths": 6,
+          "max_gen": 0,
+          "w_adapt_mean": 0.0
+        },
+        {
+          "u_id": 1,
+          "quality": 13.20119324607671,
+          "food_total": 401,
+          "n_alive": 22,
+          "n_births": 19,
+          "n_deaths": 3,
+          "max_gen": 4,
+          "w_adapt_mean": 0.0
+        },
+        {
+          "u_id": 2,
+          "quality": 14.193493892865646,
+          "food_total": 2107,
+          "n_alive": 16,
+          "n_births": 19,
+          "n_deaths": 9,
+          "max_gen": 5,
+          "w_adapt_mean": 0.0
+        },
+        {
+          "u_id": 3,
+          "quality": 14.253561036725456,
+          "food_total": 1532,
+          "n_alive": 22,
+          "n_births": 19,
+          "n_deaths": 3,
+          "max_gen": 5,
+          "w_adapt_mean": 0.0
+        }
+      ],
+      "best": 3,
+      "elapsed_ep_s": 56.86929774284363
+    },
+    {
+      "epoch": 4,
+      "stage": "S1 (DNA)",
+      "snapshots": [
+        {
+          "u_id": 0,
+          "quality": 9.954635039239012,
+          "food_total": 84,
+          "n_alive": 9,
+          "n_births": 6,
+          "n_deaths": 3,
+          "max_gen": 4,
+          "w_adapt_mean": 0.0
+        },
+        {
+          "u_id": 1,
+          "quality": 13.51488350195988,
+          "food_total": 791,
+          "n_alive": 21,
+          "n_births": 19,
+          "n_deaths": 4,
+          "max_gen": 4,
+          "w_adapt_mean": 0.0
+        },
+        {
+          "u_id": 2,
+          "quality": 14.337032759504773,
+          "food_total": 2795,
+          "n_alive": 16,
+          "n_births": 19,
+          "n_deaths": 9,
+          "max_gen": 5,
+          "w_adapt_mean": 0.0
+        },
+        {
+          "u_id": 3,
+          "quality": 14.387318174832025,
+          "food_total": 2082,
+          "n_alive": 21,
+          "n_births": 19,
+          "n_deaths": 4,
+          "max_gen": 5,
+          "w_adapt_mean": 0.0
+        }
+      ],
+      "best": 3,
+      "elapsed_ep_s": 59.88042211532593
+    },
+    {
+      "epoch": 5,
+      "stage": "S1 (DNA)",
+      "snapshots": [
+        {
+          "u_id": 0,
+          "quality": 8.659774900199498,
+          "food_total": 69,
+          "n_alive": 12,
+          "n_births": 7,
+          "n_deaths": 1,
+          "max_gen": 2,
+          "w_adapt_mean": 0.0
+        },
+        {
+          "u_id": 1,
+          "quality": 13.683574372461909,
+          "food_total": 1106,
+          "n_alive": 21,
+          "n_births": 19,
+          "n_deaths": 4,
+          "max_gen": 4,
+          "w_adapt_mean": 0.0
+        },
+        {
+          "u_id": 2,
+          "quality": 14.434142769797559,
+          "food_total": 3386,
+          "n_alive": 16,
+          "n_births": 19,
+          "n_deaths": 9,
+          "max_gen": 5,
+          "w_adapt_mean": 0.0
+        },
+        {
+          "u_id": 3,
+          "quality": 14.476888474684984,
+          "food_total": 2554,
+          "n_alive": 20,
+          "n_births": 19,
+          "n_deaths": 5,
+          "max_gen": 5,
+          "w_adapt_mean": 0.0
+        }
+      ],
+      "best": 3,
+      "elapsed_ep_s": 59.92709040641785
+    },
+    {
+      "epoch": 6,
+      "stage": "S1 (DNA)",
+      "snapshots": [
+        {
+          "u_id": 0,
+          "quality": 10.529774014377825,
+          "food_total": 102,
+          "n_alive": 13,
+          "n_births": 8,
+          "n_deaths": 1,
+          "max_gen": 4,
+          "w_adapt_mean": 0.0
+        },
+        {
+          "u_id": 1,
+          "quality": 13.849858634032277,
+          "food_total": 1540,
+          "n_alive": 21,
+          "n_births": 19,
+          "n_deaths": 4,
+          "max_gen": 4,
+          "w_adapt_mean": 0.0
+        },
+        {
+          "u_id": 2,
+          "quality": 14.529196162008956,
+          "food_total": 4087,
+          "n_alive": 16,
+          "n_births": 19,
+          "n_deaths": 9,
+          "max_gen": 5,
+          "w_adapt_mean": 0.0
+        },
+        {
+          "u_id": 3,
+          "quality": 14.559600852885222,
+          "food_total": 2996,
+          "n_alive": 20,
+          "n_births": 19,
+          "n_deaths": 5,
+          "max_gen": 5,
+          "w_adapt_mean": 0.0
+        }
+      ],
+      "best": 3,
+      "elapsed_ep_s": 59.50160789489746
+    },
+    {
+      "epoch": 7,
+      "stage": "S1 (DNA)",
+      "snapshots": [
+        {
+          "u_id": 0,
+          "quality": 13.615108956909381,
+          "food_total": 56,
+          "n_alive": 7,
+          "n_births": 6,
+          "n_deaths": 5,
+          "max_gen": 3,
+          "w_adapt_mean": 0.0
+        },
+        {
+          "u_id": 1,
+          "quality": 13.979232264344585,
+          "food_total": 1993,
+          "n_alive": 21,
+          "n_births": 19,
+          "n_deaths": 4,
+          "max_gen": 4,
+          "w_adapt_mean": 0.0
+        },
+        {
+          "u_id": 2,
+          "quality": 14.611867560687855,
+          "food_total": 4815,
+          "n_alive": 16,
+          "n_births": 19,
+          "n_deaths": 9,
+          "max_gen": 5,
+          "w_adapt_mean": 0.0
+        },
+        {
+          "u_id": 3,
+          "quality": 14.640627424493346,
+          "food_total": 3506,
+          "n_alive": 20,
+          "n_births": 19,
+          "n_deaths": 5,
+          "max_gen": 5,
+          "w_adapt_mean": 0.0
+        }
+      ],
+      "best": 3,
+      "elapsed_ep_s": 57.05520820617676
+    },
+    {
+      "epoch": 8,
+      "stage": "S1 (DNA)",
+      "snapshots": [
+        {
+          "u_id": 0,
+          "quality": 7.90054734582648,
+          "food_total": 51,
+          "n_alive": 4,
+          "n_births": 7,
+          "n_deaths": 9,
+          "max_gen": 2,
+          "w_adapt_mean": 0.0
+        },
+        {
+          "u_id": 1,
+          "quality": 14.060567214084681,
+          "food_total": 2344,
+          "n_alive": 21,
+          "n_births": 19,
+          "n_deaths": 4,
+          "max_gen": 4,
+          "w_adapt_mean": 0.0
+        },
+        {
+          "u_id": 2,
+          "quality": 14.67868558836235,
+          "food_total": 5498,
+          "n_alive": 16,
+          "n_births": 19,
+          "n_deaths": 9,
+          "max_gen": 5,
+          "w_adapt_mean": 0.0
+        },
+        {
+          "u_id": 3,
+          "quality": 14.713008289570384,
+          "food_total": 4037,
+          "n_alive": 20,
+          "n_births": 19,
+          "n_deaths": 5,
+          "max_gen": 5,
+          "w_adapt_mean": 0.0
+        }
+      ],
+      "best": 3,
+      "elapsed_ep_s": 58.93866443634033
+    },
+    {
+      "epoch": 9,
+      "stage": "S1 (DNA)",
+      "snapshots": [
+        {
+          "u_id": 0,
+          "quality": 2.678920764398584,
+          "food_total": 24,
+          "n_alive": 3,
+          "n_births": 0,
+          "n_deaths": 3,
+          "max_gen": 0,
+          "w_adapt_mean": 0.0
+        },
+        {
+          "u_id": 1,
+          "quality": 14.128827679821129,
+          "food_total": 2686,
+          "n_alive": 21,
+          "n_births": 19,
+          "n_deaths": 4,
+          "max_gen": 4,
+          "w_adapt_mean": 0.0
+        },
+        {
+          "u_id": 2,
+          "quality": 14.73582393441841,
+          "food_total": 6159,
+          "n_alive": 16,
+          "n_births": 19,
+          "n_deaths": 9,
+          "max_gen": 5,
+          "w_adapt_mean": 0.0
+        },
+        {
+          "u_id": 3,
+          "quality": 14.779345502844981,
+          "food_total": 4596,
+          "n_alive": 20,
+          "n_births": 19,
+          "n_deaths": 5,
+          "max_gen": 5,
+          "w_adapt_mean": 0.0
+        }
+      ],
+      "best": 3,
+      "elapsed_ep_s": 55.60876441001892
+    },
+    {
+      "epoch": 10,
+      "stage": "S2 (Heb)",
+      "snapshots": [
+        {
+          "u_id": 0,
+          "quality": 9.833981116568388,
+          "food_total": 66,
+          "n_alive": 12,
+          "n_births": 7,
+          "n_deaths": 1,
+          "max_gen": 3,
+          "w_adapt_mean": 0.1222264107757904
+        },
+        {
+          "u_id": 1,
+          "quality": 14.203712728289482,
+          "food_total": 3119,
+          "n_alive": 21,
+          "n_births": 19,
+          "n_deaths": 4,
+          "max_gen": 4,
+          "w_adapt_mean": 0.12629865496586185
+        },
+        {
+          "u_id": 2,
+          "quality": 14.788569536776446,
+          "food_total": 6840,
+          "n_alive": 16,
+          "n_births": 19,
+          "n_deaths": 9,
+          "max_gen": 5,
+          "w_adapt_mean": 0.14690802514585172
+        },
+        {
+          "u_id": 3,
+          "quality": 14.83582326129722,
+          "food_total": 5134,
+          "n_alive": 20,
+          "n_births": 19,
+          "n_deaths": 5,
+          "max_gen": 5,
+          "w_adapt_mean": 0.1432152143634122
+        }
+      ],
+      "best": 3,
+      "elapsed_ep_s": 59.222046852111816
+    },
+    {
+      "epoch": 11,
+      "stage": "S2 (Heb)",
+      "snapshots": [
+        {
+          "u_id": 0,
+          "quality": 10.445945156268687,
+          "food_total": 97,
+          "n_alive": 13,
+          "n_births": 11,
+          "n_deaths": 4,
+          "max_gen": 3,
+          "w_adapt_mean": 0.1064780214533386
+        },
+        {
+          "u_id": 1,
+          "quality": 14.271781735748121,
+          "food_total": 3573,
+          "n_alive": 21,
+          "n_births": 19,
+          "n_deaths": 4,
+          "max_gen": 4,
+          "w_adapt_mean": 0.13063561142510044
+        },
+        {
+          "u_id": 2,
+          "quality": 14.826085358472673,
+          "food_total": 7370,
+          "n_alive": 16,
+          "n_births": 19,
+          "n_deaths": 9,
+          "max_gen": 5,
+          "w_adapt_mean": 0.1381762021516653
+        },
+        {
+          "u_id": 3,
+          "quality": 14.885666420279218,
+          "food_total": 5662,
+          "n_alive": 20,
+          "n_births": 19,
+          "n_deaths": 5,
+          "max_gen": 5,
+          "w_adapt_mean": 0.13071372625593733
+        }
+      ],
+      "best": 3,
+      "elapsed_ep_s": 59.822765827178955
+    },
+    {
+      "epoch": 12,
+      "stage": "S2 (Heb)",
+      "snapshots": [
+        {
+          "u_id": 0,
+          "quality": 11.624992205333303,
+          "food_total": 96,
+          "n_alive": 11,
+          "n_births": 8,
+          "n_deaths": 3,
+          "max_gen": 4,
+          "w_adapt_mean": 0.1188559935427483
+        },
+        {
+          "u_id": 1,
+          "quality": 14.330190199389929,
+          "food_total": 4015,
+          "n_alive": 21,
+          "n_births": 19,
+          "n_deaths": 4,
+          "max_gen": 4,
+          "w_adapt_mean": 0.12269286451761476
+        },
+        {
+          "u_id": 2,
+          "quality": 14.87681829396722,
+          "food_total": 8153,
+          "n_alive": 16,
+          "n_births": 19,
+          "n_deaths": 9,
+          "max_gen": 5,
+          "w_adapt_mean": 0.1415091988452987
+        },
+        {
+          "u_id": 3,
+          "quality": 14.92579143328501,
+          "food_total": 6127,
+          "n_alive": 20,
+          "n_births": 19,
+          "n_deaths": 5,
+          "max_gen": 5,
+          "w_adapt_mean": 0.1278063225148448
+        }
+      ],
+      "best": 3,
+      "elapsed_ep_s": 58.68208050727844
+    },
+    {
+      "epoch": 13,
+      "stage": "S2 (Heb)",
+      "snapshots": [
+        {
+          "u_id": 0,
+          "quality": 8.251143631360073,
+          "food_total": 41,
+          "n_alive": 6,
+          "n_births": 5,
+          "n_deaths": 5,
+          "max_gen": 3,
+          "w_adapt_mean": 0.12549142387256457
+        },
+        {
+          "u_id": 1,
+          "quality": 14.37352956771689,
+          "food_total": 4378,
+          "n_alive": 21,
+          "n_births": 19,
+          "n_deaths": 4,
+          "max_gen": 4,
+          "w_adapt_mean": 0.11429878955433197
+        },
+        {
+          "u_id": 2,
+          "quality": 14.920056915873934,
+          "food_total": 8886,
+          "n_alive": 16,
+          "n_births": 19,
+          "n_deaths": 9,
+          "max_gen": 5,
+          "w_adapt_mean": 0.14794717703734733
+        },
+        {
+          "u_id": 3,
+          "quality": 14.964164455042827,
+          "food_total": 6608,
+          "n_alive": 20,
+          "n_births": 19,
+          "n_deaths": 5,
+          "max_gen": 5,
+          "w_adapt_mean": 0.1359909920082323
+        }
+      ],
+      "best": 3,
+      "elapsed_ep_s": 57.760045289993286
+    },
+    {
+      "epoch": 14,
+      "stage": "S2 (Heb)",
+      "snapshots": [
+        {
+          "u_id": 0,
+          "quality": 11.646850764818574,
+          "food_total": 125,
+          "n_alive": 20,
+          "n_births": 14,
+          "n_deaths": 0,
+          "max_gen": 4,
+          "w_adapt_mean": 0.12032298123998829
+        },
+        {
+          "u_id": 1,
+          "quality": 14.27667990629637,
+          "food_total": 4748,
+          "n_alive": 20,
+          "n_births": 19,
+          "n_deaths": 5,
+          "max_gen": 4,
+          "w_adapt_mean": 0.12657765932778614
+        },
+        {
+          "u_id": 2,
+          "quality": 14.957707936214042,
+          "food_total": 9578,
+          "n_alive": 16,
+          "n_births": 19,
+          "n_deaths": 9,
+          "max_gen": 5,
+          "w_adapt_mean": 0.13098010188102255
+        },
+        {
+          "u_id": 3,
+          "quality": 15.003860809311332,
+          "food_total": 7146,
+          "n_alive": 20,
+          "n_births": 19,
+          "n_deaths": 5,
+          "max_gen": 5,
+          "w_adapt_mean": 0.1455337486829231
+        }
+      ],
+      "best": 3,
+      "elapsed_ep_s": 62.55837798118591
+    },
+    {
+      "epoch": 15,
+      "stage": "S2 (Heb)",
+      "snapshots": [
+        {
+          "u_id": 0,
+          "quality": 4.069013990183044,
+          "food_total": 18,
+          "n_alive": 2,
+          "n_births": 1,
+          "n_deaths": 5,
+          "max_gen": 1,
+          "w_adapt_mean": 0.09778617865221163
+        },
+        {
+          "u_id": 1,
+          "quality": 14.32450320810754,
+          "food_total": 5209,
+          "n_alive": 20,
+          "n_births": 19,
+          "n_deaths": 5,
+          "max_gen": 4,
+          "w_adapt_mean": 0.12137308916739942
+        },
+        {
+          "u_id": 2,
+          "quality": 14.990075457567265,
+          "food_total": 10216,
+          "n_alive": 16,
+          "n_births": 19,
+          "n_deaths": 9,
+          "max_gen": 5,
+          "w_adapt_mean": 0.13194586957905882
+        },
+        {
+          "u_id": 3,
+          "quality": 15.033935232656582,
+          "food_total": 7583,
+          "n_alive": 20,
+          "n_births": 19,
+          "n_deaths": 5,
+          "max_gen": 5,
+          "w_adapt_mean": 0.1329291708297081
+        }
+      ],
+      "best": 3,
+      "elapsed_ep_s": 55.024147748947144
+    },
+    {
+      "epoch": 16,
+      "stage": "S2 (Heb)",
+      "snapshots": [
+        {
+          "u_id": 0,
+          "quality": 12.017644664740569,
+          "food_total": 203,
+          "n_alive": 19,
+          "n_births": 13,
+          "n_deaths": 0,
+          "max_gen": 4,
+          "w_adapt_mean": 0.12048209655082225
+        },
+        {
+          "u_id": 1,
+          "quality": 14.37131216750371,
+          "food_total": 5705,
+          "n_alive": 20,
+          "n_births": 19,
+          "n_deaths": 5,
+          "max_gen": 4,
+          "w_adapt_mean": 0.12145278421236766
+        },
+        {
+          "u_id": 2,
+          "quality": 15.024755261791753,
+          "food_total": 10947,
+          "n_alive": 16,
+          "n_births": 19,
+          "n_deaths": 9,
+          "max_gen": 5,
+          "w_adapt_mean": 0.13698621144027154
+        },
+        {
+          "u_id": 3,
+          "quality": 15.066826101058421,
+          "food_total": 8092,
+          "n_alive": 20,
+          "n_births": 19,
+          "n_deaths": 5,
+          "max_gen": 5,
+          "w_adapt_mean": 0.13686477936636085
+        }
+      ],
+      "best": 3,
+      "elapsed_ep_s": 61.65959596633911
+    },
+    {
+      "epoch": 17,
+      "stage": "S2 (Heb)",
+      "snapshots": [
+        {
+          "u_id": 0,
+          "quality": 11.942785617149454,
+          "food_total": 191,
+          "n_alive": 20,
+          "n_births": 15,
+          "n_deaths": 1,
+          "max_gen": 4,
+          "w_adapt_mean": 0.13397332854057062
+        },
+        {
+          "u_id": 1,
+          "quality": 14.406780630770083,
+          "food_total": 6113,
+          "n_alive": 20,
+          "n_births": 19,
+          "n_deaths": 5,
+          "max_gen": 4,
+          "w_adapt_mean": 0.11739205929793461
+        },
+        {
+          "u_id": 2,
+          "quality": 15.04891238845478,
+          "food_total": 11487,
+          "n_alive": 16,
+          "n_births": 19,
+          "n_deaths": 9,
+          "max_gen": 5,
+          "w_adapt_mean": 0.11404162251880479
+        },
+        {
+          "u_id": 3,
+          "quality": 15.09574221064017,
+          "food_total": 8568,
+          "n_alive": 20,
+          "n_births": 19,
+          "n_deaths": 5,
+          "max_gen": 5,
+          "w_adapt_mean": 0.11886150922521072
+        }
+      ],
+      "best": 3,
+      "elapsed_ep_s": 61.181106090545654
+    },
+    {
+      "epoch": 18,
+      "stage": "S2 (Heb)",
+      "snapshots": [
+        {
+          "u_id": 0,
+          "quality": 10.753926870164246,
+          "food_total": 147,
+          "n_alive": 19,
+          "n_births": 13,
+          "n_deaths": 0,
+          "max_gen": 3,
+          "w_adapt_mean": 0.1201953882229474
+        },
+        {
+          "u_id": 1,
+          "quality": 14.435322538174937,
+          "food_total": 6463,
+          "n_alive": 20,
+          "n_births": 19,
+          "n_deaths": 5,
+          "max_gen": 4,
+          "w_adapt_mean": 0.12202382445453468
+        },
+        {
+          "u_id": 2,
+          "quality": 15.07499120099834,
+          "food_total": 12100,
+          "n_alive": 16,
+          "n_births": 19,
+          "n_deaths": 9,
+          "max_gen": 5,
+          "w_adapt_mean": 0.14069784958455117
+        },
+        {
+          "u_id": 3,
+          "quality": 15.127195524252715,
+          "food_total": 9118,
+          "n_alive": 20,
+          "n_births": 19,
+          "n_deaths": 5,
+          "max_gen": 5,
+          "w_adapt_mean": 0.13448917438844488
+        }
+      ],
+      "best": 3,
+      "elapsed_ep_s": 62.399808406829834
+    },
+    {
+      "epoch": 19,
+      "stage": "S2 (Heb)",
+      "snapshots": [
+        {
+          "u_id": 0,
+          "quality": 9.700700862791612,
+          "food_total": 128,
+          "n_alive": 10,
+          "n_births": 8,
+          "n_deaths": 4,
+          "max_gen": 3,
+          "w_adapt_mean": 0.13049775202138852
+        },
+        {
+          "u_id": 1,
+          "quality": 14.469332582271367,
+          "food_total": 6907,
+          "n_alive": 20,
+          "n_births": 19,
+          "n_deaths": 5,
+          "max_gen": 4,
+          "w_adapt_mean": 0.11584446189000092
+        },
+        {
+          "u_id": 2,
+          "quality": 15.102962068057849,
+          "food_total": 12794,
+          "n_alive": 16,
+          "n_births": 19,
+          "n_deaths": 9,
+          "max_gen": 5,
+          "w_adapt_mean": 0.1461082375926881
+        },
+        {
+          "u_id": 3,
+          "quality": 15.155897885399348,
+          "food_total": 9651,
+          "n_alive": 20,
+          "n_births": 19,
+          "n_deaths": 5,
+          "max_gen": 5,
+          "w_adapt_mean": 0.1315260971899622
+        }
+      ],
+      "best": 3,
+      "elapsed_ep_s": 58.648194789886475
+    }
+  ]
+}
