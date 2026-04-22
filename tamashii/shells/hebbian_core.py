@@ -154,3 +154,37 @@ class HebbianCoreBrain(CoreBrain):
             "mean_reward": (float(self._cumulative_reward / self._step_count)
                             if self._step_count else 0.0),
         }
+
+    # ---- H2: Culture (親→子) 継承 API ----
+    def get_w_adapt(self) -> np.ndarray:
+        """Export learned weights (for saving/transferring to children)."""
+        return self.w_adapt.copy()
+
+    def inherit_w_adapt_from(self, parent_shells: list,
+                               inherit_rate: float = 0.8,
+                               noise_sigma: float = 0.05,
+                               rng: np.random.Generator | None = None):
+        """Inherit Hebbian learned weights from parent shell(s).
+
+        Used at child birth: child's w_adapt = weighted average of parents' +
+        small noise. inherit_rate controls how much of parents' weights carry
+        over vs staying at zero (baseline).
+
+        parent_shells: 1 or 2 HebbianCoreBrain instances (mother + father)
+        inherit_rate: 0.0 = no inheritance (zero start), 1.0 = full copy
+        noise_sigma: Gaussian noise added post-inheritance (diversity)
+        """
+        if rng is None:
+            rng = np.random.default_rng()
+        if not parent_shells:
+            return
+        # Average parents' w_adapt (handles 1 or 2 parents)
+        parent_w = np.mean(np.stack(
+            [p.get_w_adapt() if hasattr(p, "get_w_adapt") else np.zeros_like(self.w_adapt)
+             for p in parent_shells]), axis=0)
+        # Inherit with mixing rate + noise
+        self.w_adapt = (inherit_rate * parent_w
+                         + (1.0 - inherit_rate) * self.w_adapt
+                         + rng.normal(0, noise_sigma, self.w_adapt.shape))
+        # Clip to avoid runaway
+        self.w_adapt = np.clip(self.w_adapt, -self.w_clip, self.w_clip)

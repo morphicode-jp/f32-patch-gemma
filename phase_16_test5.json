@@ -1,0 +1,175 @@
+{
+  "config": {
+    "n_universes": 2,
+    "agents_per_universe": 4,
+    "epoch_steps": 400,
+    "n_epochs": 5,
+    "seed": 42,
+    "device": "cuda",
+    "architecture": "20-shell + HebbianCoreBrain"
+  },
+  "total_elapsed_s": 12.4,
+  "history": [
+    {
+      "epoch": 0,
+      "snapshots": [
+        {
+          "u_id": 0,
+          "quality": 4.1976033240867885,
+          "food_total": 9,
+          "n_alive": 3,
+          "n_births": 1,
+          "n_deaths": 2,
+          "max_gen": 1,
+          "hebbian_w_norm_mean": 1.096107867055453,
+          "hebbian_w_norm_max": 2.0,
+          "hebbian_n_changed_edges": 48.0
+        },
+        {
+          "u_id": 1,
+          "quality": 0.0,
+          "food_total": 2,
+          "n_alive": 0,
+          "n_births": 0,
+          "n_deaths": 4,
+          "max_gen": 0,
+          "hebbian_w_norm_mean": 0.0,
+          "hebbian_w_norm_max": 0.0,
+          "hebbian_n_changed_edges": 0.0
+        }
+      ],
+      "best": 0,
+      "elapsed_ep_s": 3.269892454147339
+    },
+    {
+      "epoch": 1,
+      "snapshots": [
+        {
+          "u_id": 0,
+          "quality": 4.078236978172816,
+          "food_total": 10,
+          "n_alive": 2,
+          "n_births": 1,
+          "n_deaths": 3,
+          "max_gen": 1,
+          "hebbian_w_norm_mean": 2.0,
+          "hebbian_w_norm_max": 2.0,
+          "hebbian_n_changed_edges": 48.0
+        },
+        {
+          "u_id": 1,
+          "quality": 1.861514826107538,
+          "food_total": 3,
+          "n_alive": 2,
+          "n_births": 0,
+          "n_deaths": 2,
+          "max_gen": 0,
+          "hebbian_w_norm_mean": 2.0,
+          "hebbian_w_norm_max": 2.0,
+          "hebbian_n_changed_edges": 48.0
+        }
+      ],
+      "best": 0,
+      "elapsed_ep_s": 2.514089822769165
+    },
+    {
+      "epoch": 2,
+      "snapshots": [
+        {
+          "u_id": 0,
+          "quality": 0.0,
+          "food_total": 10,
+          "n_alive": 0,
+          "n_births": 1,
+          "n_deaths": 5,
+          "max_gen": 0,
+          "hebbian_w_norm_mean": 0.0,
+          "hebbian_w_norm_max": 0.0,
+          "hebbian_n_changed_edges": 0.0
+        },
+        {
+          "u_id": 1,
+          "quality": 3.9425082831415104,
+          "food_total": 7,
+          "n_alive": 3,
+          "n_births": 1,
+          "n_deaths": 2,
+          "max_gen": 1,
+          "hebbian_w_norm_mean": 2.0,
+          "hebbian_w_norm_max": 2.0,
+          "hebbian_n_changed_edges": 48.0
+        }
+      ],
+      "best": 1,
+      "elapsed_ep_s": 2.2138864994049072
+    },
+    {
+      "epoch": 3,
+      "snapshots": [
+        {
+          "u_id": 0,
+          "quality": 0.0,
+          "food_total": 0,
+          "n_alive": 0,
+          "n_births": 0,
+          "n_deaths": 4,
+          "max_gen": 0,
+          "hebbian_w_norm_mean": 0.0,
+          "hebbian_w_norm_max": 0.0,
+          "hebbian_n_changed_edges": 0.0
+        },
+        {
+          "u_id": 1,
+          "quality": 2.6287476860138907,
+          "food_total": 7,
+          "n_alive": 1,
+          "n_births": 1,
+          "n_deaths": 4,
+          "max_gen": 0,
+          "hebbian_w_norm_mean": 2.0,
+          "hebbian_w_norm_max": 2.0,
+          "hebbian_n_changed_edges": 48.0
+        }
+      ],
+      "best": 1,
+      "elapsed_ep_s": 2.1697282791137695
+    },
+    {
+      "epoch": 4,
+      "snapshots": [
+        {
+          "u_id": 0,
+          "quality": 1.0397207708399179,
+          "food_total": 1,
+          "n_alive": 1,
+          "n_births": 0,
+          "n_deaths": 3,
+          "max_gen": 0,
+          "hebbian_w_norm_mean": 2.0,
+          "hebbian_w_norm_max": 2.0,
+          "hebbian_n_changed_edges": 48.0
+        },
+        {
+          "u_id": 1,
+          "quality": 0.0,
+          "food_total": 7,
+          "n_alive": 0,
+          "n_births": 1,
+          "n_deaths": 5,
+          "max_gen": 0,
+          "hebbian_w_norm_mean": 0.0,
+          "hebbian_w_norm_max": 0.0,
+          "hebbian_n_changed_edges": 0.0
+        }
+      ],
+      "best": 0,
+      "elapsed_ep_s": 2.083367347717285
+    }
+  ],
+  "final_summary": {
+    "total_food_final": 8,
+    "total_births_final": 1,
+    "total_alive_final": 1,
+    "hebbian_w_adapt_mean": 1.0
+  }
+}

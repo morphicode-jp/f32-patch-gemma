@@ -1,0 +1,299 @@
+{
+  "config": {
+    "n_universes": 4,
+    "agents_per_universe": 6,
+    "epoch_steps": 200,
+    "n_epochs": 5,
+    "seed": 42,
+    "device": "cuda",
+    "iss_check_every": 2
+  },
+  "total_elapsed_s": 25.4,
+  "iss_trajectory": [
+    {
+      "epoch": -1,
+      "best_universe": 0,
+      "agent_idx": 0,
+      "iss_v1": 57.21441525641438,
+      "iss_v2": 19.475848336871252,
+      "H": 6.0,
+      "L": 1.5105263157894737,
+      "C": 0.8349940582293524,
+      "I": 0.3738211447198479,
+      "hub": 18.01801801801802
+    },
+    {
+      "epoch": 1,
+      "best_universe": 2,
+      "agent_idx": 0,
+      "iss_v1": 31.296870215357497,
+      "iss_v2": 0.09111581006745263,
+      "H": 6.0,
+      "L": 1.5105263157894737,
+      "C": 0.8349940582293524,
+      "I": 0.9527906082109175,
+      "hub": 18.01801801801802
+    },
+    {
+      "epoch": 3,
+      "best_universe": 0,
+      "agent_idx": 0,
+      "iss_v1": 31.296870215357497,
+      "iss_v2": 0.09111581006745263,
+      "H": 6.0,
+      "L": 1.5105263157894737,
+      "C": 0.8349940582293524,
+      "I": 0.9527906082109175,
+      "hub": 18.01801801801802
+    },
+    {
+      "epoch": 4,
+      "best_universe": 0,
+      "agent_idx": 1,
+      "iss_v1": 31.296870215357497,
+      "iss_v2": 0.09111581006745263,
+      "H": 6.0,
+      "L": 1.5105263157894737,
+      "C": 0.8349940582293524,
+      "I": 0.9527906082109175,
+      "hub": 18.01801801801802
+    }
+  ],
+  "behavior_history": [
+    {
+      "epoch": 0,
+      "snapshots": [
+        {
+          "u_id": 0,
+          "quality": 6.330503803338368,
+          "food_total": 36,
+          "n_alive": 8,
+          "n_births": 2,
+          "n_deaths": 0,
+          "max_gen": 1,
+          "dna_diversity": 0.08329867468807706
+        },
+        {
+          "u_id": 1,
+          "quality": 5.195227527532204,
+          "food_total": 36,
+          "n_alive": 7,
+          "n_births": 1,
+          "n_deaths": 0,
+          "max_gen": 1,
+          "dna_diversity": 0.03684202316933259
+        },
+        {
+          "u_id": 2,
+          "quality": 6.712752345684186,
+          "food_total": 80,
+          "n_alive": 9,
+          "n_births": 3,
+          "n_deaths": 0,
+          "max_gen": 1,
+          "dna_diversity": 0.03850198148123449
+        },
+        {
+          "u_id": 3,
+          "quality": 6.400673036817358,
+          "food_total": 50,
+          "n_alive": 9,
+          "n_births": 3,
+          "n_deaths": 0,
+          "max_gen": 1,
+          "dna_diversity": 0.027848996885872657
+        }
+      ],
+      "best": 2,
+      "elapsed_ep_s": 2.8092002868652344
+    },
+    {
+      "epoch": 1,
+      "snapshots": [
+        {
+          "u_id": 0,
+          "quality": 8.439064813231429,
+          "food_total": 58,
+          "n_alive": 11,
+          "n_births": 5,
+          "n_deaths": 0,
+          "max_gen": 2,
+          "dna_diversity": 0.07484133437019022
+        },
+        {
+          "u_id": 1,
+          "quality": 5.923562901260699,
+          "food_total": 41,
+          "n_alive": 8,
+          "n_births": 2,
+          "n_deaths": 0,
+          "max_gen": 1,
+          "dna_diversity": 0.037223051270692045
+        },
+        {
+          "u_id": 2,
+          "quality": 9.123219727735828,
+          "food_total": 179,
+          "n_alive": 13,
+          "n_births": 7,
+          "n_deaths": 0,
+          "max_gen": 2,
+          "dna_diversity": 0.04187270783176936
+        },
+        {
+          "u_id": 3,
+          "quality": 8.831364948608721,
+          "food_total": 104,
+          "n_alive": 13,
+          "n_births": 7,
+          "n_deaths": 0,
+          "max_gen": 2,
+          "dna_diversity": 0.03745330178055991
+        }
+      ],
+      "best": 2,
+      "elapsed_ep_s": 3.6774208545684814
+    },
+    {
+      "epoch": 2,
+      "snapshots": [
+        {
+          "u_id": 0,
+          "quality": 10.624217308616823,
+          "food_total": 109,
+          "n_alive": 16,
+          "n_births": 10,
+          "n_deaths": 0,
+          "max_gen": 3,
+          "dna_diversity": 0.07662985478317903
+        },
+        {
+          "u_id": 1,
+          "quality": 6.305389130194042,
+          "food_total": 56,
+          "n_alive": 8,
+          "n_births": 2,
+          "n_deaths": 0,
+          "max_gen": 1,
+          "dna_diversity": 0.06205253490157404
+        },
+        {
+          "u_id": 2,
+          "quality": 11.288290311466252,
+          "food_total": 347,
+          "n_alive": 18,
+          "n_births": 13,
+          "n_deaths": 1,
+          "max_gen": 3,
+          "dna_diversity": 0.04805025400337601
+        },
+        {
+          "u_id": 3,
+          "quality": 10.938179540033486,
+          "food_total": 190,
+          "n_alive": 19,
+          "n_births": 13,
+          "n_deaths": 0,
+          "max_gen": 3,
+          "dna_diversity": 0.03849136356574228
+        }
+      ],
+      "best": 2,
+      "elapsed_ep_s": 4.963395595550537
+    },
+    {
+      "epoch": 3,
+      "snapshots": [
+        {
+          "u_id": 0,
+          "quality": 12.726787757067804,
+          "food_total": 162,
+          "n_alive": 23,
+          "n_births": 17,
+          "n_deaths": 0,
+          "max_gen": 4,
+          "dna_diversity": 0.0970745485301025
+        },
+        {
+          "u_id": 1,
+          "quality": 6.594147546472466,
+          "food_total": 70,
+          "n_alive": 9,
+          "n_births": 3,
+          "n_deaths": 0,
+          "max_gen": 1,
+          "dna_diversity": 0.03260092742331841
+        },
+        {
+          "u_id": 2,
+          "quality": 12.16896494583015,
+          "food_total": 528,
+          "n_alive": 24,
+          "n_births": 19,
+          "n_deaths": 1,
+          "max_gen": 3,
+          "dna_diversity": 0.04887436026663871
+        },
+        {
+          "u_id": 3,
+          "quality": 12.641672009739239,
+          "food_total": 299,
+          "n_alive": 25,
+          "n_births": 19,
+          "n_deaths": 0,
+          "max_gen": 4,
+          "dna_diversity": 0.04090432159247043
+        }
+      ],
+      "best": 0,
+      "elapsed_ep_s": 6.587577819824219
+    },
+    {
+      "epoch": 4,
+      "snapshots": [
+        {
+          "u_id": 0,
+          "quality": 12.95701989339587,
+          "food_total": 221,
+          "n_alive": 22,
+          "n_births": 19,
+          "n_deaths": 3,
+          "max_gen": 4,
+          "dna_diversity": 0.0952239638553994
+        },
+        {
+          "u_id": 1,
+          "quality": 6.177289432319634,
+          "food_total": 25,
+          "n_alive": 9,
+          "n_births": 3,
+          "n_deaths": 0,
+          "max_gen": 1,
+          "dna_diversity": 0.033069482400578186
+        },
+        {
+          "u_id": 2,
+          "quality": 12.327532615512787,
+          "food_total": 734,
+          "n_alive": 24,
+          "n_births": 19,
+          "n_deaths": 1,
+          "max_gen": 3,
+          "dna_diversity": 0.04887436026663871
+        },
+        {
+          "u_id": 3,
+          "quality": 12.822318954636753,
+          "food_total": 440,
+          "n_alive": 25,
+          "n_births": 19,
+          "n_deaths": 0,
+          "max_gen": 4,
+          "dna_diversity": 0.04090432159247043
+        }
+      ],
+      "best": 0,
+      "elapsed_ep_s": 7.156063795089722
+    }
+  ]
+}
