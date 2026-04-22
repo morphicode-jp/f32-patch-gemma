@@ -1,0 +1,20 @@
+{
+  "shell_name": "inhibition_L2_d",
+  "tick_ms": 90,
+  "gain": 0.4,
+  "layer": 2,
+  "shell_sign": 1,
+  "params": {
+    "monitor_slots": {
+      "start": 110,
+      "end": 120
+    },
+    "dampen_slots": {
+      "start": 105,
+      "end": 115
+    },
+    "activation_threshold": 0.7,
+    "suppression_frac": 0.18,
+    "ema_alpha": 0.5
+  }
+}

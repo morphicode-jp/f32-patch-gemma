@@ -1,0 +1,20 @@
+{
+  "shell_name": "inhibition_L5_c",
+  "tick_ms": 90,
+  "gain": 0.4,
+  "layer": 5,
+  "shell_sign": 1,
+  "params": {
+    "monitor_slots": {
+      "start": 0,
+      "end": 35
+    },
+    "dampen_slots": {
+      "start": 188,
+      "end": 192
+    },
+    "activation_threshold": 0.7,
+    "suppression_frac": 0.18,
+    "ema_alpha": 0.5
+  }
+}

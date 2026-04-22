@@ -58,6 +58,17 @@ SHELL_REGISTRY = {
     "inhibition_L4_a": InhibitionShell,
     "inhibition_L4_b": InhibitionShell,
     "inhibition_L5": InhibitionShell,
+    # Phase 13e: 10 more for 30-shell scaled variant
+    "inhibition_L1_b": InhibitionShell,
+    "inhibition_L1_c": InhibitionShell,
+    "inhibition_L2_c": InhibitionShell,
+    "inhibition_L2_d": InhibitionShell,
+    "inhibition_L3_c": InhibitionShell,
+    "inhibition_L3_d": InhibitionShell,
+    "inhibition_L4_c": InhibitionShell,
+    "inhibition_L4_d": InhibitionShell,
+    "inhibition_L5_b": InhibitionShell,
+    "inhibition_L5_c": InhibitionShell,
 }
 
 
