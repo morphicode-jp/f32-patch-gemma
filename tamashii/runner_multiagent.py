@@ -69,6 +69,9 @@ SHELL_REGISTRY = {
     "inhibition_L4_d": InhibitionShell,
     "inhibition_L5_b": InhibitionShell,
     "inhibition_L5_c": InhibitionShell,
+    # Phase 13f: 20 specialists for 50-shell scaled variant
+    **{f"inhibition_L{L}_spec{i}": InhibitionShell
+       for L in [0, 1, 3, 4, 5] for i in range(4)},
 }
 
 
