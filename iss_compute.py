@@ -114,6 +114,18 @@ def extract_shell_read_write_sets(shell) -> dict:
         reads.update(range(160, 180))     # goal (prefrontal)
         reads.update(range(190, 191))     # violation (taboo)
         writes.update(range(191, 192))    # context slot
+    elif "inhibition" in name:
+        # Generic inhibition shells: read & dampen same slot range (local guard)
+        # Config-driven, but expose read/dampen if attrs present
+        for attr in ["mon_start", "mon_end"]:
+            pass  # skip unless set via params later
+        # Use instance attrs if present (set by __init__)
+        mon_s = getattr(shell, "mon_start", 16)
+        mon_e = getattr(shell, "mon_end", 35)
+        damp_s = getattr(shell, "damp_start", 16)
+        damp_e = getattr(shell, "damp_end", 35)
+        reads.update(range(mon_s, mon_e))
+        writes.update(range(damp_s, damp_e))
     elif "taboo" in name:
         reads.update([0, 2, 10, 11, 12, 13, 14, 16, 17, 18])
         writes.update([16, 17, 18, 190])  # motor + violation slot

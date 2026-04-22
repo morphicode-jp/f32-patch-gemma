@@ -1,0 +1,14 @@
+{
+  "shell_name": "inhibition_L1",
+  "tick_ms": 60,
+  "gain": 0.5,
+  "layer": 1,
+  "shell_sign": -1,
+  "params": {
+    "monitor_slots": {"start": 16, "end": 35},
+    "dampen_slots":  {"start": 16, "end": 19},
+    "activation_threshold": 0.75,
+    "suppression_frac": 0.25,
+    "ema_alpha": 0.5
+  }
+}
