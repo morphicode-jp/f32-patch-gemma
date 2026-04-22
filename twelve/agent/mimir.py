@@ -244,12 +244,15 @@ def mimir(
     #       Useful for analysis phase before committing to full optimization.
     if mode == "structure_only":
         owl_budget = min(float(time_budget), 30.0)
+        # Empty data path needs autonomous=True for owl to seed via verify_fn.
+        # max_iterations=1 keeps it to 1 round (seed collection + 1 proxy fit),
+        # giving dead_dims/fragility/proxy_r2 but not the full optimization loop.
         owl_kwargs = dict(
             measurements=curated_measurements if curated_measurements else [],
             param_ranges=list(param_ranges),
             verify_fn=eval_fn,
-            autonomous=False,           # no growing loop
-            max_iterations=1,
+            autonomous=True,            # needed for empty-data seed via verify_fn
+            max_iterations=1,           # cap to 1 round for structure_only scope
             time_budget=owl_budget,
             min_r_squared=0.1,
             experience_id=f"{experience_id}_structure",

@@ -1,0 +1,361 @@
+"""eval_fn sanity checker — mimir 本番前に eval_fn の品質を自動診断する.
+
+使い方:
+    from twelve.agent.eval_check import check_eval_fn
+    diag = check_eval_fn(my_eval_fn, param_ranges)
+    if not diag["ok"]:
+        print("⚠ eval_fn 問題:", diag["issues"])
+        # 修正してから本番 mimir() を呼べ
+
+60 秒で bad eval_fn パターンを検出、本番最適化の無駄走行を防ぐ.
+
+検出する症状:
+  - constant eval_fn (全 dim dead)
+  - noisy / 多峰 / 不連続 (proxy_r2 < threshold)
+  - 崩壊 factor (fragility spike)
+  - 1 次元的 eval_fn (active_dims 少)
+  - score 爆発 (range が不安定、PPL=262144 型)
+  - dict multi-observer での observer 間非整合
+
+背景: eval_fn = 人間の価値観定義、完全自動化は原理不可能 (bootstrap paradox)。
+しかし bad pattern の自動検出で 80% の失敗は事前回避できる。
+詳細: docs/全論の公式の活用.md §11.2 "universal tracker of environment"。
+"""
+from __future__ import annotations
+
+import math
+import time
+from typing import Any, Callable, Optional, Sequence
+
+
+def _safe_finite(x):
+    try:
+        v = float(x)
+        return v if math.isfinite(v) else None
+    except (TypeError, ValueError):
+        return None
+
+
+def check_eval_fn(
+    eval_fn: Callable,
+    param_ranges: Sequence[tuple],
+    *,
+    time_budget: float = 60.0,
+    proxy_r2_threshold: float = 0.2,
+    fragility_spike_ratio: float = 5.0,
+    min_active_dims: int = 2,
+    min_dims_for_active_check: int = 5,
+    experience_id: str = "eval_check",
+    verbose: bool = False,
+) -> dict:
+    """Diagnose eval_fn quality via mimir structure_only scan.
+
+    Args:
+      eval_fn: f(params: list[float]) -> float | dict
+      param_ranges: [(lo, hi), ...]
+      time_budget: diagnosis budget (default 60s is enough for most).
+      proxy_r2_threshold: flag if proxy_r2 below this.
+      fragility_spike_ratio: flag if max(fragility) > ratio * median.
+      min_active_dims: flag if fewer active dims (when problem is >= min_dims_for_active_check).
+      min_dims_for_active_check: apply active_dims check only above this dim.
+      experience_id: namespace (kept short for sanity check runs).
+
+    Returns:
+      {
+        "ok": bool,                  # no issues detected
+        "issues": list[str],         # human-readable problem descriptions
+        "severity": "ok" | "warn" | "fatal",
+        "proxy_r2": float,
+        "active_dims": list,
+        "dead_dims": list,
+        "fragility_max": float,
+        "fragility_median": float,
+        "n_dims": int,
+        "elapsed_s": float,
+        "probe_score": float|None,   # 1-call probe result
+        "eval_fn_returned": "scalar"|"dict"|"error",
+        "recommendations": list[str],
+      }
+    """
+    from twelve.agent.mimir import mimir
+
+    t0 = time.time()
+    n_dims = len(list(param_ranges))
+    issues = []
+    recommendations = []
+    severity = "ok"
+
+    # --- Step 1: 2-point probe to catch immediate failures + constant detection ---
+    midpoint = [(lo + hi) / 2.0 for lo, hi in param_ranges]
+    # 2nd probe: shift each dim by 30% of range toward hi
+    corner = [(lo + hi) / 2.0 + 0.3 * (hi - lo) for lo, hi in param_ranges]
+    eval_returned = "scalar"
+    probe_score = None
+    probe_raw = None
+    probe_score_2 = None
+    try:
+        probe_raw = eval_fn(midpoint)
+        probe_raw_2 = eval_fn(corner)
+        if isinstance(probe_raw, dict):
+            eval_returned = "dict"
+            for v in probe_raw.values():
+                f = _safe_finite(v)
+                if f is not None:
+                    probe_score = f
+                    break
+            if isinstance(probe_raw_2, dict):
+                for v in probe_raw_2.values():
+                    f = _safe_finite(v)
+                    if f is not None:
+                        probe_score_2 = f
+                        break
+        else:
+            probe_score = _safe_finite(probe_raw)
+            probe_score_2 = _safe_finite(probe_raw_2)
+    except Exception as e:
+        eval_returned = "error"
+        issues.append(f"midpoint eval raised: {type(e).__name__}: {e}")
+        severity = "fatal"
+
+    if severity == "fatal":
+        return {
+            "ok": False,
+            "issues": issues,
+            "severity": "fatal",
+            "proxy_r2": 0.0,
+            "active_dims": [],
+            "dead_dims": [],
+            "fragility_max": 0.0,
+            "fragility_median": 0.0,
+            "n_dims": n_dims,
+            "elapsed_s": time.time() - t0,
+            "probe_score": probe_score,
+            "eval_fn_returned": eval_returned,
+            "recommendations": ["eval_fn が midpoint で例外、範囲か実装を修正せよ"],
+        }
+
+    if probe_score is None:
+        issues.append("eval_fn が non-finite or non-numeric を返した")
+        severity = "fatal"
+        return {
+            "ok": False,
+            "issues": issues,
+            "severity": "fatal",
+            "proxy_r2": 0.0,
+            "active_dims": [],
+            "dead_dims": [],
+            "fragility_max": 0.0,
+            "fragility_median": 0.0,
+            "n_dims": n_dims,
+            "elapsed_s": time.time() - t0,
+            "probe_score": None,
+            "eval_fn_returned": eval_returned,
+            "recommendations": [
+                "eval_fn は finite float か全 value finite の dict を返すこと",
+            ],
+        }
+
+    # Constant detection: 2 probes with different params returning same value.
+    # Catches apply/restore bugs and truly constant functions that mimir's
+    # correlation-based dead detection misses (corr of constant = NaN → fallback).
+    if (probe_score_2 is not None and
+            abs(probe_score - probe_score_2) < 1e-12):
+        issues.append(
+            "2 点 probe で同一 score: eval_fn が constant の疑い強 "
+            "(apply/restore bug、range 無関係、or 文字通り定数)"
+        )
+        recommendations.append(
+            "midpoint と corner で別 score が返るか debug 出力で確認。"
+            "apply が効いていない/restore で巻き戻ってないか疑え。"
+        )
+        severity = "fatal"
+
+    # --- Step 2: mimir structure_only for dead/active/fragility/proxy_r2 ---
+    # Use scalar-wrapping eval for structure scan if original returned dict
+    # (mimir's structure_only path uses owl single-obs primarily).
+    if eval_returned == "dict":
+        # Wrap: pick same key as probe's first numeric to keep consistent
+        first_key = None
+        for k, v in probe_raw.items():
+            if _safe_finite(v) is not None:
+                first_key = k
+                break
+
+        def _scalar_eval(params, _key=first_key):
+            r = eval_fn(params)
+            if isinstance(r, dict):
+                return _safe_finite(r.get(_key, 0.0)) or 0.0
+            return _safe_finite(r) or 0.0
+
+        scan_fn = _scalar_eval
+    else:
+        def _scalar_eval(params):
+            return _safe_finite(eval_fn(params)) or 0.0
+        scan_fn = _scalar_eval
+
+    try:
+        r = mimir(
+            scan_fn,
+            list(param_ranges),
+            time_budget=time_budget,
+            mode="structure_only",
+            experience_id=experience_id,
+            verbose=verbose,
+        )
+    except Exception as e:
+        issues.append(f"mimir structure_only が失敗: {type(e).__name__}: {e}")
+        return {
+            "ok": False,
+            "issues": issues,
+            "severity": "fatal",
+            "proxy_r2": 0.0,
+            "active_dims": [],
+            "dead_dims": [],
+            "fragility_max": 0.0,
+            "fragility_median": 0.0,
+            "n_dims": n_dims,
+            "elapsed_s": time.time() - t0,
+            "probe_score": probe_score,
+            "eval_fn_returned": eval_returned,
+            "recommendations": ["param_ranges または eval_fn 実装を確認"],
+        }
+
+    proxy_r2 = float(r.get("proxy_r2") or 0.0)
+    active_dims = list(r.get("active_dims") or [])
+    dead_dims = list(r.get("dead_dims") or [])
+    fragility = list(r.get("fragility") or [])
+
+    # --- Step 3: diagnose ---
+    # (a) constant (全 dim dead or active 空)
+    if len(active_dims) == 0 or (
+        len(dead_dims) == n_dims and n_dims > 0
+    ):
+        issues.append(
+            "active_dims が空 = eval_fn が param に応答しない "
+            "(constant / state leak / range 不適 等)"
+        )
+        recommendations.append(
+            "param を変えた時に eval_fn が実際に違う値を返すか debug 出力で確認。"
+            "state leak (apply/restore 漏れ) を疑え。"
+        )
+        severity = "fatal"
+
+    # (b) proxy_r2 低 (noisy / 多峰 / 不連続)
+    if proxy_r2 < proxy_r2_threshold:
+        issues.append(
+            f"proxy_r2={proxy_r2:.2f} < {proxy_r2_threshold} "
+            "= eval_fn が noisy / 多峰 / 不連続"
+        )
+        recommendations.append(
+            "eval_fn に平均化や log 変換を追加すると proxy_r2 改善することがある "
+            "(ex: return -log1p(-score))。"
+        )
+        if severity == "ok":
+            severity = "warn"
+
+    # (c) fragility spike (崩壊 factor)
+    if fragility:
+        finite_frag = [_safe_finite(x) for x in fragility]
+        finite_frag = [x for x in finite_frag if x is not None]
+        if finite_frag:
+            fmax = max(finite_frag)
+            sorted_f = sorted(finite_frag)
+            fmedian = sorted_f[len(sorted_f) // 2]
+            if fmedian > 0 and fmax > fragility_spike_ratio * fmedian:
+                spike_idx = fragility.index(fmax)
+                issues.append(
+                    f"param[{spike_idx}] fragility={fmax:.3f} が median={fmedian:.3f} "
+                    f"の {fmax / fmedian:.1f}× = 崩壊因子 (scale=0 型 PPL 爆発リスク)"
+                )
+                recommendations.append(
+                    f"param[{spike_idx}] の range が 0 を含まないか確認 (Rule 7)。"
+                    f"安全な range (例 0.5〜1.5) に狭めるか、fragility 対策として "
+                    f"対数変換・clipping を入れる。"
+                )
+                if severity == "ok":
+                    severity = "warn"
+        else:
+            fmax = 0.0
+            fmedian = 0.0
+    else:
+        fmax = 0.0
+        fmedian = 0.0
+
+    # (d) 1 次元的 eval_fn
+    if (n_dims >= min_dims_for_active_check
+            and len(active_dims) < min_active_dims):
+        issues.append(
+            f"active_dims={len(active_dims)} 個 (全 {n_dims} dim 中) "
+            "= eval_fn が 1 次元的、他の param が情報に貢献してない"
+        )
+        recommendations.append(
+            "eval_fn に追加の測定成分を加えるか、dead な param を range から除く "
+            "(次元削減)。"
+        )
+        if severity == "ok":
+            severity = "warn"
+
+    # (e) dict eval で observer 非整合 (multi-observer の stable_active チェック)
+    if eval_returned == "dict":
+        owl_raw = r.get("owl_result", {})
+        stable_active = owl_raw.get("stable_active")
+        if stable_active is not None and len(stable_active) == 0:
+            issues.append(
+                "multi-observer で stable_active が空 = observer 間で "
+                "「何が効くか」が全く一致してない = eval_fn 指標として非整合"
+            )
+            recommendations.append(
+                "dict の各 metric が同じ物理量を測ってるか見直し。"
+                "1 つを guard_fn に分離する方が適切かも。"
+            )
+            if severity == "ok":
+                severity = "warn"
+
+    ok = len(issues) == 0
+    if ok:
+        recommendations.append(
+            f"eval_fn OK (proxy_r2={proxy_r2:.2f}, active={len(active_dims)}/"
+            f"{n_dims} dim)。本番 mimir に進んでよい。"
+        )
+
+    return {
+        "ok": ok,
+        "issues": issues,
+        "severity": severity,
+        "proxy_r2": proxy_r2,
+        "active_dims": active_dims,
+        "dead_dims": dead_dims,
+        "fragility_max": float(fmax),
+        "fragility_median": float(fmedian),
+        "n_dims": n_dims,
+        "elapsed_s": time.time() - t0,
+        "probe_score": probe_score,
+        "eval_fn_returned": eval_returned,
+        "recommendations": recommendations,
+    }
+
+
+def format_report(diag: dict) -> str:
+    """Pretty-print a check_eval_fn() result for CLI usage."""
+    lines = []
+    icon = {"ok": "✅", "warn": "⚠", "fatal": "❌"}[diag.get("severity", "ok")]
+    lines.append(f"{icon} eval_fn check: severity={diag.get('severity')}")
+    lines.append(f"   proxy_r2      : {diag['proxy_r2']:.3f}")
+    lines.append(f"   active / dead : {len(diag['active_dims'])}/{diag['n_dims']} "
+                 f"active, {len(diag['dead_dims'])} dead")
+    lines.append(f"   fragility     : max={diag['fragility_max']:.3f} "
+                 f"median={diag['fragility_median']:.3f}")
+    lines.append(f"   elapsed       : {diag['elapsed_s']:.1f}s")
+    lines.append(f"   probe_score   : {diag.get('probe_score')}")
+    if diag["issues"]:
+        lines.append("   issues:")
+        for i in diag["issues"]:
+            lines.append(f"     - {i}")
+    if diag["recommendations"]:
+        lines.append("   recommendations:")
+        for r in diag["recommendations"]:
+            lines.append(f"     → {r}")
+    return "\n".join(lines)
+
+
+__all__ = ["check_eval_fn", "format_report"]

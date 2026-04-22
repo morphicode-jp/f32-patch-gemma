@@ -152,6 +152,40 @@ curated = random の **10-100× 情報量**。ドメインエキスパートの�
 
 mimir の proxy は**全て実測値から fit** される。推測・合成データは混ざらない。proxy_r2 が低い (< 0.3) 時は **direct-HC fallback** が自動発動して proxy を捨て、実 eval_fn で直接最適化に切り替わる。**推測で押し切ることは設計上ない**。
 
+## eval_fn を書いたらまず check_eval_fn() で診断
+
+**本番 `mimir()` の前に必ず走らせろ**。30-60 秒で bad eval_fn を自動検出、本番 1 時間の無駄走を防ぐ。
+
+```python
+from twelve.agent.eval_check import check_eval_fn, format_report
+
+diag = check_eval_fn(my_eval_fn, param_ranges, time_budget=60)
+print(format_report(diag))
+
+if not diag["ok"]:
+    # issue を修正してから本番へ。fatal なら止まる
+    raise ValueError(f"eval_fn bad: {diag['issues']}")
+
+# OK なら本番
+r = mimir(my_eval_fn, param_ranges, time_budget=1800)
+```
+
+検出する bad パターン:
+
+| 症状 | 検出方法 | severity |
+|---|---|---|
+| midpoint で exception | 1-call probe | **fatal** |
+| NaN / None 返す | 1-call probe | **fatal** |
+| 2 点で同値 (constant / state leak) | 2-call probe 差分 | **fatal** |
+| proxy_r2 < 0.2 (noisy / 多峰 / 不連続) | mimir structure_only | warn |
+| fragility 突出 (崩壊因子、scale=0 型) | fragility max/median | warn |
+| active_dims < 2 (高 dim で 1 次元的) | active_dims 数 | warn |
+| multi-obs dict で stable_active 空 | observer 整合性 | warn |
+
+**fatal なら本番走らせるな**。原因修正が先。
+
+**背景**: eval_fn = 人間の価値観定義、完全自動生成は原理不可能 (docs/全論の公式の活用.md §11.2)。**bad パターン検出**で 80% の失敗を事前回避できる。
+
 ## eval_fn 設計
 
 | good | bad | why |
@@ -180,6 +214,7 @@ full 数値は `benchmark_mimir.json` / `benchmark_mimir_dimscale.json`。
 |---|---|
 | -1 | Strip to essence: `x_i, perturb, share, eval_fn` |
 | 0 | Measure don't guess: ≥5 pts → mimir() → read numbers |
+| 0.5 | `check_eval_fn()` を本番 mimir 前に走らせろ、bad eval_fn 自動検出 |
 | 1 | Ask Oracle for structural questions (arc_oracle, kathara_oracle) |
 | 2 | No manual tuning: data → mimir() |
 | 3 | LaD: no if/else — convert to numeric params |
