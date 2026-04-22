@@ -59,6 +59,12 @@ class HebbianCoreBrain(CoreBrain):
         self.violation_slot = int(self.params.get("violation_slot", 190))
         self.violation_penalty_weight = float(
             self.params.get("violation_penalty_weight", 5.0))
+        # [H1b] External survival reward (food gain, energy up) — populated by runner
+        # Aligns Hebbian learning with Cardinal fitness (food + survival)
+        self.external_reward_slot = int(
+            self.params.get("external_reward_slot", 189))
+        self.external_reward_weight = float(
+            self.params.get("external_reward_weight", 0.0))  # 0 = disabled by default
 
         self.w_adapt_carry_over = bool(self.params.get("w_adapt_carry_over", False))
 
@@ -97,10 +103,14 @@ class HebbianCoreBrain(CoreBrain):
         # 4. Taboo violation penalty (from taboo shell, ACC-like error signal)
         violation = float(S_snapshot[self.violation_slot])
 
+        # [H1b] External survival reward
+        external_reward = float(S_snapshot[self.external_reward_slot])
+
         reward = (self.salience_weight * sal_mean
                   + self.sensor_novelty_weight * sensor_nov
                   + self.pred_error_weight * pred_err
-                  - self.violation_penalty_weight * violation)
+                  - self.violation_penalty_weight * violation
+                  + self.external_reward_weight * external_reward)
         self._cumulative_reward += reward
         self._step_count += 1
         # Track recent reward (EMA over last ~20 steps)

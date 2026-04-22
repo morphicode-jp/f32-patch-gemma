@@ -41,7 +41,83 @@ from world_3d_gravity import GravityVoxelWorld3D
 
 
 class HebbianHierarchicalUniverse(HierarchicalUniverse):
-    """Phase 14 の階層 + HebbianCoreBrain (runtime 学習)."""
+    """Phase 14 の階層 + HebbianCoreBrain (runtime 学習).
+
+    [H1b] run_epoch を override して、食料獲得信号を各 tick 前に
+    S[189] (external_reward_slot) に注入 → Hebbian が survival と alignment.
+    """
+
+    def run_epoch(self, n_steps: int, log_every: int = 500):
+        """Custom run that injects food-gain reward signal into agents' S[189]
+        before each tick, so HebbianCoreBrain sees survival reward."""
+        import numpy as np
+
+        sensors_list = [self.world.get_sensors(i)
+                        for i in range(self.world.n_agents)]
+        # Track per-agent food eaten to compute delta
+        prev_food = [int(self.world.agent_food_eaten[i])
+                     for i in range(self.world.n_agents)]
+
+        for step in range(n_steps):
+            N = self.world.n_agents
+            # Pad prev_food if children added
+            while len(prev_food) < N:
+                prev_food.append(0)
+
+            # Inject sensors + survival reward signal
+            for i in range(N):
+                if self.world.agent_alive[i]:
+                    cur_food = int(self.world.agent_food_eaten[i])
+                    food_delta = max(0, cur_food - prev_food[i])
+                    prev_food[i] = cur_food
+                    with self.agents[i]._lock:
+                        self.agents[i].S[0:16] = np.asarray(
+                            sensors_list[i] if isinstance(sensors_list, list)
+                            else sensors_list, dtype=np.float64)
+                        # [H1b] Food eaten signal at S[189] (1.0 if ate, else decay)
+                        prev_reward = float(self.agents[i].S[189])
+                        # EMA decay + immediate signal on eat
+                        new_signal = 0.7 * prev_reward + (1.0 if food_delta > 0 else 0.0)
+                        self.agents[i].S[189] = new_signal
+
+            # Tick × 3 (Phase 11 standard) + NaN/clip guard per tick
+            for _ in range(3):
+                for i in range(N):
+                    if self.world.agent_alive[i]:
+                        self.agents[i].tick_once()
+                        # Safety: clip S, kill NaN/Inf (prevents feedback blowup)
+                        S = self.agents[i].S
+                        np.nan_to_num(S, copy=False, nan=0.0,
+                                       posinf=3.0, neginf=-3.0)
+                        np.clip(S, -3.0, 3.0, out=S)
+
+            # Extract 4 actions (nav, speed, voice, jump)
+            actions = []
+            for i in range(N):
+                if self.world.agent_alive[i]:
+                    S = self.agents[i].read_state()
+                    actions.append((
+                        float(np.clip(S[16], 0.0, 1.0)),
+                        float(np.clip(S[17], 0.0, 1.0)),
+                        float(np.clip(S[18], 0.0, 1.0)),
+                        float(np.clip(S[19], 0.0, 1.0)) if len(S) > 19 else 0.0,
+                    ))
+                else:
+                    actions.append((0.5, 0.0, 0.0, 0.0))
+            sensors_list, ate, done = self.world.step(actions)
+
+            # Children may have been added
+            if len(self.world.agents_external) > len(self.agents):
+                self.agents = list(self.world.agents_external)
+                for new_a in self.agents[len(actions):]:
+                    new_a.reset_episode()
+
+            if step % log_every == 0:
+                self.trajectory.append({"step": step, **self.world.stats()})
+            if self.world.stats()["n_alive"] == 0:
+                break
+
+        self.trajectory.append({"step": n_steps, **self.world.stats(), "final": True})
 
     def initialize_agents(self):
         """HebbianCoreBrain を使って agent を build。"""
@@ -56,19 +132,25 @@ class HebbianHierarchicalUniverse(HierarchicalUniverse):
                 trained_dir=self.trained_dir,
                 use_hebbian_core=True,  # ★ Hebbian 有効化
                 use_3d_brain=True)
-            # Hebbian near-passive (confirm framework works, then tune up)
+            # [H1b] Hebbian with EXTERNAL SURVIVAL REWARD aligned to food
             hb = a.shells[0]
             if hasattr(hb, "hebbian_lr"):
-                hb.hebbian_lr = 0.0001      # near-zero = nearly static
-                hb.hebbian_decay = 0.02
-                hb.reward_scale = 1.0
-                hb.violation_penalty_weight = 1.0
-                hb.w_clip = 0.3
-                hb.noise_base = 0.03
-            # Reduce inhibition gain to prevent feedback instability + NaN
+                hb.hebbian_lr = 0.003       # moderate learning rate
+                hb.hebbian_decay = 0.01
+                hb.reward_scale = 1.5
+                hb.violation_penalty_weight = 2.0
+                hb.w_clip = 0.5              # tighter clip for stability
+                hb.noise_base = 0.05
+                # ★ External survival reward: big weight on food-eating ★
+                hb.external_reward_weight = 10.0  # food_delta * 10 drives learning
+                # Reduce intrinsic rewards (they're noise relative to food)
+                hb.salience_weight = 0.05
+                hb.sensor_novelty_weight = 0.05
+                hb.pred_error_weight = 0.5
+            # Reduce inhibition gain to prevent feedback instability
             for shell in a.shells[1:]:
                 if getattr(shell, "shell_sign", 1) == -1:
-                    shell.gain *= 0.3  # dampen inhibitory shells
+                    shell.gain *= 0.3
             # DNA 揺らぎ
             if pool is not None and len(pool) > 0:
                 parent_dna = pool[int(rng.integers(len(pool)))]

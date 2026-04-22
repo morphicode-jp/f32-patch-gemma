@@ -1,0 +1,1120 @@
+{
+  "config": {
+    "n_universes": 4,
+    "agents_per_universe": 6,
+    "epoch_steps": 800,
+    "n_epochs": 20,
+    "seed": 42,
+    "device": "cuda",
+    "architecture": "20-shell + HebbianCoreBrain"
+  },
+  "total_elapsed_s": 986.7,
+  "history": [
+    {
+      "epoch": 0,
+      "snapshots": [
+        {
+          "u_id": 0,
+          "quality": 9.065071712979854,
+          "food_total": 64,
+          "n_alive": 9,
+          "n_births": 5,
+          "n_deaths": 2,
+          "max_gen": 2,
+          "hebbian_w_norm_mean": 0.12938550628072326,
+          "hebbian_w_norm_max": 0.1495250201096122,
+          "hebbian_n_changed_edges": 48.0
+        },
+        {
+          "u_id": 1,
+          "quality": 2.7725887222397807,
+          "food_total": 12,
+          "n_alive": 1,
+          "n_births": 1,
+          "n_deaths": 6,
+          "max_gen": 0,
+          "hebbian_w_norm_mean": 0.10622875108561307,
+          "hebbian_w_norm_max": 0.10622875108561307,
+          "hebbian_n_changed_edges": 48.0
+        },
+        {
+          "u_id": 2,
+          "quality": 11.10662746002201,
+          "food_total": 242,
+          "n_alive": 17,
+          "n_births": 15,
+          "n_deaths": 4,
+          "max_gen": 3,
+          "hebbian_w_norm_mean": 0.12856765396045913,
+          "hebbian_w_norm_max": 0.14277823914937227,
+          "hebbian_n_changed_edges": 48.0
+        },
+        {
+          "u_id": 3,
+          "quality": 13.541237366887923,
+          "food_total": 140,
+          "n_alive": 17,
+          "n_births": 13,
+          "n_deaths": 2,
+          "max_gen": 4,
+          "hebbian_w_norm_mean": 0.1263631753664219,
+          "hebbian_w_norm_max": 0.13660979682412142,
+          "hebbian_n_changed_edges": 48.0
+        }
+      ],
+      "best": 3,
+      "elapsed_ep_s": 31.111360549926758
+    },
+    {
+      "epoch": 1,
+      "snapshots": [
+        {
+          "u_id": 0,
+          "quality": 12.939801147566161,
+          "food_total": 152,
+          "n_alive": 12,
+          "n_births": 14,
+          "n_deaths": 8,
+          "max_gen": 4,
+          "hebbian_w_norm_mean": 0.10388901010367525,
+          "hebbian_w_norm_max": 0.11037064524188549,
+          "hebbian_n_changed_edges": 48.0
+        },
+        {
+          "u_id": 1,
+          "quality": 9.611398386123941,
+          "food_total": 67,
+          "n_alive": 7,
+          "n_births": 5,
+          "n_deaths": 4,
+          "max_gen": 3,
+          "hebbian_w_norm_mean": 0.11342512930376314,
+          "hebbian_w_norm_max": 0.11931119893082949,
+          "hebbian_n_changed_edges": 48.0
+        },
+        {
+          "u_id": 2,
+          "quality": 12.9234261729198,
+          "food_total": 804,
+          "n_alive": 20,
+          "n_births": 19,
+          "n_deaths": 5,
+          "max_gen": 4,
+          "hebbian_w_norm_mean": 0.13195180718917962,
+          "hebbian_w_norm_max": 0.14239534798277972,
+          "hebbian_n_changed_edges": 48.0
+        },
+        {
+          "u_id": 3,
+          "quality": 12.514361862264249,
+          "food_total": 310,
+          "n_alive": 15,
+          "n_births": 19,
+          "n_deaths": 10,
+          "max_gen": 4,
+          "hebbian_w_norm_mean": 0.12006154542821561,
+          "hebbian_w_norm_max": 0.13201811687868067,
+          "hebbian_n_changed_edges": 48.0
+        }
+      ],
+      "best": 0,
+      "elapsed_ep_s": 51.014291524887085
+    },
+    {
+      "epoch": 2,
+      "snapshots": [
+        {
+          "u_id": 0,
+          "quality": 14.692415229632807,
+          "food_total": 388,
+          "n_alive": 11,
+          "n_births": 19,
+          "n_deaths": 14,
+          "max_gen": 5,
+          "hebbian_w_norm_mean": 0.0,
+          "hebbian_w_norm_max": 0.0,
+          "hebbian_n_changed_edges": 0.0
+        },
+        {
+          "u_id": 1,
+          "quality": 16.873993444715847,
+          "food_total": 143,
+          "n_alive": 22,
+          "n_births": 16,
+          "n_deaths": 0,
+          "max_gen": 4,
+          "hebbian_w_norm_mean": 0.12315142875242012,
+          "hebbian_w_norm_max": 0.13864438528393505,
+          "hebbian_n_changed_edges": 48.0
+        },
+        {
+          "u_id": 2,
+          "quality": 13.201914456725916,
+          "food_total": 1410,
+          "n_alive": 20,
+          "n_births": 19,
+          "n_deaths": 5,
+          "max_gen": 4,
+          "hebbian_w_norm_mean": 0.14971968800527058,
+          "hebbian_w_norm_max": 0.17401070626448698,
+          "hebbian_n_changed_edges": 48.0
+        },
+        {
+          "u_id": 3,
+          "quality": 12.139738958130682,
+          "food_total": 437,
+          "n_alive": 11,
+          "n_births": 19,
+          "n_deaths": 14,
+          "max_gen": 4,
+          "hebbian_w_norm_mean": 0.11537811156451984,
+          "hebbian_w_norm_max": 0.12519985024133354,
+          "hebbian_n_changed_edges": 48.0
+        }
+      ],
+      "best": 1,
+      "elapsed_ep_s": 53.48107028007507
+    },
+    {
+      "epoch": 3,
+      "snapshots": [
+        {
+          "u_id": 0,
+          "quality": 15.013528774699152,
+          "food_total": 642,
+          "n_alive": 11,
+          "n_births": 19,
+          "n_deaths": 14,
+          "max_gen": 5,
+          "hebbian_w_norm_mean": 0.0,
+          "hebbian_w_norm_max": 0.0,
+          "hebbian_n_changed_edges": 0.0
+        },
+        {
+          "u_id": 1,
+          "quality": 16.233537207601465,
+          "food_total": 509,
+          "n_alive": 22,
+          "n_births": 19,
+          "n_deaths": 3,
+          "max_gen": 5,
+          "hebbian_w_norm_mean": 0.12099449716422621,
+          "hebbian_w_norm_max": 0.13829785492302185,
+          "hebbian_n_changed_edges": 48.0
+        },
+        {
+          "u_id": 2,
+          "quality": 13.34244472967734,
+          "food_total": 2023,
+          "n_alive": 19,
+          "n_births": 19,
+          "n_deaths": 6,
+          "max_gen": 4,
+          "hebbian_w_norm_mean": 0.14467188093168895,
+          "hebbian_w_norm_max": 0.16795251520910703,
+          "hebbian_n_changed_edges": 48.0
+        },
+        {
+          "u_id": 3,
+          "quality": 9.253280668759103,
+          "food_total": 40,
+          "n_alive": 6,
+          "n_births": 4,
+          "n_deaths": 4,
+          "max_gen": 3,
+          "hebbian_w_norm_mean": 0.12383561790360911,
+          "hebbian_w_norm_max": 0.12692051171534033,
+          "hebbian_n_changed_edges": 48.0
+        }
+      ],
+      "best": 1,
+      "elapsed_ep_s": 53.44553780555725
+    },
+    {
+      "epoch": 4,
+      "snapshots": [
+        {
+          "u_id": 0,
+          "quality": 15.314212698651055,
+          "food_total": 1013,
+          "n_alive": 10,
+          "n_births": 19,
+          "n_deaths": 15,
+          "max_gen": 5,
+          "hebbian_w_norm_mean": 0.0,
+          "hebbian_w_norm_max": 0.0,
+          "hebbian_n_changed_edges": 0.0
+        },
+        {
+          "u_id": 1,
+          "quality": 16.496068910815847,
+          "food_total": 875,
+          "n_alive": 22,
+          "n_births": 19,
+          "n_deaths": 3,
+          "max_gen": 5,
+          "hebbian_w_norm_mean": 0.1223098201736349,
+          "hebbian_w_norm_max": 0.14462823559346294,
+          "hebbian_n_changed_edges": 48.0
+        },
+        {
+          "u_id": 2,
+          "quality": 13.474506885605553,
+          "food_total": 2617,
+          "n_alive": 19,
+          "n_births": 19,
+          "n_deaths": 6,
+          "max_gen": 4,
+          "hebbian_w_norm_mean": 0.13588701096136563,
+          "hebbian_w_norm_max": 0.15666959232201552,
+          "hebbian_n_changed_edges": 48.0
+        },
+        {
+          "u_id": 3,
+          "quality": 11.352465309798491,
+          "food_total": 166,
+          "n_alive": 22,
+          "n_births": 16,
+          "n_deaths": 0,
+          "max_gen": 3,
+          "hebbian_w_norm_mean": 0.13723209575341885,
+          "hebbian_w_norm_max": 0.14534812926046017,
+          "hebbian_n_changed_edges": 48.0
+        }
+      ],
+      "best": 1,
+      "elapsed_ep_s": 58.335273027420044
+    },
+    {
+      "epoch": 5,
+      "snapshots": [
+        {
+          "u_id": 0,
+          "quality": 15.442627213783627,
+          "food_total": 1266,
+          "n_alive": 10,
+          "n_births": 19,
+          "n_deaths": 15,
+          "max_gen": 5,
+          "hebbian_w_norm_mean": 0.0,
+          "hebbian_w_norm_max": 0.0,
+          "hebbian_n_changed_edges": 0.0
+        },
+        {
+          "u_id": 1,
+          "quality": 16.51345191212449,
+          "food_total": 1198,
+          "n_alive": 21,
+          "n_births": 19,
+          "n_deaths": 4,
+          "max_gen": 5,
+          "hebbian_w_norm_mean": 0.12396229652054076,
+          "hebbian_w_norm_max": 0.14959014590976163,
+          "hebbian_n_changed_edges": 48.0
+        },
+        {
+          "u_id": 2,
+          "quality": 13.538088687557526,
+          "food_total": 3306,
+          "n_alive": 18,
+          "n_births": 19,
+          "n_deaths": 7,
+          "max_gen": 4,
+          "hebbian_w_norm_mean": 0.15791679233657008,
+          "hebbian_w_norm_max": 0.1819922876516221,
+          "hebbian_n_changed_edges": 48.0
+        },
+        {
+          "u_id": 3,
+          "quality": 6.4948301686720225,
+          "food_total": 25,
+          "n_alive": 5,
+          "n_births": 2,
+          "n_deaths": 3,
+          "max_gen": 2,
+          "hebbian_w_norm_mean": 0.11058749902402765,
+          "hebbian_w_norm_max": 0.11761014814252331,
+          "hebbian_n_changed_edges": 48.0
+        }
+      ],
+      "best": 1,
+      "elapsed_ep_s": 52.176023721694946
+    },
+    {
+      "epoch": 6,
+      "snapshots": [
+        {
+          "u_id": 0,
+          "quality": 15.567886378345888,
+          "food_total": 1584,
+          "n_alive": 10,
+          "n_births": 19,
+          "n_deaths": 15,
+          "max_gen": 5,
+          "hebbian_w_norm_mean": 0.0,
+          "hebbian_w_norm_max": 0.0,
+          "hebbian_n_changed_edges": 0.0
+        },
+        {
+          "u_id": 1,
+          "quality": 16.662113777982768,
+          "food_total": 1609,
+          "n_alive": 21,
+          "n_births": 19,
+          "n_deaths": 4,
+          "max_gen": 5,
+          "hebbian_w_norm_mean": 0.13164372373558716,
+          "hebbian_w_norm_max": 0.14934768667335385,
+          "hebbian_n_changed_edges": 48.0
+        },
+        {
+          "u_id": 2,
+          "quality": 13.629565022923007,
+          "food_total": 3942,
+          "n_alive": 18,
+          "n_births": 19,
+          "n_deaths": 7,
+          "max_gen": 4,
+          "hebbian_w_norm_mean": 0.14735886018311234,
+          "hebbian_w_norm_max": 0.17801383277507177,
+          "hebbian_n_changed_edges": 48.0
+        },
+        {
+          "u_id": 3,
+          "quality": 9.705462842230617,
+          "food_total": 63,
+          "n_alive": 11,
+          "n_births": 7,
+          "n_deaths": 2,
+          "max_gen": 3,
+          "hebbian_w_norm_mean": 0.11673965544166477,
+          "hebbian_w_norm_max": 0.12578460025790997,
+          "hebbian_n_changed_edges": 48.0
+        }
+      ],
+      "best": 1,
+      "elapsed_ep_s": 52.3288254737854
+    },
+    {
+      "epoch": 7,
+      "snapshots": [
+        {
+          "u_id": 0,
+          "quality": 15.510928365133646,
+          "food_total": 1923,
+          "n_alive": 9,
+          "n_births": 19,
+          "n_deaths": 16,
+          "max_gen": 5,
+          "hebbian_w_norm_mean": 0.0,
+          "hebbian_w_norm_max": 0.0,
+          "hebbian_n_changed_edges": 0.0
+        },
+        {
+          "u_id": 1,
+          "quality": 16.76599212401419,
+          "food_total": 1978,
+          "n_alive": 21,
+          "n_births": 19,
+          "n_deaths": 4,
+          "max_gen": 5,
+          "hebbian_w_norm_mean": 0.12085975308133146,
+          "hebbian_w_norm_max": 0.1392467484120198,
+          "hebbian_n_changed_edges": 48.0
+        },
+        {
+          "u_id": 2,
+          "quality": 13.706640362836637,
+          "food_total": 4576,
+          "n_alive": 18,
+          "n_births": 19,
+          "n_deaths": 7,
+          "max_gen": 4,
+          "hebbian_w_norm_mean": 0.13762157650045748,
+          "hebbian_w_norm_max": 0.1752848981789613,
+          "hebbian_n_changed_edges": 48.0
+        },
+        {
+          "u_id": 3,
+          "quality": 8.962291462417575,
+          "food_total": 45,
+          "n_alive": 7,
+          "n_births": 6,
+          "n_deaths": 5,
+          "max_gen": 3,
+          "hebbian_w_norm_mean": 0.11592040172799548,
+          "hebbian_w_norm_max": 0.12496022972758784,
+          "hebbian_n_changed_edges": 48.0
+        }
+      ],
+      "best": 1,
+      "elapsed_ep_s": 51.12742590904236
+    },
+    {
+      "epoch": 8,
+      "snapshots": [
+        {
+          "u_id": 0,
+          "quality": 15.316382535274874,
+          "food_total": 2205,
+          "n_alive": 8,
+          "n_births": 19,
+          "n_deaths": 17,
+          "max_gen": 5,
+          "hebbian_w_norm_mean": 0.0,
+          "hebbian_w_norm_max": 0.0,
+          "hebbian_n_changed_edges": 0.0
+        },
+        {
+          "u_id": 1,
+          "quality": 16.285580582760286,
+          "food_total": 2330,
+          "n_alive": 19,
+          "n_births": 19,
+          "n_deaths": 6,
+          "max_gen": 5,
+          "hebbian_w_norm_mean": 0.127012277441039,
+          "hebbian_w_norm_max": 0.14056802492070797,
+          "hebbian_n_changed_edges": 48.0
+        },
+        {
+          "u_id": 2,
+          "quality": 13.770043039546643,
+          "food_total": 5176,
+          "n_alive": 18,
+          "n_births": 19,
+          "n_deaths": 7,
+          "max_gen": 4,
+          "hebbian_w_norm_mean": 0.13860287972232815,
+          "hebbian_w_norm_max": 0.15307601539559107,
+          "hebbian_n_changed_edges": 48.0
+        },
+        {
+          "u_id": 3,
+          "quality": 9.36695775617124,
+          "food_total": 41,
+          "n_alive": 7,
+          "n_births": 4,
+          "n_deaths": 3,
+          "max_gen": 2,
+          "hebbian_w_norm_mean": 0.11259774815430745,
+          "hebbian_w_norm_max": 0.12934779206473146,
+          "hebbian_n_changed_edges": 48.0
+        }
+      ],
+      "best": 1,
+      "elapsed_ep_s": 48.48310351371765
+    },
+    {
+      "epoch": 9,
+      "snapshots": [
+        {
+          "u_id": 0,
+          "quality": 15.394980434262296,
+          "food_total": 2508,
+          "n_alive": 8,
+          "n_births": 19,
+          "n_deaths": 17,
+          "max_gen": 5,
+          "hebbian_w_norm_mean": 0.0,
+          "hebbian_w_norm_max": 0.0,
+          "hebbian_n_changed_edges": 0.0
+        },
+        {
+          "u_id": 1,
+          "quality": 16.382564613850423,
+          "food_total": 2799,
+          "n_alive": 19,
+          "n_births": 19,
+          "n_deaths": 6,
+          "max_gen": 5,
+          "hebbian_w_norm_mean": 0.12535451679092474,
+          "hebbian_w_norm_max": 0.14263682684725185,
+          "hebbian_n_changed_edges": 48.0
+        },
+        {
+          "u_id": 2,
+          "quality": 13.824882186823604,
+          "food_total": 5760,
+          "n_alive": 18,
+          "n_births": 19,
+          "n_deaths": 7,
+          "max_gen": 4,
+          "hebbian_w_norm_mean": 0.13408625997238788,
+          "hebbian_w_norm_max": 0.16437653645923178,
+          "hebbian_n_changed_edges": 48.0
+        },
+        {
+          "u_id": 3,
+          "quality": 1.732867951399863,
+          "food_total": 9,
+          "n_alive": 1,
+          "n_births": 0,
+          "n_deaths": 5,
+          "max_gen": 0,
+          "hebbian_w_norm_mean": 0.10901580755118312,
+          "hebbian_w_norm_max": 0.10901580755118312,
+          "hebbian_n_changed_edges": 48.0
+        }
+      ],
+      "best": 1,
+      "elapsed_ep_s": 44.74296808242798
+    },
+    {
+      "epoch": 10,
+      "snapshots": [
+        {
+          "u_id": 0,
+          "quality": 15.457406662641638,
+          "food_total": 2785,
+          "n_alive": 8,
+          "n_births": 19,
+          "n_deaths": 17,
+          "max_gen": 5,
+          "hebbian_w_norm_mean": 0.0,
+          "hebbian_w_norm_max": 0.0,
+          "hebbian_n_changed_edges": 0.0
+        },
+        {
+          "u_id": 1,
+          "quality": 16.452445585038003,
+          "food_total": 3198,
+          "n_alive": 19,
+          "n_births": 19,
+          "n_deaths": 6,
+          "max_gen": 5,
+          "hebbian_w_norm_mean": 0.12828823621990645,
+          "hebbian_w_norm_max": 0.14732047745352794,
+          "hebbian_n_changed_edges": 48.0
+        },
+        {
+          "u_id": 2,
+          "quality": 13.87057683935415,
+          "food_total": 6298,
+          "n_alive": 18,
+          "n_births": 19,
+          "n_deaths": 7,
+          "max_gen": 4,
+          "hebbian_w_norm_mean": 0.14014688588566687,
+          "hebbian_w_norm_max": 0.17450046893855264,
+          "hebbian_n_changed_edges": 48.0
+        },
+        {
+          "u_id": 3,
+          "quality": 13.71850186760345,
+          "food_total": 59,
+          "n_alive": 11,
+          "n_births": 6,
+          "n_deaths": 1,
+          "max_gen": 4,
+          "hebbian_w_norm_mean": 0.11368739323696635,
+          "hebbian_w_norm_max": 0.12456703522660306,
+          "hebbian_n_changed_edges": 48.0
+        }
+      ],
+      "best": 1,
+      "elapsed_ep_s": 49.39812469482422
+    },
+    {
+      "epoch": 11,
+      "snapshots": [
+        {
+          "u_id": 0,
+          "quality": 15.516674686511717,
+          "food_total": 3082,
+          "n_alive": 8,
+          "n_births": 19,
+          "n_deaths": 17,
+          "max_gen": 5,
+          "hebbian_w_norm_mean": 0.0,
+          "hebbian_w_norm_max": 0.0,
+          "hebbian_n_changed_edges": 0.0
+        },
+        {
+          "u_id": 1,
+          "quality": 16.51605488636308,
+          "food_total": 3613,
+          "n_alive": 19,
+          "n_births": 19,
+          "n_deaths": 6,
+          "max_gen": 5,
+          "hebbian_w_norm_mean": 0.12319558670957785,
+          "hebbian_w_norm_max": 0.13948752818544893,
+          "hebbian_n_changed_edges": 48.0
+        },
+        {
+          "u_id": 2,
+          "quality": 13.88438142174562,
+          "food_total": 6904,
+          "n_alive": 17,
+          "n_births": 19,
+          "n_deaths": 8,
+          "max_gen": 4,
+          "hebbian_w_norm_mean": 0.1309614681432586,
+          "hebbian_w_norm_max": 0.17182928129292566,
+          "hebbian_n_changed_edges": 48.0
+        },
+        {
+          "u_id": 3,
+          "quality": 15.386798536528103,
+          "food_total": 94,
+          "n_alive": 14,
+          "n_births": 10,
+          "n_deaths": 2,
+          "max_gen": 3,
+          "hebbian_w_norm_mean": 0.11912463810695968,
+          "hebbian_w_norm_max": 0.13018284610955486,
+          "hebbian_n_changed_edges": 48.0
+        }
+      ],
+      "best": 1,
+      "elapsed_ep_s": 50.12341856956482
+    },
+    {
+      "epoch": 12,
+      "snapshots": [
+        {
+          "u_id": 0,
+          "quality": 15.567450682908806,
+          "food_total": 3366,
+          "n_alive": 8,
+          "n_births": 19,
+          "n_deaths": 17,
+          "max_gen": 5,
+          "hebbian_w_norm_mean": 0.0,
+          "hebbian_w_norm_max": 0.0,
+          "hebbian_n_changed_edges": 0.0
+        },
+        {
+          "u_id": 1,
+          "quality": 16.56287188482183,
+          "food_total": 3954,
+          "n_alive": 19,
+          "n_births": 19,
+          "n_deaths": 6,
+          "max_gen": 5,
+          "hebbian_w_norm_mean": 0.12261464451642272,
+          "hebbian_w_norm_max": 0.1315475305632738,
+          "hebbian_n_changed_edges": 48.0
+        },
+        {
+          "u_id": 2,
+          "quality": 9.505813498463418,
+          "food_total": 87,
+          "n_alive": 11,
+          "n_births": 7,
+          "n_deaths": 2,
+          "max_gen": 3,
+          "hebbian_w_norm_mean": 0.10997374878236736,
+          "hebbian_w_norm_max": 0.1199815394262167,
+          "hebbian_n_changed_edges": 48.0
+        },
+        {
+          "u_id": 3,
+          "quality": 16.82584181100012,
+          "food_total": 360,
+          "n_alive": 19,
+          "n_births": 19,
+          "n_deaths": 6,
+          "max_gen": 4,
+          "hebbian_w_norm_mean": 0.10530219797365582,
+          "hebbian_w_norm_max": 0.11650370252307675,
+          "hebbian_n_changed_edges": 48.0
+        }
+      ],
+      "best": 3,
+      "elapsed_ep_s": 49.530040979385376
+    },
+    {
+      "epoch": 13,
+      "snapshots": [
+        {
+          "u_id": 0,
+          "quality": 15.612611229281214,
+          "food_total": 3644,
+          "n_alive": 8,
+          "n_births": 19,
+          "n_deaths": 17,
+          "max_gen": 5,
+          "hebbian_w_norm_mean": 0.0,
+          "hebbian_w_norm_max": 0.0,
+          "hebbian_n_changed_edges": 0.0
+        },
+        {
+          "u_id": 1,
+          "quality": 16.613082093481914,
+          "food_total": 4357,
+          "n_alive": 19,
+          "n_births": 19,
+          "n_deaths": 6,
+          "max_gen": 5,
+          "hebbian_w_norm_mean": 0.12014399970935323,
+          "hebbian_w_norm_max": 0.1302192252181271,
+          "hebbian_n_changed_edges": 48.0
+        },
+        {
+          "u_id": 2,
+          "quality": 8.290668452905857,
+          "food_total": 46,
+          "n_alive": 6,
+          "n_births": 4,
+          "n_deaths": 4,
+          "max_gen": 3,
+          "hebbian_w_norm_mean": 0.11856726125447807,
+          "hebbian_w_norm_max": 0.12004591155609694,
+          "hebbian_n_changed_edges": 48.0
+        },
+        {
+          "u_id": 3,
+          "quality": 17.179428138957345,
+          "food_total": 724,
+          "n_alive": 19,
+          "n_births": 19,
+          "n_deaths": 6,
+          "max_gen": 4,
+          "hebbian_w_norm_mean": 0.10256993638277838,
+          "hebbian_w_norm_max": 0.1193755668991316,
+          "hebbian_n_changed_edges": 48.0
+        }
+      ],
+      "best": 3,
+      "elapsed_ep_s": 46.978593587875366
+    },
+    {
+      "epoch": 14,
+      "snapshots": [
+        {
+          "u_id": 0,
+          "quality": 15.654600174109142,
+          "food_total": 3926,
+          "n_alive": 8,
+          "n_births": 19,
+          "n_deaths": 17,
+          "max_gen": 5,
+          "hebbian_w_norm_mean": 0.0,
+          "hebbian_w_norm_max": 0.0,
+          "hebbian_n_changed_edges": 0.0
+        },
+        {
+          "u_id": 1,
+          "quality": 16.65708145315287,
+          "food_total": 4745,
+          "n_alive": 19,
+          "n_births": 19,
+          "n_deaths": 6,
+          "max_gen": 5,
+          "hebbian_w_norm_mean": 0.12143524985189107,
+          "hebbian_w_norm_max": 0.1384506367398731,
+          "hebbian_n_changed_edges": 48.0
+        },
+        {
+          "u_id": 2,
+          "quality": 2.340277040608936,
+          "food_total": 7,
+          "n_alive": 4,
+          "n_births": 0,
+          "n_deaths": 2,
+          "max_gen": 0,
+          "hebbian_w_norm_mean": 0.11457046865070468,
+          "hebbian_w_norm_max": 0.1219649315469729,
+          "hebbian_n_changed_edges": 48.0
+        },
+        {
+          "u_id": 3,
+          "quality": 17.383551514492364,
+          "food_total": 1086,
+          "n_alive": 19,
+          "n_births": 19,
+          "n_deaths": 6,
+          "max_gen": 4,
+          "hebbian_w_norm_mean": 0.11971373116211452,
+          "hebbian_w_norm_max": 0.13088062896031807,
+          "hebbian_n_changed_edges": 48.0
+        }
+      ],
+      "best": 3,
+      "elapsed_ep_s": 47.299906969070435
+    },
+    {
+      "epoch": 15,
+      "snapshots": [
+        {
+          "u_id": 0,
+          "quality": 15.692011073613966,
+          "food_total": 4198,
+          "n_alive": 8,
+          "n_births": 19,
+          "n_deaths": 17,
+          "max_gen": 5,
+          "hebbian_w_norm_mean": 0.0,
+          "hebbian_w_norm_max": 0.0,
+          "hebbian_n_changed_edges": 0.0
+        },
+        {
+          "u_id": 1,
+          "quality": 16.69971795411893,
+          "food_total": 5155,
+          "n_alive": 19,
+          "n_births": 19,
+          "n_deaths": 6,
+          "max_gen": 5,
+          "hebbian_w_norm_mean": 0.12438687102119017,
+          "hebbian_w_norm_max": 0.14744661554403501,
+          "hebbian_n_changed_edges": 48.0
+        },
+        {
+          "u_id": 2,
+          "quality": 8.91631617092284,
+          "food_total": 70,
+          "n_alive": 7,
+          "n_births": 5,
+          "n_deaths": 4,
+          "max_gen": 2,
+          "hebbian_w_norm_mean": 0.09994980083355005,
+          "hebbian_w_norm_max": 0.10641986424679817,
+          "hebbian_n_changed_edges": 48.0
+        },
+        {
+          "u_id": 3,
+          "quality": 17.539399988820193,
+          "food_total": 1481,
+          "n_alive": 19,
+          "n_births": 19,
+          "n_deaths": 6,
+          "max_gen": 4,
+          "hebbian_w_norm_mean": 0.09322092603343256,
+          "hebbian_w_norm_max": 0.10269419145015823,
+          "hebbian_n_changed_edges": 48.0
+        }
+      ],
+      "best": 3,
+      "elapsed_ep_s": 49.716872215270996
+    },
+    {
+      "epoch": 16,
+      "snapshots": [
+        {
+          "u_id": 0,
+          "quality": 15.728297745235032,
+          "food_total": 4482,
+          "n_alive": 8,
+          "n_births": 19,
+          "n_deaths": 17,
+          "max_gen": 5,
+          "hebbian_w_norm_mean": 0.0,
+          "hebbian_w_norm_max": 0.0,
+          "hebbian_n_changed_edges": 0.0
+        },
+        {
+          "u_id": 1,
+          "quality": 16.736508428071694,
+          "food_total": 5538,
+          "n_alive": 19,
+          "n_births": 19,
+          "n_deaths": 6,
+          "max_gen": 5,
+          "hebbian_w_norm_mean": 0.1294811450267527,
+          "hebbian_w_norm_max": 0.16023690421849865,
+          "hebbian_n_changed_edges": 48.0
+        },
+        {
+          "u_id": 2,
+          "quality": 8.422680970778709,
+          "food_total": 56,
+          "n_alive": 7,
+          "n_births": 4,
+          "n_deaths": 3,
+          "max_gen": 2,
+          "hebbian_w_norm_mean": 0.11258389969487209,
+          "hebbian_w_norm_max": 0.11576382799563635,
+          "hebbian_n_changed_edges": 48.0
+        },
+        {
+          "u_id": 3,
+          "quality": 17.634500011003208,
+          "food_total": 1790,
+          "n_alive": 19,
+          "n_births": 19,
+          "n_deaths": 6,
+          "max_gen": 4,
+          "hebbian_w_norm_mean": 0.11149446550107893,
+          "hebbian_w_norm_max": 0.1446054964520355,
+          "hebbian_n_changed_edges": 48.0
+        }
+      ],
+      "best": 3,
+      "elapsed_ep_s": 49.0975444316864
+    },
+    {
+      "epoch": 17,
+      "snapshots": [
+        {
+          "u_id": 0,
+          "quality": 15.75656874774409,
+          "food_total": 4718,
+          "n_alive": 8,
+          "n_births": 19,
+          "n_deaths": 17,
+          "max_gen": 5,
+          "hebbian_w_norm_mean": 0.0,
+          "hebbian_w_norm_max": 0.0,
+          "hebbian_n_changed_edges": 0.0
+        },
+        {
+          "u_id": 1,
+          "quality": 16.77602373423977,
+          "food_total": 5982,
+          "n_alive": 19,
+          "n_births": 19,
+          "n_deaths": 6,
+          "max_gen": 5,
+          "hebbian_w_norm_mean": 0.1278689505233604,
+          "hebbian_w_norm_max": 0.13900332533987722,
+          "hebbian_n_changed_edges": 48.0
+        },
+        {
+          "u_id": 2,
+          "quality": 11.457474751748897,
+          "food_total": 103,
+          "n_alive": 16,
+          "n_births": 11,
+          "n_deaths": 1,
+          "max_gen": 4,
+          "hebbian_w_norm_mean": 0.12517902499725841,
+          "hebbian_w_norm_max": 0.13449408938035248,
+          "hebbian_n_changed_edges": 48.0
+        },
+        {
+          "u_id": 3,
+          "quality": 17.73058785353281,
+          "food_total": 2168,
+          "n_alive": 19,
+          "n_births": 19,
+          "n_deaths": 6,
+          "max_gen": 4,
+          "hebbian_w_norm_mean": 0.09568182868977192,
+          "hebbian_w_norm_max": 0.10446157344653416,
+          "hebbian_n_changed_edges": 48.0
+        }
+      ],
+      "best": 3,
+      "elapsed_ep_s": 50.616859912872314
+    },
+    {
+      "epoch": 18,
+      "snapshots": [
+        {
+          "u_id": 0,
+          "quality": 15.784319046301704,
+          "food_total": 4963,
+          "n_alive": 8,
+          "n_births": 19,
+          "n_deaths": 17,
+          "max_gen": 5,
+          "hebbian_w_norm_mean": 0.0,
+          "hebbian_w_norm_max": 0.0,
+          "hebbian_n_changed_edges": 0.0
+        },
+        {
+          "u_id": 1,
+          "quality": 16.810251970961733,
+          "food_total": 6396,
+          "n_alive": 19,
+          "n_births": 19,
+          "n_deaths": 6,
+          "max_gen": 5,
+          "hebbian_w_norm_mean": 0.12748301836350648,
+          "hebbian_w_norm_max": 0.1432775651698246,
+          "hebbian_n_changed_edges": 48.0
+        },
+        {
+          "u_id": 2,
+          "quality": 6.762265544590422,
+          "food_total": 33,
+          "n_alive": 3,
+          "n_births": 3,
+          "n_deaths": 6,
+          "max_gen": 2,
+          "hebbian_w_norm_mean": 0.0907324966696344,
+          "hebbian_w_norm_max": 0.0907324966696344,
+          "hebbian_n_changed_edges": 48.0
+        },
+        {
+          "u_id": 3,
+          "quality": 17.813901372729475,
+          "food_total": 2560,
+          "n_alive": 19,
+          "n_births": 19,
+          "n_deaths": 6,
+          "max_gen": 4,
+          "hebbian_w_norm_mean": 0.12070626639089926,
+          "hebbian_w_norm_max": 0.15619768753864058,
+          "hebbian_n_changed_edges": 48.0
+        }
+      ],
+      "best": 3,
+      "elapsed_ep_s": 47.37622928619385
+    },
+    {
+      "epoch": 19,
+      "snapshots": [
+        {
+          "u_id": 0,
+          "quality": 15.162229874954711,
+          "food_total": 5143,
+          "n_alive": 6,
+          "n_births": 19,
+          "n_deaths": 19,
+          "max_gen": 5,
+          "hebbian_w_norm_mean": 0.0,
+          "hebbian_w_norm_max": 0.0,
+          "hebbian_n_changed_edges": 0.0
+        },
+        {
+          "u_id": 1,
+          "quality": 16.83905310223578,
+          "food_total": 6767,
+          "n_alive": 19,
+          "n_births": 19,
+          "n_deaths": 6,
+          "max_gen": 5,
+          "hebbian_w_norm_mean": 0.11590870882018976,
+          "hebbian_w_norm_max": 0.13903347306314548,
+          "hebbian_n_changed_edges": 48.0
+        },
+        {
+          "u_id": 2,
+          "quality": 10.795454096182649,
+          "food_total": 92,
+          "n_alive": 14,
+          "n_births": 9,
+          "n_deaths": 1,
+          "max_gen": 4,
+          "hebbian_w_norm_mean": 0.12727298016379504,
+          "hebbian_w_norm_max": 0.13846554385323093,
+          "hebbian_n_changed_edges": 48.0
+        },
+        {
+          "u_id": 3,
+          "quality": 17.87552620466635,
+          "food_total": 2895,
+          "n_alive": 19,
+          "n_births": 19,
+          "n_deaths": 6,
+          "max_gen": 4,
+          "hebbian_w_norm_mean": 0.10451946656506901,
+          "hebbian_w_norm_max": 0.1260971419746532,
+          "hebbian_n_changed_edges": 48.0
+        }
+      ],
+      "best": 3,
+      "elapsed_ep_s": 49.53620743751526
+    }
+  ],
+  "final_summary": {
+    "total_food_final": 14897,
+    "total_births_final": 66,
+    "total_alive_final": 58,
+    "hebbian_w_adapt_mean": 0.08692528888726345
+  }
+}
