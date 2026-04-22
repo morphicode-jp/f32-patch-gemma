@@ -1,0 +1,74 @@
+{
+  "config": {
+    "n_agents": 5,
+    "n_steps": 500,
+    "n_seeds": 3,
+    "output": "phase_13b_behavior_regression.json"
+  },
+  "flat": [
+    {
+      "food_total": 38,
+      "births": 0,
+      "deaths": 0,
+      "final_alive": 5,
+      "final_steps": 500,
+      "max_gen": 0,
+      "elapsed_s": 1.810964584350586
+    },
+    {
+      "food_total": 45,
+      "births": 0,
+      "deaths": 0,
+      "final_alive": 5,
+      "final_steps": 500,
+      "max_gen": 0,
+      "elapsed_s": 1.7389681339263916
+    },
+    {
+      "food_total": 2,
+      "births": 0,
+      "deaths": 5,
+      "final_alive": 0,
+      "final_steps": 354,
+      "max_gen": 0,
+      "elapsed_s": 0.9669818878173828
+    }
+  ],
+  "hierarchical": [
+    {
+      "food_total": 32,
+      "births": 0,
+      "deaths": 2,
+      "final_alive": 3,
+      "final_steps": 500,
+      "max_gen": 0,
+      "elapsed_s": 1.8499808311462402
+    },
+    {
+      "food_total": 31,
+      "births": 0,
+      "deaths": 0,
+      "final_alive": 5,
+      "final_steps": 500,
+      "max_gen": 0,
+      "elapsed_s": 2.0429608821868896
+    },
+    {
+      "food_total": 4,
+      "births": 0,
+      "deaths": 4,
+      "final_alive": 1,
+      "final_steps": 500,
+      "max_gen": 0,
+      "elapsed_s": 1.1559782028198242
+    }
+  ],
+  "summary": {
+    "flat_mean_food": 28.333333333333332,
+    "hier_mean_food": 22.333333333333332,
+    "flat_mean_births": 0.0,
+    "hier_mean_births": 0.0,
+    "food_delta": -6.0,
+    "birth_delta": 0.0
+  }
+}
