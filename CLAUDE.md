@@ -104,9 +104,53 @@ mimir()                      ← ユーザー呼び口
 
 詳細は `docs/REIGEN_INTERNALS.md` / `docs/OWL_INTERNALS.md` / `docs/SENTINEL_LEGACY.md` 参照。
 
-## curated 実測値は捨てるな (最重要原則)
+## 実測は自動化される — 手で 1 点ずつ測るな
 
-curated 20 点は random 200-2000 点の情報量。proxy R² を 0.5 → 0.85 に引き上げる。過去実験データがある時は必ず `curated_measurements=` に渡せ。mimir は自動で expensive_single route に切替、owl に直接食わせる。random `_collect` で情報を捨てないこと。
+`mimir(eval_fn, ranges, time_budget=300)` の **1 行で下記が全自動**:
+
+- seed 20 点の param 選定 (uniform random)
+- 各 param で eval_fn 呼出し、score 収集
+- 実測点から proxy (近似式) を fit
+- proxy argmax の新 param で再実測 (verify_fn)
+- growing_data 拡張 → proxy 再 fit → 次の点で実測 ... のループ
+- 収束判定・停滞検知・range 拡張
+
+**ユーザーの仕事は `eval_fn` 書くだけ**。下記の手動ループは書くな:
+
+```python
+# ❌ 昔やってた手作業 (不要)
+for p in preset_points:
+    s = eval_fn(p)
+    results.append((p, s))
+# 近似書く / 最適点選ぶ / 再測る ... 全部手動
+
+# ✅ 今はこれだけ
+r = mimir(eval_fn, ranges, time_budget=300)
+```
+
+### 過去データは必ず `curated_measurements=` に渡せ
+
+過去に手動で測った点があるなら**絶対に捨てるな**。mimir の seed にして精度を爆上げできる。
+
+```python
+past = [{"params": [0.8, 1.2], "score": 0.71},
+        {"params": [1.0, 1.3], "score": 0.68}, ... ]   # 過去の実測 20 点
+r = mimir(eval_fn, ranges, curated_measurements=past, time_budget=600)
+```
+
+### proxy_r2 の違い (同じ実測数でも桁違い)
+
+| 始点 | 初期 proxy_r2 |
+|---|---|
+| empty start (mimir が random 20 点実測) | 0.5 〜 0.7 |
+| curated 20 点 (ドメイン知識) | **0.80 〜 0.90** |
+| curated 50 点 | **0.90 〜 0.95** |
+
+curated = random の **10-100× 情報量**。ドメインエキスパートの選んだ 20 点は random 200-2000 点に相当する。
+
+### 推測では始めない、常に実測で proxy 構築
+
+mimir の proxy は**全て実測値から fit** される。推測・合成データは混ざらない。proxy_r2 が低い (< 0.3) 時は **direct-HC fallback** が自動発動して proxy を捨て、実 eval_fn で直接最適化に切り替わる。**推測で押し切ることは設計上ない**。
 
 ## eval_fn 設計
 
@@ -161,7 +205,11 @@ full 数値は `benchmark_mimir.json` / `benchmark_mimir_dimscale.json`。
 
 **Rule 3**: LaD = if/else を数値 param に変換。eval_fn の if は次元、threshold は range。`owl()` が cutover を自分で発見する。
 
-**Rule 4**: 正典 MirrorScan は `importance = (truth × max(connectivity, floor))^exp`、defaults `exp=0.3064` / `floor=0.1411` (`configs/ma_meta_params.json`)。**掛け算がノイズを殺す**: score と相関するが他 dim と co-move しない次元は accidental correlation として落ちる。
+**Rule 4**: 正典 MirrorScan `importance[i] = (truth[i] × max(connectivity[i], floor))^exp`。defaults `exp=0.3064` / `floor=0.1411` (`configs/ma_meta_params.json`)。
+- `truth[i] = |corr(param_i, scores)|` — score に効くか
+- `connectivity[i] = mean(|corr(param_i, param_j)|) j≠i` — 他次元と連動するか
+
+**掛け算が AND 条件**: 両方高いときのみ importance 高。偶然の相関 (truth 高 + conn 低) はノイズとして自動除去、dead (両方低) は 0 に潰れる。この式が dead_dims / active_dims / fragility の根本。**r["dead_dims"] は次元削減に即使える**。
 
 **Rule 5**: `n_problems > n_params` 守れ。train split で最適化 → held-out で検証。params が problems より多いと proxy はノイズを memorize、R² が意味を失う。
 
@@ -197,11 +245,104 @@ full 数値は `benchmark_mimir.json` / `benchmark_mimir_dimscale.json`。
 
 以下は絶対 commit しない: `unified_memory.py`、`evaluator*.py`、`_legacy/` 配下、特許下書き、credentials。commit 前に必ず `git status` 確認。`.env` や認証情報の誤コミット回避のため `git add -A` より個別ファイル add を優先。
 
+## 推論サーバ: `C:/Users/user/infinite_think_server.py`
+
+Qwen3.6-35B-A3B-Abliterated-Heretic を OpenAI 互換 API (`http://127.0.0.1:8282/v1`) で提供する本番サーバ。2026-04-21〜22 に Phase O (10 個の stop-token/cleanup バグ修正) + Phase P (OpenAI tool calling) を入れて完成済。
+
+### 起動
+```bash
+python C:/Users/user/infinite_think_server.py --preset zenron_core_xl --hk-size 1000 --port 8282
+```
+
+### 主要エンドポイント
+| path | 用途 |
+|---|---|
+| `POST /v1/chat/completions` | OpenAI 互換チャット (tools 対応) |
+| `GET  /v1/models` | モデル一覧 |
+| `GET  /v1/hk_state` | HK/W/n_ctx + tool_call 統計 |
+| `POST /v1/debug_raw` | cleaner 無しで raw トークン確認 |
+| `POST /v1/debug_tool_call` | tool_call パース span 可視化 |
+| `GET  /v1/presets` / `/v1/presets/{name}/preview` | preset 一覧 + プレビュー |
+
+### 設定 (env var)
+| var | default | 意味 |
+|---|---|---|
+| `HK_PRESET` | none | 焼き込む preset 名 (`zenron_core_xl` 等) |
+| `HK_SIZE` | auto | HK 占有トークン数 (通常 1000) |
+| `HK_W` | 4000 | sliding window の末尾長 |
+| `HK_NCTX` | 16384 | KV cache 容量 |
+| `HK_KV_TYPE` | 8 (q8_0) | KV 量子化ビット (1=F16, 8=q8_0) |
+
+### アーキテクチャ
+- **HK (前 1000 tok)**: 起動時に preset を tokenize して焼き付け、**会話中は絶対に消えない** attention sink
+- **W (末尾 4000 tok)**: 最新のやり取りの生トークン
+- **中間**: trim で破棄される (Phase K/L で Summary Zone 試みて失敗、撤去済)
+- **tool calling**: Qwen 固有 `<tool_call><function=X><parameter=K>V</parameter></function></tool_call>` を受信 → OpenAI `tool_calls:[]` に変換。Phase P parser が 10 種の Heretic 壊れパターンを防御
+
+### 防御層 (`_clean_output` + `_clean_with_tools`)
+Heretic abliteration の副作用を吸収する regex + mask-then-clean パイプライン:
+- `<|im_end|>` / `<|im_start|>` literal 漏れ除去
+- 末尾の bare role (`user`/`assistant`) 除去
+- 2 回目以降の `<think>`/`</think>` で再突入カット
+- `<tool_call>` span はセンチネルで保護してから cleaner 通す
+
+全 regex の設計経緯は `docs/HK.md` Phase O-1〜O-10 + P-1〜P-5 に記録。
+
+### 関連プローブ
+`twelve/hk/quality_probe_{xl,chat,stress,deep,adversarial,tools}.py` — サーバ挙動の regression テスト群。`test_parse_tool_calls.py` が tool_call パーサ単体テスト。
+
+## 知識を Qwen に持たせる 2 つの方法 (重要)
+
+### 方法 A: **HK preset に焼き込み (現在の方式)**
+`twelve/hk/presets/zenron_core_xl.yaml` を編集してサーバ再起動するだけ。
+
+- **仕組み**: 起動時に YAML を tokenize → 先頭 1000 tok に配置 → 以降のすべての生成でこの 1000 tok が attention sink として参照される
+- **変更コスト**: YAML 編集 + サーバ再起動 (30 秒)
+- **容量**: 1000 tok = 日本語 2500 字 / 英語 4000 字 程度。Phase I 実験で 60 facts 密詰め可能 (92% recall)
+- **消えない**: 会話が何万トークン続いても、trim 後も HK は不変 (設計上の保証)
+- **モデル本体は無傷**: 重み変更なし、他の用途にすぐ切替可能 (`--preset` 変えるだけ)
+- **何が得意か**: プロジェクト固有の規則・公式・API シグネチャ・判断ルール
+
+### 方法 B: **モデル重み自体に焼き込み (fine-tuning / weight surgery)**
+`weight_analysis/` の GGUF patcher / LoRA / full fine-tune 系。
+
+- **仕組み**: モデルの weight parameter を書き換える。学習で gradient 更新するか、直接 byte レベルで scale をいじる (layer_output_scale 等)
+- **変更コスト**: 大きい。数時間〜数日の GPU 時間、データセット準備、評価ループ
+- **容量**: 実質無限 (パラメータが 35B あるので)
+- **消えない (本当に消えない)**: モデルそのものが変わる。どんな preset / prompt でも反映される
+- **戻せない**: weight 変更はロールバックが面倒 (GGUF 丸ごと保存しとく必要あり、Phase O-2 で触れた abliteration も事例の 1 つ)
+- **副作用あり**: Heretic の例に見られるように、他の能力が壊れる可能性 (chat template 遵守が damaged)
+- **何が得意か**: 言語スタイルの変更、新言語対応、特定タスクの精度ブースト
+
+### 比較表
+
+| 観点 | HK preset 焼込 | weight 焼込 |
+|---|---|---|
+| 変更時間 | 30 秒 | 数時間〜数日 |
+| 容量 | HK=1000 tok (= 60 facts 程度) | 実質無制限 |
+| モデル重み | 無傷 | 書き換え |
+| 戻し易さ | `--preset` 変えるだけ | バックアップから差し替え |
+| 副作用 | HK の末尾 facts が tail truncate される | 他能力が劣化する可能性 |
+| 得意分野 | 規則・公式・ID・判断基準 | 言語スタイル・新言語・精度 |
+| 測定 | `check_recall.py` で recall 即測 | HellaSwag 等 benchmark 必要 |
+| 共有 | YAML 1 枚で移植可能 | GGUF 全体 (21 GB) 要配布 |
+
+### 使い分けの原則
+1. **まず HK preset で試す** — 変更が軽く、リスクなし、Phase I で 2.2× effective 確認済
+2. **HK で不足なら weight** — 言語的な癖や低レベル挙動が要件の時だけ
+3. **両方併用できる** — weight 焼込した重みに更に HK preset 載せる (重複投資、普通はやらない)
+
+現プロジェクトは **HK preset のみ** で運用。`zenron_core_xl.yaml` が本番。weight 焼込 (例: Heretic abliteration) は既に base model に入ってる分のみ、自前では追加してない。
+
 ## Docs 索引
 
 | 目的 | 読むファイル |
 |---|---|
 | mimir 使い方 | 本ファイル |
+| **推論サーバ内部 / Phase O/P defense** | `@docs/HK.md` |
+| **HK preset 設計 / recall 測定** | `@docs/HK.md` (Phase D/E/G/I/M) |
+| **HK preset 本体** | `@twelve/hk/presets/zenron_core_xl.yaml` |
+| **Hermes 統合 (Windows 修正済)** | `/c/Users/user/hermes-agent/` + `@docs/HK.md` Phase P-1/P-2/P-3 |
 | **Reigen 内部実装・編集時** | `@docs/REIGEN_INTERNALS.md` |
 | **owl 内部実装・編集時** | `@docs/OWL_INTERNALS.md` |
 | **Sentinel (legacy)** | `@docs/SENTINEL_LEGACY.md` |
