@@ -1,0 +1,794 @@
+{
+  "A_no_culture": {
+    "trajectory": [
+      {
+        "epoch": 0,
+        "snapshots": [
+          {
+            "u_id": 0,
+            "quality": 2.6287476860138907,
+            "food_total": 8,
+            "n_alive": 1,
+            "n_births": 1,
+            "n_deaths": 6,
+            "max_gen": 0,
+            "mean_gen": 0.0,
+            "w_adapt_mean": 2.0
+          },
+          {
+            "u_id": 1,
+            "quality": 0.0,
+            "food_total": 10,
+            "n_alive": 0,
+            "n_births": 1,
+            "n_deaths": 7,
+            "max_gen": 0,
+            "mean_gen": 0.0,
+            "w_adapt_mean": 0.0
+          },
+          {
+            "u_id": 2,
+            "quality": 3.2307340881768587,
+            "food_total": 28,
+            "n_alive": 1,
+            "n_births": 1,
+            "n_deaths": 6,
+            "max_gen": 0,
+            "mean_gen": 0.0,
+            "w_adapt_mean": 2.0
+          }
+        ],
+        "elapsed_ep_s": 9.362210512161255
+      },
+      {
+        "epoch": 1,
+        "snapshots": [
+          {
+            "u_id": 0,
+            "quality": 0.0,
+            "food_total": 8,
+            "n_alive": 0,
+            "n_births": 1,
+            "n_deaths": 7,
+            "max_gen": 0,
+            "mean_gen": 0.0,
+            "w_adapt_mean": 0.0
+          },
+          {
+            "u_id": 1,
+            "quality": 0.0,
+            "food_total": 2,
+            "n_alive": 0,
+            "n_births": 0,
+            "n_deaths": 6,
+            "max_gen": 0,
+            "mean_gen": 0.0,
+            "w_adapt_mean": 0.0
+          },
+          {
+            "u_id": 2,
+            "quality": 0.0,
+            "food_total": 33,
+            "n_alive": 0,
+            "n_births": 1,
+            "n_deaths": 7,
+            "max_gen": 0,
+            "mean_gen": 0.0,
+            "w_adapt_mean": 0.0
+          }
+        ],
+        "elapsed_ep_s": 2.9050064086914062
+      },
+      {
+        "epoch": 2,
+        "snapshots": [
+          {
+            "u_id": 0,
+            "quality": 0.0,
+            "food_total": 8,
+            "n_alive": 0,
+            "n_births": 1,
+            "n_deaths": 7,
+            "max_gen": 0,
+            "mean_gen": 0.0,
+            "w_adapt_mean": 0.0
+          },
+          {
+            "u_id": 1,
+            "quality": 0.0,
+            "food_total": 2,
+            "n_alive": 0,
+            "n_births": 0,
+            "n_deaths": 6,
+            "max_gen": 0,
+            "mean_gen": 0.0,
+            "w_adapt_mean": 0.0
+          },
+          {
+            "u_id": 2,
+            "quality": 0.0,
+            "food_total": 0,
+            "n_alive": 0,
+            "n_births": 0,
+            "n_deaths": 6,
+            "max_gen": 0,
+            "mean_gen": 0.0,
+            "w_adapt_mean": 0.0
+          }
+        ],
+        "elapsed_ep_s": 2.492053508758545
+      },
+      {
+        "epoch": 3,
+        "snapshots": [
+          {
+            "u_id": 0,
+            "quality": 0.0,
+            "food_total": 8,
+            "n_alive": 0,
+            "n_births": 1,
+            "n_deaths": 7,
+            "max_gen": 0,
+            "mean_gen": 0.0,
+            "w_adapt_mean": 0.0
+          },
+          {
+            "u_id": 1,
+            "quality": 0.0,
+            "food_total": 2,
+            "n_alive": 0,
+            "n_births": 0,
+            "n_deaths": 6,
+            "max_gen": 0,
+            "mean_gen": 0.0,
+            "w_adapt_mean": 0.0
+          },
+          {
+            "u_id": 2,
+            "quality": 0.0,
+            "food_total": 6,
+            "n_alive": 0,
+            "n_births": 0,
+            "n_deaths": 6,
+            "max_gen": 0,
+            "mean_gen": 0.0,
+            "w_adapt_mean": 0.0
+          }
+        ],
+        "elapsed_ep_s": 2.2680418491363525
+      },
+      {
+        "epoch": 4,
+        "snapshots": [
+          {
+            "u_id": 0,
+            "quality": 0.0,
+            "food_total": 8,
+            "n_alive": 0,
+            "n_births": 1,
+            "n_deaths": 7,
+            "max_gen": 0,
+            "mean_gen": 0.0,
+            "w_adapt_mean": 0.0
+          },
+          {
+            "u_id": 1,
+            "quality": 0.0,
+            "food_total": 2,
+            "n_alive": 0,
+            "n_births": 0,
+            "n_deaths": 6,
+            "max_gen": 0,
+            "mean_gen": 0.0,
+            "w_adapt_mean": 0.0
+          },
+          {
+            "u_id": 2,
+            "quality": 4.013971861869042,
+            "food_total": 12,
+            "n_alive": 3,
+            "n_births": 2,
+            "n_deaths": 5,
+            "max_gen": 0,
+            "mean_gen": 0.0,
+            "w_adapt_mean": 2.0
+          }
+        ],
+        "elapsed_ep_s": 4.1476030349731445
+      },
+      {
+        "epoch": 5,
+        "snapshots": [
+          {
+            "u_id": 0,
+            "quality": 0.0,
+            "food_total": 8,
+            "n_alive": 0,
+            "n_births": 1,
+            "n_deaths": 7,
+            "max_gen": 0,
+            "mean_gen": 0.0,
+            "w_adapt_mean": 0.0
+          },
+          {
+            "u_id": 1,
+            "quality": 3.0850821323125954,
+            "food_total": 9,
+            "n_alive": 3,
+            "n_births": 1,
+            "n_deaths": 4,
+            "max_gen": 0,
+            "mean_gen": 0.0,
+            "w_adapt_mean": 0.7960707218119752
+          },
+          {
+            "u_id": 2,
+            "quality": 0.0,
+            "food_total": 12,
+            "n_alive": 0,
+            "n_births": 2,
+            "n_deaths": 8,
+            "max_gen": 0,
+            "mean_gen": 0.0,
+            "w_adapt_mean": 0.0
+          }
+        ],
+        "elapsed_ep_s": 4.853999853134155
+      },
+      {
+        "epoch": 6,
+        "snapshots": [
+          {
+            "u_id": 0,
+            "quality": 0.0,
+            "food_total": 8,
+            "n_alive": 0,
+            "n_births": 1,
+            "n_deaths": 7,
+            "max_gen": 0,
+            "mean_gen": 0.0,
+            "w_adapt_mean": 0.0
+          },
+          {
+            "u_id": 1,
+            "quality": 0.0,
+            "food_total": 9,
+            "n_alive": 0,
+            "n_births": 1,
+            "n_deaths": 7,
+            "max_gen": 0,
+            "mean_gen": 0.0,
+            "w_adapt_mean": 0.0
+          },
+          {
+            "u_id": 2,
+            "quality": 2.16697356394584,
+            "food_total": 6,
+            "n_alive": 3,
+            "n_births": 0,
+            "n_deaths": 3,
+            "max_gen": 0,
+            "mean_gen": 0.0,
+            "w_adapt_mean": 0.7938003493206306
+          }
+        ],
+        "elapsed_ep_s": 4.150066614151001
+      },
+      {
+        "epoch": 7,
+        "snapshots": [
+          {
+            "u_id": 0,
+            "quality": 0.0,
+            "food_total": 8,
+            "n_alive": 0,
+            "n_births": 1,
+            "n_deaths": 7,
+            "max_gen": 0,
+            "mean_gen": 0.0,
+            "w_adapt_mean": 0.0
+          },
+          {
+            "u_id": 1,
+            "quality": 1.7802257963495558,
+            "food_total": 4,
+            "n_alive": 2,
+            "n_births": 0,
+            "n_deaths": 4,
+            "max_gen": 0,
+            "mean_gen": 0.0,
+            "w_adapt_mean": 0.19113031523954538
+          },
+          {
+            "u_id": 2,
+            "quality": 0.0,
+            "food_total": 6,
+            "n_alive": 0,
+            "n_births": 0,
+            "n_deaths": 6,
+            "max_gen": 0,
+            "mean_gen": 0.0,
+            "w_adapt_mean": 0.0
+          }
+        ],
+        "elapsed_ep_s": 4.3198630809783936
+      },
+      {
+        "epoch": 8,
+        "snapshots": [
+          {
+            "u_id": 0,
+            "quality": 0.0,
+            "food_total": 8,
+            "n_alive": 0,
+            "n_births": 1,
+            "n_deaths": 7,
+            "max_gen": 0,
+            "mean_gen": 0.0,
+            "w_adapt_mean": 0.0
+          },
+          {
+            "u_id": 1,
+            "quality": 0.0,
+            "food_total": 4,
+            "n_alive": 0,
+            "n_births": 0,
+            "n_deaths": 6,
+            "max_gen": 0,
+            "mean_gen": 0.0,
+            "w_adapt_mean": 0.0
+          },
+          {
+            "u_id": 2,
+            "quality": 5.343874912405415,
+            "food_total": 18,
+            "n_alive": 5,
+            "n_births": 2,
+            "n_deaths": 3,
+            "max_gen": 1,
+            "mean_gen": 0.4,
+            "w_adapt_mean": 2.0
+          }
+        ],
+        "elapsed_ep_s": 5.8766114711761475
+      },
+      {
+        "epoch": 9,
+        "snapshots": [
+          {
+            "u_id": 0,
+            "quality": 0.0,
+            "food_total": 8,
+            "n_alive": 0,
+            "n_births": 1,
+            "n_deaths": 7,
+            "max_gen": 0,
+            "mean_gen": 0.0,
+            "w_adapt_mean": 0.0
+          },
+          {
+            "u_id": 1,
+            "quality": 3.5391146845824153,
+            "food_total": 7,
+            "n_alive": 4,
+            "n_births": 1,
+            "n_deaths": 3,
+            "max_gen": 0,
+            "mean_gen": 0.0,
+            "w_adapt_mean": 1.0956035663995711
+          },
+          {
+            "u_id": 2,
+            "quality": 5.017555083384212,
+            "food_total": 30,
+            "n_alive": 2,
+            "n_births": 2,
+            "n_deaths": 6,
+            "max_gen": 1,
+            "mean_gen": 0.5,
+            "w_adapt_mean": 2.0
+          }
+        ],
+        "elapsed_ep_s": 5.97730016708374
+      }
+    ],
+    "total_elapsed_s": 46.7,
+    "inherit_rate": 0.0
+  },
+  "B_culture": {
+    "trajectory": [
+      {
+        "epoch": 0,
+        "snapshots": [
+          {
+            "u_id": 0,
+            "quality": 2.6287476860138907,
+            "food_total": 8,
+            "n_alive": 1,
+            "n_births": 1,
+            "n_deaths": 6,
+            "max_gen": 0,
+            "mean_gen": 0.0,
+            "w_adapt_mean": 2.0
+          },
+          {
+            "u_id": 1,
+            "quality": 0.0,
+            "food_total": 10,
+            "n_alive": 0,
+            "n_births": 1,
+            "n_deaths": 7,
+            "max_gen": 0,
+            "mean_gen": 0.0,
+            "w_adapt_mean": 0.0
+          },
+          {
+            "u_id": 2,
+            "quality": 3.2307340881768587,
+            "food_total": 28,
+            "n_alive": 1,
+            "n_births": 1,
+            "n_deaths": 6,
+            "max_gen": 0,
+            "mean_gen": 0.0,
+            "w_adapt_mean": 2.0
+          }
+        ],
+        "elapsed_ep_s": 9.359015464782715
+      },
+      {
+        "epoch": 1,
+        "snapshots": [
+          {
+            "u_id": 0,
+            "quality": 0.0,
+            "food_total": 8,
+            "n_alive": 0,
+            "n_births": 1,
+            "n_deaths": 7,
+            "max_gen": 0,
+            "mean_gen": 0.0,
+            "w_adapt_mean": 0.0
+          },
+          {
+            "u_id": 1,
+            "quality": 0.0,
+            "food_total": 2,
+            "n_alive": 0,
+            "n_births": 0,
+            "n_deaths": 6,
+            "max_gen": 0,
+            "mean_gen": 0.0,
+            "w_adapt_mean": 0.0
+          },
+          {
+            "u_id": 2,
+            "quality": 0.0,
+            "food_total": 33,
+            "n_alive": 0,
+            "n_births": 1,
+            "n_deaths": 7,
+            "max_gen": 0,
+            "mean_gen": 0.0,
+            "w_adapt_mean": 0.0
+          }
+        ],
+        "elapsed_ep_s": 2.943474769592285
+      },
+      {
+        "epoch": 2,
+        "snapshots": [
+          {
+            "u_id": 0,
+            "quality": 0.0,
+            "food_total": 8,
+            "n_alive": 0,
+            "n_births": 1,
+            "n_deaths": 7,
+            "max_gen": 0,
+            "mean_gen": 0.0,
+            "w_adapt_mean": 0.0
+          },
+          {
+            "u_id": 1,
+            "quality": 0.0,
+            "food_total": 2,
+            "n_alive": 0,
+            "n_births": 0,
+            "n_deaths": 6,
+            "max_gen": 0,
+            "mean_gen": 0.0,
+            "w_adapt_mean": 0.0
+          },
+          {
+            "u_id": 2,
+            "quality": 0.0,
+            "food_total": 0,
+            "n_alive": 0,
+            "n_births": 0,
+            "n_deaths": 6,
+            "max_gen": 0,
+            "mean_gen": 0.0,
+            "w_adapt_mean": 0.0
+          }
+        ],
+        "elapsed_ep_s": 2.501659393310547
+      },
+      {
+        "epoch": 3,
+        "snapshots": [
+          {
+            "u_id": 0,
+            "quality": 0.0,
+            "food_total": 8,
+            "n_alive": 0,
+            "n_births": 1,
+            "n_deaths": 7,
+            "max_gen": 0,
+            "mean_gen": 0.0,
+            "w_adapt_mean": 0.0
+          },
+          {
+            "u_id": 1,
+            "quality": 0.0,
+            "food_total": 2,
+            "n_alive": 0,
+            "n_births": 0,
+            "n_deaths": 6,
+            "max_gen": 0,
+            "mean_gen": 0.0,
+            "w_adapt_mean": 0.0
+          },
+          {
+            "u_id": 2,
+            "quality": 0.0,
+            "food_total": 6,
+            "n_alive": 0,
+            "n_births": 0,
+            "n_deaths": 6,
+            "max_gen": 0,
+            "mean_gen": 0.0,
+            "w_adapt_mean": 0.0
+          }
+        ],
+        "elapsed_ep_s": 2.3016936779022217
+      },
+      {
+        "epoch": 4,
+        "snapshots": [
+          {
+            "u_id": 0,
+            "quality": 0.0,
+            "food_total": 8,
+            "n_alive": 0,
+            "n_births": 1,
+            "n_deaths": 7,
+            "max_gen": 0,
+            "mean_gen": 0.0,
+            "w_adapt_mean": 0.0
+          },
+          {
+            "u_id": 1,
+            "quality": 0.0,
+            "food_total": 2,
+            "n_alive": 0,
+            "n_births": 0,
+            "n_deaths": 6,
+            "max_gen": 0,
+            "mean_gen": 0.0,
+            "w_adapt_mean": 0.0
+          },
+          {
+            "u_id": 2,
+            "quality": 3.784189356765539,
+            "food_total": 11,
+            "n_alive": 2,
+            "n_births": 2,
+            "n_deaths": 6,
+            "max_gen": 0,
+            "mean_gen": 0.0,
+            "w_adapt_mean": 2.0
+          }
+        ],
+        "elapsed_ep_s": 3.932621479034424
+      },
+      {
+        "epoch": 5,
+        "snapshots": [
+          {
+            "u_id": 0,
+            "quality": 0.0,
+            "food_total": 8,
+            "n_alive": 0,
+            "n_births": 1,
+            "n_deaths": 7,
+            "max_gen": 0,
+            "mean_gen": 0.0,
+            "w_adapt_mean": 0.0
+          },
+          {
+            "u_id": 1,
+            "quality": 3.0850821323125954,
+            "food_total": 9,
+            "n_alive": 3,
+            "n_births": 1,
+            "n_deaths": 4,
+            "max_gen": 0,
+            "mean_gen": 0.0,
+            "w_adapt_mean": 0.798798459539186
+          },
+          {
+            "u_id": 2,
+            "quality": 0.0,
+            "food_total": 11,
+            "n_alive": 0,
+            "n_births": 2,
+            "n_deaths": 8,
+            "max_gen": 0,
+            "mean_gen": 0.0,
+            "w_adapt_mean": 0.0
+          }
+        ],
+        "elapsed_ep_s": 4.782464265823364
+      },
+      {
+        "epoch": 6,
+        "snapshots": [
+          {
+            "u_id": 0,
+            "quality": 0.0,
+            "food_total": 8,
+            "n_alive": 0,
+            "n_births": 1,
+            "n_deaths": 7,
+            "max_gen": 0,
+            "mean_gen": 0.0,
+            "w_adapt_mean": 0.0
+          },
+          {
+            "u_id": 1,
+            "quality": 0.0,
+            "food_total": 9,
+            "n_alive": 0,
+            "n_births": 1,
+            "n_deaths": 7,
+            "max_gen": 0,
+            "mean_gen": 0.0,
+            "w_adapt_mean": 0.0
+          },
+          {
+            "u_id": 2,
+            "quality": 2.16697356394584,
+            "food_total": 6,
+            "n_alive": 3,
+            "n_births": 0,
+            "n_deaths": 3,
+            "max_gen": 0,
+            "mean_gen": 0.0,
+            "w_adapt_mean": 0.7938003493206306
+          }
+        ],
+        "elapsed_ep_s": 4.1967995166778564
+      },
+      {
+        "epoch": 7,
+        "snapshots": [
+          {
+            "u_id": 0,
+            "quality": 0.0,
+            "food_total": 8,
+            "n_alive": 0,
+            "n_births": 1,
+            "n_deaths": 7,
+            "max_gen": 0,
+            "mean_gen": 0.0,
+            "w_adapt_mean": 0.0
+          },
+          {
+            "u_id": 1,
+            "quality": 1.7802257963495558,
+            "food_total": 4,
+            "n_alive": 2,
+            "n_births": 0,
+            "n_deaths": 4,
+            "max_gen": 0,
+            "mean_gen": 0.0,
+            "w_adapt_mean": 0.19113031523954538
+          },
+          {
+            "u_id": 2,
+            "quality": 0.0,
+            "food_total": 6,
+            "n_alive": 0,
+            "n_births": 0,
+            "n_deaths": 6,
+            "max_gen": 0,
+            "mean_gen": 0.0,
+            "w_adapt_mean": 0.0
+          }
+        ],
+        "elapsed_ep_s": 4.394861936569214
+      },
+      {
+        "epoch": 8,
+        "snapshots": [
+          {
+            "u_id": 0,
+            "quality": 0.0,
+            "food_total": 8,
+            "n_alive": 0,
+            "n_births": 1,
+            "n_deaths": 7,
+            "max_gen": 0,
+            "mean_gen": 0.0,
+            "w_adapt_mean": 0.0
+          },
+          {
+            "u_id": 1,
+            "quality": 0.0,
+            "food_total": 4,
+            "n_alive": 0,
+            "n_births": 0,
+            "n_deaths": 6,
+            "max_gen": 0,
+            "mean_gen": 0.0,
+            "w_adapt_mean": 0.0
+          },
+          {
+            "u_id": 2,
+            "quality": 5.366100793690832,
+            "food_total": 19,
+            "n_alive": 5,
+            "n_births": 2,
+            "n_deaths": 3,
+            "max_gen": 1,
+            "mean_gen": 0.4,
+            "w_adapt_mean": 2.0
+          }
+        ],
+        "elapsed_ep_s": 5.806957006454468
+      },
+      {
+        "epoch": 9,
+        "snapshots": [
+          {
+            "u_id": 0,
+            "quality": 0.0,
+            "food_total": 8,
+            "n_alive": 0,
+            "n_births": 1,
+            "n_deaths": 7,
+            "max_gen": 0,
+            "mean_gen": 0.0,
+            "w_adapt_mean": 0.0
+          },
+          {
+            "u_id": 1,
+            "quality": 3.5391146845824153,
+            "food_total": 7,
+            "n_alive": 4,
+            "n_births": 1,
+            "n_deaths": 3,
+            "max_gen": 0,
+            "mean_gen": 0.0,
+            "w_adapt_mean": 1.0952371553162885
+          },
+          {
+            "u_id": 2,
+            "quality": 4.977533729547444,
+            "food_total": 29,
+            "n_alive": 2,
+            "n_births": 2,
+            "n_deaths": 6,
+            "max_gen": 1,
+            "mean_gen": 0.5,
+            "w_adapt_mean": 2.0
+          }
+        ],
+        "elapsed_ep_s": 6.316616058349609
+      }
+    ],
+    "total_elapsed_s": 46.9,
+    "inherit_rate": 0.8
+  }
+}

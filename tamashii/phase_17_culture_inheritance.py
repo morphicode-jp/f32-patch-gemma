@@ -136,7 +136,7 @@ class NoCultureHebbianUniverse(CultureHebbianUniverse):
     inherit_rate: float = 0.0
 
 
-def run_comparison(n_universes=2, agents_per_u=6, epoch_steps=800,
+def run_comparison(n_universes=3, agents_per_u=6, epoch_steps=600,
                     n_epochs=15, seed=42, output="phase_17_culture_compare.json"):
     """Compare: A (no inheritance) vs B (inheritance)."""
     print("=" * 72, flush=True)
