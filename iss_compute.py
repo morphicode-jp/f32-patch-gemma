@@ -49,11 +49,27 @@ def extract_shell_read_write_sets(shell) -> dict:
 
     Returns {'reads': set[int], 'writes': set[int], 'inhibitory': bool}.
 
-    Uses multiple strategies:
-      1. Explicit slot attributes (sensor_slot, motor_nav, firing_slot, etc.)
-      2. Active probing: run step() with known S, see which indices change
-      3. Name heuristics for inhibitory designation
+    Strategies (in priority order):
+      0. EXPLICIT OVERRIDE: shell._reads_override / shell._writes_override
+         (set by Cardinal for slot mutation)
+      1. Explicit slot attributes (sensor_slot, motor_nav, firing_slot)
+      2. Active probing
+      3. Name heuristics
     """
+    # Priority 0: explicit override (for Cardinal slot mutation)
+    if (hasattr(shell, "_reads_override") and
+            shell._reads_override is not None and
+            hasattr(shell, "_writes_override") and
+            shell._writes_override is not None):
+        name = getattr(shell, "name", "").lower()
+        return {
+            "reads": set(int(x) for x in shell._reads_override),
+            "writes": set(int(x) for x in shell._writes_override),
+            "inhibitory": ("taboo" in name or "inhib" in name
+                            or getattr(shell, "shell_sign", 1) == -1),
+            "name": name,
+        }
+
     reads = set()
     writes = set()
 
