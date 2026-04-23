@@ -1,0 +1,37 @@
+{
+  "problem": "LLM eval on localhost:8282 Qwen 3.6",
+  "model": "qwen36-heretic-ithink-zenron_core_xl",
+  "time_budget_per_specialist_s": 90.0,
+  "single": {
+    "best_score": 98.0,
+    "tool_used": "owl(reigen_tried)",
+    "elapsed_s": 121.76242995262146,
+    "eval_calls": 197
+  },
+  "council": {
+    "winner": "expensive",
+    "best_score": 98.0,
+    "council": [
+      [
+        "expensive",
+        98.0
+      ],
+      [
+        "scipy-forced",
+        98.0
+      ],
+      [
+        "default",
+        98.0
+      ]
+    ],
+    "variance": 0.0,
+    "elapsed_s": 129.15528464317322,
+    "eval_calls": 256
+  },
+  "verdict": {
+    "wall_ratio": 1.0607154004189008,
+    "calls_ratio": 1.299492385786802,
+    "conclusion": "✅ GPU concurrent OK — council usable for LLM eval"
+  }
+}

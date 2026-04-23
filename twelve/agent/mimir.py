@@ -291,6 +291,8 @@ def mimir(
         if n_seed_samples is not None:
             owl_kwargs["n_seed_samples"] = int(n_seed_samples)
         r_owl = _owl(**owl_kwargs)
+        if r_owl is None:
+            r_owl = {}  # None-safe access below
         return {
             "mode": "structure_only",
             "best_params": r_owl.get("best_params"),
@@ -343,6 +345,21 @@ def mimir(
         owl_kwargs["n_seed_samples"] = int(n_seed_samples)
 
     r_owl = _owl(**owl_kwargs)
+
+    # Defensive: owl can occasionally return None in LaD + noisy eval_fn paths
+    # (seen in high-n_samples LLM keijb). Treat as owl failure and let cascade
+    # escalate if budget remains; otherwise raise with context.
+    if r_owl is None:
+        if verbose:
+            print(f"  [mimir] owl returned None (LaD + noise corner case); "
+                  f"using empty fallback to let cascade escalate")
+        r_owl = {
+            "best_params": None,
+            "best_score": None,
+            "verified_score": None,
+            "confidence": "owl_none_fallback",
+            "proxy_r2": 0.0,
+        }
 
     owl_best_params = r_owl.get("best_params")
     owl_best_score = r_owl.get("verified_score")

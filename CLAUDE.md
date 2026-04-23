@@ -19,9 +19,9 @@ r = mimir(eval_fn, param_ranges, time_budget=300)
 print(r["best_params"], r["best_score"], r["tool_used"])
 ```
 
-返り値 dict 主要キー: `best_params` / `best_score` / `tool_used` / `dead_dims` / `fragility` / `proxy_r2` / `route`。構造発見系 (dead_dims, fragility, proxy_r2) は最適化と同時に得られる。
+返り値 dict 主要キー: `best_params` / `best_score` / `tool_used` / `dead_dims` / `fragility` / `proxy_r2` / `route`。構造発見系 (dead_dims, fragility, proxy_r2) は最適化と同時に得られる。stochastic eval_fn / `n_samples_per_eval>1` / dict eval_fn 時は追加で `stable_active` / `observer_dependent` / `dead_observers` / `multi_observer_side_analysis` も付く (Rule 12)。
 
-## mimir 使用 5 パターン
+## mimir 使用 6 パターン
 
 第1に、何も知らない状態で最適化したい時。`mimir(fn, ranges, time_budget=300)` で終わる。
 
@@ -33,12 +33,15 @@ print(r["best_params"], r["best_score"], r["tool_used"])
 
 第5に、安全指標を守りたい時。`guard_fn=my_guard` を渡す。owl に safe_dim_analysis=True 経由で引き継がれ、2 指標 pivot が発動する。
 
+第6に、stochastic eval_fn (LLM 生成 / RL rollout / Monte Carlo 等、1 call が noisy) の時。`n_samples_per_eval=20` で各 seed 点を N 回実測 → 集約 + LaD 多観測化。proxy が noise を fit して崩壊するのを防ぐ。詳細は Rule 12。
+
 ```python
 r1 = mimir(fn, [(-5, 5)] * 8, time_budget=300)                           # (1) 一般
 r2 = mimir(fn, ranges, curated_measurements=past_data, time_budget=600)  # (2) 過去 data
 r3 = mimir(ppl_eval, ranges, time_budget=1800)                           # (3) 自動 expensive
 r4 = mimir(fn, ranges, mode="structure_only", time_budget=30)            # (4) 分析のみ
 r5 = mimir(fn, ranges, guard_fn=my_guard, time_budget=300)               # (5) 2 指標
+r6 = mimir(llm_eval, ranges, n_samples_per_eval=20, time_budget=1800)    # (6) stochastic
 ```
 
 ## mimir 内部分岐ロジック
@@ -72,6 +75,8 @@ mimir(fn, ranges, time_budget) 呼出し
 | `scipy_cascade_dim_threshold` | 10 | scipy.basinhopping 発火の最小次元 |
 | `scipy_cascade_budget_share` | 0.5 | scipy の budget 割合 (remaining × X) |
 
+`n_samples_per_eval` / `stochastic_aggregator` (Rule 12) は **kwarg 専用 / JSON 非対応**。compute 予算が silent に N× されるのを避けるための明示 opt-in 設計 (default は 1 で backward compat)。
+
 ## mimir の返り値
 
 ```
@@ -79,6 +84,10 @@ best_params, best_score, tool_used, route, eval_cost_s, confidence, elapsed_s
 # 構造発見 (owl 由来)
 dead_dims, active_dims, fragility, proxy_type, proxy_r2
 verified_score (実測スコア), param_names, rounds_completed, recovered_dims, n_measurements
+# multi-observer side-analysis (LaD seed / dict eval_fn / n_samples_per_eval>1 時のみ、Rule 12)
+stable_active, stable_dead, observer_dependent
+dead_observers, observers, observer_correlations
+multi_observer_side_analysis (True flag)
 # raw 生 dict (詳細読み取り)
 owl_result, reigen_result (escalation 時), scipy_result (dim≥10 時)
 ```
@@ -109,7 +118,7 @@ mimir()                      ← ユーザー呼び口
 `mimir(eval_fn, ranges, time_budget=300)` の **1 行で下記が全自動**:
 
 - seed 20 点の param 選定 (uniform random)
-- 各 param で eval_fn 呼出し、score 収集
+- 各 param で eval_fn 呼出し (**`n_samples_per_eval=N` 指定時は 1 点あたり N 回実測 → 集約 + 個別 observer 保存**)、score 収集
 - 実測点から proxy (近似式) を fit
 - proxy argmax の新 param で再実測 (verify_fn)
 - growing_data 拡張 → proxy 再 fit → 次の点で実測 ... のループ
@@ -128,6 +137,8 @@ for p in preset_points:
 r = mimir(eval_fn, ranges, time_budget=300)
 ```
 
+ただし **stochastic eval_fn (LLM 生成 / RL / Monte Carlo) は `n_samples_per_eval=20` or `wrap_multi_obs` の明示指定必須** (default 1 では seed が noise 直撃)。詳細は Rule 12。
+
 ### 過去データは必ず `curated_measurements=` に渡せ
 
 過去に手動で測った点があるなら**絶対に捨てるな**。mimir の seed にして精度を爆上げできる。
@@ -145,6 +156,8 @@ r = mimir(eval_fn, ranges, curated_measurements=past, time_budget=600)
 | empty start (mimir が random 20 点実測) | 0.5 〜 0.7 |
 | curated 20 点 (ドメイン知識) | **0.80 〜 0.90** |
 | curated 50 点 | **0.90 〜 0.95** |
+| stochastic eval_fn, `n_samples_per_eval=1` (Rule 12) | 0.3 〜 0.5 (noise fit、崩壊) |
+| stochastic eval_fn, `n_samples_per_eval=20` (Rule 12) | **0.7 〜 0.9** (N 集約で noise 除去) |
 
 curated = random の **10-100× 情報量**。ドメインエキスパートの選んだ 20 点は random 200-2000 点に相当する。
 
@@ -181,8 +194,9 @@ r = mimir(my_eval_fn, param_ranges, time_budget=1800)
 | fragility 突出 (崩壊因子、scale=0 型) | fragility max/median | warn |
 | active_dims < 2 (高 dim で 1 次元的) | active_dims 数 | warn |
 | multi-obs dict で stable_active 空 | observer 整合性 | warn |
+| 同一 params で高 CV (stochastic eval_fn) | N-call stability probe (MAD/\|median\|) | warn |
 
-**fatal なら本番走らせるな**。原因修正が先。
+**fatal なら本番走らせるな**。原因修正が先。stochastic 検出時 (`stochastic_cv > 0.10`) は `wrap_stochastic(n=20)` / `wrap_multi_obs(n=20)` / `n_samples_per_eval=20` を recommendations に自動追加 (Rule 12)。
 
 **背景**: eval_fn = 人間の価値観定義、完全自動生成は原理不可能 (docs/全論の公式の活用.md §11.2)。**bad パターン検出**で 80% の失敗を事前回避できる。
 
@@ -195,6 +209,7 @@ r = mimir(my_eval_fn, param_ranges, time_budget=1800)
 | apply → measure → restore | state leak | 測定汚染 |
 | curated 過去 data を mimir に | random _collect | 10-100× 情報量損 |
 | dict `{"nll":..., "hs":...}` return | 単一 scalar | multi-observer で stable_active 等取れる |
+| stochastic: `wrap_stochastic(fn, n=20)` or `wrap_multi_obs(fn, n=20)` | stochastic を raw で渡す | LaD 化で noise 除去、proxy_r2 +0.3-0.4 (Rule 12) |
 
 ## experience_id
 
@@ -228,6 +243,9 @@ full 数値は `benchmark_mimir.json` / `benchmark_mimir_dimscale.json`。
 | 11 | `batch_eval_fn` は external params 限定。internal model state では禁止 |
 | 11b | mimir parallel cascade も internal state 危険 → `thread_safe_eval=False` |
 | 12 | stochastic eval_fn は `n_samples_per_eval` か `wrap_multi_obs` で LaD 化せよ |
+| 13 | 多峰 / stochastic / 弱点分からん問題は `mimir_council()` (4 specialist 並列) |
+| 14 | 高次元 sparse かつ reigen symbolic 解なし (Hebbian 進化系) は `mimir_cardinal_hierarchy()` |
+| 15 | multi-metric eval でどう aggregate すべきか不明なら `mimir_cardinal_coevolution()` (params × weights 共進化) |
 
 ### Rule -1 〜 11b (詳解)
 
@@ -259,7 +277,7 @@ full 数値は `benchmark_mimir.json` / `benchmark_mimir_dimscale.json`。
 
 **Rule 10**: chaos-game uniformity 0.993 は N=12 + 5-regular + symmetric placement の 3 条件同時必要。1 つ破れば崩壊。Reigen 内部では graph 性質のみ (Circulant(12,{1,4,6}), λ₂=4.0, diameter 2) 使用、placement uniformity は使わないので Rule 10 の縛りは Reigen に効かない。
 
-**Rule 11**: `batch_eval_fn` は learning rate / dropout / prompt token 等の external param 限定。KV cache scale / weight scale / LoRA adapter 等 **internal model state を触る param** には禁止 (global state 共有で並列 eval 不能)。この場面は eval_fn を 2 秒以内に収め、multi-observer dict (`{"nll": -ppl, "hs": hs_score, "mmlu": mmlu_score}`) を返し mimir の `mode="structure_only"` で構造発見。
+**Rule 11**: `batch_eval_fn` は learning rate / dropout / prompt token 等の external param 限定。KV cache scale / weight scale / LoRA adapter 等 **internal model state を触る param** には禁止 (global state 共有で並列 eval 不能)。この場面は eval_fn を 2 秒以内に収め、multi-observer dict (`{"nll": -ppl, "hs": hs_score, "mmlu": mmlu_score}`) を返す。`mode="structure_only"` で構造発見だけも可だし、LaD 改善後 (ed73d16) は **通常最適化も可能** — seed で score+scores 両方作られ、multi-observer 解析が side-analysis として並列実行される。
 
 **Rule 11b**: mimir cheap_cascade は reigen と scipy を並列 thread で走らせる。eval_fn が global state を mutate する場合 race condition 発生。`thread_safe_eval=False` を渡して逐次化、or `eval_cost_hint=2.0` で expensive_route 強制 (cascade 発火せず安全)。LLM キャリブは通常 eval_cost>0.5s で自動 expensive、安全。
 
@@ -286,6 +304,87 @@ r = mimir(wrapped, ranges, time_budget=3600)
 
 **検出と推奨は自動**: `check_eval_fn()` が同一 params で N 回 probe、CV > 0.10 で stochastic 判定 → wrap_* 推奨警告。Default `n_samples_per_eval=1` は backward compat (明示指定しないと compute 予算が勝手に 20× されない)。詳細は `twelve/agent/lad_wrappers.py`。
 
+**Rule 13**: 問題性質が事前に分からん時、または single mimir が多峰 / noise で局所解に嵌まる時は **`mimir_council()`** を使う。4 specialist (default / lad / expensive / scipy-forced) を並列実行、最良を採用:
+
+```python
+from twelve.agent.mimir_council import mimir_council
+r = mimir_council(eval_fn, ranges, time_budget=60)
+# 4 specialist 並列で 60 秒 → 最良 best_score の結果を返す
+print(r["specialist"])              # "lad" / "default" / "expensive" / "scipy-forced"
+print(r["council"])                 # [(name, score), ...] 全員の結果
+print(r["council_variance_std"])    # 問題難易度シグナル
+```
+
+**ベンチ実績** (stochastic Rastrigin 10d, 3 seeds × 2 noise levels):
+- 単独 mimir: gap 31-201 (noise / seed で不安定)
+- **mimir_council: gap ≈ 0 全 6 run** (完全解発見、理論下限到達)
+
+**LLM eval でも使える** (実測: wall time 1.06×、GPU concurrent 並列化成功)。
+
+**specialist 内訳**:
+| name | kwargs | 得意 |
+|---|---|---|
+| `default` | `{}` | 低 noise / symbolic 多峰 (reigen が効く決定論) |
+| `lad` | `{n_samples_per_eval: 20, ...}` | stochastic / 高 noise (LLM / RL / Monte Carlo) |
+| `expensive` | `{eval_cost_hint: 2.0}` | owl 全力 + L-BFGS + random restart 5 (局所解脱出) |
+| `scipy-forced` | `{scipy_cascade_dim_threshold: 3, ...}` | 高次元 gradient / Rosenbrock 系 |
+
+**使い分け**:
+- **単独 `mimir()`**: eval 激安 + 既に何が効くか分かってる時 (2-3 秒で済む簡単問題)
+- **`mimir_council()`**: 多峰 / stochastic / 問題性質不明 / 単独で頭打ち時 (~同時間で 4× 保険)
+
+**避けるべきケース**:
+- GGUF patch 系 eval_fn (disk / メモリ競合で逐次化、council 意味なし)
+- eval_fn が global state mutate (Rule 11b、`executor="thread"` でもダメ)
+
+詳細は `twelve/agent/mimir_council.py`。
+
+**Rule 14**: 高次元 sparse 問題 (20d+ で効く dim が 5-10 個など) は **Council で構造圧縮 → GA で進化** を連結する `mimir_cardinal_hierarchy()` が最強:
+
+```python
+from twelve.agent.mimir_cardinal import mimir_cardinal_hierarchy
+r = mimir_cardinal_hierarchy(eval_fn, ranges_20d, time_budget=600)
+# Step 1 (20% budget): mimir_council で active_dims 抽出 → 5 dim に圧縮
+# Step 2 (80% budget): GA (tournament + crossover + Gaussian mutation) で進化
+# → 2^25 = 33M× 探索空間縮小、局所解を集団選択で飛び越える
+```
+
+**Cardinal (生物進化) の仕組みを optimization に借用**。既存 Cardinal (`tamashii/phase_10_3_cardinal.py`) は 3D voxel 専用、本 module が汎用 GA を提供。
+
+**想定シナリオ** (reigen symbolic 解が効かない問題限定):
+- FlyWorld 30 dim brain param の局所解突破 (Hebbian v7 67% → 85% 目標、symbolic 解なし)
+- Cardinal agent 進化の hyperparameter tune (emergence 必須)
+- multi-modal landscape で basin 探索 (reigen が効かない場合)
+
+**ベンチ結果 (honest limit)**: Rastrigin 20d (active 5) では council の reigen が symbolic で完全解、hierarchy が負けた。**reigen が効く問題では council 単独が速い**。hierarchy は「symbolic 解なし + 本当に dead 検出できる」場面のみ。
+
+**Rule 15**: multi-metric eval_fn (`{"hs": ..., "mmlu": ..., "ppl_neg": ...}` 等) で **どう aggregate すべきか分からない** 時は `mimir_cardinal_coevolution()` を使う。(params, weights) ペアを共進化させ、**balanced な params** と **意味ある weights 組合せ** を同時発見:
+
+```python
+from twelve.agent.mimir_coevolution import mimir_cardinal_coevolution
+
+def multi_eval(p):
+    return {"hs": hellaswag(p), "mmlu": mmlu(p), "ppl_neg": -ppl(p)}
+
+r = mimir_cardinal_coevolution(
+    multi_eval, param_ranges,
+    metric_names=["hs", "mmlu", "ppl_neg"],
+    time_budget=3600, population=16, generations=30,
+    fitness_mode="harmonic",  # 全 metric 高得点を要求 (特化者を淘汰)
+)
+print(r["best_params"])                  # balanced params
+print(r["best_weights"])                 # 共進化で発見された weight 組合せ
+print(r["metric_ranking_by_weight"])     # どの metric が重要か露出
+print(r["weight_evolution_mean"])        # weight の世代推移 (収束可視化)
+```
+
+**emergence**: 人間が決めた eval_fn aggregation (weighted sum 等) を超えて、「**balanced な param 空間と対応する weight 分布**」を進化が発見する。docs/全論の公式の活用.md §11 "eval_fn 自動生成" の実装の 1 形態。
+
+**fitness_mode**:
+- `"min"` 最悪 metric 優先 (保守、specialist 淘汰)
+- `"harmonic"` 全 metric 要求 (0 近傍で急落、最も balanced)
+- `"weighted"` 個体自身の weight で加重 (weights も選択圧受ける、真の co-evolution)
+
 ## Gotchas (よくハマる落とし穴)
 
 - **scale=0** (Rule 7): range に 0 を絶対入れない。モデル破壊の実証あり
@@ -293,6 +392,7 @@ r = mimir(wrapped, ranges, time_budget=3600)
 - **parallel cascade の race** (Rule 11b): internal state 触る eval_fn で `thread_safe_eval=False` を渡す
 - **wall time overshoot**: cheap_cascade は +20-30% 超過するが quality 優先で accept。厳密な budget 必要なら `eval_cost_hint=N.0` で expensive_route 強制
 - **mimir の高次元 Styblinski 系**: 2^n basin 問題 (non-symmetric deep basins) で cma/basin に劣る。これは mimir 核心的 honest limit、BBOB-Styblinski は稀
+- **stochastic compute 膨張** (Rule 12): `n_samples_per_eval=20` で eval_fn 呼出数が 20× になる。LLM 生成で 1 call = 5s なら seed 20 点 × 20 sample = 2000s 消費。`time_budget` を最低 3000s に。小さな `n` (例 5) から試すのが安全
 
 ## Hardware & safety
 
@@ -404,6 +504,8 @@ Heretic abliteration の副作用を吸収する regex + mask-then-clean パイ�
 | **Hermes 統合 (Windows 修正済)** | `/c/Users/user/hermes-agent/` + `@docs/HK.md` Phase P-1/P-2/P-3 |
 | **Reigen 内部実装・編集時** | `@docs/REIGEN_INTERNALS.md` |
 | **owl 内部実装・編集時** | `@docs/OWL_INTERNALS.md` |
+| **stochastic eval_fn を LaD 化する wrapper (Rule 12)** | `@twelve/agent/lad_wrappers.py` |
+| **mimir council (4 specialist 並列、Rule 13)** | `@twelve/agent/mimir_council.py` |
 | **Sentinel (legacy)** | `@docs/SENTINEL_LEGACY.md` |
 | **HTTP API / ngrok / session API** | `@docs/API_SERVERS.md` |
 | Zenron 実践ガイド + MirrorScan 詳細 | `@docs/ZENRON_GUIDE.md` |
@@ -428,6 +530,14 @@ Heretic abliteration の副作用を吸収する regex + mask-then-clean パイ�
 | Reigen tests | `@twelve/tests/test_reigen*.py` |
 | owl / optimize (primitive HC) | `@twelve/optimize.py` |
 | owl tests | `@twelve/tests/test_owl_*.py` |
+| owl stochastic tests (Rule 12) | `@twelve/tests/test_owl_stochastic.py` |
+| **lad_wrappers** (wrap_stochastic / wrap_multi_obs / wrap_llm_judge、Rule 12) | `@twelve/agent/lad_wrappers.py` |
+| lad_wrappers tests | `@twelve/tests/test_lad_wrappers.py` |
+| **mimir_council** (4 specialist 並列、Rule 13) | `@twelve/agent/mimir_council.py` |
+| mimir_council tests | `@twelve/tests/test_mimir_council.py` |
+| **mimir_cardinal** (Council × GA Hierarchy、Rule 14) | `@twelve/agent/mimir_cardinal.py` |
+| **mimir_coevolution** (params × weights 共進化、Rule 15) | `@twelve/agent/mimir_coevolution.py` |
+| cardinal + coevolution tests | `@twelve/tests/test_mimir_cardinal.py` |
 | Sentinel (legacy) | `@twelve/agent/sentinel.py`, `test_sentinel.py` |
 | MirrorAgent / MS | `@twelve/agent/mirror_agent.py` |
 | UnifiedExperience | `@twelve/agent/unified_experience.py` |
