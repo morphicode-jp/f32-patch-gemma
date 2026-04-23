@@ -17,12 +17,15 @@
   POST /odin/start            — オーディン (4 specialist 並列) session 開始 (2026-04-23)
   GET  /odin/next?sid=...     — odin session の次 action (reigen と共用)
   POST /odin/score            — odin session score 送信 (reigen と共用)
+  POST /stable/start          — オーディン + stabilizer (peak→plateau、Rule 16、2026-04-24)
+  GET  /stable/next?sid=...   — stable session の次 action (reigen と共用)
+  POST /stable/score          — stable session score 送信 (reigen と共用)
   POST /status               — 実行中のATの状態を取得
   POST /stop                 — 実行中のATを停止
   GET  /health               — ヘルスチェック
 
 認証:
-  環境変数 REIGEN_API_KEY 設定時は全 /reigen*, /mimir*, /odin*, /owl に Bearer token 必須。
+  環境変数 REIGEN_API_KEY 設定時は全 /reigen*, /mimir*, /odin*, /stable*, /owl に Bearer token 必須。
   未設定なら認証スキップ (ローカル開発モード)。
 """
 
@@ -191,6 +194,46 @@ def _run_odin_thread(session, config):
         session.done.set()
 
 
+def _run_odin_stable_thread(session, config):
+    """Background thread: mimir_odin_stable (odin → stabilizer、Rule 16) を回す.
+
+    API context の制約は _run_odin_thread と同じ (executor='thread' 強制、
+    Queue(1) で client eval 逐次化)。Stage 1 で odin、Stage 2 で stabilizer が
+    peak 周辺を探索するので eval 呼出数は odin 単独より増える (stabilize_particles
+    × stabilize_gens 分 + robustness 測定で 10)。
+    """
+    try:
+        from twelve.agent.mimir_odin_stable import mimir_odin_stable as _odin_stable
+
+        client_timeout = int(config.get("client_eval_timeout", 600))
+        eval_fn = _remote_eval_factory(session, client_timeout)
+
+        user_ranges = [tuple(x) for x in config["user_param_ranges"]]
+
+        r = _odin_stable(
+            eval_fn=eval_fn,
+            param_ranges=user_ranges,
+            time_budget=float(config.get("time_budget", 300)),
+            stabilize_budget_ratio=float(config.get("stabilize_budget_ratio", 0.25)),
+            stabilize_particles=int(config.get("stabilize_particles", 12)),
+            stabilize_gens=int(config.get("stabilize_gens", 20)),
+            stabilize_sigma0=float(config.get("stabilize_sigma0", 0.08)),
+            robustness_sigma=float(config.get("robustness_sigma", 0.10)),
+            robustness_trials=int(config.get("robustness_trials", 5)),
+            executor="thread",   # process 不可 (queue 共有不能)
+            experience_id=config.get("experience_id", "genesis_odin_stable"),
+            verbose=False,
+        )
+        # Trim heavy nested results before network send
+        for k in ("owl_result", "reigen_result", "scipy_result"):
+            r.pop(k, None)
+        session.result = r
+    except Exception as e:
+        session.result = {"error": str(e), "traceback": traceback.format_exc()}
+    finally:
+        session.done.set()
+
+
 def _cleanup_expired_sessions():
     """放置セッション定期削除 (daemon thread)."""
     while True:
@@ -284,11 +327,12 @@ class ATHandler(BaseHTTPRequestHandler):
 
     # -------- auth --------
     def _auth_required_path(self, path):
-        """Auth required for /owl, /reigen*, /mimir*, /odin* paths."""
+        """Auth required for /owl, /reigen*, /mimir*, /odin*, /stable* paths."""
         return (path.startswith("/reigen")
                 or path == "/owl"
                 or path.startswith("/mimir")
-                or path.startswith("/odin"))
+                or path.startswith("/odin")
+                or path.startswith("/stable"))
 
     def _check_auth(self):
         """Bearer token チェック. 環境変数 REIGEN_API_KEY 未設定なら常に許可."""
@@ -326,6 +370,8 @@ class ATHandler(BaseHTTPRequestHandler):
         elif path == "/mimir/next":
             self._handle_reigen_next(query)  # session loop is algorithm-agnostic
         elif path == "/odin/next":
+            self._handle_reigen_next(query)  # same session protocol
+        elif path == "/stable/next":
             self._handle_reigen_next(query)  # same session protocol
         else:
             self._json_response({"error": "not found"}, 404)
@@ -382,6 +428,10 @@ class ATHandler(BaseHTTPRequestHandler):
         elif path == "/odin/start":
             self._handle_odin_start(data)
         elif path == "/odin/score":
+            self._handle_reigen_score(data)  # same session protocol
+        elif path == "/stable/start":
+            self._handle_odin_stable_start(data)
+        elif path == "/stable/score":
             self._handle_reigen_score(data)  # same session protocol
         elif path == "/status":
             self._handle_status()
@@ -738,6 +788,43 @@ class ATHandler(BaseHTTPRequestHandler):
         session.thread.start()
         self._json_response({"session_id": sid})
 
+    def _handle_odin_stable_start(self, data):
+        """Start a new オーディン + stabilizer session (peak→plateau、Rule 16).
+
+        Request body: /odin/start と同じ + stabilize-specific optional keys:
+          - stabilize_budget_ratio (default 0.25)
+          - stabilize_particles (default 12)
+          - stabilize_gens (default 20)
+          - stabilize_sigma0 (default 0.08)
+          - robustness_sigma / robustness_trials
+        Response: {"session_id": "abc12345"}
+
+        Client flow: /stable/start → poll /stable/next → submit /stable/score
+        → next / done. Final result:
+          - best_params = plateau centroid (robust、実用推奨)
+          - peak_params = 元の sharp peak (参考)
+          - peak_robustness / plateau_robustness
+        """
+        ranges = data.get("param_ranges") or data.get("user_param_ranges")
+        if not ranges or not isinstance(ranges, list):
+            self._json_response({"error": "param_ranges required"}, 400)
+            return
+        config = dict(data)
+        config["user_param_ranges"] = ranges
+        config.setdefault("user_param_names", data.get("param_names"))
+
+        sid = uuid.uuid4().hex[:8]
+        session = _ReigenSession()
+        with _sessions_lock:
+            _sessions[sid] = session
+        session.thread = threading.Thread(
+            target=_run_odin_stable_thread,
+            args=(session, config),
+            daemon=True,
+        )
+        session.thread.start()
+        self._json_response({"session_id": sid})
+
     def _handle_status(self):
         with _lock:
             self._json_response(dict(_status))
@@ -791,6 +878,9 @@ def serve(host="0.0.0.0", port=8282, quiet=False):
     print(f"  POST /odin/start            - オーディン session: start → session_id (4 specialist 並列)", flush=True)
     print(f"  GET  /odin/next?sid=...     - odin session: poll (shares reigen impl)", flush=True)
     print(f"  POST /odin/score            - odin session: submit score", flush=True)
+    print(f"  POST /stable/start          - オーディン + stabilizer session (peak→plateau、Rule 16)", flush=True)
+    print(f"  GET  /stable/next?sid=...   - stable session: poll (shares reigen impl)", flush=True)
+    print(f"  POST /stable/score          - stable session: submit score", flush=True)
     print(f"  POST /status                - status", flush=True)
     print(f"  POST /stop                  - stop", flush=True)
     print(f"  GET  /health                - health", flush=True)

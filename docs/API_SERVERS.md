@@ -21,6 +21,9 @@ HTTP (local/ngrok-shareable, auth via REIGEN_API_KEY env var):
   POST /odin/start                          ← オーディン (4 specialist 並列、2026-04-23 default)
   GET  /odin/next?sid=X                     ← session protocol は /reigen と同じ
   POST /odin/score                          ← 同上
+  POST /stable/start                        ← オーディン + stabilizer (peak→plateau、Rule 16)
+  GET  /stable/next?sid=X                   ← session protocol は /reigen と同じ
+  POST /stable/score                        ← 同上
 ```
 
 ## Launch

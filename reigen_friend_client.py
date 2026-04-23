@@ -379,6 +379,135 @@ def run_odin_remote(
         raise RuntimeError(f"Unknown action: {resp}")
 
 
+def run_odin_stable_remote(
+    server_url,
+    api_key,
+    eval_fn,
+    param_ranges,
+    param_names=None,
+    experience_id="genesis_odin_stable",
+    time_budget=300,
+    stabilize_budget_ratio=0.25,
+    stabilize_particles=12,
+    stabilize_gens=20,
+    stabilize_sigma0=0.08,
+    robustness_sigma=0.10,
+    robustness_trials=5,
+    poll_timeout=15,
+    verbose=True,
+):
+    """Run オーディン + stabilizer (peak→plateau、Rule 16) remotely.
+
+    3-stage pipeline:
+      Stage 1: mimir_odin で最良 peak 発見 (time_budget × (1-stab_ratio))
+      Stage 2: stabilizer で peak 周辺を Metropolis 探索 → plateau 変換
+      Stage 3: plateau centroid を robust な best_params として返却
+
+    実世界応用 (LLM キャリブ / GGUF patch / Hebbian) では peak より plateau
+    が実用。実測で sharp 関数の robustness 8%→96% (demo)。
+
+    Args:
+        server_url, api_key, eval_fn, param_ranges: run_odin_remote と同じ
+        time_budget: 総予算 (秒)
+        stabilize_budget_ratio: 総予算のうち stabilize に使う比率 (default 0.25)
+        stabilize_particles: plateau 探索粒子数 (default 12)
+        stabilize_gens: plateau 探索世代数 (default 20)
+        stabilize_sigma0: 初期摂動スケール (bounds 幅比、default 0.08)
+        robustness_sigma / robustness_trials: 耐性測定 param
+
+    Returns:
+        dict with:
+          best_params        : ★ plateau centroid (robust、実用推奨)
+          plateau_score      : centroid の実測 score
+          plateau_robustness : plateau の摂動耐性 (0-1)
+          plateau_width      : 各次元の信頼区間的幅
+          peak_params        : odin sharp peak (参考)
+          peak_robustness    : peak の摂動耐性 (0-1、通常 plateau より低い)
+          robustness_improvement: plateau - peak (差分)
+          specialist / council / ... : odin の全キー
+    """
+    server = server_url.rstrip("/")
+    headers = {
+        "Content-Type": "application/json",
+        "Authorization": f"Bearer {api_key}",
+    }
+
+    start_body = {
+        "param_ranges": [list(r) for r in param_ranges],
+        "experience_id": experience_id,
+        "time_budget": int(time_budget),
+        "stabilize_budget_ratio": float(stabilize_budget_ratio),
+        "stabilize_particles": int(stabilize_particles),
+        "stabilize_gens": int(stabilize_gens),
+        "stabilize_sigma0": float(stabilize_sigma0),
+        "robustness_sigma": float(robustness_sigma),
+        "robustness_trials": int(robustness_trials),
+    }
+    if param_names:
+        start_body["param_names"] = list(param_names)
+
+    start_resp = _post(f"{server}/stable/start", start_body, headers)
+    sid = start_resp.get("session_id")
+    if not sid:
+        raise RuntimeError(f"Failed to start session: {start_resp}")
+    if verbose:
+        print(f"[オーディン+stabilizer session started] sid={sid}")
+
+    t0 = time.time()
+    n_evals = 0
+    while True:
+        try:
+            resp = _get(
+                f"{server}/stable/next?sid={sid}&timeout={int(poll_timeout)}",
+                headers,
+                timeout=poll_timeout + 10,
+            )
+        except urllib.error.URLError as e:
+            if verbose:
+                print(f"  [net error] {e} — retrying in 3s")
+            time.sleep(3)
+            continue
+
+        action = resp.get("action")
+        if action == "done":
+            result = resp.get("result", {})
+            if verbose:
+                elapsed = time.time() - t0
+                peak_r = result.get("peak_robustness", 0.0)
+                plat_r = result.get("plateau_robustness", 0.0)
+                print(f"[stable done] {n_evals} evals, {elapsed:.0f}s")
+                print(f"  peak robust={peak_r:.0%} → plateau robust={plat_r:.0%} "
+                      f"(improvement {(plat_r - peak_r):+.0%})")
+            return result
+
+        if action == "wait":
+            time.sleep(0.5)
+            continue
+
+        if action == "eval":
+            params = resp.get("params")
+            if params is None:
+                raise RuntimeError(f"Unexpected response: {resp}")
+            try:
+                score = float(eval_fn(list(params)))
+            except Exception as e:
+                if verbose:
+                    print(f"  [eval_fn error] {e} — returning 0.0")
+                score = 0.0
+            n_evals += 1
+            if verbose and n_evals % 10 == 0:
+                elapsed = time.time() - t0
+                print(f"  [eval #{n_evals}] score={score:.4f} ({elapsed:.0f}s)")
+            _post(
+                f"{server}/stable/score",
+                {"sid": sid, "score": score, "params": list(params)},
+                headers,
+            )
+            continue
+
+        raise RuntimeError(f"Unknown action: {resp}")
+
+
 # -------------------------------------------------------------------
 # Demo main
 # -------------------------------------------------------------------

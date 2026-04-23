@@ -24,7 +24,29 @@ Copy the client helper to your machine:
 
 That's it. No installation needed beyond Python 3.10+ (uses stdlib only; no `pip install`).
 
-## Quickstart (オーディン、2026-04-23 以降) — 10 lines
+## Quickstart (オーディン + Stabilizer、2026-04-24、実世界推奨) — 12 lines
+
+```python
+from reigen_friend_client import run_odin_stable_remote
+
+def my_eval(params):
+    return -sum((x - 1.0) ** 2 for x in params)
+
+result = run_odin_stable_remote(
+    server_url="https://xxxx.ngrok-free.dev",
+    api_key="YOUR_SHARED_KEY",
+    eval_fn=my_eval,
+    param_ranges=[(-3, 3)] * 5,
+    time_budget=300,
+)
+print(result["best_params"])          # plateau centroid (実用 robust)
+print(result["peak_robustness"])       # 元の peak 摂動耐性 (通常 < 30%)
+print(result["plateau_robustness"])    # plateau 摂動耐性 (通常 > 70%)
+```
+
+peak (理論最適) より plateau (摂動耐性) のほうが**実世界で役に立つ**。実測で robust 8%→96%。LLM キャリブ / 物理系 / 強化学習など「1mm ズレたら壊れる」系必須。
+
+## Quickstart (オーディン単独、2026-04-23 以降) — 10 lines
 
 ```python
 from reigen_friend_client import run_odin_remote

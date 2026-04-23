@@ -13,8 +13,10 @@ All responses in Japanese.
 **ミーミル家族** (関連 library 一覧):
 - `mimir()` — 基本最適化 (owl/reigen/scipy を内部自動分岐)
 - `mimir_odin()` — オーディン (4 specialist 並列、default) ← 本 Rule 9/13
+- `mimir_odin_stable()` — オーディン + stabilizer (peak→plateau、実世界用、Rule 16)
 - `mimir_cardinal_hierarchy()` — Council → GA (高次元 Hebbian 系、Rule 14)
 - `mimir_cardinal_coevolution()` — params × weights 共進化 (多指標、Rule 15)
+- `stabilizer.stabilize()` — 汎用 peak→plateau 変換 (Rule 16、stand-alone でも可)
 
 `mimir_odin()` は 4 specialist の mimir (default / lad / expensive / scipy-forced) を並列実行し、最良 best_score を採用する。単独 mimir の弱点 (低/高 noise / 多峰 / 高次元 gradient) を相互補完、「どの specialist の成績 ≤ council 成績」が保証される (取り方が max なので理論的下限 = 最強 specialist 単独)。
 
@@ -225,6 +227,7 @@ full 数値は `benchmark_mimir.json` / `benchmark_mimir_dimscale.json`。
 | 13 | **Default = `mimir_odin()`** (4 specialist 並列、単独 mimir の strict 上位互換) |
 | 14 | 高次元 sparse かつ reigen symbolic 解なし (Hebbian 進化系) は `mimir_cardinal_hierarchy()` |
 | 15 | multi-metric eval でどう aggregate すべきか不明なら `mimir_cardinal_coevolution()` (params × weights 共進化) |
+| 16 | 実世界で使う最適化結果は `stabilizer.stabilize()` で peak→plateau 変換 (摂動耐性 8%→96% 実証) |
 
 ### Rule -1 〜 11b (詳解)
 
@@ -373,6 +376,38 @@ print(r["weight_evolution_mean"])        # weight の世代推移 (収束可視�
 - `"harmonic"` 全 metric 要求 (0 近傍で急落、最も balanced)
 - `"weighted"` 個体自身の weight で加重 (weights も選択圧受ける、真の co-evolution)
 
+**Rule 16**: mimir/odin が返す `best_params` は理論最適だが **sharp peak** のことがある。実世界 (LLM キャリブ / GGUF patch / Hebbian / 強化学習) で使うなら `stabilizer.stabilize()` で plateau 変換必須。demo 実測で **robust 8% → 96%** (10 倍以上の摂動耐性改善):
+
+```python
+# (A) 自動連結 — 推奨
+from twelve.agent.mimir_odin_stable import mimir_odin_stable
+r = mimir_odin_stable(eval_fn, ranges, time_budget=300)
+print(r["best_params"])             # plateau centroid (robust)
+print(r["peak_params"])              # 元の sharp peak (参考)
+print(r["peak_robustness"])          # peak 摂動耐性 (通常 < 30%)
+print(r["plateau_robustness"])       # plateau 摂動耐性 (通常 > 70%)
+print(r["plateau_width"])            # 各次元の信頼区間的幅
+
+# (B) 手動連結 — odin 結果を後で安定化
+from twelve.agent.mimir_odin import mimir_odin
+from stabilizer import stabilize
+r = mimir_odin(eval_fn, ranges)
+stab = stabilize(r["best_params"], eval_fn, ranges)
+robust_params = stab.centroid
+```
+
+**技術**: Metropolis + cooling (焼きなまし 1 個)。ablation で SOC / Hebbian / Darwin は plateau 構築に寄与せず、焼きなまし単独で十分と実証済。`stabilizer.py` は project root、friend's 原作を改変せず wrapper 経由で使う (外部資産として尊重)。
+
+**適用場面**:
+- LLM キャリブ: prompt drift robust な layer_scale
+- GGUF patch: weight loading drift robust な scale 値
+- Hebbian / brain_sim: 進化的に安定な agent params (Cardinal の生物的選択原理と一致)
+- 強化学習: rollout noise robust な policy params
+
+**適用しない場面**:
+- 決定論的ベンチマーク (BBOB 等): peak が fragile でも問題にならない (gap=0 で十分)
+- 1 回限り / 理論研究: plateau 要らず peak で OK
+
 ## Gotchas (よくハマる落とし穴)
 
 - **scale=0** (Rule 7): range に 0 を絶対入れない。モデル破壊の実証あり
@@ -404,6 +439,8 @@ mimir_odin()                        ← ユーザー呼び口 (新 default、202
   └── mimir (scipy-forced specialist)  ← 低次元でも scipy 強制 (Rosenbrock 系)
 
 特殊用途 (council の外側):
+  mimir_odin_stable()          ← odin → stabilizer 自動連結 (Rule 16、peak→plateau)
+  └── stabilizer.stabilize()    ← Metropolis で plateau 探索 (stand-alone でも可)
   mimir_cardinal_hierarchy()   ← Council で active_dims 圧縮 → 汎用 GA (Rule 14)
   mimir_cardinal_coevolution() ← params × weights 共進化 (Rule 15、多指標重み探索)
 ```
@@ -574,6 +611,8 @@ Heretic abliteration の副作用を吸収する regex + mask-then-clean パイ�
 | **owl 内部実装・編集時** | `@docs/OWL_INTERNALS.md` |
 | **stochastic eval_fn を LaD 化する wrapper (Rule 12)** | `@twelve/agent/lad_wrappers.py` |
 | **mimir council (4 specialist 並列、Rule 13)** | `@twelve/agent/mimir_odin.py` |
+| **stabilizer (peak→plateau、Rule 16)** | `@stabilizer.py` (project root、friend's 原作) |
+| **mimir_odin_stable (odin + stabilizer 連結、Rule 16)** | `@twelve/agent/mimir_odin_stable.py` |
 | **Sentinel (legacy)** | `@docs/SENTINEL_LEGACY.md` |
 | **HTTP API / ngrok / session API** | `@docs/API_SERVERS.md` |
 | Zenron 実践ガイド + MirrorScan 詳細 | `@docs/ZENRON_GUIDE.md` |
@@ -603,6 +642,9 @@ Heretic abliteration の副作用を吸収する regex + mask-then-clean パイ�
 | lad_wrappers tests | `@twelve/tests/test_lad_wrappers.py` |
 | **mimir_odin** (4 specialist 並列、Rule 13) | `@twelve/agent/mimir_odin.py` |
 | mimir_odin tests | `@twelve/tests/test_mimir_odin.py` |
+| **stabilizer** (Metropolis peak→plateau、Rule 16、friend's 原作) | `@stabilizer.py` |
+| **mimir_odin_stable** (odin + stabilizer 連結、Rule 16) | `@twelve/agent/mimir_odin_stable.py` |
+| stabilizer tests | `@twelve/tests/test_stabilizer.py` |
 | **mimir_cardinal** (Council × GA Hierarchy、Rule 14) | `@twelve/agent/mimir_cardinal.py` |
 | **mimir_coevolution** (params × weights 共進化、Rule 15) | `@twelve/agent/mimir_coevolution.py` |
 | cardinal + coevolution tests | `@twelve/tests/test_mimir_cardinal.py` |
