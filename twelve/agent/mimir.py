@@ -127,6 +127,8 @@ def mimir(
     thread_safe_eval: bool = True,  # False: eval_fn touches global state (Rule 11); forces sequential cascade
     batch_eval_fn: Optional[Callable] = None,  # f(params_list) -> scores_list, for GPU/vectorized eval
     batch_size: int = 8,                        # batch size for batch_eval_fn (5090 LLM sweet spot)
+    n_samples_per_eval: int = 1,                 # 2026-04-23 LaD: N>1 で seed/verify 各点を N 回 eval、集約 + multi-obs 化
+    stochastic_aggregator: str = "median",       # "median" (noise-robust) / "mean" / "min" / "max"
     verbose: bool = False,
 ) -> dict:
     """Meta-dispatcher routing to owl or cascading owl→Reigen.
@@ -221,15 +223,36 @@ def mimir(
                 [_batch_rng.uniform(lo, hi) for lo, hi in param_ranges]
                 for _ in range(_n_seed)
             ]
-            _seed_scores = batch_eval_fn(_seed_params)
-            _seed_measurements = [
-                {"params": list(p), "score": float(s)}
-                for p, s in zip(_seed_params, _seed_scores)
-            ]
+            # LaD N-sample: call batch_eval_fn N times, aggregate + preserve as multi-observer
+            _N_batch = max(1, int(n_samples_per_eval))
+            _all_runs = [batch_eval_fn(_seed_params) for _ in range(_N_batch)]
+            # _all_runs[j][k] = score of params[k] on sample j
+            _seed_measurements = []
+            def _agg_list(vs):
+                if stochastic_aggregator == "mean":
+                    return sum(vs) / len(vs)
+                if stochastic_aggregator == "min":
+                    return min(vs)
+                if stochastic_aggregator == "max":
+                    return max(vs)
+                vss = sorted(vs); nn = len(vss)
+                return vss[nn // 2] if nn % 2 else (vss[nn // 2 - 1] + vss[nn // 2]) / 2
+            for k, p in enumerate(_seed_params):
+                vals = [float(_all_runs[j][k]) for j in range(_N_batch)]
+                if _N_batch == 1:
+                    _seed_measurements.append({"params": list(p), "score": vals[0]})
+                else:
+                    obs = {f"s{i}": v for i, v in enumerate(vals)}
+                    _seed_measurements.append({
+                        "params": list(p),
+                        "score": _agg_list(vals),
+                        "scores": obs,
+                    })
             # Replace curated_measurements so owl gets batched seed
             curated_measurements = _seed_measurements
             if verbose:
-                print(f"  [batch seed] {_n_seed} points via batch_eval_fn")
+                _lad = f" × {_N_batch} LaD" if _N_batch > 1 else ""
+                print(f"  [batch seed] {_n_seed} points via batch_eval_fn{_lad}")
         except Exception as _bsc_e:
             if verbose:
                 print(f"  [batch seed] failed: {type(_bsc_e).__name__}; falling back to eval_fn path")
@@ -259,6 +282,8 @@ def mimir(
             use_lbfgs_refinement=False,
             use_multistart_fallback=False,
             random_restart_count=0,
+            n_samples_per_eval=int(n_samples_per_eval),
+            stochastic_aggregator=stochastic_aggregator,
             verbose=verbose,
         )
         if param_names is not None:
@@ -305,6 +330,8 @@ def mimir(
         use_lbfgs_refinement=True,
         use_multistart_fallback=True,
         random_restart_count=_owl_random_K,
+        n_samples_per_eval=int(n_samples_per_eval),
+        stochastic_aggregator=stochastic_aggregator,
         verbose=verbose,
     )
     if param_names is not None:

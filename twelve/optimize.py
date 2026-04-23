@@ -1722,6 +1722,8 @@ def owl(
     use_lbfgs_refinement=False,  # 2026-04-20: opt-in scipy L-BFGS-B local refinement at the end (crushes smooth curved valleys like Rosenbrock; uses finite-diff gradient, ~50 extra evals).
     use_multistart_fallback=False,  # 2026-04-20: opt-in diversified warm-starts in direct-HC fallback (rescues wrong-basin failures like Styblinski).
     random_restart_count=0,  # 2026-04-20 v3: opt-in K uniform-random warm-starts added to multi-start fallback (basinhopping-style random hop → rescues curved-valley Rosenbrock).
+    n_samples_per_eval=1,  # 2026-04-23: LaD N-sample aggregation. >1 = call verify_fn N times per seed point, aggregate + preserve as multi-observer dict (activates multi-observer path). Default 1 = backward compat.
+    stochastic_aggregator="median",  # 2026-04-23: when n_samples_per_eval>1 returns scalars, aggregate via "median"/"mean"/"min"/"max". median is noise-robust.
 ):
     """Owl — 見えない構造を見つけて最適化する。
 
@@ -1800,30 +1802,101 @@ def owl(
         n_dims = len(param_ranges)
         n_seed = n_seed_samples if n_seed_samples is not None else max(5, n_dims + 2)
         _rng = _random.Random(seed_rng_state)
+        _N = max(1, int(n_samples_per_eval))
         if verbose:
-            print(f"  [owl empty-start] seeding {n_seed} points in {n_dims}d via verify_fn")
+            _lad = f" × {_N} LaD samples" if _N > 1 else ""
+            print(f"  [owl empty-start] seeding {n_seed} points in {n_dims}d via verify_fn{_lad}")
+        # Aggregator resolver (for scalar N-sample path)
+        def _agg_vals(vs):
+            if stochastic_aggregator == "mean":
+                return sum(vs) / len(vs)
+            if stochastic_aggregator == "min":
+                return min(vs)
+            if stochastic_aggregator == "max":
+                return max(vs)
+            # median (default, noise-robust)
+            vs_s = sorted(vs)
+            n = len(vs_s)
+            return vs_s[n // 2] if n % 2 else (vs_s[n // 2 - 1] + vs_s[n // 2]) / 2
         measurements = []
         for _ in range(n_seed):
             sample = [_rng.uniform(lo, hi) for lo, hi in param_ranges]
-            try:
-                s = float(verify_fn(sample))
-            except Exception as e:
-                if verbose:
-                    print(f"    seed eval error ({type(e).__name__}), skipping")
-                continue
             use_params = sample
             if param_names:
                 use_params = {n: v for n, v in zip(param_names, sample)}
-            measurements.append({"params": use_params, "score": s})
+            try:
+                # N-sample LaD collection (or N=1 = legacy 1-shot)
+                raw_list = []
+                for _j in range(_N):
+                    raw_list.append(verify_fn(sample))
+                # Dispatch on return type of first call
+                first = raw_list[0]
+                if isinstance(first, dict):
+                    # dict path: preserve all observers × all samples as flat dict
+                    # Key format: "{obs_name}_s{i}" (or just "{obs_name}" if N=1)
+                    flat = {}
+                    if _N == 1:
+                        for k, v in first.items():
+                            flat[str(k)] = float(v)
+                    else:
+                        for i, r in enumerate(raw_list):
+                            if not isinstance(r, dict):
+                                # eval_fn return-type consistency broken
+                                raise ValueError(
+                                    f"verify_fn returned dict then {type(r).__name__}; mixed types not supported"
+                                )
+                            for k, v in r.items():
+                                flat[f"{k}_s{i}"] = float(v)
+                    measurements.append({"params": use_params, "scores": flat})
+                else:
+                    # scalar path
+                    vals = [float(x) for x in raw_list]
+                    if _N == 1:
+                        # Legacy: {"score": scalar} — no multi-observer activation
+                        measurements.append({"params": use_params, "score": vals[0]})
+                    else:
+                        # LaD: aggregate + preserve individual samples as observers
+                        agg = _agg_vals(vals)
+                        obs = {f"s{i}": v for i, v in enumerate(vals)}
+                        measurements.append({
+                            "params": use_params,
+                            "score": agg,       # scalar-path compat
+                            "scores": obs,      # activates multi-observer path
+                        })
+            except Exception as e:
+                if verbose:
+                    print(f"    seed eval error ({type(e).__name__}): {e}; skipping")
+                continue
         if len(measurements) < 2:
             raise RuntimeError(
                 f"owl() empty-start: only {len(measurements)}/{n_seed} seed evals succeeded; "
                 f"verify_fn failing too often"
             )
 
-    # Multi-observer検出: "scores" dictがあればmulti-observer分析にディスパッチ
+    # Multi-observer 検出 (2026-04-23 LaD update):
+    # - 従来: "scores" dict があれば _owl_multi_observer に dispatch で EARLY RETURN
+    #         → 以後の optimization pipeline が走らない (analysis 専用)
+    # - 新: measurement が "scores" も "score" も持つ (Step 1a LaD seed 経由) なら、
+    #      multi-observer 分析を **サイドで走らせて structure info 保存**、
+    #      "score" を使う normal optimization は続行する。
+    # - 互換: "score" が無く "scores" のみ (pure dict eval_fn、N=1) の場合は
+    #        従来通り multi-observer early return (最初の observer 値を score に
+    #        derive して続行もできるが、互換性優先で early return 維持).
+    _multi_obs_side_result = None
     if measurements and "scores" in measurements[0] and isinstance(measurements[0]["scores"], dict):
-        return _owl_multi_observer(measurements, param_names=param_names, verbose=verbose)
+        if "score" in measurements[0]:
+            # LaD seed path: run multi-obs as SIDE analysis, continue with scalar "score"
+            try:
+                _multi_obs_side_result = _owl_multi_observer(
+                    measurements, param_names=param_names, verbose=verbose
+                )
+            except Exception as _moe:
+                if verbose:
+                    print(f"  [Owl-MultiObs side] analysis failed: {_moe}; continuing scalar path")
+                _multi_obs_side_result = None
+        else:
+            # Pure dict eval_fn (no scalar score): early return (legacy behavior)
+            return _owl_multi_observer(measurements, param_names=param_names, verbose=verbose)
 
     # 経験読み込み (UnifiedExperience)
     _ue = None
@@ -2150,22 +2223,61 @@ def owl(
                 best_params = bp + [(lo + hi) / 2 for lo, hi in ranges[len(bp):]]
 
         # --- Step 5: verify_fnで本番検証 ---
+        # LaD 対応 (2026-04-23): verify_fn が dict 返せば growing_data に "scores"
+        # として格納 (multi-observer path 維持)。scalar なら従来通り "score"。
+        # n_samples_per_eval>1 の場合も LaD で保存して multi-obs 活性化。
         verified_score = None
         if verify_fn is not None:
             try:
                 _verify_t0 = time.time()
-                verified_score = float(verify_fn(best_params))
+                # N-sample collection (N=1 is legacy 1-shot)
+                _N_verify = max(1, int(n_samples_per_eval))
+                raw_list = [verify_fn(best_params) for _ in range(_N_verify)]
                 _verify_eval_times.append(time.time() - _verify_t0)
-                if verbose:
-                    print(f"  [Verify] proxy={best_score:.4f} → real={verified_score:.4f}")
 
-                # 実測結果をmeasurementsに追加（次ラウンドでproxyが育つ）
-                # best_paramsはnumpy arrayの場合があるのでfloat()に変換
-                if is_dict:
-                    new_entry = {"params": {n: float(v) for n, v in zip(names, best_params)},
-                                 "score": verified_score}
+                _first = raw_list[0]
+                _params_field = ({n: float(v) for n, v in zip(names, best_params)}
+                                  if is_dict else [float(v) for v in best_params])
+                if isinstance(_first, dict):
+                    # dict LaD path
+                    flat = {}
+                    if _N_verify == 1:
+                        for k, v in _first.items():
+                            flat[str(k)] = float(v)
+                    else:
+                        for i, r in enumerate(raw_list):
+                            if not isinstance(r, dict):
+                                raise ValueError(
+                                    f"verify_fn returned dict then {type(r).__name__}; mixed types not supported"
+                                )
+                            for k, v in r.items():
+                                flat[f"{k}_s{i}"] = float(v)
+                    new_entry = {"params": _params_field, "scores": flat}
+                    # verified_score reporting: pick first observer for scalar progress print
+                    verified_score = next(iter(flat.values())) if flat else None
                 else:
-                    new_entry = {"params": [float(v) for v in best_params], "score": verified_score}
+                    vals = [float(x) for x in raw_list]
+                    if _N_verify == 1:
+                        verified_score = vals[0]
+                        new_entry = {"params": _params_field, "score": verified_score}
+                    else:
+                        # aggregate + preserve observers
+                        if stochastic_aggregator == "mean":
+                            verified_score = sum(vals) / len(vals)
+                        elif stochastic_aggregator == "min":
+                            verified_score = min(vals)
+                        elif stochastic_aggregator == "max":
+                            verified_score = max(vals)
+                        else:  # median
+                            _sv = sorted(vals)
+                            _nv = len(_sv)
+                            verified_score = (_sv[_nv // 2] if _nv % 2
+                                              else (_sv[_nv // 2 - 1] + _sv[_nv // 2]) / 2)
+                        obs = {f"s{i}": v for i, v in enumerate(vals)}
+                        new_entry = {"params": _params_field,
+                                     "score": verified_score, "scores": obs}
+                if verbose and verified_score is not None:
+                    print(f"  [Verify] proxy={best_score:.4f} → real={verified_score:.4f}")
                 growing_data.append(new_entry)
 
             except Exception as e:
@@ -2569,6 +2681,15 @@ def owl(
         except Exception as _e:
             if verbose:
                 print(f"  [guard_fn] evaluation failed: {type(_e).__name__}")
+
+    # LaD side-analysis 結果があれば multi-obs keys を best_result にマージ
+    # (seed 経由で "scores" dict が作られた場合のみ発火)
+    if _multi_obs_side_result is not None and isinstance(best_result, dict):
+        for _k in ("stable_active", "stable_dead", "observer_dependent",
+                   "observers", "observer_correlations", "dead_observers"):
+            if _k in _multi_obs_side_result:
+                best_result.setdefault(_k, _multi_obs_side_result[_k])
+        best_result.setdefault("multi_observer_side_analysis", True)
 
     return best_result
 

@@ -45,6 +45,8 @@ def check_eval_fn(
     fragility_spike_ratio: float = 5.0,
     min_active_dims: int = 2,
     min_dims_for_active_check: int = 5,
+    n_stability_probes: int = 3,
+    stochastic_cv_threshold: float = 0.10,
     experience_id: str = "eval_check",
     verbose: bool = False,
 ) -> dict:
@@ -58,6 +60,10 @@ def check_eval_fn(
       fragility_spike_ratio: flag if max(fragility) > ratio * median.
       min_active_dims: flag if fewer active dims (when problem is >= min_dims_for_active_check).
       min_dims_for_active_check: apply active_dims check only above this dim.
+      n_stability_probes: # repeated same-params calls to detect stochasticity
+                         (default 3; set 1 to disable).
+      stochastic_cv_threshold: robust CV threshold above which eval_fn is
+                               flagged as stochastic (default 0.10).
       experience_id: namespace (kept short for sanity check runs).
 
     Returns:
@@ -74,6 +80,8 @@ def check_eval_fn(
         "elapsed_s": float,
         "probe_score": float|None,   # 1-call probe result
         "eval_fn_returned": "scalar"|"dict"|"error",
+        "stochastic_cv": float|None, # robust CV across n_stability_probes repeats
+        "stochastic_detected": bool, # True if CV > stochastic_cv_threshold
         "recommendations": list[str],
       }
     """
@@ -84,6 +92,8 @@ def check_eval_fn(
     issues = []
     recommendations = []
     severity = "ok"
+    stochastic_cv = None
+    stochastic_detected = False
 
     # --- Step 1: 2-point probe to catch immediate failures + constant detection ---
     midpoint = [(lo + hi) / 2.0 for lo, hi in param_ranges]
@@ -131,6 +141,8 @@ def check_eval_fn(
             "elapsed_s": time.time() - t0,
             "probe_score": probe_score,
             "eval_fn_returned": eval_returned,
+            "stochastic_cv": stochastic_cv,
+            "stochastic_detected": stochastic_detected,
             "recommendations": ["eval_fn が midpoint で例外、範囲か実装を修正せよ"],
         }
 
@@ -150,6 +162,8 @@ def check_eval_fn(
             "elapsed_s": time.time() - t0,
             "probe_score": None,
             "eval_fn_returned": eval_returned,
+            "stochastic_cv": stochastic_cv,
+            "stochastic_detected": stochastic_detected,
             "recommendations": [
                 "eval_fn は finite float か全 value finite の dict を返すこと",
             ],
@@ -169,6 +183,53 @@ def check_eval_fn(
             "apply が効いていない/restore で巻き戻ってないか疑え。"
         )
         severity = "fatal"
+
+    # --- Step 1.5: stochasticity probe (repeat same midpoint N times) ---
+    # Detect stochastic eval_fn (LLM sampling, RL rollout, Monte Carlo) so
+    # the user knows they should wrap with lad_wrappers before running mimir.
+    # Use robust CV (MAD / |median|) to handle zero-mean eval_fns.
+    if n_stability_probes >= 2:
+        repeat_vals = [probe_score]
+        for _ in range(n_stability_probes - 1):
+            try:
+                rv = eval_fn(midpoint)
+            except Exception:
+                break
+            if isinstance(rv, dict):
+                f = None
+                for v in rv.values():
+                    f = _safe_finite(v)
+                    if f is not None:
+                        break
+            else:
+                f = _safe_finite(rv)
+            if f is None:
+                break
+            repeat_vals.append(f)
+
+        if len(repeat_vals) >= 2:
+            s = sorted(repeat_vals)
+            nr = len(s)
+            med = s[nr // 2] if nr % 2 else (s[nr // 2 - 1] + s[nr // 2]) / 2
+            abs_dev = sorted(abs(v - med) for v in repeat_vals)
+            na = len(abs_dev)
+            mad = abs_dev[na // 2] if na % 2 else (abs_dev[na // 2 - 1] + abs_dev[na // 2]) / 2
+            denom = max(abs(med), 1e-9)
+            stochastic_cv = mad / denom
+            if stochastic_cv > stochastic_cv_threshold:
+                stochastic_detected = True
+                issues.append(
+                    f"同一 params で {len(repeat_vals)} 回 probe、robust CV={stochastic_cv:.2f} > "
+                    f"{stochastic_cv_threshold:.2f} = stochastic eval_fn の疑い強 "
+                    "(LLM 生成 / RL reward / Monte Carlo 等)"
+                )
+                recommendations.append(
+                    "wrap_stochastic(eval_fn, n=20) で集約 (scalar 互換) or "
+                    "wrap_multi_obs(eval_fn, n=20) で LaD 多観測化 (mimir の multi-observer path 活性) を推奨。"
+                    " 詳細: twelve/agent/lad_wrappers.py、もしくは mimir(..., n_samples_per_eval=20) で自動集約。"
+                )
+                if severity == "ok":
+                    severity = "warn"
 
     # --- Step 2: mimir structure_only for dead/active/fragility/proxy_r2 ---
     # Use scalar-wrapping eval for structure scan if original returned dict
@@ -217,6 +278,8 @@ def check_eval_fn(
             "elapsed_s": time.time() - t0,
             "probe_score": probe_score,
             "eval_fn_returned": eval_returned,
+            "stochastic_cv": stochastic_cv,
+            "stochastic_detected": stochastic_detected,
             "recommendations": ["param_ranges または eval_fn 実装を確認"],
         }
 
@@ -331,6 +394,8 @@ def check_eval_fn(
         "elapsed_s": time.time() - t0,
         "probe_score": probe_score,
         "eval_fn_returned": eval_returned,
+        "stochastic_cv": stochastic_cv,
+        "stochastic_detected": stochastic_detected,
         "recommendations": recommendations,
     }
 
@@ -347,6 +412,10 @@ def format_report(diag: dict) -> str:
                  f"median={diag['fragility_median']:.3f}")
     lines.append(f"   elapsed       : {diag['elapsed_s']:.1f}s")
     lines.append(f"   probe_score   : {diag.get('probe_score')}")
+    cv = diag.get("stochastic_cv")
+    if cv is not None:
+        tag = " (stochastic!)" if diag.get("stochastic_detected") else ""
+        lines.append(f"   stochastic_cv : {cv:.3f}{tag}")
     if diag["issues"]:
         lines.append("   issues:")
         for i in diag["issues"]:

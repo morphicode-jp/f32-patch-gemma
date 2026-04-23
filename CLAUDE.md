@@ -227,6 +227,7 @@ full 数値は `benchmark_mimir.json` / `benchmark_mimir_dimscale.json`。
 | 10 | Kathara 0.993 uniformity requires N=12 + 5-regular + symmetric placement |
 | 11 | `batch_eval_fn` は external params 限定。internal model state では禁止 |
 | 11b | mimir parallel cascade も internal state 危険 → `thread_safe_eval=False` |
+| 12 | stochastic eval_fn は `n_samples_per_eval` か `wrap_multi_obs` で LaD 化せよ |
 
 ### Rule -1 〜 11b (詳解)
 
@@ -261,6 +262,29 @@ full 数値は `benchmark_mimir.json` / `benchmark_mimir_dimscale.json`。
 **Rule 11**: `batch_eval_fn` は learning rate / dropout / prompt token 等の external param 限定。KV cache scale / weight scale / LoRA adapter 等 **internal model state を触る param** には禁止 (global state 共有で並列 eval 不能)。この場面は eval_fn を 2 秒以内に収め、multi-observer dict (`{"nll": -ppl, "hs": hs_score, "mmlu": mmlu_score}`) を返し mimir の `mode="structure_only"` で構造発見。
 
 **Rule 11b**: mimir cheap_cascade は reigen と scipy を並列 thread で走らせる。eval_fn が global state を mutate する場合 race condition 発生。`thread_safe_eval=False` を渡して逐次化、or `eval_cost_hint=2.0` で expensive_route 強制 (cascade 発火せず安全)。LLM キャリブは通常 eval_cost>0.5s で自動 expensive、安全。
+
+**Rule 12**: stochastic eval_fn (LLM 生成 / RL rollout / Monte Carlo) は **1 call = 1 scalar** のまま mimir に渡すと seed で noise 直撃、proxy が noise を fit して崩壊。**真の実測値は「N 回集約 or LaD 多観測化」が前提** — 昔 owl 使ってた時の「手で 20 回測ってから渡す」を自動化する。3 経路:
+
+```python
+# (A) 自動集約: N 回 eval_fn を call して scalar 化 (median 既定、noise-robust)
+r = mimir(llm_eval, ranges, n_samples_per_eval=20, time_budget=1800)
+
+# (B) LaD 多観測: N 個の観測者として dict 化、multi-observer path 活性
+from twelve.agent.lad_wrappers import wrap_multi_obs
+wrapped = wrap_multi_obs(llm_eval, n=20)
+r = mimir(wrapped, ranges, time_budget=1800)
+# r["stable_active"]      — 全 20 gen で共通に効く dim = 真の価値
+# r["observer_dependent"] — gen 依存 = noise 由来、自動除外
+
+# (C) LLM-assisted 多次元: 生成 + LLM 判定で dimension 別 score
+from twelve.agent.lad_wrappers import wrap_llm_judge
+wrapped = wrap_llm_judge(generator_fn, judge_fn,
+                         dimensions=["fluency", "accuracy", "safety"],
+                         n_generations=5)
+r = mimir(wrapped, ranges, time_budget=3600)
+```
+
+**検出と推奨は自動**: `check_eval_fn()` が同一 params で N 回 probe、CV > 0.10 で stochastic 判定 → wrap_* 推奨警告。Default `n_samples_per_eval=1` は backward compat (明示指定しないと compute 予算が勝手に 20× されない)。詳細は `twelve/agent/lad_wrappers.py`。
 
 ## Gotchas (よくハマる落とし穴)
 

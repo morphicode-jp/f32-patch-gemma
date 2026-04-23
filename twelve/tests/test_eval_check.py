@@ -7,8 +7,11 @@ Covers:
   - non-numeric return flagged
   - dict return handled
   - format_report runs without error
+  - stochastic eval_fn flagged with CV > threshold + wrap recommendation
+  - deterministic eval_fn has CV ~0 (no false positive)
 """
 import os
+import random
 import sys
 
 import pytest
@@ -146,3 +149,70 @@ def test_format_report_runs():
     assert isinstance(report, str)
     assert len(report) > 20
     assert "proxy_r2" in report
+
+
+# -----------------------------------------------------------------
+# stochasticity probe: detect noisy eval_fn
+# -----------------------------------------------------------------
+
+def test_check_stochastic_eval_flagged():
+    """Stochastic eval_fn should be flagged with high CV and wrap_* recommendation."""
+    rng = random.Random(42)
+
+    def stochastic_eval(p):
+        # small signal + large noise → high CV at midpoint
+        return 1.0 + rng.gauss(0, 2.0)
+
+    diag = check_eval_fn(
+        stochastic_eval,
+        [(-1, 1)] * 2,
+        time_budget=5,
+        experience_id="test_check_stochastic",
+        n_stability_probes=8,
+    )
+    assert diag.get("stochastic_detected") is True, (
+        f"stochastic eval not flagged: cv={diag.get('stochastic_cv')}"
+    )
+    assert diag["stochastic_cv"] is not None and diag["stochastic_cv"] > 0.1
+    # Recommendation must point at wrap_stochastic / wrap_multi_obs
+    rec_text = " ".join(diag["recommendations"])
+    assert ("wrap_stochastic" in rec_text
+            or "wrap_multi_obs" in rec_text
+            or "n_samples_per_eval" in rec_text)
+
+
+def test_check_deterministic_no_false_positive():
+    """Pure deterministic eval_fn should not be flagged as stochastic."""
+    def det_eval(p):
+        return -sum((x - 0.5) ** 2 for x in p)
+
+    diag = check_eval_fn(
+        det_eval,
+        [(-1, 1)] * 2,
+        time_budget=8,
+        experience_id="test_check_det_no_fp",
+        n_stability_probes=5,
+    )
+    assert diag.get("stochastic_detected") is False
+    # CV should be effectively zero
+    cv = diag.get("stochastic_cv")
+    assert cv is not None
+    assert cv < 1e-6, f"deterministic eval has non-zero CV: {cv}"
+
+
+def test_check_stochastic_disabled_when_n_lt_2():
+    """n_stability_probes<2 disables the probe; stochastic_cv should be None."""
+    rng = random.Random(0)
+
+    def noisy(p):
+        return rng.gauss(0, 1.0)
+
+    diag = check_eval_fn(
+        noisy,
+        [(-1, 1)] * 2,
+        time_budget=5,
+        experience_id="test_check_sp_off",
+        n_stability_probes=1,
+    )
+    assert diag.get("stochastic_cv") is None
+    assert diag.get("stochastic_detected") is False
