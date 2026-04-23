@@ -1,4 +1,4 @@
-"""Tests for mimir_brunnir — parallel specialist ensemble.
+"""Tests for mimir_odin — parallel specialist ensemble.
 
 Covers:
   - default 4 specialists run and return best
@@ -18,10 +18,10 @@ import pytest
 sys.path.insert(0, os.path.dirname(os.path.dirname(os.path.dirname(
     os.path.abspath(__file__)))))
 
-from twelve.agent.mimir_brunnir import (
+from twelve.agent.mimir_odin import (
     DEFAULT_SPECIALISTS,
     _score_of,
-    mimir_brunnir,
+    mimir_odin,
 )
 
 
@@ -51,7 +51,7 @@ def always_zero(p):
 
 def test_council_thread_executor_basic():
     """Thread executor works, returns best among 4 specialists."""
-    r = mimir_brunnir(
+    r = mimir_odin(
         quadratic_eval,
         [(-1, 1)] * 2,
         time_budget=5,
@@ -70,7 +70,7 @@ def test_council_thread_executor_basic():
 
 def test_council_process_executor_basic():
     """Process executor works with module-level eval_fn."""
-    r = mimir_brunnir(
+    r = mimir_odin(
         quadratic_eval,
         [(-1, 1)] * 2,
         time_budget=5,
@@ -87,7 +87,7 @@ def test_council_process_executor_basic():
 
 def test_council_winner_has_max_score():
     """The returned 'best' specialist must have the highest score in council."""
-    r = mimir_brunnir(
+    r = mimir_odin(
         quadratic_eval,
         [(-1, 1)] * 2,
         time_budget=5,
@@ -104,7 +104,7 @@ def test_council_winner_has_max_score():
 # -----------------------------------------------------------------
 
 def test_council_variance_non_negative():
-    r = mimir_brunnir(
+    r = mimir_odin(
         quadratic_eval,
         [(-1, 1)] * 2,
         time_budget=5,
@@ -116,7 +116,7 @@ def test_council_variance_non_negative():
 
 def test_council_variance_low_for_constant_fn():
     """Constant eval_fn should produce low council variance (all agree)."""
-    r = mimir_brunnir(
+    r = mimir_odin(
         always_zero,
         [(-1, 1)] * 2,
         time_budget=5,
@@ -137,7 +137,7 @@ def test_council_custom_specialists():
         {"name": "fast",  "kwargs": {},                        "role": "quick"},
         {"name": "lad",   "kwargs": {"n_samples_per_eval": 5}, "role": "stochastic"},
     ]
-    r = mimir_brunnir(
+    r = mimir_odin(
         quadratic_eval,
         [(-1, 1)] * 2,
         time_budget=5,
@@ -157,7 +157,7 @@ def test_council_custom_specialists():
 
 def test_council_invalid_executor_raises():
     with pytest.raises(ValueError):
-        mimir_brunnir(
+        mimir_odin(
             quadratic_eval,
             [(-1, 1)] * 2,
             time_budget=5,
@@ -180,7 +180,7 @@ def test_council_extra_kwargs_passthrough():
         {"params": [0.5, 0.6], "score": -0.01},
         {"params": [0.3, 0.3], "score": -0.08},
     ]
-    r = mimir_brunnir(
+    r = mimir_odin(
         quadratic_eval,
         [(-1, 1)] * 2,
         time_budget=5,

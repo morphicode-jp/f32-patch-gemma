@@ -1,6 +1,6 @@
 """Council vs single-mimir benchmark — same problem as A/B/C, same seeds.
 
-Adds condition D = mimir_brunnir (4 specialists parallel) to the previous
+Adds condition D = mimir_odin (4 specialists parallel) to the previous
 A/B/C runs on stochastic Rastrigin 10d.
 
 Runs both noise regimes (sigma=2 low, sigma=30 high) to see if council fixes
@@ -22,7 +22,7 @@ import time
 
 sys.path.insert(0, os.path.dirname(os.path.abspath(__file__)))
 
-from twelve.agent.mimir_brunnir import mimir_brunnir
+from twelve.agent.mimir_odin import mimir_odin
 
 
 DIM = 10
@@ -66,7 +66,7 @@ def run_council(seed: int, noise_std: float) -> dict:
 
     t0 = time.time()
     # Thread executor because eval_fn is closure (not picklable)
-    r = mimir_brunnir(
+    r = mimir_odin(
         eval_fn, ranges,
         time_budget=TIME_BUDGET,
         executor="thread",

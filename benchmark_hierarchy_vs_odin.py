@@ -16,7 +16,7 @@ import time
 sys.path.insert(0, os.path.dirname(os.path.abspath(__file__)))
 
 from twelve.agent.mimir_cardinal import mimir_cardinal_hierarchy
-from twelve.agent.mimir_brunnir import mimir_brunnir
+from twelve.agent.mimir_odin import mimir_odin
 
 
 DIM = 20
@@ -35,7 +35,7 @@ def sparse_rastrigin(p):
 
 def run_council(seed: int) -> dict:
     t0 = time.time()
-    r = mimir_brunnir(
+    r = mimir_odin(
         sparse_rastrigin,
         [(RANGE_LO, RANGE_HI)] * DIM,
         time_budget=TIME_BUDGET,
