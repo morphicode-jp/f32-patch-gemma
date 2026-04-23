@@ -2,11 +2,13 @@
 
 All responses in Japanese.
 
-## 最優先ルール: `mimir_council()` を呼べ
+## 最優先ルール: `mimir_brunnir()` を呼べ
 
-全ての最適化は `mimir_council(eval_fn, param_ranges, time_budget=N)` で始まる。2026-04-23 以降の新 default エントリーポイント。
+全ての最適化は `mimir_brunnir(eval_fn, param_ranges, time_budget=N)` で始まる。2026-04-23 以降の新 default エントリーポイント。
 
-`mimir_council()` は 4 specialist の mimir (default / lad / expensive / scipy-forced) を並列実行し、最良 best_score を採用する。単独 mimir の弱点 (低/高 noise / 多峰 / 高次元 gradient) を相互補完、「どの specialist の成績 ≤ council 成績」が保証される (取り方が max なので理論的下限 = 最強 specialist 単独)。
+**名前の由来**: Mímisbrunnr (北欧神話) = ミーミル (知恵の神) の泉。オーディンが片目を捧げて知恵を汲んだ聖なる泉。4 specialist の mimir を「4 本の泉」と見立て、それぞれから汲み上げた最適解候補の**最良を採用**する。
+
+`mimir_brunnir()` は 4 specialist の mimir (default / lad / expensive / scipy-forced) を並列実行し、最良 best_score を採用する。単独 mimir の弱点 (低/高 noise / 多峰 / 高次元 gradient) を相互補完、「どの specialist の成績 ≤ council 成績」が保証される (取り方が max なので理論的下限 = 最強 specialist 単独)。
 
 単独 `mimir()` が適切な例外は 3 つのみ: (a) 2-3d convex の超単純問題、(b) CPU 1 core / メモリ < 4GB 環境、(c) GGUF patch 系 eval_fn (disk/メモリ競合で council 逆効果)。
 
@@ -18,9 +20,9 @@ All responses in Japanese.
 ## 最小使用法 (council)
 
 ```python
-from twelve.agent.mimir_council import mimir_council
+from twelve.agent.mimir_brunnir import mimir_brunnir
 
-r = mimir_council(eval_fn, param_ranges, time_budget=300)
+r = mimir_brunnir(eval_fn, param_ranges, time_budget=300)
 print(r["best_params"], r["best_score"], r["specialist"])  # 勝った specialist 名
 print(r["council"])                                         # [(name, score), ...] 全員降順
 print(r["council_variance_std"])                            # 問題難易度 signal
@@ -34,11 +36,11 @@ r = mimir(eval_fn, param_ranges, time_budget=300)
 
 返り値 dict 主要キー (council): `best_params` / `best_score` / `specialist` / `council` / `council_variance_std` / `n_specialists_ran` + 勝者 mimir の全キー (`dead_dims` / `fragility` / `proxy_r2` / `tool_used` / `route`)。構造発見系は最適化と同時に得られる。stochastic eval_fn / `n_samples_per_eval>1` / dict eval_fn 時は追加で `stable_active` / `observer_dependent` / `dead_observers` / `multi_observer_side_analysis` も付く (Rule 12)。
 
-## mimir_council 使用 6 パターン
+## mimir_brunnir 使用 6 パターン
 
-全て `mimir_council()` 1 関数で扱える。extra_kwargs が全 specialist に passthrough される。
+全て `mimir_brunnir()` 1 関数で扱える。extra_kwargs が全 specialist に passthrough される。
 
-第1. **何も知らない最適化**: `mimir_council(fn, ranges, time_budget=300)` で終わる。
+第1. **何も知らない最適化**: `mimir_brunnir(fn, ranges, time_budget=300)` で終わる。
 第2. **過去 data あり**: `curated_measurements=past` extra_kwargs で全 specialist の seed を底上げ。
 第3. **LLM キャリブ等 eval 重い**: そのまま渡す。specialist "lad" が n_samples=20 集約で noise 除去、"expensive" が owl 全力モードで補完。
 第4. **構造分析のみ**: `mode="structure_only"` を extra_kwargs で渡す。全 specialist が dead_dims/active_dims/proxy_r2 だけ返す。※ overkill なら単独 `mimir(mode="structure_only")` で十分。
@@ -46,12 +48,12 @@ r = mimir(eval_fn, param_ranges, time_budget=300)
 第6. **stochastic / 自動集約**: specialist "lad" が `n_samples_per_eval=20` を自動担当、ユーザー側追加 kwarg 不要。
 
 ```python
-r1 = mimir_council(fn, [(-5, 5)] * 8, time_budget=300)                                # (1) 一般
-r2 = mimir_council(fn, ranges, curated_measurements=past_data, time_budget=600)       # (2) 過去 data
-r3 = mimir_council(ppl_eval, ranges, time_budget=1800)                                # (3) LLM キャリブ
+r1 = mimir_brunnir(fn, [(-5, 5)] * 8, time_budget=300)                                # (1) 一般
+r2 = mimir_brunnir(fn, ranges, curated_measurements=past_data, time_budget=600)       # (2) 過去 data
+r3 = mimir_brunnir(ppl_eval, ranges, time_budget=1800)                                # (3) LLM キャリブ
 r4 = mimir(fn, ranges, mode="structure_only", time_budget=30)                         # (4) 分析のみ (単独で OK)
-r5 = mimir_council(fn, ranges, guard_fn=my_guard, time_budget=300)                    # (5) 2 指標
-r6 = mimir_council(llm_eval, ranges, time_budget=1800)                                # (6) stochastic (lad 自動)
+r5 = mimir_brunnir(fn, ranges, guard_fn=my_guard, time_budget=300)                    # (5) 2 指標
+r6 = mimir_brunnir(llm_eval, ranges, time_budget=1800)                                # (6) stochastic (lad 自動)
 ```
 
 **単独 `mimir()` が適切な 3 例外**:
@@ -77,7 +79,7 @@ owl_result, reigen_result (escalation 時), scipy_result (dim≥10 時)
 tool_used 値: `"owl"` / `"owl+reigen"` / `"owl+scipy"` / `"owl(reigen_tried)"` / `"owl(reigen_scipy_tried)"` / `"owl_structure_only"`
 route 値: `"expensive_single"` / `"cheap_cascade"` / `"structure_only"`
 
-## mimir_council の返り値 (追加キー)
+## mimir_brunnir の返り値 (追加キー)
 
 council は勝者 mimir の全キーを含んだ上で以下を追加:
 
@@ -98,7 +100,7 @@ council_errors             : 失敗 specialist の詳細 list
 
 ## 実測は自動化される — 手で 1 点ずつ測るな
 
-`mimir_council(eval_fn, ranges, time_budget=300)` の **1 行で全自動** (seed 生成 → 実測 → proxy fit → argmax 再実測 → 収束判定 → range 拡張 → 4 specialist 並列 → 最良 best_score 採用)。ユーザーの仕事は `eval_fn` 書くだけ、手動ループは不要 (詳細は Rule 0/2)。
+`mimir_brunnir(eval_fn, ranges, time_budget=300)` の **1 行で全自動** (seed 生成 → 実測 → proxy fit → argmax 再実測 → 収束判定 → range 拡張 → 4 specialist 並列 → 最良 best_score 採用)。ユーザーの仕事は `eval_fn` 書くだけ、手動ループは不要 (詳細は Rule 0/2)。
 
 ### 過去データは必ず `curated_measurements=` に渡せ
 
@@ -107,7 +109,7 @@ council_errors             : 失敗 specialist の詳細 list
 ```python
 past = [{"params": [0.8, 1.2], "score": 0.71},
         {"params": [1.0, 1.3], "score": 0.68}, ... ]   # 過去の実測 20 点
-r = mimir_council(eval_fn, ranges, curated_measurements=past, time_budget=600)
+r = mimir_brunnir(eval_fn, ranges, curated_measurements=past, time_budget=600)
 ```
 
 ### proxy_r2 の違い (同じ実測数でも桁違い)
@@ -128,11 +130,11 @@ mimir の proxy は**全て実測値から fit** される。推測・合成デ�
 
 ## eval_fn を書いたらまず check_eval_fn() で診断
 
-**本番 `mimir_council()` (or 単独 `mimir()`) の前に必ず走らせろ**。30-60 秒で bad eval_fn を自動検出、本番 1 時間の無駄走を防ぐ。
+**本番 `mimir_brunnir()` (or 単独 `mimir()`) の前に必ず走らせろ**。30-60 秒で bad eval_fn を自動検出、本番 1 時間の無駄走を防ぐ。
 
 ```python
 from twelve.agent.eval_check import check_eval_fn, format_report
-from twelve.agent.mimir_council import mimir_council
+from twelve.agent.mimir_brunnir import mimir_brunnir
 
 diag = check_eval_fn(my_eval_fn, param_ranges, time_budget=60)
 print(format_report(diag))
@@ -142,7 +144,7 @@ if not diag["ok"]:
     raise ValueError(f"eval_fn bad: {diag['issues']}")
 
 # OK なら本番 (council が default)
-r = mimir_council(my_eval_fn, param_ranges, time_budget=1800)
+r = mimir_brunnir(my_eval_fn, param_ranges, time_budget=1800)
 ```
 
 検出する bad パターン:
@@ -172,7 +174,7 @@ r = mimir_council(my_eval_fn, param_ranges, time_budget=1800)
 | curated 過去 data を mimir に | random _collect | 10-100× 情報量損 |
 | dict `{"nll":..., "hs":...}` return | 単一 scalar | multi-observer で stable_active 等取れる |
 | stochastic: `wrap_stochastic(fn, n=20)` or `wrap_multi_obs(fn, n=20)` | stochastic を raw で渡す | LaD 化で noise 除去、proxy_r2 +0.3-0.4 (Rule 12) |
-| 弱点分からん / 単独 mimir で局所解嵌まる → `mimir_council()` | 単独 mimir で頑張る | 4 specialist 並列で弱点補完 (Rule 13) |
+| 弱点分からん / 単独 mimir で局所解嵌まる → `mimir_brunnir()` | 単独 mimir で頑張る | 4 specialist 並列で弱点補完 (Rule 13) |
 
 ## experience_id
 
@@ -207,12 +209,12 @@ full 数値は `benchmark_mimir.json` / `benchmark_mimir_dimscale.json`。
 | 6 | Discrete/int params OK via mimir (owl direct-HC fallback 自動) |
 | 7 | **scale=0 forbidden**. Never include 0 in ranges |
 | 8 | Two metrics → `mimir(..., guard_fn=my_guard)`. 1 metric → guard_fn 不要 |
-| 9 | **Default to `mimir_council()`** (2026-04-23). 単独 mimir は簡単問題 / 1 core / GGUF patch の 3 例外のみ |
+| 9 | **Default to `mimir_brunnir()`** (2026-04-23). 単独 mimir は簡単問題 / 1 core / GGUF patch の 3 例外のみ |
 | 10 | Kathara 0.993 uniformity requires N=12 + 5-regular + symmetric placement |
 | 11 | `batch_eval_fn` は external params 限定。internal model state では禁止 |
 | 11b | mimir parallel cascade も internal state 危険 → `thread_safe_eval=False` |
 | 12 | stochastic eval_fn は `n_samples_per_eval` か `wrap_multi_obs` で LaD 化せよ |
-| 13 | **Default = `mimir_council()`** (4 specialist 並列、単独 mimir の strict 上位互換) |
+| 13 | **Default = `mimir_brunnir()`** (4 specialist 並列、単独 mimir の strict 上位互換) |
 | 14 | 高次元 sparse かつ reigen symbolic 解なし (Hebbian 進化系) は `mimir_cardinal_hierarchy()` |
 | 15 | multi-metric eval でどう aggregate すべきか不明なら `mimir_cardinal_coevolution()` (params × weights 共進化) |
 
@@ -242,7 +244,7 @@ full 数値は `benchmark_mimir.json` / `benchmark_mimir_dimscale.json`。
 
 **Rule 8**: 2 指標は `mimir(eval_fn, ranges, guard_fn=my_guard)`。mimir が owl 経由 safe_dim_analysis=True を引継ぎ、guard 破綻時に自動 pivot。1 指標は guard_fn 不要。Sentinel 直呼びは legacy。
 
-**Rule 9**: `mimir_council()` が 2026-04-23 以降の default entry。標準呼出 `mimir_council(fn, ranges, time_budget=N)`、extra_kwargs で全 specialist に (curated_measurements / guard_fn / mode 等) passthrough。単独 `mimir()` は「超単純問題 (2-3d convex)」「CPU 1 core / メモリ < 4GB 環境」「GGUF patch disk 競合」の 3 例外のみ。owl 直呼びは「dead_dims だけ欲しい」「eval 激安で分岐 overhead 嫌」の 2 場面。Reigen 直呼びは cross-task meta_knowledge 明示共有時のみ。詳細は Rule 13。
+**Rule 9**: `mimir_brunnir()` が 2026-04-23 以降の default entry。標準呼出 `mimir_brunnir(fn, ranges, time_budget=N)`、extra_kwargs で全 specialist に (curated_measurements / guard_fn / mode 等) passthrough。単独 `mimir()` は「超単純問題 (2-3d convex)」「CPU 1 core / メモリ < 4GB 環境」「GGUF patch disk 競合」の 3 例外のみ。owl 直呼びは「dead_dims だけ欲しい」「eval 激安で分岐 overhead 嫌」の 2 場面。Reigen 直呼びは cross-task meta_knowledge 明示共有時のみ。詳細は Rule 13。
 
 **Rule 10**: chaos-game uniformity 0.993 は N=12 + 5-regular + symmetric placement の 3 条件同時必要。1 つ破れば崩壊。Reigen 内部では graph 性質のみ (Circulant(12,{1,4,6}), λ₂=4.0, diameter 2) 使用、placement uniformity は使わないので Rule 10 の縛りは Reigen に効かない。
 
@@ -273,11 +275,11 @@ r = mimir(wrapped, ranges, time_budget=3600)
 
 **検出と推奨は自動**: `check_eval_fn()` が同一 params で N 回 probe、CV > 0.10 で stochastic 判定 → wrap_* 推奨警告。Default `n_samples_per_eval=1` は backward compat (明示指定しないと compute 予算が勝手に 20× されない)。詳細は `twelve/agent/lad_wrappers.py`。
 
-**Rule 13**: **Default 選択: 迷わず `mimir_council()` を使え**。mimir 単体を選ぶ積極的理由は Rule 9 の 3 例外のみ。council は 4 specialist (default / lad / expensive / scipy-forced) を並列実行、最良を採用 — 取り方が max なので理論的に単独 mimir の strict 上位互換:
+**Rule 13**: **Default 選択: 迷わず `mimir_brunnir()` を使え**。mimir 単体を選ぶ積極的理由は Rule 9 の 3 例外のみ。council は 4 specialist (default / lad / expensive / scipy-forced) を並列実行、最良を採用 — 取り方が max なので理論的に単独 mimir の strict 上位互換:
 
 ```python
-from twelve.agent.mimir_council import mimir_council
-r = mimir_council(eval_fn, ranges, time_budget=60)
+from twelve.agent.mimir_brunnir import mimir_brunnir
+r = mimir_brunnir(eval_fn, ranges, time_budget=60)
 # 4 specialist 並列で 60 秒 → 最良 best_score の結果を返す
 print(r["specialist"])              # "lad" / "default" / "expensive" / "scipy-forced"
 print(r["council"])                 # [(name, score), ...] 全員の結果
@@ -286,7 +288,7 @@ print(r["council_variance_std"])    # 問題難易度シグナル
 
 **ベンチ実績** (stochastic Rastrigin 10d, 3 seeds × 2 noise levels):
 - 単独 mimir: gap 31-201 (noise / seed で不安定)
-- **mimir_council: gap ≈ 0 全 6 run** (完全解発見、理論下限到達)
+- **mimir_brunnir: gap ≈ 0 全 6 run** (完全解発見、理論下限到達)
 
 **LLM eval でも使える** (実測: wall time 1.06×、GPU concurrent 並列化成功)。
 
@@ -302,10 +304,10 @@ print(r["council_variance_std"])    # 問題難易度シグナル
 
 | 状況 | 2026-04-22 まで | **2026-04-23 以降 (default)** |
 |---|---|---|
-| 何も知らずに最適化 | `mimir(fn, ranges)` | **`mimir_council(fn, ranges)`** |
-| 過去 data あり | `mimir(..., curated_measurements=)` | **`mimir_council(..., curated_measurements=)`** |
-| LLM キャリブ | `mimir(..., n_samples_per_eval=20)` | **`mimir_council(..., )`** (lad specialist 自動担当) |
-| 2 指標 guard | `mimir(..., guard_fn=)` | **`mimir_council(..., guard_fn=)`** |
+| 何も知らずに最適化 | `mimir(fn, ranges)` | **`mimir_brunnir(fn, ranges)`** |
+| 過去 data あり | `mimir(..., curated_measurements=)` | **`mimir_brunnir(..., curated_measurements=)`** |
+| LLM キャリブ | `mimir(..., n_samples_per_eval=20)` | **`mimir_brunnir(..., )`** (lad specialist 自動担当) |
+| 2 指標 guard | `mimir(..., guard_fn=)` | **`mimir_brunnir(..., guard_fn=)`** |
 | 構造分析のみ | `mimir(..., mode="structure_only")` | 単独 `mimir(mode="structure_only")` で OK (council overkill) |
 | 2-3d convex 超単純 | `mimir(fn, ranges)` | 単独 `mimir()` で OK (council overhead 損) |
 | CPU 1 core / メモリ少 | `mimir(fn, ranges)` | 単独 `mimir()` 強制 (並列不可) |
@@ -315,14 +317,14 @@ print(r["council_variance_std"])    # 問題難易度シグナル
 - GGUF patch 系 eval_fn: disk / メモリ競合で逐次化、council 意味なし
 - eval_fn が global state mutate: Rule 11b、`executor="thread"` でもダメ
 
-詳細は `twelve/agent/mimir_council.py`。
+詳細は `twelve/agent/mimir_brunnir.py`。
 
 **Rule 14**: 高次元 sparse 問題 (20d+ で効く dim が 5-10 個など) は **Council で構造圧縮 → GA で進化** を連結する `mimir_cardinal_hierarchy()` が最強:
 
 ```python
 from twelve.agent.mimir_cardinal import mimir_cardinal_hierarchy
 r = mimir_cardinal_hierarchy(eval_fn, ranges_20d, time_budget=600)
-# Step 1 (20% budget): mimir_council で active_dims 抽出 → 5 dim に圧縮
+# Step 1 (20% budget): mimir_brunnir で active_dims 抽出 → 5 dim に圧縮
 # Step 2 (80% budget): GA (tournament + crossover + Gaussian mutation) で進化
 # → 2^25 = 33M× 探索空間縮小、局所解を集団選択で飛び越える
 ```
@@ -379,10 +381,10 @@ print(r["weight_evolution_mean"])        # weight の世代推移 (収束可視�
 
 ## ツール役割の階層 (4 段構成)
 
-表舞台は `mimir_council()` 1 個。裏方は 4 specialist mimir、さらにその下に owl / reigen / scipy。
+表舞台は `mimir_brunnir()` 1 個。裏方は 4 specialist mimir、さらにその下に owl / reigen / scipy。
 
 ```
-mimir_council()                        ← ユーザー呼び口 (新 default、2026-04-23)
+mimir_brunnir()                        ← ユーザー呼び口 (新 default、2026-04-23)
   ├── mimir (default specialist)       ← 低 noise / symbolic 多峰 (reigen 効く決定論)
   │    ├── owl                          ← Phase 1 + 構造発見
   │    │    └── optimize()              ← primitive HC engine
@@ -409,7 +411,7 @@ mimir_council()                        ← ユーザー呼び口 (新 default、
 ## 内部分岐ロジック (council 層 + mimir 層)
 
 ```
-mimir_council(fn, ranges, time_budget) 呼出し
+mimir_brunnir(fn, ranges, time_budget) 呼出し
 │
 └── 4 specialist を並列実行 (ProcessPool or ThreadPool)
     ├── default      : mimir(fn, ranges, time_budget)
@@ -450,7 +452,7 @@ mimir_council(fn, ranges, time_budget) 呼出し
 
 `n_samples_per_eval` / `stochastic_aggregator` (Rule 12) は **kwarg 専用 / JSON 非対応**。compute 予算が silent に N× されるのを避けるための明示 opt-in 設計 (default は 1 で backward compat)。
 
-**注**: 上記 JSON は**単独 `mimir()` の内部分岐設定**。`mimir_council()` は specialist list (`DEFAULT_SPECIALISTS` in `mimir_council.py`) で挙動制御、JSON 非経由。council 内の各 mimir インスタンスは上記 JSON を読む。
+**注**: 上記 JSON は**単独 `mimir()` の内部分岐設定**。`mimir_brunnir()` は specialist list (`DEFAULT_SPECIALISTS` in `mimir_brunnir.py`) で挙動制御、JSON 非経由。council 内の各 mimir インスタンスは上記 JSON を読む。
 
 ## Hardware & safety
 
@@ -563,7 +565,7 @@ Heretic abliteration の副作用を吸収する regex + mask-then-clean パイ�
 | **Reigen 内部実装・編集時** | `@docs/REIGEN_INTERNALS.md` |
 | **owl 内部実装・編集時** | `@docs/OWL_INTERNALS.md` |
 | **stochastic eval_fn を LaD 化する wrapper (Rule 12)** | `@twelve/agent/lad_wrappers.py` |
-| **mimir council (4 specialist 並列、Rule 13)** | `@twelve/agent/mimir_council.py` |
+| **mimir council (4 specialist 並列、Rule 13)** | `@twelve/agent/mimir_brunnir.py` |
 | **Sentinel (legacy)** | `@docs/SENTINEL_LEGACY.md` |
 | **HTTP API / ngrok / session API** | `@docs/API_SERVERS.md` |
 | Zenron 実践ガイド + MirrorScan 詳細 | `@docs/ZENRON_GUIDE.md` |
@@ -591,8 +593,8 @@ Heretic abliteration の副作用を吸収する regex + mask-then-clean パイ�
 | owl stochastic tests (Rule 12) | `@twelve/tests/test_owl_stochastic.py` |
 | **lad_wrappers** (wrap_stochastic / wrap_multi_obs / wrap_llm_judge、Rule 12) | `@twelve/agent/lad_wrappers.py` |
 | lad_wrappers tests | `@twelve/tests/test_lad_wrappers.py` |
-| **mimir_council** (4 specialist 並列、Rule 13) | `@twelve/agent/mimir_council.py` |
-| mimir_council tests | `@twelve/tests/test_mimir_council.py` |
+| **mimir_brunnir** (4 specialist 並列、Rule 13) | `@twelve/agent/mimir_brunnir.py` |
+| mimir_brunnir tests | `@twelve/tests/test_mimir_brunnir.py` |
 | **mimir_cardinal** (Council × GA Hierarchy、Rule 14) | `@twelve/agent/mimir_cardinal.py` |
 | **mimir_coevolution** (params × weights 共進化、Rule 15) | `@twelve/agent/mimir_coevolution.py` |
 | cardinal + coevolution tests | `@twelve/tests/test_mimir_cardinal.py` |

@@ -1,12 +1,16 @@
-"""mimir_council — 4 specialist mimir を並列実行し、最良結果を返す.
+"""mimir_brunnir — 4 specialist mimir を並列実行し、最良結果を返す.
+
+Mímisbrunnr (北欧神話): ミーミル (知恵の神) の泉。オーディンが片目を捧げて
+知恵を汲んだ聖なる泉。本 module は 4 つの specialist mimir を「4 本の泉」と
+見立て、それぞれから汲み上げた最適解候補の最良を採用する。
 
 背景:
   単一 mimir は config によって得意分野が違う。低 noise / 高 noise / 多峰 /
   高次元 gradient など、それぞれに特化した config がある。ユーザーが問題性質を
   事前に判断するのは難しいので、**全 specialist を並列で走らせて最良を採用**する。
 
-比較: mimir 単体 vs council
-  | | 単体 mimir | council (本 module) |
+比較: mimir 単体 vs brunnir (4 泉の合議)
+  | | 単体 mimir | mimir_brunnir (本 module) |
   |---|---|---|
   | 時間 | 1×time_budget | 1×time_budget (並列) |
   | CPU | 1 core | 4 core |
@@ -14,8 +18,8 @@
   | 問題難易度検出 | 不可 | council variance で可視化 |
 
 使い方:
-    from twelve.agent.mimir_council import mimir_council
-    r = mimir_council(eval_fn, ranges, time_budget=60)
+    from twelve.agent.mimir_brunnir import mimir_brunnir
+    r = mimir_brunnir(eval_fn, ranges, time_budget=60)
     print(r["best_params"], r["council"])  # 勝者 + 全員の結果
 """
 from __future__ import annotations
@@ -68,7 +72,7 @@ def _score_of(r: dict) -> float:
     return float("-inf")
 
 
-def mimir_council(
+def mimir_brunnir(
     eval_fn: Callable,
     param_ranges: Sequence[tuple],
     *,
@@ -189,4 +193,4 @@ def mimir_council(
     return best
 
 
-__all__ = ["mimir_council", "DEFAULT_SPECIALISTS"]
+__all__ = ["mimir_brunnir", "DEFAULT_SPECIALISTS"]

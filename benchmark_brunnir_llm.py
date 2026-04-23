@@ -10,7 +10,7 @@ eval_fn: POST /v1/chat/completions with params=[temperature, top_p]
 
 比較:
   S  = mimir(fn, ranges) 単独
-  D  = mimir_council(fn, ranges) 4 specialist 並列
+  D  = mimir_brunnir(fn, ranges) 4 specialist 並列
 
 測定:
   - wall time (council が 1.5× 以内なら GPU 並列 OK、3-4× なら逐次化)
@@ -29,7 +29,7 @@ from urllib.error import URLError
 sys.path.insert(0, os.path.dirname(os.path.abspath(__file__)))
 
 from twelve.agent.mimir import mimir
-from twelve.agent.mimir_council import mimir_council
+from twelve.agent.mimir_brunnir import mimir_brunnir
 
 
 LLM_URL = "http://127.0.0.1:8282/v1/chat/completions"
@@ -106,7 +106,7 @@ def main():
     print("=" * 60)
     CALL_COUNTER["n"] = 0
     t0 = time.time()
-    r_council = mimir_council(
+    r_council = mimir_brunnir(
         llm_eval, ranges,
         time_budget=TIME_BUDGET,
         executor="thread",  # closure eval_fn not picklable; also LLM is I/O

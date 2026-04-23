@@ -1,12 +1,12 @@
 """mimir_cardinal — Council × Cardinal Hierarchy (Pattern 3).
 
 背景:
-  mimir_council は 4 specialist 並列で弱点を相互補完するが、高次元多峰問題では
+  mimir_brunnir は 4 specialist 並列で弱点を相互補完するが、高次元多峰問題では
   単体 mimir と同様 proxy に嵌まることがある。Cardinal の進化 (集団 + 変異 +
   淘汰) は局所解を飛び越える力を持つが、高次元で世代数が足りない弱点がある。
 
 Hierarchy: Council で次元圧縮 → Cardinal (汎用 GA) で進化探索
-  Step 1 (20% budget): mimir_council で structure_only、active_dims を抽出
+  Step 1 (20% budget): mimir_brunnir で structure_only、active_dims を抽出
     - 30 dim → 5 dim に圧縮 (2^25 = 33M× 探索空間縮小)
     - dead dims は中点固定
   Step 2 (80% budget): 汎用 GA で active_dims 空間を進化探索
@@ -177,7 +177,7 @@ def mimir_cardinal_hierarchy(
 ) -> dict:
     """Council で次元圧縮 → GA で進化探索 (Pattern 3 Hierarchy).
 
-    Step 1: mimir_council(mode="structure_only") で active_dims 抽出
+    Step 1: mimir_brunnir(mode="structure_only") で active_dims 抽出
             (budget: council_budget_share × time_budget)
     Step 2: GA で active 次元のみ進化
             (budget: (1 - council_budget_share) × time_budget)
@@ -204,7 +204,7 @@ def mimir_cardinal_hierarchy(
       ga_generations (実際に走った世代数)
       elapsed_s, council_elapsed_s, ga_elapsed_s
     """
-    from twelve.agent.mimir_council import mimir_council
+    from twelve.agent.mimir_brunnir import mimir_brunnir
 
     t0 = time.time()
     n_dims = len(list(param_ranges))
@@ -217,7 +217,7 @@ def mimir_cardinal_hierarchy(
         {"name": "default",   "kwargs": {},                          "role": ""},
         {"name": "expensive", "kwargs": {"eval_cost_hint": 2.0},     "role": ""},
     ]  # lightweight 2-specialist scan to save budget for GA
-    r_council = mimir_council(
+    r_council = mimir_brunnir(
         eval_fn, list(param_ranges),
         time_budget=council_budget,
         specialists=council_specialists,
