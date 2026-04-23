@@ -2,21 +2,31 @@
 
 All responses in Japanese.
 
-## 最優先ルール: `mimir_odin()` を呼べ
+## 最優先ルール: `mimir_odin_stable()` を呼べ
 
-全ての最適化は `mimir_odin(eval_fn, param_ranges, time_budget=N)` で始まる。2026-04-23 以降の新 default エントリーポイント。
+全ての最適化は `mimir_odin_stable(eval_fn, param_ranges, time_budget=N)` で始まる。2026-04-24 以降の新 default エントリーポイント。
 
-**日常呼称**: 「**オーディン**」(会話では略称で OK、例: 「オーディンに任せて」「オーディン走らせて結果確認」)。正式関数名は `mimir_odin()`。
+`mimir_odin_stable()` はオーディン (4 specialist 並列で peak 発見) → stabilizer (peak 周辺を Metropolis で探索し plateau 変換) の 2 段 pipeline。実測で**摂動耐性 8% → 96%** (10 倍改善)。実世界で「1mm ズレても壊れない答え」を保証。
 
-**名前の由来**: オーディン (北欧神話の主神) = 知恵を求めて片目を捧げた決断者。mimir (ミーミル: 知恵の神) から 4 specialist 経由で最適解候補を得て、その中から**最良を選択する決断者**。ユーザーはオーディンを呼び出し、オーディンは 4 本の知恵の泉 (specialist) から汲み上げた答えの最良を採用して返す。
+**日常呼称**: 「**オーディン (stable)**」または「**安定オーディン**」。関数呼出は `mimir_odin_stable()`。
 
-**ミーミル家族** (関連 library 一覧):
-- `mimir()` — 基本最適化 (owl/reigen/scipy を内部自動分岐)
-- `mimir_odin()` — オーディン (4 specialist 並列、default) ← 本 Rule 9/13
-- `mimir_odin_stable()` — オーディン + stabilizer (peak→plateau、実世界用、Rule 16)
-- `mimir_cardinal_hierarchy()` — Council → GA (高次元 Hebbian 系、Rule 14)
-- `mimir_cardinal_coevolution()` — params × weights 共進化 (多指標、Rule 15)
-- `stabilizer.stabilize()` — 汎用 peak→plateau 変換 (Rule 16、stand-alone でも可)
+**名前の由来**: オーディン (北欧神話の主神) = 知恵を求めて片目を捧げた決断者。mimir (ミーミル: 知恵の神) から 4 specialist 経由で最適解候補を得て、その中から**最良を選択する決断者**。stable 版は更にその最良を Metropolis + cooling で**安定化** (plateau 化) する。
+
+**時間コスト**: `time_budget` に対し実測 +25% (stabilize stage 分)。time_budget=300 なら実測 ~400s 想定。
+
+**例外 — 旧 default `mimir_odin()` を直呼びする場面 2 つのみ**:
+1. 論文 / 理論ベンチマーク (BBOB 等) で peak が fragile でも問題にならない
+2. 時間が極端に厳しく 25% overhead が致命的
+
+更に下層の `mimir()` 直呼びは 3 例外 (単純問題 / 1 core / GGUF patch、Rule 9 詳解)。
+
+**ミーミル家族** (上から default 優先):
+- `mimir_odin_stable()` — ★ default (Rule 9/16、peak→plateau、実世界推奨)
+- `mimir_odin()` — 旧 default (Rule 13、論文ベンチ用、time -25%)
+- `mimir()` — 内部実装 (3 例外時のみ直呼び)
+- `mimir_cardinal_hierarchy()` — Council → GA (Rule 14、特殊)
+- `mimir_cardinal_coevolution()` — params × weights 共進化 (Rule 15、特殊)
+- `stabilizer.stabilize()` — 汎用 peak→plateau 変換 (stand-alone、他 optimizer に後付け可)
 
 `mimir_odin()` は 4 specialist の mimir (default / lad / expensive / scipy-forced) を並列実行し、最良 best_score を採用する。単独 mimir の弱点 (低/高 noise / 多峰 / 高次元 gradient) を相互補完、「どの specialist の成績 ≤ council 成績」が保証される (取り方が max なので理論的下限 = 最強 specialist 単独)。
 
@@ -27,49 +37,61 @@ All responses in Japanese.
 - LLM eval (Qwen 3.6): wall time 1.06× (GPU concurrent 並列化成功)
 - BBOB 4 問題で gap≈0 達成、Rastrigin 20d で cma_es の 128× 優位、Rosenbrock 20d scipy cascade で gap=0 (単独 mimir ベースの実績、council はさらに安定)
 
-## 最小使用法 (council)
+## 最小使用法 (stable)
 
 ```python
-from twelve.agent.mimir_odin import mimir_odin
+from twelve.agent.mimir_odin_stable import mimir_odin_stable
 
-r = mimir_odin(eval_fn, param_ranges, time_budget=300)
-print(r["best_params"], r["best_score"], r["specialist"])  # 勝った specialist 名
-print(r["council"])                                         # [(name, score), ...] 全員降順
-print(r["council_variance_std"])                            # 問題難易度 signal
+r = mimir_odin_stable(eval_fn, param_ranges, time_budget=400)
+print(r["best_params"])            # ★ plateau centroid (robust、実用推奨)
+print(r["best_score"])             # plateau の score
+print(r["plateau_robustness"])     # 摂動耐性 (通常 0.7-0.9)
+print(r["peak_robustness"])        # 元の peak 耐性 (通常 0.1-0.3、比較用)
+print(r["specialist"])             # 勝った odin specialist (diagnostic)
 ```
 
-**単独 mimir (fallback、3 例外時のみ)**:
+**旧 default (`mimir_odin()` 直呼び、論文ベンチ時のみ)**:
+```python
+from twelve.agent.mimir_odin import mimir_odin
+r = mimir_odin(eval_fn, param_ranges, time_budget=300)
+```
+
+**内部実装 (`mimir()` 直呼び、3 例外時のみ)**:
 ```python
 from twelve.agent.mimir import mimir
 r = mimir(eval_fn, param_ranges, time_budget=300)
 ```
 
-返り値 dict 主要キー (council): `best_params` / `best_score` / `specialist` / `council` / `council_variance_std` / `n_specialists_ran` + 勝者 mimir の全キー (`dead_dims` / `fragility` / `proxy_r2` / `tool_used` / `route`)。構造発見系は最適化と同時に得られる。stochastic eval_fn / `n_samples_per_eval>1` / dict eval_fn 時は追加で `stable_active` / `observer_dependent` / `dead_observers` / `multi_observer_side_analysis` も付く (Rule 12)。
+返り値 dict 主要キー (stable): `best_params` (★ plateau centroid) / `best_score` / `peak_params` / `peak_robustness` / `plateau_robustness` / `plateau_width` / `plateau_particles` / `robustness_improvement` + odin 由来 (`specialist` / `council` / `council_variance_std`) + mimir 由来 (`dead_dims` / `active_dims` / `proxy_r2` / `tool_used` / `route`) 全部引き継ぎ。構造発見系は最適化と同時に得られる。
 
-## mimir_odin 使用 6 パターン
+## mimir_odin_stable 使用 6 パターン
 
-全て `mimir_odin()` 1 関数で扱える。extra_kwargs が全 specialist に passthrough される。
+全て `mimir_odin_stable()` 1 関数で扱える。extra_kwargs が odin → 全 specialist に passthrough される。time_budget に +25% 余裕を持たせる (stabilize stage 分)。
 
-第1. **何も知らない最適化**: `mimir_odin(fn, ranges, time_budget=300)` で終わる。
-第2. **過去 data あり**: `curated_measurements=past` extra_kwargs で全 specialist の seed を底上げ。
-第3. **LLM キャリブ等 eval 重い**: そのまま渡す。specialist "lad" が n_samples=20 集約で noise 除去、"expensive" が owl 全力モードで補完。
-第4. **構造分析のみ**: `mode="structure_only"` を extra_kwargs で渡す。全 specialist が dead_dims/active_dims/proxy_r2 だけ返す。※ overkill なら単独 `mimir(mode="structure_only")` で十分。
-第5. **2 指標 guard**: `guard_fn=my_guard` extra_kwargs で 全 specialist に伝搬、安全指標 pivot 発動。
+第1. **何も知らない最適化**: `mimir_odin_stable(fn, ranges, time_budget=400)` で終わる。
+第2. **過去 data あり**: `curated_measurements=past` extra_kwargs で odin stage の seed を底上げ。
+第3. **LLM キャリブ等 eval 重い**: そのまま渡す。specialist "lad" が n_samples=20 集約で noise 除去、stabilizer が plateau 化。
+第4. **構造分析のみ**: `mode="structure_only"` は単独 `mimir(mode="structure_only")` 推奨 (stable 要らない、overkill)。
+第5. **2 指標 guard**: `guard_fn=my_guard` extra_kwargs で odin 全 specialist に伝搬、安全指標 pivot 発動。
 第6. **stochastic / 自動集約**: specialist "lad" が `n_samples_per_eval=20` を自動担当、ユーザー側追加 kwarg 不要。
 
 ```python
-r1 = mimir_odin(fn, [(-5, 5)] * 8, time_budget=300)                                # (1) 一般
-r2 = mimir_odin(fn, ranges, curated_measurements=past_data, time_budget=600)       # (2) 過去 data
-r3 = mimir_odin(ppl_eval, ranges, time_budget=1800)                                # (3) LLM キャリブ
-r4 = mimir(fn, ranges, mode="structure_only", time_budget=30)                         # (4) 分析のみ (単独で OK)
-r5 = mimir_odin(fn, ranges, guard_fn=my_guard, time_budget=300)                    # (5) 2 指標
-r6 = mimir_odin(llm_eval, ranges, time_budget=1800)                                # (6) stochastic (lad 自動)
+r1 = mimir_odin_stable(fn, [(-5, 5)] * 8, time_budget=400)                             # (1) 一般
+r2 = mimir_odin_stable(fn, ranges, curated_measurements=past_data, time_budget=800)    # (2) 過去 data
+r3 = mimir_odin_stable(ppl_eval, ranges, time_budget=2400)                             # (3) LLM キャリブ
+r4 = mimir(fn, ranges, mode="structure_only", time_budget=30)                          # (4) 分析のみ (単独 OK)
+r5 = mimir_odin_stable(fn, ranges, guard_fn=my_guard, time_budget=400)                 # (5) 2 指標
+r6 = mimir_odin_stable(llm_eval, ranges, time_budget=2400)                             # (6) stochastic (lad 自動)
 ```
 
-**単独 `mimir()` が適切な 3 例外**:
-- (a) 2-3d convex な超単純問題 (council の並列 overhead で逆に遅い)
-- (b) CPU 1 core / メモリ < 4GB 環境 (4 プロセス並列の恩恵なし)
-- (c) GGUF patch + 評価系 eval_fn (disk/メモリ競合で逐次化、council 破綻)
+**旧 default `mimir_odin()` を直呼びする 2 例外**:
+- (a) BBOB / 論文ベンチマークで peak fragile でも gap=0 のみ評価される
+- (b) 時間が極端に厳しく 25% overhead が致命的 (典型: 1h 予算の中で stable は 15 分無駄になる)
+
+**更に内側 `mimir()` が適切な 3 例外** (stable / odin 両方 overkill):
+- (c) 2-3d convex な超単純問題 (stable / odin の並列 overhead で逆に遅い)
+- (d) CPU 1 core / メモリ < 4GB 環境 (4 プロセス並列の恩恵なし)
+- (e) GGUF patch + 評価系 eval_fn (disk/メモリ競合で逐次化、並列破綻)
 
 ## mimir の返り値
 
@@ -89,28 +111,56 @@ owl_result, reigen_result (escalation 時), scipy_result (dim≥10 時)
 tool_used 値: `"owl"` / `"owl+reigen"` / `"owl+scipy"` / `"owl(reigen_tried)"` / `"owl(reigen_scipy_tried)"` / `"owl_structure_only"`
 route 値: `"expensive_single"` / `"cheap_cascade"` / `"structure_only"`
 
-## mimir_odin の返り値 (追加キー)
+## mimir_odin_stable の返り値 (default 出力)
 
-council は勝者 mimir の全キーを含んだ上で以下を追加:
+stable は odin の全キー + stabilizer 由来キーを追加。**`best_params` は plateau centroid に上書き** (実用推奨)、元の peak は `peak_params` に保存:
 
 ```
+# ★ 実用推奨 (plateau = robust な答え)
+best_params        : plateau centroid (list)
+best_score         : centroid の実測 score
+plateau_score      : 同上 (alias)
+plateau_robustness : 摂動耐性 0-1 (期待 >0.7)
+plateau_width      : 各次元の std (list、信頼区間的幅)
+plateau_particles  : stabilizer 12 粒子の最終位置 (ensemble 用)
+
+# 比較用 (peak = 元のfragile な最適)
+peak_params        : odin が見つけた sharp peak (list)
+peak_score         : peak の実測 score (通常 plateau_score より少し高い)
+peak_robustness    : peak の摂動耐性 (通常 0.1-0.3)
+robustness_improvement: plateau - peak (改善差分、典型 +0.5-0.8)
+
+# diagnostics
+stabilize_elapsed_s
+stage1_elapsed_s
+stabilize_applied  : True (fallback 時のみ False)
+
+# odin 由来 (内部の council から引き継ぎ)
 specialist                 : 勝者名 ("default" / "lad" / "expensive" / "scipy-forced")
 specialist_role            : 勝者の役割説明 (日本語)
 council                    : [(name, score), ...] 全 specialist の score 降順
 council_variance_std       : best_score の std (問題難易度 signal)
-council_elapsed_s          : 全 specialist 完了までの wall time
-n_specialists_ran          : 成功した specialist 数 (default 4)
-n_specialists_failed       : 失敗した数
-council_errors             : 失敗 specialist の詳細 list
+council_elapsed_s, n_specialists_ran, n_specialists_failed, council_errors
+
+# mimir 由来 (更に内部、勝者 specialist から引き継ぎ)
+dead_dims / active_dims / fragility / proxy_r2 / proxy_type / tool_used / route /
+rounds_completed / recovered_dims / n_measurements / verified_score ...
+# multi-observer (LaD seed / dict eval_fn 時のみ)
+stable_active / stable_dead / observer_dependent / dead_observers / observers /
+observer_correlations / multi_observer_side_analysis
 ```
 
 **council_variance_std の解釈**:
-- std < 0.1 → 全員同じ答え、問題易しい、次回 default 単独で十分
-- std > 10 → specialist 毎に大差、問題難しい、council 継続要
+- std < 0.1 → 全 specialist 同じ答え、問題易しい、次回 odin 単独で十分
+- std > 10 → specialist 毎に大差、問題難しい、stable 継続要
 
 ## 実測は自動化される — 手で 1 点ずつ測るな
 
-`mimir_odin(eval_fn, ranges, time_budget=300)` の **1 行で全自動** (seed 生成 → 実測 → proxy fit → argmax 再実測 → 収束判定 → range 拡張 → 4 specialist 並列 → 最良 best_score 採用)。ユーザーの仕事は `eval_fn` 書くだけ、手動ループは不要 (詳細は Rule 0/2)。
+`mimir_odin_stable(eval_fn, ranges, time_budget=400)` の **1 行で 2 stage 全自動**:
+Stage 1 (75%): odin 4 specialist 並列で peak 発見 (seed 生成 → 実測 → proxy fit → argmax 再実測 → 収束判定 → range 拡張)
+Stage 2 (25%): stabilizer 12 粒子 × 20 gens Metropolis で peak → plateau 変換
+→ robust な `best_params` 返却 (摂動耐性 8%→96%)
+ユーザーの仕事は `eval_fn` 書くだけ、手動ループ不要 (詳細は Rule 0/2)。
 
 ### 過去データは必ず `curated_measurements=` に渡せ
 
@@ -140,11 +190,11 @@ mimir の proxy は**全て実測値から fit** される。推測・合成デ�
 
 ## eval_fn を書いたらまず check_eval_fn() で診断
 
-**本番 `mimir_odin()` (or 単独 `mimir()`) の前に必ず走らせろ**。30-60 秒で bad eval_fn を自動検出、本番 1 時間の無駄走を防ぐ。
+**本番 `mimir_odin_stable()` (or `mimir_odin()` / `mimir()`) の前に必ず走らせろ**。30-60 秒で bad eval_fn を自動検出、本番 1 時間の無駄走を防ぐ。
 
 ```python
 from twelve.agent.eval_check import check_eval_fn, format_report
-from twelve.agent.mimir_odin import mimir_odin
+from twelve.agent.mimir_odin_stable import mimir_odin_stable
 
 diag = check_eval_fn(my_eval_fn, param_ranges, time_budget=60)
 print(format_report(diag))
@@ -153,8 +203,8 @@ if not diag["ok"]:
     # issue を修正してから本番へ。fatal なら止まる
     raise ValueError(f"eval_fn bad: {diag['issues']}")
 
-# OK なら本番 (council が default)
-r = mimir_odin(my_eval_fn, param_ranges, time_budget=1800)
+# OK なら本番 (stable が default、time_budget に +25% 余裕)
+r = mimir_odin_stable(my_eval_fn, param_ranges, time_budget=2400)
 ```
 
 検出する bad パターン:
@@ -219,15 +269,15 @@ full 数値は `benchmark_mimir.json` / `benchmark_mimir_dimscale.json`。
 | 6 | Discrete/int params OK via mimir (owl direct-HC fallback 自動) |
 | 7 | **scale=0 forbidden**. Never include 0 in ranges |
 | 8 | Two metrics → `mimir(..., guard_fn=my_guard)`. 1 metric → guard_fn 不要 |
-| 9 | **Default to `mimir_odin()`** (2026-04-23). 単独 mimir は簡単問題 / 1 core / GGUF patch の 3 例外のみ |
+| 9 | **Default to `mimir_odin_stable()`** (2026-04-24、peak→plateau 常時適用、time +25%) |
 | 10 | Kathara 0.993 uniformity requires N=12 + 5-regular + symmetric placement |
 | 11 | `batch_eval_fn` は external params 限定。internal model state では禁止 |
 | 11b | mimir parallel cascade も internal state 危険 → `thread_safe_eval=False` |
 | 12 | stochastic eval_fn は `n_samples_per_eval` か `wrap_multi_obs` で LaD 化せよ |
-| 13 | **Default = `mimir_odin()`** (4 specialist 並列、単独 mimir の strict 上位互換) |
+| 13 | 論文ベンチ / peak のみで十分なら `mimir_odin()` 直呼び (旧 default、time -25%) |
 | 14 | 高次元 sparse かつ reigen symbolic 解なし (Hebbian 進化系) は `mimir_cardinal_hierarchy()` |
 | 15 | multi-metric eval でどう aggregate すべきか不明なら `mimir_cardinal_coevolution()` (params × weights 共進化) |
-| 16 | 実世界で使う最適化結果は `stabilizer.stabilize()` で peak→plateau 変換 (摂動耐性 8%→96% 実証) |
+| 16 | `stabilizer.stabilize()` は `mimir_odin_stable` が内部で使用、他 optimizer にも後付け可 |
 
 ### Rule -1 〜 11b (詳解)
 
@@ -255,7 +305,13 @@ full 数値は `benchmark_mimir.json` / `benchmark_mimir_dimscale.json`。
 
 **Rule 8**: 2 指標は `mimir(eval_fn, ranges, guard_fn=my_guard)`。mimir が owl 経由 safe_dim_analysis=True を引継ぎ、guard 破綻時に自動 pivot。1 指標は guard_fn 不要。Sentinel 直呼びは legacy。
 
-**Rule 9**: `mimir_odin()` が 2026-04-23 以降の default entry。標準呼出 `mimir_odin(fn, ranges, time_budget=N)`、extra_kwargs で全 specialist に (curated_measurements / guard_fn / mode 等) passthrough。単独 `mimir()` は「超単純問題 (2-3d convex)」「CPU 1 core / メモリ < 4GB 環境」「GGUF patch disk 競合」の 3 例外のみ。owl 直呼びは「dead_dims だけ欲しい」「eval 激安で分岐 overhead 嫌」の 2 場面。Reigen 直呼びは cross-task meta_knowledge 明示共有時のみ。詳細は Rule 13。
+**Rule 9**: `mimir_odin_stable()` が 2026-04-24 以降の default entry。peak (fragile 理論最適) → plateau (robust 実用解) への自動変換が内蔵。標準呼出 `mimir_odin_stable(fn, ranges, time_budget=N)`、extra_kwargs で (curated_measurements / guard_fn / stabilize_particles / mode 等) odin → specialist に passthrough。
+
+**旧 default `mimir_odin()` 直呼び** は 2 例外 — 論文ベンチ (BBOB 等) で peak fragile でも gap=0 のみ評価、または 25% overhead が致命的な時。
+
+**更に内側 `mimir()` 直呼び** は 3 例外 — 超単純問題 (2-3d convex) / 1 core 環境 / GGUF patch disk 競合。
+
+owl 直呼びは「dead_dims だけ欲しい」「eval 激安で分岐 overhead 嫌」の 2 場面。Reigen 直呼びは cross-task meta_knowledge 明示共有時のみ。詳細は Rule 13 / 16。
 
 **Rule 10**: chaos-game uniformity 0.993 は N=12 + 5-regular + symmetric placement の 3 条件同時必要。1 つ破れば崩壊。Reigen 内部では graph 性質のみ (Circulant(12,{1,4,6}), λ₂=4.0, diameter 2) 使用、placement uniformity は使わないので Rule 10 の縛りは Reigen に効かない。
 
@@ -286,11 +342,11 @@ r = mimir(wrapped, ranges, time_budget=3600)
 
 **検出と推奨は自動**: `check_eval_fn()` が同一 params で N 回 probe、CV > 0.10 で stochastic 判定 → wrap_* 推奨警告。Default `n_samples_per_eval=1` は backward compat (明示指定しないと compute 予算が勝手に 20× されない)。詳細は `twelve/agent/lad_wrappers.py`。
 
-**Rule 13**: **Default 選択: 迷わず `mimir_odin()` を使え**。mimir 単体を選ぶ積極的理由は Rule 9 の 3 例外のみ。council は 4 specialist (default / lad / expensive / scipy-forced) を並列実行、最良を採用 — 取り方が max なので理論的に単独 mimir の strict 上位互換:
+**Rule 13**: `mimir_odin()` は 2026-04-23〜2026-04-24 の default だった (現在は **旧 default**)。`mimir_odin_stable()` が内部で Stage 1 として呼ぶ。直呼びする積極的理由は Rule 9 の 2 例外 (論文ベンチ / 25% overhead 致命的) のみ。council は 4 specialist (default / lad / expensive / scipy-forced) を並列実行、最良 peak を採用 — 取り方が max なので理論的に単独 mimir の strict 上位互換:
 
 ```python
 from twelve.agent.mimir_odin import mimir_odin
-r = mimir_odin(eval_fn, ranges, time_budget=60)
+r = mimir_odin_stable(eval_fn, ranges, time_budget=80)
 # 4 specialist 並列で 60 秒 → 最良 best_score の結果を返す
 print(r["specialist"])              # "lad" / "default" / "expensive" / "scipy-forced"
 print(r["council"])                 # [(name, score), ...] 全員の結果
@@ -376,7 +432,7 @@ print(r["weight_evolution_mean"])        # weight の世代推移 (収束可視�
 - `"harmonic"` 全 metric 要求 (0 近傍で急落、最も balanced)
 - `"weighted"` 個体自身の weight で加重 (weights も選択圧受ける、真の co-evolution)
 
-**Rule 16**: mimir/odin が返す `best_params` は理論最適だが **sharp peak** のことがある。実世界 (LLM キャリブ / GGUF patch / Hebbian / 強化学習) で使うなら `stabilizer.stabilize()` で plateau 変換必須。demo 実測で **robust 8% → 96%** (10 倍以上の摂動耐性改善):
+**Rule 16**: `mimir_odin_stable()` (2026-04-24 new default、Rule 9) が内部で `stabilizer.stabilize()` を呼び、peak → plateau を自動変換。ユーザーが個別に stabilizer を叩く必要なし。demo 実測で **robust 8% → 96%** (10 倍以上の摂動耐性改善):
 
 ```python
 # (A) 自動連結 — 推奨
@@ -398,15 +454,18 @@ robust_params = stab.centroid
 
 **技術**: Metropolis + cooling (焼きなまし 1 個)。ablation で SOC / Hebbian / Darwin は plateau 構築に寄与せず、焼きなまし単独で十分と実証済。`stabilizer.py` は project root、friend's 原作を改変せず wrapper 経由で使う (外部資産として尊重)。
 
-**適用場面**:
+**stand-alone 用途** (`stabilizer.stabilize()` 単独): 他 optimizer (scipy / cma / random / 手動 grid) の出力に後付け plateau 変換したい時。`mimir_odin_stable` 以外を使う場面で有用。
+
+**stable default で常時適用される場面** (実世界):
 - LLM キャリブ: prompt drift robust な layer_scale
 - GGUF patch: weight loading drift robust な scale 値
 - Hebbian / brain_sim: 進化的に安定な agent params (Cardinal の生物的選択原理と一致)
 - 強化学習: rollout noise robust な policy params
 
-**適用しない場面**:
-- 決定論的ベンチマーク (BBOB 等): peak が fragile でも問題にならない (gap=0 で十分)
+**stable をスキップする場面** (旧 odin 直呼び):
+- 論文ベンチマーク (BBOB 等): peak が fragile でも gap=0 で評価される、stable overhead 無駄
 - 1 回限り / 理論研究: plateau 要らず peak で OK
+- 時間極限 (1h 予算内で 25% overhead 致命的)
 
 ## Gotchas (よくハマる落とし穴)
 
@@ -419,36 +478,42 @@ robust_params = stab.centroid
 - **council の 4× CPU / メモリ** (Rule 13): `ProcessPoolExecutor` 時 4 Python プロセス並列、~2-4GB RAM、CPU 4 core 要。1 core 環境では単独 `mimir()` に fallback。5090 マシン (20 core / 96GB RAM) なら余裕
 - **council ≠ 万能** (Rule 13): reigen が symbolic 解発見できる smooth 問題 (Rastrigin 等) では council も単独 mimir も同じ結果、council 使う意味なし。超単純問題は単独 mimir の方が速い
 - **council × GGUF patch 禁忌** (Rule 13): eval_fn が disk に数 GB 書く (GGUF patch 系) と 4 specialist が I/O 競合で逐次化、wall time 4× 悪化。GGUF 系は単独 mimir で逐次実行
+- **stable の +25% time** (Rule 9): `time_budget=300` なら実測 400s 目安。stabilize stage (25%) の overhead。論文ベンチで気にする場合は `mimir_odin()` 直接呼び (Rule 13 ルート)
+- **stable の eval_fn 呼出 +240** (Rule 9): stabilize の 12 粒子 × 20 gens + 粒子初期化 = 追加 eval 240 回。LLM / GPU 系で API 課金・time budget に跳ねる時は `stabilize_particles=6, stabilize_gens=10` で半減可能
+- **論文ベンチ (BBOB) で stable は無意味** (Rule 9): 決定論 smooth 問題は peak で gap=0 達成、stabilize stage は overhead だけで改善なし。この場面は `mimir_odin()` 直呼び
 
 # 内部実装 (読みたい人向け)
 
-## ツール役割の階層 (4 段構成)
+## ツール役割の階層 (5 段構成)
 
-表舞台は `mimir_odin()` 1 個。裏方は 4 specialist mimir、さらにその下に owl / reigen / scipy。
+表舞台は `mimir_odin_stable()` 1 個。内部で odin → stabilizer、odin は 4 specialist mimir、mimir は owl / reigen / scipy。
 
 ```
-mimir_odin()                        ← ユーザー呼び口 (新 default、2026-04-23)
-  ├── mimir (default specialist)       ← 低 noise / symbolic 多峰 (reigen 効く決定論)
-  │    ├── owl                          ← Phase 1 + 構造発見
-  │    │    └── optimize()              ← primitive HC engine
-  │    ├── reigen                       ← Phase 2 cascade (symbolic 探索)
-  │    │    └── Sentinel                ← legacy 互換
-  │    └── scipy.basinhopping           ← Phase 2b (dim≥10 gradient)
-  ├── mimir (lad specialist)           ← stochastic / 高 noise (LLM / RL / MC)
-  ├── mimir (expensive specialist)     ← owl 全力 (L-BFGS + multi-start + restart 5)
-  └── mimir (scipy-forced specialist)  ← 低次元でも scipy 強制 (Rosenbrock 系)
+mimir_odin_stable()                     ← ユーザー呼び口 (新 default、2026-04-24)
+  ├── Stage 1: mimir_odin()              ← 4 specialist で peak 発見 (75% budget)
+  │    ├── mimir (default specialist)   ← 低 noise / symbolic 多峰 (reigen 効く決定論)
+  │    │    ├── owl                      ← Phase 1 + 構造発見
+  │    │    │    └── optimize()          ← primitive HC engine
+  │    │    ├── reigen                   ← Phase 2 cascade (symbolic 探索)
+  │    │    │    └── Sentinel            ← legacy 互換
+  │    │    └── scipy.basinhopping       ← Phase 2b (dim≥10 gradient)
+  │    ├── mimir (lad specialist)       ← stochastic / 高 noise (LLM / RL / MC)
+  │    ├── mimir (expensive specialist) ← owl 全力 (L-BFGS + multi-start + restart 5)
+  │    └── mimir (scipy-forced specialist) ← 低次元でも scipy 強制 (Rosenbrock 系)
+  └── Stage 2: stabilizer.stabilize()    ← peak → plateau 変換 (25% budget)
+       (Metropolis + cooling、12 粒子 × 20 gens、friend's 原作)
 
-特殊用途 (council の外側):
-  mimir_odin_stable()          ← odin → stabilizer 自動連結 (Rule 16、peak→plateau)
-  └── stabilizer.stabilize()    ← Metropolis で plateau 探索 (stand-alone でも可)
+特殊用途 (stable の外):
   mimir_cardinal_hierarchy()   ← Council で active_dims 圧縮 → 汎用 GA (Rule 14)
   mimir_cardinal_coevolution() ← params × weights 共進化 (Rule 15、多指標重み探索)
 ```
 
 **直呼びは限定場面**:
+- `mimir_odin()` 直呼び: 論文ベンチ / 25% overhead 致命的の 2 例外のみ (Rule 13)
 - 単独 `mimir()`: 超単純問題 (2-3d convex) / 1 core 環境 / GGUF patch 系の 3 例外のみ
 - `owl()`: 「dead_dims / fragility だけ欲しい + 分岐 overhead 嫌」(`mimir(mode="structure_only")` でも可)
 - `Reigen()`: cross-task meta_knowledge 明示共有時
+- `stabilizer.stabilize()` stand-alone: 他 optimizer に後付け plateau 化したい時 (mimir 外)
 - Sentinel / optimize / scipy 直呼び: 特殊事情のみ
 
 詳細は `docs/REIGEN_INTERNALS.md` / `docs/OWL_INTERNALS.md` / `docs/SENTINEL_LEGACY.md` 参照。
