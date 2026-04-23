@@ -59,52 +59,6 @@ r6 = mimir_council(llm_eval, ranges, time_budget=1800)                          
 - (b) CPU 1 core / メモリ < 4GB 環境 (4 プロセス並列の恩恵なし)
 - (c) GGUF patch + 評価系 eval_fn (disk/メモリ競合で逐次化、council 破綻)
 
-## 内部分岐ロジック (council 層 + mimir 層)
-
-```
-mimir_council(fn, ranges, time_budget) 呼出し
-│
-└── 4 specialist を並列実行 (ProcessPool or ThreadPool)
-    ├── default      : mimir(fn, ranges, time_budget)
-    ├── lad          : mimir(fn, ranges, time_budget, n_samples_per_eval=20,
-    │                        stochastic_aggregator="median")
-    ├── expensive    : mimir(fn, ranges, time_budget, eval_cost_hint=2.0)
-    └── scipy-forced : mimir(fn, ranges, time_budget, eval_cost_hint=2.0,
-                             scipy_cascade_dim_threshold=3)
-    │
-    └── 全 specialist 完了待ち → verified_score (or best_score) 最大を勝者採用
-
-各 mimir() 内部分岐 (従来通り):
-  ├── mode="structure_only"          → owl autonomous=False, max 30s
-  ├── eval > 0.5s or curated あり     → expensive_single: owl 100% + 全強化
-  └── eval ≤ 0.5s + curated なし      → cheap_cascade
-          ├── Phase 1: owl 40% budget
-          │   └── conf=="high" AND proxy_r2 ≥ 0.95 なら即終了
-          └── Phase 2 (並列): reigen || scipy.basinhopping
-                ├── reigen: 全 remaining budget (構造探索 + cross-task)
-                ├── scipy:  並列起動 (dim ≥ 10 かつ owl 失敗時のみ)
-                └── 3 者 {owl, reigen, scipy} から最高スコアを採用
-```
-
-## mimir LaD 設定 (JSON 制御)
-
-`twelve/configs/mimir_params.json` に 8 個の dispatch 値。precedence は kwarg > JSON > hardcode。benchmark 駆動で最適値に設定済。
-
-| key | default | 意味 |
-|---|---|---|
-| `eval_cost_threshold` | 0.5s | expensive route 切替秒数 |
-| `owl_share` | 0.4 | cheap cascade での Phase 1 budget 比 |
-| `escalation_min_remaining` | 5.0s | Reigen 起動最小残時間 |
-| `confidence_skip_threshold` | 0.95 | Reigen skip の proxy_r2 閾値 |
-| `random_restart_count` | 5 | owl の uniform random 再起動数 |
-| `reigen_inner_time_budget` | 2.0s | Reigen inner Sentinel の 1 回分 |
-| `scipy_cascade_dim_threshold` | 10 | scipy.basinhopping 発火の最小次元 |
-| `scipy_cascade_budget_share` | 0.5 | scipy の budget 割合 (remaining × X) |
-
-`n_samples_per_eval` / `stochastic_aggregator` (Rule 12) は **kwarg 専用 / JSON 非対応**。compute 予算が silent に N× されるのを避けるための明示 opt-in 設計 (default は 1 で backward compat)。
-
-**注**: 上記 JSON は**単独 `mimir()` の内部分岐設定**。`mimir_council()` は specialist list (`DEFAULT_SPECIALISTS` in `mimir_council.py`) で挙動制御、JSON 非経由。council 内の各 mimir インスタンスは上記 JSON を読む。
-
 ## mimir の返り値
 
 ```
@@ -142,70 +96,18 @@ council_errors             : 失敗 specialist の詳細 list
 - std < 0.1 → 全員同じ答え、問題易しい、次回 default 単独で十分
 - std > 10 → specialist 毎に大差、問題難しい、council 継続要
 
-## ツール役割の階層 (4 段構成)
-
-表舞台は `mimir_council()` 1 個。裏方は 4 specialist mimir、さらにその下に owl / reigen / scipy。
-
-```
-mimir_council()                        ← ユーザー呼び口 (新 default、2026-04-23)
-  ├── mimir (default specialist)       ← 低 noise / symbolic 多峰 (reigen 効く決定論)
-  │    ├── owl                          ← Phase 1 + 構造発見
-  │    │    └── optimize()              ← primitive HC engine
-  │    ├── reigen                       ← Phase 2 cascade (symbolic 探索)
-  │    │    └── Sentinel                ← legacy 互換
-  │    └── scipy.basinhopping           ← Phase 2b (dim≥10 gradient)
-  ├── mimir (lad specialist)           ← stochastic / 高 noise (LLM / RL / MC)
-  ├── mimir (expensive specialist)     ← owl 全力 (L-BFGS + multi-start + restart 5)
-  └── mimir (scipy-forced specialist)  ← 低次元でも scipy 強制 (Rosenbrock 系)
-
-特殊用途 (council の外側):
-  mimir_cardinal_hierarchy()   ← Council で active_dims 圧縮 → 汎用 GA (Rule 14)
-  mimir_cardinal_coevolution() ← params × weights 共進化 (Rule 15、多指標重み探索)
-```
-
-**直呼びは限定場面**:
-- 単独 `mimir()`: 超単純問題 (2-3d convex) / 1 core 環境 / GGUF patch 系の 3 例外のみ
-- `owl()`: 「dead_dims / fragility だけ欲しい + 分岐 overhead 嫌」(`mimir(mode="structure_only")` でも可)
-- `Reigen()`: cross-task meta_knowledge 明示共有時
-- Sentinel / optimize / scipy 直呼び: 特殊事情のみ
-
-詳細は `docs/REIGEN_INTERNALS.md` / `docs/OWL_INTERNALS.md` / `docs/SENTINEL_LEGACY.md` 参照。
-
 ## 実測は自動化される — 手で 1 点ずつ測るな
 
-`mimir_council(eval_fn, ranges, time_budget=300)` の **1 行で下記が 4 specialist 並列で全自動**:
-
-- seed 20 点の param 選定 (各 specialist が独立に uniform random)
-- 各 param で eval_fn 呼出し (specialist "lad" は 1 点あたり 20 回実測 → 集約 + LaD observer 保存)、score 収集
-- 実測点から proxy (近似式) を fit
-- proxy argmax の新 param で再実測 (verify_fn)
-- growing_data 拡張 → proxy 再 fit → 次の点で実測 ... のループ (各 specialist 独立実行)
-- 収束判定・停滞検知・range 拡張
-- **council 層**: 全 specialist 完了後、最良 best_score を採用
-
-**ユーザーの仕事は `eval_fn` 書くだけ**。下記の手動ループは書くな:
-
-```python
-# ❌ 昔やってた手作業 (不要)
-for p in preset_points:
-    s = eval_fn(p)
-    results.append((p, s))
-# 近似書く / 最適点選ぶ / 再測る ... 全部手動
-
-# ✅ 今はこれだけ (council = 4 specialist 並列)
-r = mimir_council(eval_fn, ranges, time_budget=300)
-```
-
-stochastic eval_fn (LLM 生成 / RL / Monte Carlo) は council の specialist "lad" が n_samples_per_eval=20 を自動担当、**ユーザー側追加指定不要**。単独 mimir を使う場合のみ `n_samples_per_eval=20` or `wrap_multi_obs` 明示必須 (Rule 12)。
+`mimir_council(eval_fn, ranges, time_budget=300)` の **1 行で全自動** (seed 生成 → 実測 → proxy fit → argmax 再実測 → 収束判定 → range 拡張 → 4 specialist 並列 → 最良 best_score 採用)。ユーザーの仕事は `eval_fn` 書くだけ、手動ループは不要 (詳細は Rule 0/2)。
 
 ### 過去データは必ず `curated_measurements=` に渡せ
 
-過去に手動で測った点があるなら**絶対に捨てるな**。mimir の seed にして精度を爆上げできる。
+過去に手動で測った点があるなら**絶対に捨てるな**。seed にして精度を爆上げできる。
 
 ```python
 past = [{"params": [0.8, 1.2], "score": 0.71},
         {"params": [1.0, 1.3], "score": 0.68}, ... ]   # 過去の実測 20 点
-r = mimir(eval_fn, ranges, curated_measurements=past, time_budget=600)
+r = mimir_council(eval_fn, ranges, curated_measurements=past, time_budget=600)
 ```
 
 ### proxy_r2 の違い (同じ実測数でも桁違い)
@@ -472,6 +374,83 @@ print(r["weight_evolution_mean"])        # weight の世代推移 (収束可視�
 - **council の 4× CPU / メモリ** (Rule 13): `ProcessPoolExecutor` 時 4 Python プロセス並列、~2-4GB RAM、CPU 4 core 要。1 core 環境では単独 `mimir()` に fallback。5090 マシン (20 core / 96GB RAM) なら余裕
 - **council ≠ 万能** (Rule 13): reigen が symbolic 解発見できる smooth 問題 (Rastrigin 等) では council も単独 mimir も同じ結果、council 使う意味なし。超単純問題は単独 mimir の方が速い
 - **council × GGUF patch 禁忌** (Rule 13): eval_fn が disk に数 GB 書く (GGUF patch 系) と 4 specialist が I/O 競合で逐次化、wall time 4× 悪化。GGUF 系は単独 mimir で逐次実行
+
+# 内部実装 (読みたい人向け)
+
+## ツール役割の階層 (4 段構成)
+
+表舞台は `mimir_council()` 1 個。裏方は 4 specialist mimir、さらにその下に owl / reigen / scipy。
+
+```
+mimir_council()                        ← ユーザー呼び口 (新 default、2026-04-23)
+  ├── mimir (default specialist)       ← 低 noise / symbolic 多峰 (reigen 効く決定論)
+  │    ├── owl                          ← Phase 1 + 構造発見
+  │    │    └── optimize()              ← primitive HC engine
+  │    ├── reigen                       ← Phase 2 cascade (symbolic 探索)
+  │    │    └── Sentinel                ← legacy 互換
+  │    └── scipy.basinhopping           ← Phase 2b (dim≥10 gradient)
+  ├── mimir (lad specialist)           ← stochastic / 高 noise (LLM / RL / MC)
+  ├── mimir (expensive specialist)     ← owl 全力 (L-BFGS + multi-start + restart 5)
+  └── mimir (scipy-forced specialist)  ← 低次元でも scipy 強制 (Rosenbrock 系)
+
+特殊用途 (council の外側):
+  mimir_cardinal_hierarchy()   ← Council で active_dims 圧縮 → 汎用 GA (Rule 14)
+  mimir_cardinal_coevolution() ← params × weights 共進化 (Rule 15、多指標重み探索)
+```
+
+**直呼びは限定場面**:
+- 単独 `mimir()`: 超単純問題 (2-3d convex) / 1 core 環境 / GGUF patch 系の 3 例外のみ
+- `owl()`: 「dead_dims / fragility だけ欲しい + 分岐 overhead 嫌」(`mimir(mode="structure_only")` でも可)
+- `Reigen()`: cross-task meta_knowledge 明示共有時
+- Sentinel / optimize / scipy 直呼び: 特殊事情のみ
+
+詳細は `docs/REIGEN_INTERNALS.md` / `docs/OWL_INTERNALS.md` / `docs/SENTINEL_LEGACY.md` 参照。
+
+## 内部分岐ロジック (council 層 + mimir 層)
+
+```
+mimir_council(fn, ranges, time_budget) 呼出し
+│
+└── 4 specialist を並列実行 (ProcessPool or ThreadPool)
+    ├── default      : mimir(fn, ranges, time_budget)
+    ├── lad          : mimir(fn, ranges, time_budget, n_samples_per_eval=20,
+    │                        stochastic_aggregator="median")
+    ├── expensive    : mimir(fn, ranges, time_budget, eval_cost_hint=2.0)
+    └── scipy-forced : mimir(fn, ranges, time_budget, eval_cost_hint=2.0,
+                             scipy_cascade_dim_threshold=3)
+    │
+    └── 全 specialist 完了待ち → verified_score (or best_score) 最大を勝者採用
+
+各 mimir() 内部分岐 (従来通り):
+  ├── mode="structure_only"          → owl autonomous=False, max 30s
+  ├── eval > 0.5s or curated あり     → expensive_single: owl 100% + 全強化
+  └── eval ≤ 0.5s + curated なし      → cheap_cascade
+          ├── Phase 1: owl 40% budget
+          │   └── conf=="high" AND proxy_r2 ≥ 0.95 なら即終了
+          └── Phase 2 (並列): reigen || scipy.basinhopping
+                ├── reigen: 全 remaining budget (構造探索 + cross-task)
+                ├── scipy:  並列起動 (dim ≥ 10 かつ owl 失敗時のみ)
+                └── 3 者 {owl, reigen, scipy} から最高スコアを採用
+```
+
+## mimir LaD 設定 (JSON 制御)
+
+`twelve/configs/mimir_params.json` に 8 個の dispatch 値。precedence は kwarg > JSON > hardcode。benchmark 駆動で最適値に設定済。
+
+| key | default | 意味 |
+|---|---|---|
+| `eval_cost_threshold` | 0.5s | expensive route 切替秒数 |
+| `owl_share` | 0.4 | cheap cascade での Phase 1 budget 比 |
+| `escalation_min_remaining` | 5.0s | Reigen 起動最小残時間 |
+| `confidence_skip_threshold` | 0.95 | Reigen skip の proxy_r2 閾値 |
+| `random_restart_count` | 5 | owl の uniform random 再起動数 |
+| `reigen_inner_time_budget` | 2.0s | Reigen inner Sentinel の 1 回分 |
+| `scipy_cascade_dim_threshold` | 10 | scipy.basinhopping 発火の最小次元 |
+| `scipy_cascade_budget_share` | 0.5 | scipy の budget 割合 (remaining × X) |
+
+`n_samples_per_eval` / `stochastic_aggregator` (Rule 12) は **kwarg 専用 / JSON 非対応**。compute 予算が silent に N× されるのを避けるための明示 opt-in 設計 (default は 1 で backward compat)。
+
+**注**: 上記 JSON は**単独 `mimir()` の内部分岐設定**。`mimir_council()` は specialist list (`DEFAULT_SPECIALISTS` in `mimir_council.py`) で挙動制御、JSON 非経由。council 内の各 mimir インスタンスは上記 JSON を読む。
 
 ## Hardware & safety
 
