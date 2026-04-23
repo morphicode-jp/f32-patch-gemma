@@ -17,6 +17,10 @@ HTTP (local/ngrok-shareable, auth via REIGEN_API_KEY env var):
   POST /reigen/start                        ← session: start → {session_id}
   GET  /reigen/next?sid=X&timeout=15        ← session: poll → {action: eval|wait|done}
   POST /reigen/score                        ← session: submit {sid, score, params}
+  POST /mimir/start                         ← 単独 mimir session
+  POST /odin/start                          ← オーディン (4 specialist 並列、2026-04-23 default)
+  GET  /odin/next?sid=X                     ← session protocol は /reigen と同じ
+  POST /odin/score                          ← 同上
 ```
 
 ## Launch
@@ -72,3 +76,24 @@ Local-only (`importlib.import_module`, no code eval). HTTPS + auth needed beyond
 ```
 
 Response: `{"session_id": "abc12345"}`. Session TTL 30 min idle; all 3 endpoints need `Authorization: Bearer <REIGEN_API_KEY>` when env var is set.
+
+## /odin/start body (オーディン — 4 specialist 並列、新 default)
+
+```json
+{
+  "param_ranges": [[-5, 5], ...],             // required
+  "param_names": ["x1", "x2", ...],            // optional
+  "experience_id": "genesis_odin",             // default
+  "time_budget": 300,                          // per specialist (並列なので wall time 同じ)
+  "client_eval_timeout": 600
+}
+```
+
+Response: `{"session_id": "abc12345"}`. Final result の追加キー:
+- `specialist` — 勝者名 (default / lad / expensive / scipy-forced)
+- `council` — [(name, score), ...] 全員降順
+- `council_variance_std` — 問題難易度 signal
+
+Client: `reigen_friend_client.run_odin_remote(server, key, eval_fn, ranges, ...)`。
+
+**注意**: server 側は `executor="thread"` で 4 specialist 並列、client 側の eval_fn は Queue(1) で逐次化される。実測 eval 総数は単独 mimir より多い (4-20×)、wall time は同程度。

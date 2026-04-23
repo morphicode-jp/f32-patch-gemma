@@ -14,12 +14,15 @@
   POST /mimir/start           — mimir (session) 開始 → session_id
   GET  /mimir/next?sid=...    — mimir session の次 action (reigen と共用)
   POST /mimir/score           — mimir session score 送信 (reigen と共用)
+  POST /odin/start            — オーディン (4 specialist 並列) session 開始 (2026-04-23)
+  GET  /odin/next?sid=...     — odin session の次 action (reigen と共用)
+  POST /odin/score            — odin session score 送信 (reigen と共用)
   POST /status               — 実行中のATの状態を取得
   POST /stop                 — 実行中のATを停止
   GET  /health               — ヘルスチェック
 
 認証:
-  環境変数 REIGEN_API_KEY 設定時は全 /reigen*, /mimir*, /owl に Bearer token 必須。
+  環境変数 REIGEN_API_KEY 設定時は全 /reigen*, /mimir*, /odin*, /owl に Bearer token 必須。
   未設定なら認証スキップ (ローカル開発モード)。
 """
 
@@ -154,6 +157,40 @@ def _run_mimir_thread(session, config):
         session.done.set()
 
 
+def _run_odin_thread(session, config):
+    """Background thread: mimir_odin (4 specialist 並列) を回す.
+
+    API context では eval_fn が remote (queue 経由) なので executor は必ず 'thread'。
+    'process' だと subprocess が queue にアクセスできない。4 specialist が
+    concurrent に eval_fn 呼ぶが、Queue(maxsize=1) で自然に逐次化される
+    (client は 1 eval ずつ処理)。
+    """
+    try:
+        from twelve.agent.mimir_odin import mimir_odin as _odin
+
+        client_timeout = int(config.get("client_eval_timeout", 600))
+        eval_fn = _remote_eval_factory(session, client_timeout)
+
+        user_ranges = [tuple(x) for x in config["user_param_ranges"]]
+
+        r = _odin(
+            eval_fn=eval_fn,
+            param_ranges=user_ranges,
+            time_budget=float(config.get("time_budget", 300)),
+            executor="thread",  # 必須: process だと queue 共有不可
+            experience_id=config.get("experience_id", "genesis_odin"),
+            verbose=False,
+        )
+        # Trim heavy raw results before sending over network
+        for k in ("owl_result", "reigen_result", "scipy_result"):
+            r.pop(k, None)
+        session.result = r
+    except Exception as e:
+        session.result = {"error": str(e), "traceback": traceback.format_exc()}
+    finally:
+        session.done.set()
+
+
 def _cleanup_expired_sessions():
     """放置セッション定期削除 (daemon thread)."""
     while True:
@@ -247,10 +284,11 @@ class ATHandler(BaseHTTPRequestHandler):
 
     # -------- auth --------
     def _auth_required_path(self, path):
-        """Auth required for /owl*, /reigen*, /mimir* paths."""
+        """Auth required for /owl, /reigen*, /mimir*, /odin* paths."""
         return (path.startswith("/reigen")
                 or path == "/owl"
-                or path.startswith("/mimir"))
+                or path.startswith("/mimir")
+                or path.startswith("/odin"))
 
     def _check_auth(self):
         """Bearer token チェック. 環境変数 REIGEN_API_KEY 未設定なら常に許可."""
@@ -287,6 +325,8 @@ class ATHandler(BaseHTTPRequestHandler):
             self._handle_reigen_next(query)
         elif path == "/mimir/next":
             self._handle_reigen_next(query)  # session loop is algorithm-agnostic
+        elif path == "/odin/next":
+            self._handle_reigen_next(query)  # same session protocol
         else:
             self._json_response({"error": "not found"}, 404)
 
@@ -339,6 +379,10 @@ class ATHandler(BaseHTTPRequestHandler):
             self._handle_mimir_start(data)
         elif path == "/mimir/score":
             self._handle_reigen_score(data)  # score path is tool-agnostic
+        elif path == "/odin/start":
+            self._handle_odin_start(data)
+        elif path == "/odin/score":
+            self._handle_reigen_score(data)  # same session protocol
         elif path == "/status":
             self._handle_status()
         elif path == "/stop":
@@ -660,6 +704,40 @@ class ATHandler(BaseHTTPRequestHandler):
         session.thread.start()
         self._json_response({"session_id": sid})
 
+    def _handle_odin_start(self, data):
+        """Start a new オーディン (mimir_odin) session — 4 specialist 並列最適化.
+
+        Request body: /mimir/start と同じ形式:
+          - `param_ranges` (list[[lo,hi]]) required
+          - `param_names` optional
+          - `time_budget` optional (default 300 sec)
+          - `experience_id` optional (default "genesis_odin")
+          - `client_eval_timeout` optional (default 600 sec)
+        Response: {"session_id": "abc12345"}
+
+        Client flow: /odin/start → poll /odin/next?sid=X → submit /odin/score
+        → next / done. Final result の council キーで勝者 specialist が分かる。
+        """
+        ranges = data.get("param_ranges") or data.get("user_param_ranges")
+        if not ranges or not isinstance(ranges, list):
+            self._json_response({"error": "param_ranges required"}, 400)
+            return
+        config = dict(data)
+        config["user_param_ranges"] = ranges
+        config.setdefault("user_param_names", data.get("param_names"))
+
+        sid = uuid.uuid4().hex[:8]
+        session = _ReigenSession()
+        with _sessions_lock:
+            _sessions[sid] = session
+        session.thread = threading.Thread(
+            target=_run_odin_thread,
+            args=(session, config),
+            daemon=True,
+        )
+        session.thread.start()
+        self._json_response({"session_id": sid})
+
     def _handle_status(self):
         with _lock:
             self._json_response(dict(_status))
@@ -710,6 +788,9 @@ def serve(host="0.0.0.0", port=8282, quiet=False):
     print(f"  POST /mimir/start           - mimir session: start → session_id", flush=True)
     print(f"  GET  /mimir/next?sid=...    - mimir session: poll (shares reigen impl)", flush=True)
     print(f"  POST /mimir/score           - mimir session: submit score", flush=True)
+    print(f"  POST /odin/start            - オーディン session: start → session_id (4 specialist 並列)", flush=True)
+    print(f"  GET  /odin/next?sid=...     - odin session: poll (shares reigen impl)", flush=True)
+    print(f"  POST /odin/score            - odin session: submit score", flush=True)
     print(f"  POST /status                - status", flush=True)
     print(f"  POST /stop                  - stop", flush=True)
     print(f"  GET  /health                - health", flush=True)

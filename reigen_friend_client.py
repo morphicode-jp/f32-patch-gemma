@@ -265,6 +265,120 @@ def run_mimir_remote(
         raise RuntimeError(f"Unknown action: {resp}")
 
 
+def run_odin_remote(
+    server_url,
+    api_key,
+    eval_fn,
+    param_ranges,
+    param_names=None,
+    experience_id="genesis_odin",
+    time_budget=300,
+    poll_timeout=15,
+    verbose=True,
+):
+    """Run オーディン (mimir_odin) on the remote server, eval_fn running LOCALLY.
+
+    mimir_odin は 4 specialist (default / lad / expensive / scipy-forced) を
+    並列実行し、最良 best_score を採用する。remote context では server 側で
+    thread 並列、client の eval_fn は serial で呼ばれる (Queue(1) による逐次化)。
+
+    Args:
+        server_url: e.g. "https://xxxx.ngrok-free.dev" (no trailing slash)
+        api_key: shared Bearer token
+        eval_fn: callable(params_list) -> float (higher = better)
+        param_ranges: list of (lo, hi) tuples
+        param_names: optional list of str
+        experience_id: shared ID (default "genesis_odin")
+        time_budget: wall budget per specialist (seconds)
+        poll_timeout: /odin/next wait per call (1-60 sec)
+        verbose: print progress
+
+    Returns:
+        dict with keys:
+          best_params, best_score       # 勝者 specialist の結果
+          specialist                    # 勝者名 ("default"/"lad"/"expensive"/"scipy-forced")
+          council                       # [(name, score), ...] 全員降順
+          council_variance_std          # 問題難易度 signal
+          dead_dims, active_dims, ...   # 勝者の構造発見結果
+    """
+    server = server_url.rstrip("/")
+    headers = {
+        "Content-Type": "application/json",
+        "Authorization": f"Bearer {api_key}",
+    }
+
+    start_body = {
+        "param_ranges": [list(r) for r in param_ranges],
+        "experience_id": experience_id,
+        "time_budget": int(time_budget),
+    }
+    if param_names:
+        start_body["param_names"] = list(param_names)
+
+    start_resp = _post(f"{server}/odin/start", start_body, headers)
+    sid = start_resp.get("session_id")
+    if not sid:
+        raise RuntimeError(f"Failed to start session: {start_resp}")
+    if verbose:
+        print(f"[オーディン session started] sid={sid}")
+
+    t0 = time.time()
+    n_evals = 0
+    while True:
+        try:
+            resp = _get(
+                f"{server}/odin/next?sid={sid}&timeout={int(poll_timeout)}",
+                headers,
+                timeout=poll_timeout + 10,
+            )
+        except urllib.error.URLError as e:
+            if verbose:
+                print(f"  [net error] {e} — retrying in 3s")
+            time.sleep(3)
+            continue
+
+        action = resp.get("action")
+        if action == "done":
+            result = resp.get("result", {})
+            if verbose:
+                elapsed = time.time() - t0
+                specialist = result.get("specialist", "?")
+                variance = result.get("council_variance_std", 0.0)
+                print(f"[オーディン done] {n_evals} evals, {elapsed:.0f}s, "
+                      f"winner={specialist}, council_std={variance:.3f}")
+                council = result.get("council")
+                if council:
+                    print(f"  council: {council}")
+            return result
+
+        if action == "wait":
+            time.sleep(0.5)
+            continue
+
+        if action == "eval":
+            params = resp.get("params")
+            if params is None:
+                raise RuntimeError(f"Unexpected response: {resp}")
+            try:
+                score = float(eval_fn(list(params)))
+            except Exception as e:
+                if verbose:
+                    print(f"  [eval_fn error] {e} — returning 0.0")
+                score = 0.0
+            n_evals += 1
+            if verbose and n_evals % 5 == 0:
+                elapsed = time.time() - t0
+                print(f"  [eval #{n_evals}] score={score:.4f} ({elapsed:.0f}s)")
+            _post(
+                f"{server}/odin/score",
+                {"sid": sid, "score": score, "params": list(params)},
+                headers,
+            )
+            continue
+
+        raise RuntimeError(f"Unknown action: {resp}")
+
+
 # -------------------------------------------------------------------
 # Demo main
 # -------------------------------------------------------------------

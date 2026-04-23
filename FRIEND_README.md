@@ -1,18 +1,17 @@
-# mimir / Reigen — Remote Optimization for Friends
+# オーディン / mimir / Reigen — Remote Optimization for Friends
 
 ## What it does
 
-Your optimization task, powered by our meta-dispatcher **mimir** on my server.
+Your optimization task, powered by our **オーディン** (4 specialist 並列) on my server.
 
 - **You** provide: a Python function `eval_fn(params) -> score`
-- **My server** provides: mimir (auto-routing to owl + Reigen + scipy.basinhopping)
+- **My server** provides: オーディン (4 mimir specialist 並列で最良採用)
 - Your `eval_fn` runs on **your** machine. My server only does the optimization math.
 
 Use it for: LLM hyperparameter tuning, model calibration, scientific problems,
 game AI tuning, anything where you want "given ranges, find the best params".
 
-**2026-04-21 以降**: `run_mimir_remote()` を推奨 (旧 `run_reigen_remote` も互換で使える)。
-mimir は内部で最適なサブアルゴリズム (owl / Reigen / scipy) を自動選択する。
+**2026-04-23 以降: `run_odin_remote()` が新 default** (4 specialist 並列、単独 mimir の strict 上位互換)。旧 `run_mimir_remote()` / `run_reigen_remote()` も互換で使える。
 
 ## Setup (one-time)
 
@@ -25,14 +24,33 @@ Copy the client helper to your machine:
 
 That's it. No installation needed beyond Python 3.10+ (uses stdlib only; no `pip install`).
 
-## Quickstart (mimir 推奨、2026-04-21 以降) — 10 lines
+## Quickstart (オーディン、2026-04-23 以降) — 10 lines
 
 ```python
-from reigen_friend_client import run_mimir_remote
+from reigen_friend_client import run_odin_remote
 
 def my_eval(params):
     # params is a list of floats; return a number (higher = better)
     return -sum((x - 1.0) ** 2 for x in params)
+
+result = run_odin_remote(
+    server_url="https://xxxx.ngrok-free.dev",
+    api_key="YOUR_SHARED_KEY",
+    eval_fn=my_eval,
+    param_ranges=[(-3, 3)] * 5,
+    time_budget=180,
+)
+
+print(result["best_params"], result["best_score"])
+print(result["specialist"])             # 勝った specialist 名
+print(result["council"])                 # [(name, score), ...] 全員の結果
+print(result["council_variance_std"])    # 問題難易度 signal
+```
+
+## Quickstart (mimir 単独、簡単問題向け)
+
+```python
+from reigen_friend_client import run_mimir_remote
 
 result = run_mimir_remote(
     server_url="https://xxxx.ngrok-free.dev",
@@ -43,7 +61,6 @@ result = run_mimir_remote(
 )
 
 print(result["best_params"], result["best_score"], result["tool_used"])
-# tool_used: "owl" | "owl+reigen" | "owl+scipy" ...
 ```
 
 ## Quickstart (Reigen 直使い、legacy で OK)
