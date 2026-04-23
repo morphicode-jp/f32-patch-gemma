@@ -6,7 +6,15 @@ All responses in Japanese.
 
 全ての最適化は `mimir_odin(eval_fn, param_ranges, time_budget=N)` で始まる。2026-04-23 以降の新 default エントリーポイント。
 
-**名前の由来**: オーディン (北欧神話の主神) = 知恵を求めて片目を捧げた決断者。mimir (ミーミル: 知恵の源) から 4 specialist 経由で最適解候補を得て、その中から**最良を選択する決断者**。ユーザーはオーディンを呼び出し、オーディンは 4 本の知恵の泉 (specialist) から汲み上げた答えの最良を採用して返す。
+**日常呼称**: 「**オーディン**」(会話では略称で OK、例: 「オーディンに任せて」「オーディン走らせて結果確認」)。正式関数名は `mimir_odin()`。
+
+**名前の由来**: オーディン (北欧神話の主神) = 知恵を求めて片目を捧げた決断者。mimir (ミーミル: 知恵の神) から 4 specialist 経由で最適解候補を得て、その中から**最良を選択する決断者**。ユーザーはオーディンを呼び出し、オーディンは 4 本の知恵の泉 (specialist) から汲み上げた答えの最良を採用して返す。
+
+**ミーミル家族** (関連 library 一覧):
+- `mimir()` — 基本最適化 (owl/reigen/scipy を内部自動分岐)
+- `mimir_odin()` — オーディン (4 specialist 並列、default) ← 本 Rule 9/13
+- `mimir_cardinal_hierarchy()` — Council → GA (高次元 Hebbian 系、Rule 14)
+- `mimir_cardinal_coevolution()` — params × weights 共進化 (多指標、Rule 15)
 
 `mimir_odin()` は 4 specialist の mimir (default / lad / expensive / scipy-forced) を並列実行し、最良 best_score を採用する。単独 mimir の弱点 (低/高 noise / 多峰 / 高次元 gradient) を相互補完、「どの specialist の成績 ≤ council 成績」が保証される (取り方が max なので理論的下限 = 最強 specialist 単独)。
 
