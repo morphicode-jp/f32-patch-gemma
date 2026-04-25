@@ -42,13 +42,21 @@ All responses in Japanese.
 ```python
 from twelve.agent.mimir_odin_stable import mimir_odin_stable
 
-r = mimir_odin_stable(eval_fn, param_ranges, time_budget=400)
+r = mimir_odin_stable(eval_fn, param_ranges, time_budget=400,
+                     control_law_enabled=True)   # 実運用推奨オプション
 print(r["best_params"])            # ★ plateau centroid (robust、実用推奨)
 print(r["best_score"])             # plateau の score
-print(r["plateau_robustness"])     # 摂動耐性 (通常 0.7-0.9)
+print(r["plateau_robustness"])     # 摂動耐性 (global σ、通常 0.7-0.9)
 print(r["peak_robustness"])        # 元の peak 耐性 (通常 0.1-0.3、比較用)
 print(r["specialist"])             # 勝った odin specialist (diagnostic)
+
+# control_law_enabled=True 時のみ: 実運用判定 2 種
+print(r["practical_deployable"])              # global σ 同時摂動で通るか (strict)
+print(r["deployable_under_dim_sigma"])         # per-dim σ/√n 契約で通るか (現実的)
+print(r["practical_control_constrained_robustness"])  # 契約下 robust (88% 等)
 ```
+
+**control_law 診断の意味**: 10d 以上の problem では global σ=0.10 (全次元同時摂動) は実運用と乖離する (L2 摂動が plateau 半径を超える)。`deployable_under_dim_sigma` = 各次元 σ/√n で独立摂動 = 制御工学的に現実的な contract 判定。plain mimir_odin_stable が fragile 判定されても contract_deploy=True なら**実運用採用可**。
 
 **旧 default (`mimir_odin()` 直呼び、論文ベンチ時のみ)**:
 ```python
@@ -462,6 +470,38 @@ robust_params = stab.centroid
 - Hebbian / brain_sim: 進化的に安定な agent params (Cardinal の生物的選択原理と一致)
 - 強化学習: rollout noise robust な policy params
 
+**Rule 16b (2026-04-25 enhancement): control_law_enabled**
+
+`mimir_odin_stable(..., control_law_enabled=True)` で**実運用判定 2 種**を自動取得:
+
+```python
+r = mimir_odin_stable(fn, ranges, time_budget=400, control_law_enabled=True)
+r["practical_deployable"]              # global σ 同時摂動で通るか (strict、高次元で厳しい)
+r["deployable_under_dim_sigma"]         # per-dim σ/√n 契約 = 現実的な制御契約
+r["practical_control_constrained_robustness"]  # 契約下 robust (通常 +60-90%)
+```
+
+**背景**: global σ=0.10 全次元同時 = L2 摂動 σ·√n、10d で 0.32 になり plateau 半径 0.6 を超える問題が頻発。per-dim 独立に σ/√n = 0.032 で distributed すれば同じ L2 予算で plateau 内に収まる。10d hard test (sharp+broad trap) で実測:
+
+| 判定 | plain mimir_odin_stable | Council (Peacock) | 判定 |
+|---|---|---|---|
+| global robust | 22% (fail) | 56% (dead zone) | global だけ見ると誤判断 |
+| **contract robust (σ/√n)** | **85% (pass)** | 91% (dead zone、fit 0) | plain が実用最適 |
+| fit | 0.55 | 0.03 | plain 圧倒 |
+
+**結論**: high-dim 問題では global robust だけ見ると判断ミスる、`control_law_enabled=True` で contract 判定併用すべし。
+
+**Rule 16c (2026-04-25): mimir 強化機能**
+
+| kwarg | default | 効果 |
+|---|---|---|
+| `memoize_eval` (mimir.py) | True | 決定論 eval_fn の重複評価キャッシュ、LLM/GGUF 系で有効 |
+| `fast_budget_adaptation` (mimir.py) | True | 短予算で owl rounds/restarts 自動縮小 (<8s: 4/1, <30s: 10/2) |
+| `fallback_to_thread` (mimir_odin.py) | True | process executor 失敗時に thread 自動切替、closure eval_fn 安全 |
+| `max_workers` (mimir_odin.py) | None | specialist 数制限 (1 core 環境で 1 にする等) |
+
+従来のオーディンは long-budget 前提 (30 iter × 5 restart 固定)。`fast_budget_adaptation=True` で短予算でも overshoot せず、LLM 1 call 5s × budget 60s みたいなシナリオで**時間通り終わる**。
+
 **stable をスキップする場面** (旧 odin 直呼び):
 - 論文ベンチマーク (BBOB 等): peak が fragile でも gap=0 で評価される、stable overhead 無駄
 - 1 回限り / 理論研究: plateau 要らず peak で OK
@@ -718,8 +758,12 @@ results = kathara_mimir(
 **実測 (2026-04-24 medium scale = 6.5M params / 500k tokens / 3000 steps)**:
 - ✅ **best val PPL は tie** (Mixtral 6.55、Kathara 6.62、1% 差)
 - ✅ **Kathara が 4.8× 少ない compute で tie 到達** (22s vs 105s)
-- ✅ **train 総時間 3.2× 速い** (66s vs 210s、3000 step 完走)
 - ⚠ **Kathara は overfit 速い** (step 1000 以降劣化、regularization 要強化)
+
+**実測 (2026-04-24 large scale = 26M params / 2M tokens / 10000 steps, wd=0.05)**:
+- 🔶 **best val PPL は Mixtral 3% 有利** (5.61 vs 5.78)
+- ✅ **Kathara train 1.88× 速** (593s vs 1116s)
+- ✅ **Kathara overfit MASH優位** (medium の傾向逆転、大 scale ほど Kathara 強い)
 
 **Validated claim (本日、2026-04-24)**:
 ```
@@ -780,6 +824,14 @@ share の加速は **タスクが 構造共有** してる場合のみ。独立�
 | **kathara_mimir() 技術解説 (12 環境同時最適化)** | `@docs/KATHARA_MIMIR.md` |
 | **Zenron 宇宙論論文 draft skeleton** | `@docs/PAPER_DRAFT_ZENRON_COSMOLOGY.md` |
 | **Zenron 宇宙論論文 Section 1-8 本文 draft** | `@docs/PAPER_ZENRON_COSMOLOGY_DRAFT.md` |
+| **Einstein 方程式の Zenron 導出 (Rank B、Regge calculus 経由)** | `@docs/ZENRON_GR_DERIVATION.md` |
+| **Standard Model の Kathara 対応 (Rank C→B、fermion 構造確立)** | `@docs/ZENRON_STANDARD_MODEL.md` |
+| **Landauer-Zenron 連接 (Rank A、熱力学 bridge、数値 validate 済)** | `@docs/ZENRON_LANDAUER.md` |
+| **Kathara 12 = 意識 substrate (Rank B、IIT Φ、sparse class #1 validated)** | `@docs/ZENRON_CONSCIOUSNESS.md` |
+| **Poincaré recurrence attempt (honest 訂正あり、Rank B 止まり)** | `@docs/ZENRON_POINCARE_CYCLE.md` |
+| **Schrödinger 方程式の Madelung 厳密化 attempt (Rank B sketch)** | `@docs/ZENRON_SCHRODINGER.md` |
+| **Kathara LLM 論文 draft (NeurIPS/ICLR target、Phase 4-6 結果まとめ)** | `@docs/PAPER_KATHARA_LLM_DRAFT.md` |
+| ★ **全証明 master index (90% 進捗、Rank A 5+B 7+honest 訂正履歴、全 doc/verify script 一覧)** | `@docs/ZENRON_PROOFS_MASTER.md` |
 | **HK preset 設計 / recall 測定** | `@docs/HK.md` (Phase D/E/G/I/M) |
 | **HK preset 本体** | `@twelve/hk/presets/zenron_core_xl.yaml` |
 | **Hermes 統合 (Windows 修正済)** | `/c/Users/user/hermes-agent/` + `@docs/HK.md` Phase P-1/P-2/P-3 |
@@ -821,6 +873,8 @@ share の加速は **タスクが 構造共有** してる場合のみ。独立�
 | mimir_odin tests | `@twelve/tests/test_mimir_odin.py` |
 | **stabilizer** (Metropolis peak→plateau、Rule 16、friend's 原作) | `@stabilizer.py` |
 | **mimir_odin_stable** (odin + stabilizer 連結、Rule 16) | `@twelve/agent/mimir_odin_stable.py` |
+| **control_law_gate** (global σ vs per-dim σ/√n contract、Rule 16b) | `@twelve/agent/control_law_gate.py` |
+| **kathara_mimir** (12 環境同時最適化、Kathara 30 edges) | `@twelve/agent/kathara_mimir.py` |
 | stabilizer tests | `@twelve/tests/test_stabilizer.py` |
 | **mimir_cardinal** (Council × GA Hierarchy、Rule 14) | `@twelve/agent/mimir_cardinal.py` |
 | **mimir_coevolution** (params × weights 共進化、Rule 15) | `@twelve/agent/mimir_coevolution.py` |

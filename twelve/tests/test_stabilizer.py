@@ -51,6 +51,22 @@ def quadratic_max(x):
     return -sum((v - 0.5) ** 2 for v in x)
 
 
+def control_contract_fn(x):
+    """同時摂動には弱いが次元別制御なら通る ridge."""
+    x = np.asarray(x)
+    return float(1.0 - x[0] ** 2 - 8.0 * x[1] ** 2 - x[2] ** 2)
+
+
+def negative_loss_like(x):
+    """常に負の -loss 系目的関数."""
+    return -1.0 - sum(v ** 2 for v in x)
+
+
+def zero_top_loss_like(x):
+    """最良点が 0 になる -loss 系目的関数."""
+    return -sum(v ** 2 for v in x)
+
+
 # -----------------------------------------------------------------
 # StabilizerResult 構造 + stabilize() 基本動作
 # -----------------------------------------------------------------
@@ -131,6 +147,131 @@ def test_measure_robustness_broad_is_robust():
     r = measure_robustness([-0.5, -0.5], broad_plateau_fn, [(-1.5, 1.5)] * 2,
                             n_trials=15, sigma=0.1)
     assert r["robustness"] > 0.50
+
+
+def test_measure_robustness_negative_objective_is_not_forced_zero():
+    """-loss 系の負 base でも摂動耐性を 0..1 で評価する."""
+    r = measure_robustness([0.0, 0.0], negative_loss_like, [(-1, 1)] * 2,
+                            n_trials=10, sigma=0.05)
+    assert r["base"] < 0
+    assert 0.0 <= r["robustness"] <= 1.0
+    assert r["robustness"] > 0.0
+
+
+def test_measure_robustness_zero_base_objective_is_meaningful():
+    """最良 score=0 の -loss 系でも旧実装のように常時 0 へ潰さない."""
+    r = measure_robustness([0.0, 0.0], zero_top_loss_like, [(-1, 1)] * 2,
+                            n_trials=10, sigma=0.05)
+    assert r["base"] == pytest.approx(0.0)
+    assert 0.0 <= r["robustness"] <= 1.0
+    assert r["robustness"] > 0.0
+
+
+def test_control_law_contract_separates_global_and_dim_sigma():
+    """strict global と dim別制御契約を別判定する."""
+    from twelve.agent.control_law_gate import evaluate_control_law_contract
+
+    r = evaluate_control_law_contract(
+        [0.0, 0.0, 0.0],
+        control_contract_fn,
+        [(-1, 1)] * 3,
+        sigma=0.1,
+        n_trials=256,
+        seed=17,
+        min_robustness=0.8,
+    )
+    assert r["practical_deployable"] is False
+    assert r["deployable_under_dim_sigma"] is True
+    assert len(r["sigma_by_dim"]) == 3
+    assert all(0.0 <= s <= 0.1 for s in r["sigma_by_dim"])
+
+
+def test_control_law_skips_contract_when_global_passes():
+    """global が十分 robust なら contract 再測定を省く."""
+    from twelve.agent.control_law_gate import evaluate_control_law_contract
+
+    calls = {"n": 0}
+
+    def broad_counting_fn(x):
+        calls["n"] += 1
+        x = np.asarray(x)
+        return float(1.0 - 0.01 * np.sum(x * x))
+
+    r = evaluate_control_law_contract(
+        [0.0, 0.0, 0.0],
+        broad_counting_fn,
+        [(-1, 1)] * 3,
+        sigma=0.1,
+        n_trials=256,
+        seed=17,
+        min_robustness=0.8,
+        min_trials=16,
+    )
+    assert r["practical_deployable"] is True
+    assert r["deployable_under_dim_sigma"] is True
+    assert r["contract_skipped"] is True
+    assert r["contract_probe"]["skip_reason"] == "global_already_deployable"
+    assert r["eval_calls"] == r["global_probe"]["eval_calls"]
+    assert calls["n"] < 256
+
+
+def test_control_law_does_not_skip_contract_when_global_fails():
+    """global が落ちる場合は contract 判定まで進む."""
+    from twelve.agent.control_law_gate import evaluate_control_law_contract
+
+    r = evaluate_control_law_contract(
+        [0.0, 0.0, 0.0],
+        control_contract_fn,
+        [(-1, 1)] * 3,
+        sigma=0.1,
+        n_trials=256,
+        seed=17,
+        min_robustness=0.8,
+        min_trials=16,
+    )
+    assert r["practical_deployable"] is False
+    assert r["deployable_under_dim_sigma"] is True
+    assert r["contract_skipped"] is False
+    assert r["contract_probe"]["eval_calls"] > 0
+
+
+def test_control_law_uses_batch_eval_fn():
+    """batch_eval_fn がある場合は制御診断をまとめて評価する."""
+    from twelve.agent.control_law_gate import evaluate_control_law_contract
+
+    scalar_calls = {"n": 0}
+    batch_calls = {"n": 0}
+
+    def scalar_fn(x):
+        scalar_calls["n"] += 1
+        x = np.asarray(x)
+        return float(1.0 - 0.01 * np.sum(x * x))
+
+    def batch_fn(points):
+        batch_calls["n"] += 1
+        return [
+            float(1.0 - 0.01 * np.sum(np.asarray(p) * np.asarray(p)))
+            for p in points
+        ]
+
+    r = evaluate_control_law_contract(
+        [0.0, 0.0, 0.0],
+        scalar_fn,
+        [(-1, 1)] * 3,
+        sigma=0.1,
+        n_trials=256,
+        seed=17,
+        min_robustness=0.8,
+        min_trials=16,
+        batch_eval_fn=batch_fn,
+        batch_size=64,
+    )
+    assert scalar_calls["n"] == 0
+    assert batch_calls["n"] == r["batch_calls"]
+    assert r["batch_eval_enabled"] is True
+    assert r["global_probe"]["batch_enabled"] is True
+    assert r["contract_skipped"] is True
+    assert r["batch_calls"] <= 2
 
 
 # -----------------------------------------------------------------
@@ -232,3 +373,136 @@ def test_mimir_odin_stable_passes_odin_kwargs():
     )
     # curated は expensive_single ルートに切替 → tool_used が "owl" に近い
     assert r.get("tool_used") is not None
+
+
+def test_mimir_odin_stable_marks_fallback_when_stabilizer_fails(monkeypatch):
+    """stabilizer 例外時は peak fallback を明示する."""
+    import stabilizer as stabilizer_mod
+    import twelve.agent.mimir_odin as odin_mod
+
+    def fake_odin(eval_fn, param_ranges, **kwargs):
+        return {
+            "best_params": [0.0],
+            "best_score": 1.0,
+            "tool_used": "fake_odin",
+        }
+
+    def broken_stabilize(*args, **kwargs):
+        raise RuntimeError("intentional stabilizer failure")
+
+    monkeypatch.setattr(odin_mod, "mimir_odin", fake_odin)
+    monkeypatch.setattr(stabilizer_mod, "stabilize", broken_stabilize)
+
+    def eval_fn(p):
+        return 1.0 - abs(p[0])
+
+    r = mimir_odin_stable(
+        eval_fn,
+        [(-1, 1)],
+        time_budget=1,
+        robustness_trials=2,
+        verbose=False,
+    )
+    assert r["best_params"] == [0.0]
+    assert r["peak_params"] == [0.0]
+    assert r["stabilize_applied"] is False
+    assert "RuntimeError: intentional stabilizer failure" == r["stabilize_error"]
+
+
+def test_mimir_odin_stable_control_law_is_opt_out(monkeypatch):
+    """control law は default で有効。明示的に False を渡した時のみ抑止される (Rule 16b、2026-04-25 以降)。"""
+    import stabilizer as stabilizer_mod
+    import twelve.agent.mimir_odin as odin_mod
+
+    def fake_odin(eval_fn, param_ranges, **kwargs):
+        return {
+            "best_params": [0.0, 0.0, 0.0],
+            "best_score": 1.0,
+            "tool_used": "fake_odin",
+        }
+
+    def fake_stabilize(*args, **kwargs):
+        x0 = np.asarray([0.0, 0.0, 0.0], dtype=float)
+        particles = np.tile(x0, (2, 1))
+        return StabilizerResult(
+            particles=particles,
+            fitnesses=np.asarray([1.0, 1.0]),
+            centroid=x0,
+            width=np.zeros(3),
+            x0=x0,
+            x0_fitness=1.0,
+            history={},
+        )
+
+    monkeypatch.setattr(odin_mod, "mimir_odin", fake_odin)
+    monkeypatch.setattr(stabilizer_mod, "stabilize", fake_stabilize)
+
+    r = mimir_odin_stable(
+        control_contract_fn,
+        [(-1, 1)] * 3,
+        time_budget=1,
+        robustness_trials=2,
+        control_law_enabled=False,
+        verbose=False,
+    )
+    assert "control_law" not in r
+    assert "control_law_applied" not in r
+
+
+def test_mimir_odin_stable_control_law_opt_in(monkeypatch):
+    """有効化時だけ practical/control-law 診断を追加する."""
+    import stabilizer as stabilizer_mod
+    import twelve.agent.mimir_odin as odin_mod
+
+    def fake_odin(eval_fn, param_ranges, **kwargs):
+        return {
+            "best_params": [0.0, 0.0, 0.0],
+            "best_score": 1.0,
+            "tool_used": "fake_odin",
+        }
+
+    def fake_stabilize(*args, **kwargs):
+        x0 = np.asarray([0.0, 0.0, 0.0], dtype=float)
+        particles = np.tile(x0, (2, 1))
+        return StabilizerResult(
+            particles=particles,
+            fitnesses=np.asarray([1.0, 1.0]),
+            centroid=x0,
+            width=np.zeros(3),
+            x0=x0,
+            x0_fitness=1.0,
+            history={},
+        )
+
+    monkeypatch.setattr(odin_mod, "mimir_odin", fake_odin)
+    monkeypatch.setattr(stabilizer_mod, "stabilize", fake_stabilize)
+
+    batch_calls = {"n": 0}
+
+    def batch_eval_fn(points):
+        batch_calls["n"] += 1
+        return [control_contract_fn(p) for p in points]
+
+    r = mimir_odin_stable(
+        control_contract_fn,
+        [(-1, 1)] * 3,
+        time_budget=1,
+        robustness_trials=2,
+        control_law_enabled=True,
+        control_law_trials=256,
+        control_law_seed=17,
+        control_law_min_robustness=0.8,
+        control_law_batch_size=64,
+        batch_eval_fn=batch_eval_fn,
+        verbose=False,
+    )
+    assert r["control_law_applied"] is True
+    assert r["control_law"]["law"] == "joint_noise_budget"
+    assert r["practical_deployable"] is False
+    assert r["deployable_under_dim_sigma"] is True
+    assert len(r["control_sigma_by_dim"]) == 3
+    assert r["practical_control_constrained_deployable"] is True
+    assert r["control_law_eval_calls"] > 0
+    assert r["control_law_contract_skipped"] is False
+    assert r["control_law_batch_eval_enabled"] is True
+    assert r["control_law_batch_calls"] == batch_calls["n"]

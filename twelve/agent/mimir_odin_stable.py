@@ -53,6 +53,18 @@ def mimir_odin_stable(
     stabilize_seed: int = 31,
     robustness_sigma: float = 0.10,
     robustness_trials: int = 5,
+    control_law_enabled: bool = True,
+    control_law_sigma: Optional[float] = None,
+    control_law_trials: Optional[int] = None,
+    control_law_min_robustness: float = 0.80,
+    control_law_joint_budget: bool = True,
+    control_law_seed: Optional[int] = None,
+    control_law_early_stop: bool = True,
+    control_law_min_trials: int = 32,
+    control_law_decision_margin: float = 0.08,
+    control_law_skip_contract_when_global_deployable: bool = True,
+    control_law_batch_eval_fn: Optional[Callable] = None,
+    control_law_batch_size: int = 64,
     verbose: bool = False,
     **odin_kwargs: Any,
 ) -> dict:
@@ -69,6 +81,18 @@ def mimir_odin_stable(
       stabilize_seed: stabilizer RNG seed
       robustness_sigma: 摂動耐性測定の sigma (bounds 比、default 0.10)
       robustness_trials: 摂動耐性測定の試行数 (default 5)
+      control_law_enabled: True なら実用投入用の制御契約を診断として追加 (default True、Rule 16b)
+      control_law_sigma: 制御契約の目標 sigma。None なら robustness_sigma
+      control_law_trials: 制御契約の測定回数。None なら max(robustness_trials, 31)
+      control_law_min_robustness: deployable 判定の最低 robustness
+      control_law_joint_budget: 次元ごとの sigma を sqrt(dim) で共同予算化する
+      control_law_seed: 制御契約診断の RNG seed。None なら stabilize_seed + 101
+      control_law_early_stop: 判定が固まった時に摂動測定を途中終了する
+      control_law_min_trials: 早期終了を許可する最低 trial 数
+      control_law_decision_margin: robustness 閾値からこの幅だけ離れたら早期終了
+      control_law_skip_contract_when_global_deployable: global が通ったら contract 測定を省く
+      control_law_batch_eval_fn: 制御契約診断用 batch_eval_fn。None なら odin_kwargs の batch_eval_fn を再利用
+      control_law_batch_size: batch_eval_fn にまとめて渡す摂動点数
       verbose: 進捗 print
       odin_kwargs: mimir_odin に passthrough (specialists / executor 等)
 
@@ -85,6 +109,7 @@ def mimir_odin_stable(
         robustness_improvement: plateau_robustness - peak_robustness
         stabilize_elapsed_s: Stage 2 所要時間
         stage1_elapsed_s   : Stage 1 (odin) 所要時間
+        control_law         : control_law_enabled=True の時だけ返る実用投入診断
     """
     from twelve.agent.mimir_odin import mimir_odin
     from stabilizer import stabilize, measure_robustness
@@ -125,6 +150,8 @@ def mimir_odin_stable(
         print(f"[odin_stable] Stage 2: stabilize "
               f"({stabilize_particles} particles × {stabilize_gens} gens)")
     t2 = time.time()
+    stabilize_applied = False
+    stabilize_error = None
     try:
         stab_result = stabilize(
             x0=peak_params,
@@ -144,11 +171,13 @@ def mimir_odin_stable(
         centroid = stab_result.centroid.tolist()
         width = stab_result.width.tolist()
         particles = stab_result.particles.tolist()
+        stabilize_applied = True
     except Exception as e:
         # stabilize 失敗時: odin peak をそのまま best_params に fallback
         if verbose:
             print(f"[odin_stable] stabilize failed ({type(e).__name__}: {e}); "
                   f"falling back to peak")
+        stabilize_error = f"{type(e).__name__}: {e}"
         centroid = list(peak_params)
         width = [0.0] * len(peak_params)
         particles = [list(peak_params)]
@@ -158,7 +187,10 @@ def mimir_odin_stable(
     try:
         plateau_score = float(eval_fn(centroid))
     except Exception:
-        plateau_score = float("-inf")
+        plateau_score = (
+            float(peak_score) if not stabilize_applied and peak_score is not None
+            else float("-inf")
+        )
 
     plateau_rob = measure_robustness(
         centroid, eval_fn, param_ranges,
@@ -186,7 +218,66 @@ def mimir_odin_stable(
     result["stabilize_elapsed_s"] = stabilize_elapsed
     result["stage1_elapsed_s"] = stage1_elapsed
     result["total_elapsed_s"] = time.time() - t_all
-    result["stabilize_applied"] = True
+    result["stabilize_applied"] = stabilize_applied
+    result["stabilize_error"] = stabilize_error
+
+    if control_law_enabled:
+        try:
+            from twelve.agent.control_law_gate import evaluate_control_law_contract
+
+            effective_control_batch_eval_fn = control_law_batch_eval_fn
+            if effective_control_batch_eval_fn is None:
+                candidate_batch_eval_fn = odin_kwargs.get("batch_eval_fn")
+                if callable(candidate_batch_eval_fn):
+                    effective_control_batch_eval_fn = candidate_batch_eval_fn
+
+            control_law = evaluate_control_law_contract(
+                centroid,
+                eval_fn,
+                param_ranges,
+                sigma=robustness_sigma if control_law_sigma is None else control_law_sigma,
+                n_trials=(
+                    max(int(robustness_trials), 31)
+                    if control_law_trials is None
+                    else int(control_law_trials)
+                ),
+                seed=stabilize_seed + 101 if control_law_seed is None else int(control_law_seed),
+                min_robustness=control_law_min_robustness,
+                joint_budget=control_law_joint_budget,
+                early_stop=control_law_early_stop,
+                min_trials=control_law_min_trials,
+                decision_margin=control_law_decision_margin,
+                skip_contract_when_global_deployable=(
+                    control_law_skip_contract_when_global_deployable
+                ),
+                batch_eval_fn=effective_control_batch_eval_fn,
+                batch_size=control_law_batch_size,
+            )
+            result["control_law_applied"] = True
+            result["control_law"] = control_law
+            result["practical_deployable"] = control_law["practical_deployable"]
+            result["deployable_under_dim_sigma"] = control_law["deployable_under_dim_sigma"]
+            result["control_sigma_by_dim"] = control_law["sigma_by_dim"]
+            result["control_contract"] = control_law["contract"]
+            result["practical_control_constrained_deployable"] = (
+                control_law["deployable_under_dim_sigma"]
+            )
+            result["practical_control_constrained_utility"] = (
+                control_law["contract_probe"]["utility"]
+            )
+            result["practical_control_constrained_robustness"] = (
+                control_law["contract_probe"]["robustness"]
+            )
+            result["practical_control_constrained_sigma_by_dim"] = (
+                control_law["sigma_by_dim"]
+            )
+            result["control_law_eval_calls"] = control_law["eval_calls"]
+            result["control_law_contract_skipped"] = control_law["contract_skipped"]
+            result["control_law_batch_eval_enabled"] = control_law["batch_eval_enabled"]
+            result["control_law_batch_calls"] = control_law["batch_calls"]
+        except Exception as e:
+            result["control_law_applied"] = False
+            result["control_law_error"] = f"{type(e).__name__}: {e}"
 
     return result
 
