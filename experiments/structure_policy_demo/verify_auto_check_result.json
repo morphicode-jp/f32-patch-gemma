@@ -1,0 +1,158 @@
+[
+  {
+    "case": "1. 純連続 — auto_check pass + 本番完走",
+    "elapsed": 15.039575576782227,
+    "raised": false,
+    "checks": [
+      {
+        "name": "no_raise",
+        "ok": true,
+        "msg": "completed"
+      },
+      {
+        "name": "auto_check_present",
+        "ok": true,
+        "msg": "severity=ok"
+      },
+      {
+        "name": "severity_match",
+        "ok": true,
+        "msg": "expected=ok actual=ok"
+      },
+      {
+        "name": "recommended_match",
+        "ok": true,
+        "msg": "expected=mimir_odin_stable actual=mimir_odin_stable"
+      }
+    ],
+    "all_ok": true
+  },
+  {
+    "case": "2. constant — fatal raise (1h 救済)",
+    "elapsed": 5.26000189781189,
+    "raised": true,
+    "checks": [
+      {
+        "name": "raise",
+        "ok": true,
+        "msg": "raised as expected: [odin_stable] auto_check detected fatal eval_fn issues: ['2 "
+      },
+      {
+        "name": "fast_raise",
+        "ok": true,
+        "msg": "elapsed=5.3s (raise should be < 20.0s)"
+      }
+    ],
+    "all_ok": true
+  },
+  {
+    "case": "3. NaN return — fatal raise",
+    "elapsed": 0.0,
+    "raised": true,
+    "checks": [
+      {
+        "name": "raise",
+        "ok": true,
+        "msg": "raised as expected: [odin_stable] auto_check detected fatal eval_fn issues: ['ev"
+      },
+      {
+        "name": "fast_raise",
+        "ok": true,
+        "msg": "elapsed=0.0s (raise should be < 20.0s)"
+      }
+    ],
+    "all_ok": true
+  },
+  {
+    "case": "4. stochastic — pass + lad 推奨 warning",
+    "elapsed": 15.192037343978882,
+    "raised": false,
+    "checks": [
+      {
+        "name": "no_raise",
+        "ok": true,
+        "msg": "completed"
+      },
+      {
+        "name": "auto_check_present",
+        "ok": true,
+        "msg": "severity=warn"
+      },
+      {
+        "name": "recommended_match",
+        "ok": true,
+        "msg": "expected=mimir_odin_stable actual=mimir_odin_stable"
+      },
+      {
+        "name": "stochastic_detected",
+        "ok": true,
+        "msg": "detected=True cv=0.2106877128662994"
+      }
+    ],
+    "all_ok": true
+  },
+  {
+    "case": "5. TSP (純離散) — fatal raise (stable で TSP 誤用を阻止)",
+    "elapsed": 5.2739996910095215,
+    "raised": true,
+    "checks": [
+      {
+        "name": "raise",
+        "ok": true,
+        "msg": "raised as expected: [odin_stable] auto_check detected fatal eval_fn issues: ['2 "
+      },
+      {
+        "name": "fast_raise",
+        "ok": true,
+        "msg": "elapsed=5.3s (raise should be < 20.0s)"
+      }
+    ],
+    "all_ok": true
+  },
+  {
+    "case": "6. auto_check=False — fatal でも raise しない",
+    "elapsed": 6.371020793914795,
+    "raised": false,
+    "checks": [
+      {
+        "name": "no_raise",
+        "ok": true,
+        "msg": "completed"
+      },
+      {
+        "name": "auto_check_skipped",
+        "ok": true,
+        "msg": "skipped as expected"
+      }
+    ],
+    "all_ok": true
+  },
+  {
+    "case": "7. declared_structural=True + 混合 — structure_policy 推奨確定",
+    "elapsed": 15.24501371383667,
+    "raised": false,
+    "checks": [
+      {
+        "name": "no_raise",
+        "ok": true,
+        "msg": "completed"
+      },
+      {
+        "name": "auto_check_present",
+        "ok": true,
+        "msg": "severity=ok"
+      },
+      {
+        "name": "recommended_match",
+        "ok": true,
+        "msg": "expected=mimir_odin_structure_policy actual=mimir_odin_structure_policy"
+      },
+      {
+        "name": "stable_continued",
+        "ok": true,
+        "msg": "best_params present=True"
+      }
+    ],
+    "all_ok": true
+  }
+]

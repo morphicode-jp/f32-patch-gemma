@@ -139,6 +139,8 @@ def mimir_odin_stable(
             auto_check_diag = check_eval_fn(
                 eval_fn, param_ranges,
                 time_budget=check_budget,
+                # 5 値以上で stability probe → 3 値時の MAD 過小評価を回避
+                n_stability_probes=5,
                 declared_structural=auto_check_declared_structural,
                 experience_id=odin_kwargs.get("experience_id", "stable_auto_check") + "_check",
                 verbose=False,
