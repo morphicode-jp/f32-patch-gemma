@@ -305,7 +305,7 @@ full 数値は `benchmark_mimir.json` / `benchmark_mimir_dimscale.json`。
 |---|---|
 | -1 | Strip to essence: `x_i, perturb, share, eval_fn` |
 | 0 | Measure don't guess: ≥5 pts → mimir() → read numbers |
-| 0.5 | `check_eval_fn()` を本番 mimir 前に走らせろ、bad eval_fn 自動検出 |
+| 0.5 | `check_eval_fn()` を本番 mimir 前に走らせろ。`mimir_odin_stable(auto_check=True)` で **default 有効、Rule 0.5 を実装で強制** (2026-04-26 以降) |
 | 1 | Ask Oracle for structural questions (arc_oracle, kathara_oracle) |
 | 2 | No manual tuning: data → mimir() |
 | 3 | LaD: no if/else — convert to numeric params |
@@ -622,6 +622,31 @@ diag = check_eval_fn(eval_fn, ranges, declared_structural=True)
 ```
 
 純連続推奨時は recommendations に「混合の心当たりがあれば declared_structural=True か直接 structure_policy 呼出」を always 付加 (検出限界の自覚化)。
+
+### auto_check (mimir_odin_stable 内蔵、2026-04-26)
+
+`mimir_odin_stable(auto_check=True)` が default。Rule 0.5 を実装レベルで強制し、本番処理の前に自動で `check_eval_fn` を走らせる。
+
+```python
+# default で auto_check=True、fatal eval_fn は raise される
+r = mimir_odin_stable(eval_fn, ranges, time_budget=300)
+
+# 慣れた eval_fn / short budget で skip したい時
+r = mimir_odin_stable(eval_fn, ranges, time_budget=300, auto_check=False)
+
+# 混合と分かってる時の hint
+r = mimir_odin_stable(eval_fn, ranges, time_budget=300,
+                     auto_check_declared_structural=True)
+# → structure_policy 推奨 warning が出る、stable で続行
+```
+
+挙動:
+- check_budget = `max(5, min(15, time_budget × 0.05))` (短 budget で 5%、長 budget で 15s 上限)
+- fatal 検出 (constant eval_fn / NaN / state leak) → ValueError raise、本番起動前に止める
+- structure_policy 推奨 → warning print、stable で続行 (ユーザー判断尊重)
+- result["auto_check"] に diagnostic が入る (severity / recommended_optimizer / 等)
+
+**60s overhead が嫌な場面** (LLM eval × short budget) では `auto_check=False` で off。それ以外は default でつけっぱなしが安全。`structure_policy` は元から内部で check_eval_fn を呼んでるので auto_check 引数なし。
 
 ## Gotchas (よくハマる落とし穴)
 

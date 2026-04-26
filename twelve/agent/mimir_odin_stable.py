@@ -65,6 +65,10 @@ def mimir_odin_stable(
     control_law_skip_contract_when_global_deployable: bool = True,
     control_law_batch_eval_fn: Optional[Callable] = None,
     control_law_batch_size: int = 64,
+    auto_check: bool = True,
+    auto_check_budget_max: float = 15.0,
+    auto_check_budget_ratio: float = 0.05,
+    auto_check_declared_structural: bool = False,
     verbose: bool = False,
     **odin_kwargs: Any,
 ) -> dict:
@@ -93,6 +97,15 @@ def mimir_odin_stable(
       control_law_skip_contract_when_global_deployable: global が通ったら contract 測定を省く
       control_law_batch_eval_fn: 制御契約診断用 batch_eval_fn。None なら odin_kwargs の batch_eval_fn を再利用
       control_law_batch_size: batch_eval_fn にまとめて渡す摂動点数
+      auto_check: True で本番前に check_eval_fn() を自動実行 (Rule 0.5 強制)。
+        fatal なら ValueError raise、structure_policy 推奨なら warning。
+        慣れた eval_fn では auto_check=False で skip 可能。
+      auto_check_budget_max: auto_check の最大予算秒 (default 15s)
+      auto_check_budget_ratio: time_budget の何割を auto_check に割くか (default 5%)
+        実 budget = max(5, min(auto_check_budget_max, time_budget * ratio))
+      auto_check_declared_structural: True で混合問題 hint を check_eval_fn に渡す。
+        この場合 stable じゃなく structure_policy 推奨が確定するので
+        通常は意図的に False のまま (stable で押し通すなら warning 受ける)。
       verbose: 進捗 print
       odin_kwargs: mimir_odin に passthrough (specialists / executor 等)
 
@@ -115,6 +128,43 @@ def mimir_odin_stable(
     from stabilizer import stabilize, measure_robustness
 
     t_all = time.time()
+
+    # ---- Stage 0: auto_check (Rule 0.5 を実装で強制) ----
+    auto_check_diag = None
+    if auto_check:
+        from twelve.agent.eval_check import check_eval_fn
+        check_budget = max(5.0, min(auto_check_budget_max,
+                                    time_budget * auto_check_budget_ratio))
+        try:
+            auto_check_diag = check_eval_fn(
+                eval_fn, param_ranges,
+                time_budget=check_budget,
+                declared_structural=auto_check_declared_structural,
+                experience_id=odin_kwargs.get("experience_id", "stable_auto_check") + "_check",
+                verbose=False,
+            )
+        except Exception as e:
+            if verbose:
+                print(f"[odin_stable] auto_check raised {type(e).__name__}: {e}; "
+                      f"continuing without diagnostic")
+            auto_check_diag = {"severity": "skipped", "error": str(e)}
+        if auto_check_diag.get("severity") == "fatal":
+            raise ValueError(
+                f"[odin_stable] auto_check detected fatal eval_fn issues: "
+                f"{auto_check_diag.get('issues', [])}. "
+                f"Run check_eval_fn() manually to diagnose, "
+                f"or pass auto_check=False to skip this safety check."
+            )
+        rec = auto_check_diag.get("recommended_optimizer")
+        if rec == "mimir_odin_structure_policy":
+            print(
+                f"[odin_stable] WARNING: auto_check recommends "
+                f"mimir_odin_structure_policy ({auto_check_diag.get('recommended_reason')}). "
+                f"Continuing with stable as requested. "
+                f"Pass auto_check=False to suppress this warning, or switch to "
+                f"mimir_odin_structure_policy(param_decoder=...) for proper handling.",
+                flush=True,
+            )
 
     # ---- Stage 1: mimir_odin で peak 発見 ----
     odin_budget = time_budget * (1.0 - stabilize_budget_ratio)
@@ -220,6 +270,7 @@ def mimir_odin_stable(
     result["total_elapsed_s"] = time.time() - t_all
     result["stabilize_applied"] = stabilize_applied
     result["stabilize_error"] = stabilize_error
+    result["auto_check"] = auto_check_diag
 
     if control_law_enabled:
         try:

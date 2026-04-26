@@ -506,3 +506,50 @@ def test_mimir_odin_stable_control_law_opt_in(monkeypatch):
     assert r["control_law_contract_skipped"] is False
     assert r["control_law_batch_eval_enabled"] is True
     assert r["control_law_batch_calls"] == batch_calls["n"]
+
+
+def test_mimir_odin_stable_auto_check_default_passes_continuous():
+    """auto_check=True default で純連続 eval_fn は問題なく通過する."""
+    r = mimir_odin_stable(
+        lambda p: -(p[0] ** 2 + p[1] ** 2),
+        [(-1.0, 1.0)] * 2,
+        time_budget=6.0,
+        executor="thread",
+        verbose=False,
+    )
+    assert "auto_check" in r
+    diag = r["auto_check"]
+    assert diag is not None
+    assert diag.get("severity") in ("ok", "warn")
+    assert diag.get("recommended_optimizer") == "mimir_odin_stable"
+
+
+def test_mimir_odin_stable_auto_check_raises_on_constant():
+    """auto_check が constant eval_fn を fatal 検出して raise する."""
+    def constant_fn(p):
+        return 0.42
+
+    with pytest.raises(ValueError, match="auto_check detected fatal"):
+        mimir_odin_stable(
+            constant_fn,
+            [(-1.0, 1.0)] * 2,
+            time_budget=6.0,
+            executor="thread",
+            verbose=False,
+        )
+
+
+def test_mimir_odin_stable_auto_check_false_bypasses():
+    """auto_check=False で diagnostic 完全 skip、constant でも raise しない."""
+    def constant_fn(p):
+        return 0.42
+
+    r = mimir_odin_stable(
+        constant_fn,
+        [(-1.0, 1.0)] * 2,
+        time_budget=4.0,
+        executor="thread",
+        auto_check=False,
+        verbose=False,
+    )
+    assert r.get("auto_check") is None
