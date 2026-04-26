@@ -601,6 +601,28 @@ r["practical_control_constrained_robustness"]  # 契約下 robust (通常 +60-90
 - Rule 9 (default to stable) の哲学崩壊
 - 代わりに `check_eval_fn(check_discrete=True)` で **どっち使うべきかを推奨** する診断 API 拡張が筋 (人間判断は残す、Rule 0.5 強化)
 
+### 診断 API (check_eval_fn 拡張、2026-04-26)
+
+```python
+diag = check_eval_fn(eval_fn, ranges, time_budget=15)
+print(diag["recommended_optimizer"])    # "mimir_odin_stable" or "mimir_odin_structure_policy"
+print(diag["recommended_reason"])
+```
+
+**自動判定 6/7 ケース (86%) で正解** (`experiments/structure_policy_demo/verify_recommendation.py`):
+- ✓ 純連続 smooth / stochastic / sparse / TSP / 真 constant — discrete + linearity probe で正しく分類
+- ✗ **整数 + 連続混合 (k=round(p[0]) で score=sum(top_k))** — abs() の kink と round() のジャンプは数学的に区別不能 (両方とも右/左微分の不一致)、probe では見えない
+
+**混合問題救済**: `declared_structural=True` でユーザー hint を渡せば確実に structure_policy 推奨。
+
+```python
+# 整数化 / mask / カテゴリが裏で絡む混合問題で人間が知ってる場合
+diag = check_eval_fn(eval_fn, ranges, declared_structural=True)
+# → recommended_optimizer = "mimir_odin_structure_policy" 確定
+```
+
+純連続推奨時は recommendations に「混合の心当たりがあれば declared_structural=True か直接 structure_policy 呼出」を always 付加 (検出限界の自覚化)。
+
 ## Gotchas (よくハマる落とし穴)
 
 - **scale=0** (Rule 7): range に 0 を絶対入れない。モデル破壊の実証あり

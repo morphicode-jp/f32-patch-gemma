@@ -1,6 +1,6 @@
 {
-  "correct": 5,
-  "total": 6,
+  "correct": 6,
+  "total": 7,
   "results": [
     {
       "case": "Case 1: 純連続 smooth (10d Gaussian)",
@@ -61,6 +61,16 @@
       "stochastic_detected": false,
       "likely_discrete": true,
       "reason": "fatal issue を修正してから再診断"
+    },
+    {
+      "case": "Case 7: 整数 mask (declared_structural=True で救済)",
+      "expected": "mimir_odin_structure_policy",
+      "actual": "mimir_odin_structure_policy",
+      "ok": true,
+      "severity": "ok",
+      "stochastic_detected": false,
+      "likely_discrete": false,
+      "reason": "ユーザー宣言 declared_structural=True、混合問題で probe では見えない場合の 明示的推奨 (Rule 17)"
     }
   ]
 }

@@ -63,6 +63,112 @@ def _single_probe(eval_fn, midpoint, param_ranges, eps_frac, n_probes, rng_state
     }
 
 
+def _probe_linearity(
+    eval_fn: Callable,
+    midpoint: list[float],
+    param_ranges: Sequence[tuple],
+    *,
+    n_points: int = 11,
+    span_frac: float = 0.45,
+    n_directions: int = 5,
+    seed: int = 23,
+    spike_ratio: float = 10.0,
+    min_step_directions: int = 3,
+) -> dict:
+    """ランダム方向の line probe で 2 階差分 spike を検出 (混合 step 検出).
+
+    純連続 smooth: 2 階差分の max は median の 数倍以内 (滑らか)
+    混合 (整数 + 連続): 整数境界で discontinuity → 1 点だけ |d²| 巨大
+    spike_ratio (max/median) が閾値超えなら step-like 判定。
+
+    複数方向で試して 1 つでも step like なら likely_step=True。
+    direction を midpoint 中心の random unit-ish ベクトルにすることで argsort
+    対称軸 tie 問題を回避 (全 dim 同方向に動くと tie)。
+    """
+    import random as _random
+    rng_widths = [hi - lo for (lo, hi) in param_ranges]
+    rng_state = _random.Random(seed)
+    n_dims = len(midpoint)
+
+    direction_results = []
+    step_count = 0
+    for d_idx in range(n_directions):
+        direction = [rng_state.gauss(0, 1) for _ in range(n_dims)]
+        norm = sum(d * d for d in direction) ** 0.5
+        if norm < 1e-12:
+            continue
+        direction = [d / norm for d in direction]
+
+        scores: list[Optional[float]] = []
+        for k in range(n_points):
+            t = (k / (n_points - 1)) - 0.5  # -0.5 to 0.5
+            p = [
+                m + 2.0 * t * span_frac * w * direction[i]
+                for i, (m, w) in enumerate(zip(midpoint, rng_widths))
+            ]
+            try:
+                v = eval_fn(p)
+                if isinstance(v, dict):
+                    v = next((x for x in v.values() if _safe_finite(x) is not None), None)
+                f = _safe_finite(v)
+                scores.append(f)
+            except Exception:
+                scores.append(None)
+
+        valid = [s for s in scores if s is not None]
+        if len(valid) < 5:
+            direction_results.append({"step_like": False, "max_d2": 0.0, "median_d2": 0.0})
+            continue
+
+        # 1 階差分 (連続インデックスのみ)
+        d1 = []
+        for i in range(len(scores) - 1):
+            if scores[i] is None or scores[i + 1] is None:
+                d1.append(None)
+            else:
+                d1.append(scores[i + 1] - scores[i])
+
+        # 2 階差分
+        d2 = []
+        for i in range(len(d1) - 1):
+            if d1[i] is None or d1[i + 1] is None:
+                continue
+            d2.append(d1[i + 1] - d1[i])
+
+        if len(d2) < 3:
+            direction_results.append({"step_like": False, "max_d2": 0.0, "median_d2": 0.0})
+            continue
+
+        abs_d2 = sorted(abs(x) for x in d2)
+        median_d2 = abs_d2[len(abs_d2) // 2]
+        max_d2 = abs_d2[-1]
+        # 全体の score スケール (normalize 用)
+        score_range = max(valid) - min(valid)
+        # spike 判定: max が median の spike_ratio 倍超 + 絶対値も score range 比で大きい
+        step_like = (
+            median_d2 > 0
+            and max_d2 > spike_ratio * median_d2
+            and max_d2 > 0.05 * max(score_range, 1e-9)
+        )
+        if step_like:
+            step_count += 1
+        direction_results.append({
+            "step_like": bool(step_like),
+            "max_d2": float(max_d2),
+            "median_d2": float(median_d2),
+            "score_range": float(score_range),
+        })
+
+    likely_step = step_count >= min_step_directions
+    return {
+        "likely_step": bool(likely_step),
+        "step_count": int(step_count),
+        "n_directions": int(n_directions),
+        "min_step_directions": int(min_step_directions),
+        "directions": direction_results,
+    }
+
+
 def _probe_discreteness(
     eval_fn: Callable,
     midpoint: list[float],
@@ -139,6 +245,7 @@ def check_eval_fn(
     check_discrete: bool = True,
     discreteness_eps_frac: float = 0.001,
     discreteness_n_probes: int = 8,
+    declared_structural: bool = False,
     experience_id: str = "eval_check",
     verbose: bool = False,
 ) -> dict:
@@ -347,6 +454,11 @@ def check_eval_fn(
     # --- Step 1.7: discreteness probe (微小摂動で score 潰れるか) ---
     # 丸め / 整数化 / mask decode は近傍 params で同じ score を返す。
     # 連続的 eval_fn なら 8 点 probe で 8 unique score が出るはず。
+    # 注: 整数 + 連続混合 (k = round(p[0]) で score = sum(top_k) 型) は score
+    # が連続的に変動するため probe で見えない。原理的限界 (abs() の kink と
+    # round() のジャンプは右/左微分の違いで数学的に区別不能)。
+    # 混合疑いがある時はユーザーが直接 mimir_odin_structure_policy(param_decoder=)
+    # を呼んで明示的に構造扱いすべし。
     if check_discrete and not stochastic_detected:
         discreteness = _probe_discreteness(
             eval_fn, midpoint, param_ranges,
@@ -356,13 +468,12 @@ def check_eval_fn(
         likely_discrete = discreteness.get("likely_discrete", False)
         if likely_discrete and discreteness["n_probes"] >= 4:
             issues.append(
-                f"微小摂動 ({discreteness_eps_frac*100:.1f}% range) {discreteness['n_probes']} 点で "
-                f"unique score = {discreteness['n_unique']} 個 (spread {discreteness['spread']:.2e}) "
-                "= 丸め/整数化/mask decode の疑い、純連続じゃない"
+                f"摂動 probe で unique score = {discreteness['n_unique']}/"
+                f"{discreteness['n_probes']} (spread {discreteness['spread']:.2e}) "
+                "= 丸め/整数化/mask decode の疑い"
             )
             recommendations.append(
-                "近傍点で score が潰れるなら mimir_odin_structure_policy() を推奨。"
-                " 連続 carrier を policy に decode する離散構造問題と判断 (Rule 17)。"
+                "近傍点で score が潰れるなら mimir_odin_structure_policy() を推奨 (Rule 17)。"
             )
             if severity == "ok":
                 severity = "warn"
@@ -527,7 +638,14 @@ def check_eval_fn(
     #   likely_discrete   → mimir_odin_structure_policy
     #   stochastic        → mimir_odin_stable + lad wrapper
     #   default           → mimir_odin_stable
-    if severity == "fatal":
+    if declared_structural:
+        # ユーザー宣言を最優先 (混合問題で probe では見えない時の救済)
+        recommended_optimizer = "mimir_odin_structure_policy"
+        recommended_reason = (
+            "ユーザー宣言 declared_structural=True、混合問題で probe では見えない場合の "
+            "明示的推奨 (Rule 17)"
+        )
+    elif severity == "fatal":
         # 2 点 constant fatal だが discreteness probe で動きが見えるなら
         # 対称軸 tie / argsort decode の誤発動 → structure_policy 推奨に救済
         if (constant_2pt_detected and discreteness and
@@ -543,10 +661,14 @@ def check_eval_fn(
             recommended_reason = "fatal issue を修正してから再診断"
     elif likely_discrete:
         recommended_optimizer = "mimir_odin_structure_policy"
-        recommended_reason = (
-            f"discrete probe で n_unique={discreteness['n_unique']}/"
-            f"{discreteness['n_probes']}、近傍 score 潰れ検出 (Rule 17)"
-        )
+        # どの probe で trigger したか正確に reason 化
+        if discreteness and discreteness.get("likely_discrete"):
+            recommended_reason = (
+                f"discrete probe で n_unique={discreteness['n_unique']}/"
+                f"{discreteness['n_probes']}、近傍 score 潰れ検出 (Rule 17)"
+            )
+        else:
+            recommended_reason = "discrete probe trigger (Rule 17)"
     elif stochastic_detected:
         recommended_optimizer = "mimir_odin_stable"
         recommended_reason = (
@@ -558,6 +680,14 @@ def check_eval_fn(
         recommended_reason = "純連続検出、stable が default (Rule 9)"
     if recommended_optimizer:
         recommendations.append(f"→ 推奨: {recommended_optimizer}() ({recommended_reason})")
+    # 混合問題注意 (純連続推奨でも整数/mask/カテゴリが裏で絡んでる場合救済不能)
+    if recommended_optimizer == "mimir_odin_stable":
+        recommendations.append(
+            "注意: 整数化 / round() / mask decode / カテゴリ選択が含まれる混合問題は "
+            "probe では見えない (abs() の kink と round() のジャンプは数学的に区別不能)。"
+            "心当たりがあれば declared_structural=True で再診断、または直接 "
+            "mimir_odin_structure_policy(param_decoder=...) を呼ぶ。"
+        )
 
     return {
         "ok": ok,

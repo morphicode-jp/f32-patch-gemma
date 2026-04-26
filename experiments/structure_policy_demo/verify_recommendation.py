@@ -102,7 +102,15 @@ CASES = [
     ("Case 6: constant (broken)",
      f_constant, [(-1.0, 1.0)] * 5,
      None, "fatal、推奨保留"),
+    ("Case 7: 整数 mask (declared_structural=True で救済)",
+     f_integer_mask, [(-1.5, 1.5)] * 10,
+     "mimir_odin_structure_policy", "ユーザー hint で混合問題救済"),
 ]
+
+
+def _check_with_hint(fn, ranges, declared_structural=False):
+    return check_eval_fn(fn, ranges, time_budget=15, verbose=False,
+                         declared_structural=declared_structural)
 
 
 def main():
@@ -117,7 +125,9 @@ def main():
         print(f"\n--- {label} ---", flush=True)
         print(f"  期待: {expected}  ({note})", flush=True)
 
-        diag = check_eval_fn(fn, ranges, time_budget=15, verbose=False)
+        # Case 7 のみ declared_structural=True で hint
+        declared = "declared_structural" in note or "ユーザー hint" in note
+        diag = _check_with_hint(fn, ranges, declared_structural=declared)
         actual = diag.get("recommended_optimizer")
         ok = (actual == expected)
         marker = "✓" if ok else "✗"
