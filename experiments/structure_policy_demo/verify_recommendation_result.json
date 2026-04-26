@@ -1,0 +1,66 @@
+{
+  "correct": 5,
+  "total": 6,
+  "results": [
+    {
+      "case": "Case 1: 純連続 smooth (10d Gaussian)",
+      "expected": "mimir_odin_stable",
+      "actual": "mimir_odin_stable",
+      "ok": true,
+      "severity": "ok",
+      "stochastic_detected": false,
+      "likely_discrete": false,
+      "reason": "純連続検出、stable が default (Rule 9)"
+    },
+    {
+      "case": "Case 2: 整数 mask (丸めで潰れる)",
+      "expected": "mimir_odin_structure_policy",
+      "actual": "mimir_odin_stable",
+      "ok": false,
+      "severity": "ok",
+      "stochastic_detected": false,
+      "likely_discrete": false,
+      "reason": "純連続検出、stable が default (Rule 9)"
+    },
+    {
+      "case": "Case 3: stochastic (Gaussian noise σ=0.15)",
+      "expected": "mimir_odin_stable",
+      "actual": "mimir_odin_stable",
+      "ok": true,
+      "severity": "ok",
+      "stochastic_detected": false,
+      "likely_discrete": false,
+      "reason": "純連続検出、stable が default (Rule 9)"
+    },
+    {
+      "case": "Case 4: TSP argsort (8 cities)",
+      "expected": "mimir_odin_structure_policy",
+      "actual": "mimir_odin_structure_policy",
+      "ok": true,
+      "severity": "fatal",
+      "stochastic_detected": false,
+      "likely_discrete": false,
+      "reason": "2 点 probe constant 誤発動の疑い (discrete probe で n_unique=8/8 反応)、argsort/policy decode の対称軸 tie で structure_policy 推奨 (Rule 17)"
+    },
+    {
+      "case": "Case 5: 純連続 sparse (30d)",
+      "expected": "mimir_odin_stable",
+      "actual": "mimir_odin_stable",
+      "ok": true,
+      "severity": "ok",
+      "stochastic_detected": false,
+      "likely_discrete": false,
+      "reason": "純連続検出、stable が default (Rule 9)"
+    },
+    {
+      "case": "Case 6: constant (broken)",
+      "expected": null,
+      "actual": null,
+      "ok": true,
+      "severity": "fatal",
+      "stochastic_detected": false,
+      "likely_discrete": true,
+      "reason": "fatal issue を修正してから再診断"
+    }
+  ]
+}

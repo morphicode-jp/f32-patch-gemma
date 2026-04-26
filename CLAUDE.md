@@ -2,6 +2,12 @@
 
 All responses in Japanese.
 
+## Current Workspace
+
+現在の開発正本は `E:/新しいフォルダー/開発/パイプラインオートメーション`。
+旧 `C:/新しいフォルダー (2)/パイプラインオートメーション` 側ではなく、原則としてEドライブ側を読む・編集する。
+毎回の短い起動メモは `AGENTS.md`、詳細ルールの正本はこの `CLAUDE.md`。
+
 ## 最優先ルール: `mimir_odin_stable()` を呼べ
 
 全ての最適化は `mimir_odin_stable(eval_fn, param_ranges, time_budget=N)` で始まる。2026-04-24 以降の新 default エントリーポイント。
@@ -22,6 +28,7 @@ All responses in Japanese.
 
 **ミーミル家族** (上から default 優先):
 - `mimir_odin_stable()` — ★ default (Rule 9/16、peak→plateau、実世界推奨)
+- `mimir_odin_structure_policy()` — 離散/構造policy探索用 wrapper。`check_eval_fn()` + discrete policy probe + `mimir_odin_stable()`。
 - `mimir_odin()` — 旧 default (Rule 13、論文ベンチ用、time -25%)
 - `mimir()` — 内部実装 (3 例外時のみ直呼び)
 - `mimir_cardinal_hierarchy()` — Council → GA (Rule 14、特殊)
@@ -72,7 +79,7 @@ r = mimir(eval_fn, param_ranges, time_budget=300)
 
 返り値 dict 主要キー (stable): `best_params` (★ plateau centroid) / `best_score` / `peak_params` / `peak_robustness` / `plateau_robustness` / `plateau_width` / `plateau_particles` / `robustness_improvement` + odin 由来 (`specialist` / `council` / `council_variance_std`) + mimir 由来 (`dead_dims` / `active_dims` / `proxy_r2` / `tool_used` / `route`) 全部引き継ぎ。構造発見系は最適化と同時に得られる。
 
-## mimir_odin_stable 使用 6 パターン
+## mimir_odin_stable / structure-policy 使用 7 パターン
 
 全て `mimir_odin_stable()` 1 関数で扱える。extra_kwargs が odin → 全 specialist に passthrough される。time_budget に +25% 余裕を持たせる (stabilize stage 分)。
 
@@ -82,6 +89,7 @@ r = mimir(eval_fn, param_ranges, time_budget=300)
 第4. **構造分析のみ**: `mode="structure_only"` は単独 `mimir(mode="structure_only")` 推奨 (stable 要らない、overkill)。
 第5. **2 指標 guard**: `guard_fn=my_guard` extra_kwargs で odin 全 specialist に伝搬、安全指標 pivot 発動。
 第6. **stochastic / 自動集約**: specialist "lad" が `n_samples_per_eval=20` を自動担当、ユーザー側追加 kwarg 不要。
+第7. **離散 / 構造 policy 探索**: `mimir_odin_structure_policy(...)`。mask / edge gate / rewind epoch / codec policy 等、連続値を丸めて policy に decode する問題専用。`check_eval_fn()` が離散丸めで fatal でも、discrete policy probe が有限・反応ありなら stable ODIN へ進む。
 
 ```python
 r1 = mimir_odin_stable(fn, [(-5, 5)] * 8, time_budget=400)                             # (1) 一般
@@ -90,7 +98,33 @@ r3 = mimir_odin_stable(ppl_eval, ranges, time_budget=2400)                      
 r4 = mimir(fn, ranges, mode="structure_only", time_budget=30)                          # (4) 分析のみ (単独 OK)
 r5 = mimir_odin_stable(fn, ranges, guard_fn=my_guard, time_budget=400)                 # (5) 2 指標
 r6 = mimir_odin_stable(llm_eval, ranges, time_budget=2400)                             # (6) stochastic (lad 自動)
+r7 = mimir_odin_structure_policy(fn, ranges, policy_points=past_policies,
+                                 param_decoder=decode_policy, time_budget=600)         # (7) 離散/構造 policy
 ```
+
+## 構造policy探索モード (ODIN for masks / codec / Lottery Ticket)
+
+`mimir_odin_structure_policy()` は、ODIN を「連続値の最適化器」ではなく **構造仮説を吐き出す探索器**として使う wrapper。ODIN / OWL / Reigen / `optimize()` 本体は変更せず、外側で以下を行う。
+
+```python
+from twelve.agent.mimir_odin_structure_policy import mimir_odin_structure_policy
+
+r = mimir_odin_structure_policy(
+    eval_fn,
+    param_ranges,
+    policy_points=curated_policies,
+    param_decoder=decode_policy,
+    detail_fn=evaluate_detail,
+    objective_schema={"primary": "practical_acc", "penalty": "density_mean"},
+    time_budget=600,
+)
+```
+
+使う場面: `keep_nodes` / `edge_gate` / `rescue_ratio` / `rewind_epoch` / mask policy / codec policy / quant block policy のように、入力は連続 range だが実体は離散・丸め・カテゴリ混在の構造探索。
+
+重要: 通常の `check_eval_fn()` は、丸めで近傍点が同じ policy に潰れると「flat / fatal」と誤判定し得る。これを無視してはいけない。structure-policy wrapper は raw check を保存した上で、`policy_response_probe` により finite score、score spread、density spread、unique decoded policies を確認し、反応がある場合だけ `check_eval_accepted_via_discrete_probe=True` で stable ODIN に進む。
+
+返り値で毎回見るキー: `structure_policy_mode` / `policy_response_probe` / `check_eval` / `check_eval_accepted_via_discrete_probe` / `curated_measurements` / `peak_policy` / `best_policy` / `best_policy_detail`。`best_params` は ODIN の連続座標、`best_policy` が実際に使う構造。
 
 **旧 default `mimir_odin()` を直呼びする 2 例外**:
 - (a) BBOB / 論文ベンチマークで peak fragile でも gap=0 のみ評価される
@@ -230,6 +264,8 @@ r = mimir_odin_stable(my_eval_fn, param_ranges, time_budget=2400)
 
 **fatal なら本番走らせるな**。原因修正が先。stochastic 検出時 (`stochastic_cv > 0.10`) は `wrap_stochastic(n=20)` / `wrap_multi_obs(n=20)` / `n_samples_per_eval=20` を recommendations に自動追加 (Rule 12)。
 
+**離散 / 構造 policy だけは専用経路**。mask / codec / Lottery Ticket のように連続 range を decode して離散 policy にする問題では、近傍点が同じ policy に丸め込まれて `check_eval_fn()` が flat fatal を出すことがある。この場合も raw fatal を無視せず、`mimir_odin_structure_policy()` の `policy_response_probe` が有限 score・score spread・unique policy を確認した場合だけ本番へ進む。
+
 **背景**: eval_fn = 人間の価値観定義、完全自動生成は原理不可能 (docs/全論の公式の活用.md §11.2)。**bad パターン検出**で 80% の失敗を事前回避できる。
 
 ## eval_fn 設計
@@ -243,6 +279,7 @@ r = mimir_odin_stable(my_eval_fn, param_ranges, time_budget=2400)
 | dict `{"nll":..., "hs":...}` return | 単一 scalar | multi-observer で stable_active 等取れる |
 | stochastic: `wrap_stochastic(fn, n=20)` or `wrap_multi_obs(fn, n=20)` | stochastic を raw で渡す | LaD 化で noise 除去、proxy_r2 +0.3-0.4 (Rule 12) |
 | 弱点分からん / 単独 mimir で局所解嵌まる → `mimir_odin()` | 単独 mimir で頑張る | 4 specialist 並列で弱点補完 (Rule 13) |
+| 離散 mask / codec policy → `mimir_odin_structure_policy()` | `check_eval_fn` fatal を手で握り潰す | policy probe で反応性を検証してから stable ODIN へ渡す |
 
 ## experience_id
 
@@ -286,6 +323,7 @@ full 数値は `benchmark_mimir.json` / `benchmark_mimir_dimscale.json`。
 | 14 | 高次元 sparse かつ reigen symbolic 解なし (Hebbian 進化系) は `mimir_cardinal_hierarchy()` |
 | 15 | multi-metric eval でどう aggregate すべきか不明なら `mimir_cardinal_coevolution()` (params × weights 共進化) |
 | 16 | `stabilizer.stabilize()` は `mimir_odin_stable` が内部で使用、他 optimizer にも後付け可 |
+| 17 | 離散 / 構造 policy 探索は `mimir_odin_structure_policy()`。本体 ODIN/OWL/Reigen/optimize は触らず、policy probe で安全に通す |
 
 ### Rule -1 〜 11b (詳解)
 
@@ -506,6 +544,62 @@ r["practical_control_constrained_robustness"]  # 契約下 robust (通常 +60-90
 - 論文ベンチマーク (BBOB 等): peak が fragile でも gap=0 で評価される、stable overhead 無駄
 - 1 回限り / 理論研究: plateau 要らず peak で OK
 - 時間極限 (1h 予算内で 25% overhead 致命的)
+
+**Rule 17 (2026-04-26): ODIN 構造policy探索**
+
+`mimir_odin_structure_policy()` は、構造を発見・選択するための外側 wrapper。対象は Kathara mask、Lottery Ticket、codec policy、quant block gate、edge enable、rewind epoch など。連続探索点を `param_decoder` で policy dict に変換し、`detail_fn` で density / compression / practical_acc 等を保存する。
+
+この経路は本体 `mimir_odin_stable()` の上位互換ではない。**離散丸め・カテゴリ混在・構造候補専用**。通常の連続最適化、LLM calibration、GGUF scale tune は従来通り `check_eval_fn()` → `mimir_odin_stable()`。
+
+安全条件: raw `check_eval_fn` を結果に残す。fatal でも `policy_response_probe.ok=True`、finite score、複数 unique policy、score/density spread ありの場合だけ `check_eval_accepted_via_discrete_probe=True` で進める。probe が弱い場合は設計不良として止める。
+
+## stable vs structure_policy 使い分けフロー (2026-04-26 検証済)
+
+実測ベンチで「一本化」を検証した結果 (`experiments/structure_policy_demo/run_unification_check.py`)、**両方残して適材適所が正解**。`mimir_odin_structure_policy()` は **離散/構造専用の頑強な wrapper** で、純連続に転用すると守備機能が誤発動する。
+
+### 判断フロー
+
+```
+問題に「種類選び / 構造遷移 / mask / 順列」が含まれる?
+  ├── Yes → mimir_odin_structure_policy()
+  │          (Lottery Ticket, TSP, codec policy, edge gate, rewind epoch)
+  └── No (純粋に数字いじり) → mimir_odin_stable()
+            (LLM scale, 薬の量, learning rate, hyperparameter tune)
+```
+
+### 実測ベンチ (4 シナリオ × 同 budget)
+
+| シナリオ | stable | structure_policy | 判定 |
+|---|---|---|---|
+| 純連続 + curated なし | fit 0.219 / 49s | fit 0.219 / 29s | structure_policy 速い (内部 random seed 効果) |
+| **純連続 + curated 公平** | **fit 0.219 / 23s** | fit 0.219 / 29s | **stable が overhead 分速い (-6s)** |
+| 重い eval_fn (sleep 0.3s) | fit 0.219 / 173s | fit 0.219 / 164s | tie (微差) |
+| **50d 純連続** | fit 0.003 / 63s | **NaN / 5s で abort** | **structure_policy 守備誤発動** |
+| TSP 10 cities (純離散) | gap +72.9% / 70s | **gap +26.3% / 52s** | **structure_policy 圧勝 (gap 1/3)** |
+
+### 50d abort の原因 (重要)
+
+50d 純連続を identity decode で structure_policy に流すと、`policy_response_probe.score_spread = 1.29e-10` で abort。原因:
+- 50d で random seed (-1〜1.5) を 8 個取ると全部 peak から遥か遠い
+- `exp(-30 × distance²)` が `distance²=O(50)` で 0 に潰れる
+- 8 seed 全部 score≈0、spread = 浮動小数点ノイズ
+- probe が「policy 反応してない、設計不良」と判定 → 5 秒で abort
+
+これは **structure_policy の正しい守備動作** (Rule 17)。バグじゃなく「使い方が違う」シグナル。
+
+### 一本化が NO な理由 3 つ
+
+1. **公平比較 (curated 同条件) で stable のが 6s 速い** — overhead 確実にある
+2. **純連続 + identity decode で abort リスク** — 50d で実証
+3. **適材適所のコストはほぼゼロ** — 関数名 1 つ違うだけ、抽象化の利益小
+
+### 「上の層」を作らない理由
+
+`auto_solve(eval_fn, ranges)` のような unified entrypoint を作ると:
+- 自動判定の無駄走り (probe abort → stable 切替で +5-10s 損)
+- 抽象階層 6 段化で debug 困難
+- Rule 9 (default to stable) の哲学崩壊
+- 代わりに `check_eval_fn(check_discrete=True)` で **どっち使うべきかを推奨** する診断 API 拡張が筋 (人間判断は残す、Rule 0.5 強化)
 
 ## Gotchas (よくハマる落とし穴)
 
@@ -777,6 +871,25 @@ NEW: "Kathara 12x は Mixtral 8x の best val PPL を 4.8× 短時間で到達" 
 - `_kvopt/core/kathara_moe_medium.py` — medium validate
 - 次: large scale (100M params × 10M tokens) で 4.8× claim の確度上げ
 
+### ODIN × Kathara Lottery Ticket / structure policy (2026-04-26)
+
+**隔離実験**: `experiments/lottery_ticket_odin_v0/`。本体 GGUF / ODIN / OWL / Reigen / `optimize()` は触らない。目的は ODIN を「重みを直接いじる optimizer」ではなく、**構造 mask / Kathara graph / rewind policy を吐き出す探索器**として使えるか測ること。
+
+**MLP 3seed 実測**:
+- fixed Kathara node_edge: practical acc 0.9542、density 0.154、compression 6.50x
+- compact 4 nodes: practical acc 0.9521、density 0.091、compression 11.15x
+- 解釈: compact は精度 -0.22pt で 1.72x 深く圧縮。構造がある問題では「少ない node でも残る」可能性あり。
+
+**Tiny Transformer 3seed 実測**:
+- hand-designed `kathara_node_edge_rescue`: practical acc 1.0000、density 0.152、compression 6.61x
+- ODIN structure-policy 1seed 発見: `keep_nodes=3`, `edge_enabled=True`, `rescue_ratio=0.012945859056057787`, `rewind_epoch=4`
+- ODIN candidate 1seed: practical acc 1.0000、density 0.048、compression 20.77x
+- ODIN candidate 3seed 再評価: practical acc 0.9706、density 0.0479、compression 20.87x
+
+**現時点の結論**: hand-designed は 6.61x で満点維持、ODIN candidate は約 3pt 精度を払って 20.87x。つまり **実用精度を残したまま、設計済み Kathara mask より 3.16x 深い圧縮候補を ODIN が見つけた**。ただし small synthetic MLP / tiny Transformer の結果であり、LLM/GGUF 証明ではない。
+
+読むべき代表レポート: `experiments/lottery_ticket_odin_v0/reports/policy_compare_compression_3seed.md`, `transformer_ticket_3seed.md`, `transformer_policy_odin_smoke.md`, `transformer_ticket_odin_candidate_3seed.md`。
+
 ### なぜ Zenron + Kathara = 別次元か
 
 | 単独 | 性質 | 限界 |
@@ -841,6 +954,8 @@ share の加速は **タスクが 構造共有** してる場合のみ。独立�
 | **mimir council (4 specialist 並列、Rule 13)** | `@twelve/agent/mimir_odin.py` |
 | **stabilizer (peak→plateau、Rule 16)** | `@stabilizer.py` (project root、friend's 原作) |
 | **mimir_odin_stable (odin + stabilizer 連結、Rule 16)** | `@twelve/agent/mimir_odin_stable.py` |
+| **mimir_odin_structure_policy (離散/構造policy探索、Rule 17)** | `@twelve/agent/mimir_odin_structure_policy.py` |
+| **Lottery Ticket / Kathara mask 隔離実験** | `@experiments/lottery_ticket_odin_v0/README.md` |
 | **Sentinel (legacy)** | `@docs/SENTINEL_LEGACY.md` |
 | **HTTP API / ngrok / session API** | `@docs/API_SERVERS.md` |
 | Zenron 実践ガイド + MirrorScan 詳細 | `@docs/ZENRON_GUIDE.md` |
@@ -873,6 +988,7 @@ share の加速は **タスクが 構造共有** してる場合のみ。独立�
 | mimir_odin tests | `@twelve/tests/test_mimir_odin.py` |
 | **stabilizer** (Metropolis peak→plateau、Rule 16、friend's 原作) | `@stabilizer.py` |
 | **mimir_odin_stable** (odin + stabilizer 連結、Rule 16) | `@twelve/agent/mimir_odin_stable.py` |
+| **mimir_odin_structure_policy** (離散/構造policy探索 wrapper、Rule 17) | `@twelve/agent/mimir_odin_structure_policy.py` |
 | **control_law_gate** (global σ vs per-dim σ/√n contract、Rule 16b) | `@twelve/agent/control_law_gate.py` |
 | **kathara_mimir** (12 環境同時最適化、Kathara 30 edges) | `@twelve/agent/kathara_mimir.py` |
 | stabilizer tests | `@twelve/tests/test_stabilizer.py` |

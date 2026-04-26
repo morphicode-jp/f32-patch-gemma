@@ -1,0 +1,62 @@
+[
+  {
+    "label": "A: 純連続 curated なし",
+    "optimal": 0.55,
+    "stable": {
+      "fit": 0.21946696092929924,
+      "t": 49.13955092430115
+    },
+    "structure_policy": {
+      "fit": 0.21946696092929924,
+      "t": 28.592496156692505,
+      "aborted": false
+    },
+    "delta_fit": 0.0,
+    "delta_t_s": -20.547054767608643
+  },
+  {
+    "label": "B: 純連続 curated 公平",
+    "optimal": 0.55,
+    "stable": {
+      "fit": 0.21946696092929924,
+      "t": 22.99452233314514
+    },
+    "structure_policy": {
+      "fit": 0.21946696092929924,
+      "t": 28.58070659637451,
+      "aborted": false
+    },
+    "delta_fit": 0.0,
+    "delta_t_s": 5.58618426322937
+  },
+  {
+    "label": "C: 重い eval_fn",
+    "optimal": 0.55,
+    "stable": {
+      "fit": 0.21946696713094924,
+      "t": 172.59950256347656
+    },
+    "structure_policy": {
+      "fit": 0.21946696092929924,
+      "t": 163.54476737976074,
+      "aborted": false
+    },
+    "delta_fit": -6.201649999093561e-09,
+    "delta_t_s": -9.05473518371582
+  },
+  {
+    "label": "D: 50d 純連続",
+    "optimal": 0.55,
+    "stable": {
+      "fit": 0.003155623079675603,
+      "t": 62.586437463760376
+    },
+    "structure_policy": {
+      "fit": NaN,
+      "t": 5.03904128074646,
+      "aborted": true
+    },
+    "delta_fit": NaN,
+    "delta_t_s": -57.547396183013916
+  }
+]
