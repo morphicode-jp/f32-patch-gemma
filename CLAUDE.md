@@ -4,8 +4,8 @@ All responses in Japanese.
 
 ## Current Workspace
 
-現在の開発正本は `E:/新しいフォルダー/開発/パイプラインオートメーション`。
-旧 `C:/新しいフォルダー (2)/パイプラインオートメーション` 側ではなく、原則としてEドライブ側を読む・編集する。
+現在の開発正本は `C:/Users/morph/開発/パイプラインオートメーション`。
+旧 `E:/新しいフォルダー/開発/パイプラインオートメーション` や `C:/Users/mukic/...` 側ではなく、原則としてこの morph 側を読む・編集する。
 毎回の短い起動メモは `AGENTS.md`、詳細ルールの正本はこの `CLAUDE.md`。
 
 ## 最優先ルール: `mimir_odin_stable()` を呼べ
@@ -648,6 +648,24 @@ r = mimir_odin_stable(eval_fn, ranges, time_budget=300,
 
 **60s overhead が嫌な場面** (LLM eval × short budget) では `auto_check=False` で off。それ以外は default でつけっぱなしが安全。`structure_policy` は元から内部で check_eval_fn を呼んでるので auto_check 引数なし。
 
+## Kathara / Zenron / ODIN 統一使い分け (2026-04-26 検証済)
+
+`experiments/zenron_eml_bridge/integrated_report.md` で 12 target × 7 modes の数値検証完了、ヒエラルキー確定:
+
+| 用途 | ツール | 実測根拠 |
+|---|---|---|
+| 純連続 (LLM scale, 薬量, 学習率) | `mimir_odin_stable()` | Rule 9 default、BBOB cma_es 128× 優位 (20d) |
+| 離散 / mask / TSP / 順列 | `mimir_odin_structure_policy()` | TSP gap 1/3、Lottery 6.6× 圧縮で満点 |
+| 12 並列の似たタスク | `kathara_mimir()` | 5.6× speedup + 37% 質向上 (smoke) |
+| シンボリック回帰 (式発見) | `experiments/zenron_eml_bridge/` | 9/12 target で 5/5、test_loss < 1e-8 |
+| 理論統一 / 物理 + 意識 | `docs/ZENRON_*.md` | Rank A 5 + Rank B 7 |
+
+**重要な数値**: mimir 単独 (`stable` / `structure_policy`) は symbolic regression に**届かない** (全 24 cell で 0/3、bridge との gap 7-12 桁)。bridge は ODIN の **symbolic 拡張ユニット**として位置付け。
+
+ただし bridge も sin/cos/tanh は **既存 budget で 0/5** — universality 主張は理論的、深 tree が必要な関数は探索コスト指数的。
+
+詳細実践ガイド (7 シナリオ + 7 失敗救済策 + 世界比較): `@docs/KATHARA_ZENRON_ODIN_USAGE.md`
+
 ## Gotchas (よくハマる落とし穴)
 
 - **scale=0** (Rule 7): range に 0 を絶対入れない。モデル破壊の実証あり
@@ -749,20 +767,23 @@ mimir_odin(fn, ranges, time_budget) 呼出し
 
 ### Workstation
 
-開発機は Windows 11 Pro、Intel i7-12700K、NVIDIA RTX 5090 (32 GB VRAM)。llama.cpp prebuilt binaries は `c:/Users/user/llm/llama-bin/` (b8795, CUDA 12.4)。GGUF モデルは `c:/Users/user/llm/models/`。Visual Studio / GCC 未インストール、llama.cpp はソースビルドしない。
+開発機は Windows 11 Pro、NVIDIA RTX 5090 (32 GB VRAM)。この checkout の Python 依存は `C:/Users/morph/開発/パイプラインオートメーション/Lib/site-packages` にあるため、Python 実行時は `PYTHONPATH` にこのディレクトリを入れる。
 
 ### Commit safety
 
 以下は絶対 commit しない: `unified_memory.py`、`evaluator*.py`、`_legacy/` 配下、特許下書き、credentials。commit 前に必ず `git status` 確認。`.env` や認証情報の誤コミット回避のため `git add -A` より個別ファイル add を優先。
 
-## 推論サーバ: `C:/Users/user/infinite_think_server.py`
+## 推論サーバ: `http://127.0.0.1:8282/v1`
 
 Qwen3.6-35B-A3B-Abliterated-Heretic を OpenAI 互換 API (`http://127.0.0.1:8282/v1`) で提供する本番サーバ。2026-04-21〜22 に Phase O (10 個の stop-token/cleanup バグ修正) + Phase P (OpenAI tool calling) を入れて完成済。
 
 ### 起動
-```bash
-python C:/Users/user/infinite_think_server.py --preset zenron_core_xl --hk-size 1000 --port 8282
+```powershell
+$env:PYTHONPATH = "C:/Users/morph/開発/パイプラインオートメーション/Lib/site-packages"
+python -B path/to/infinite_think_server.py --preset zenron_core_xl --hk-size 1000 --port 8282
 ```
+
+注: `infinite_think_server.py` の実体パスはこの checkout 内では未確認。旧 `C:/Users/user/infinite_think_server.py` を前提にしない。
 
 ### 主要エンドポイント
 | path | 用途 |
@@ -980,6 +1001,7 @@ share の加速は **タスクが 構造共有** してる場合のみ。独立�
 | 目的 | 読むファイル |
 |---|---|
 | mimir 使い方 | 本ファイル |
+| ★ **Kathara / Zenron / ODIN 実践使い分けガイド (2026-04-26、7 シナリオ + 失敗救済 + 世界比較)** | `@docs/KATHARA_ZENRON_ODIN_USAGE.md` |
 | **推論サーバ内部 / Phase O/P defense** | `@docs/HK.md` |
 | **kathara_mimir() 技術解説 (12 環境同時最適化)** | `@docs/KATHARA_MIMIR.md` |
 | **Zenron 宇宙論論文 draft skeleton** | `@docs/PAPER_DRAFT_ZENRON_COSMOLOGY.md` |
