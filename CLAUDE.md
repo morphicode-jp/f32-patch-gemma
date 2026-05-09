@@ -927,17 +927,31 @@ results = kathara_mimir(
 - ✅ **Kathara train 1.88× 速** (593s vs 1116s)
 - ✅ **Kathara overfit MASH優位** (medium の傾向逆転、大 scale ほど Kathara 強い)
 
-**Validated claim (本日、2026-04-24)**:
+**実測 (2026-05-09 xLarge scale = 50M params / 5M tokens / 20000 steps, wd=0.01)**:
+- ⚠ **best val PPL ほぼ tie** (Mixtral 4.296 vs Kathara 4.248、+1.1% Kathara)
+- ❌ **Kathara が遅い** (5237s vs 3580s、Mixtral が 1.46× 速い、medium と逆転)
+- ❌ **params parity 失敗**: Kathara 67.6M vs Mixtral 50.8M (33% 大、`D_kathara=8/12 比`
+  の式が constructor 挙動と齟齬、再計算必要)
+- ⚠ **両方 step 2000 で overfit 開始**、20000 steps は 32 epoch 相当でオーバー
+
+**Validated claim (2026-05-09 修正)**:
 ```
-OLD: "Kathara 12x は同性能で 15% 軽量" (未 validate)
-NEW: "Kathara 12x は Mixtral 8x の best val PPL を 4.8× 短時間で到達" (medium scale validate)
+OLD (2026-04-24 medium 単独): "Kathara 12x は Mixtral 8x の best val PPL を
+                              4.8× 短時間で到達"
+NEW (2026-05-09 xLarge で修正): "Kathara 4.8× claim は medium scale 限定の
+                              偶然、xLarge (50M) で逆転 (Kathara 1.46× 遅い)
+                              + params parity 計算失敗 (33% 大) + best PPL は
+                              実質 tie。論文 claim は xLarge データ取り直して
+                              再構築要"
 ```
 
 **実装 status**:
 - `twelve/agent/kathara_moe_torch.py` — PyTorch module 動作確認済
 - `_kvopt/core/kathara_moe_train.py` — tiny benchmark
-- `_kvopt/core/kathara_moe_medium.py` — medium validate
-- 次: large scale (100M params × 10M tokens) で 4.8× claim の確度上げ
+- `_kvopt/core/kathara_moe_medium.py` — medium validate (4.8× claim 出所)
+- `_kvopt/core/kathara_moe_xlarge.py` — xLarge 検証 (4.8× claim 否定、参照: `_kvopt/results/kathara_moe_xlarge.json`)
+- 次: params parity 修正版で再 xLarge、または Kathara の真の利点 (load
+  balancing / interpretability) を別 metric で検証
 
 ### ODIN × Kathara Lottery Ticket / structure policy (2026-04-26)
 

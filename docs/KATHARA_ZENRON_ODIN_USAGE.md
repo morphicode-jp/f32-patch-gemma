@@ -334,7 +334,7 @@ r = mimir_odin_stable(
 | 領域 | 世界トップ | 本プロジェクト |
 |---|---|---|
 | **連続最適化** | CMA-ES, Vizier, Optuna | ODIN (Rastrigin 20d で cma_es 128× 優位) |
-| **MoE** | Mixtral 8x7B, Switch Transformer | kathara_moe (Mixtral 比 4.8× 短時間、medium scale) |
+| **MoE** | Mixtral 8x7B, Switch Transformer | kathara_moe (medium scale で 4.8× 短主張あったが xLarge 50M で逆転、params parity 計算ミス、検証中) |
 | **Symbolic regression** | PySR (Cranmer) — 標準 | zenron_eml_bridge (1 演算子 + Kathara mining、minimalist) |
 | **NAS / Pruning** | DARTS, Lottery Ticket Hypothesis | structure_policy (TSP gap 1/3、Lottery 6.6× 圧縮) |
 | **Connectome 解析** | Google/Harvard H01 | Kathara で 12 ロール圧縮 (別軸) |
