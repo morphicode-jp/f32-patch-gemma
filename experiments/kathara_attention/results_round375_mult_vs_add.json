@@ -1,0 +1,30 @@
+{
+  "n_seeds": 10,
+  "multiplicative_reach": 5,
+  "additive_reach": 5,
+  "mult_results": [
+    false,
+    false,
+    false,
+    false,
+    true,
+    false,
+    true,
+    true,
+    true,
+    true
+  ],
+  "add_results": [
+    false,
+    false,
+    true,
+    false,
+    true,
+    true,
+    false,
+    true,
+    false,
+    true
+  ],
+  "verdict": "★★★ 同等 (5 = 5)、 差なし"
+}
