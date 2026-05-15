@@ -1,0 +1,13 @@
+{
+  "core_universal_cover": "infinite mixed-degree tree (girth 4)",
+  "K1_aut_count_bounded": 24,
+  "core_aut_orbits": [
+    "{0: 0, 1: 1, 2: 2, 3: 3, 4: 4, 5: 5, 6: 6, 7: 7, 8: 8, 9: 9, 10: 10, 11: 11}",
+    "{0: 0, 4: 1, 3: 2, 2: 3, 1: 4, 5: 5, 6: 6, 10: 7, 9: 8, 8: 9, 7: 10, 11: 11}",
+    "{11: 0, 10: 1, 9: 2, 8: 3, 7: 4, 6: 5, 5: 6, 4: 7, 3: 8, 2: 9, 1: 10, 0: 11}"
+  ],
+  "schlafli_connection": "162 = 6 × 27, Schläfli graph 6-fold relation hypothesis",
+  "quartic_disc_24197": {
+    "24197": 1
+  }
+}
