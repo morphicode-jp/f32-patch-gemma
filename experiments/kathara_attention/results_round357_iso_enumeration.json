@@ -1,0 +1,11 @@
+{
+  "N_trials": 10000000,
+  "triangle_free_count": 22787,
+  "unique_spectra": 8556,
+  "five_identity_iso_classes": 144,
+  "iso_with_core_count": 1,
+  "distinct_iso_classes_5_of_5": 143,
+  "iso_to_core_in_random": 0,
+  "elapsed_seconds": 34.359386682510376,
+  "verdict": "★★★ 多くの iso class が 5/5 達成 (143 個) — uniqueness 弱"
+}

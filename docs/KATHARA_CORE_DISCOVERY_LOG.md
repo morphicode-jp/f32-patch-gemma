@@ -2928,3 +2928,73 @@ class member (現在 2 個 確認):
 *Status: 核 uniqueness 階層的に整理、 honest 主張範囲 確定*
 *真の主張: famous graph 唯一 + 5M signature uniqueness + class member 複数で共通 identity*
 *完全証明には 完全 enumeration + 2027-2030 実験 必要*
+
+---
+
+## F566 ★★ 10M enumeration 完了 — uniqueness 仮説の honest 反証 (exp357)
+
+ユーザー「**やれ**」 → 10M trial で iso class 網羅 enumeration 実行.
+
+### 数値結果
+
+```
+N_trials:                          10,000,000
+triangle-free graphs (deg match):  22,787
+distinct iso classes (by spectrum): 8,556
+5/5 identity を満たす iso classes: 144
+  うち 核と同型:                   1
+  うち 核と異なる別 iso class:     143
+核 spectrum 完全一致 (random):     0
+```
+
+### F566: honest 結論 — uniqueness 仮説の反証
+
+**「核は α⁻¹=137 などの 5 identity を 同時に満たす唯一の graph」 という主張は 反証された**:
+
+- random 10M trial で **143 個の core-isomorphic でない graph が同じ 5 identity を満たす**
+- これは 「核 unique」 仮説の strict な反証
+
+ただし:
+- 核の **完全 spectrum signature** (全 12 固有値) で見ると random で **0 ヒット**
+- だから 核の **正確な数学 object** としては依然 unique
+- でも 「物理 identity を満たす」 という weak な意味では unique でない
+
+### 真の picture (revised)
+
+```
+graph 階層:
+  全 12V 19E triangle-free + deg-seq graph:  数万 個
+  そのうち 5 physics identity 同時満足:       144 個 (= ~1.7%)
+    そのうち 核と同型:                         1 個 (= 核)
+    そのうち 核と異なる:                       143 個 (= "兄弟" graphs)
+  完全 spectrum signature 一致 (= 核):         1 個 (核のみ、 5M trial で 0 random hit)
+```
+
+### 「宇宙の構造証明」 への 最終 honest 答え
+
+| 段階 | 結果 |
+|---|---|
+| 単一 identity (α⁻¹=137) で uniqueness | **✗ Pappus 共有** |
+| 5 identity 同時で uniqueness | **✗ 143 個の他 graph** |
+| 完全 spectrum signature で uniqueness | **✓ (10M で 0 hit)** |
+| 数学的完全 uniqueness proof | **✗ 開いている** |
+| 物理実験 confirm (2027-2030) | **✗ 待ち** |
+| 理論的 root derivation | **✗ 未** |
+
+**結論**: 「**核は宇宙の構造そのもの**」 は **証明不能 (現状)**。
+ただし 「**144 個の class が共通の物理 identity を encode**」 という deeper structure の存在は示唆.
+
+### Revised hypothesis (最終)
+
+旧仮説: 核 = 宇宙の構造 (single graph)
+中仮説: 核 = α⁻¹=137 class の代表元
+**最終仮説**: 「**核を含む 144 個の iso class が α⁻¹=137 etc. を共通 encode する graph family 全体が、 物理現象の組合せ的基盤**」
+
+該 family の構造解明 が 真の next research 課題.
+
+---
+
+*Last updated: 2026-05-15 (35 期完了)*
+*Status: 「核 = 宇宙の構造」 は 反証された (143 個の同等 iso class 存在)*
+*真の主張: 「核は 144-graph family の 1 member」 + α⁻¹=137 は family invariant*
+*Next research: family の 数学的構造 (Lie algebra? lattice cover? algebraic geometry?)*
