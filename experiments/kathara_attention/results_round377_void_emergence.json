@@ -1,0 +1,38 @@
+{
+  "n_seeds": 5,
+  "avg_final_edges": 23.2,
+  "iso_core_count": 0,
+  "all_void_broke_to_structure": true,
+  "results": [
+    {
+      "seed": 42,
+      "final_n_edges": 20,
+      "final_score": 28,
+      "iso_core": false
+    },
+    {
+      "seed": 123,
+      "final_n_edges": 19,
+      "final_score": 20,
+      "iso_core": false
+    },
+    {
+      "seed": 7,
+      "final_n_edges": 25,
+      "final_score": 20,
+      "iso_core": false
+    },
+    {
+      "seed": 2024,
+      "final_n_edges": 25,
+      "final_score": 20,
+      "iso_core": false
+    },
+    {
+      "seed": 31415,
+      "final_n_edges": 27,
+      "final_score": -12,
+      "iso_core": false
+    }
+  ]
+}

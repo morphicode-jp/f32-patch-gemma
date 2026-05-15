@@ -1,0 +1,8 @@
+{
+  "alpha_derived": "137 EXACT via Tr A^4 / 2 + 2 (F486)",
+  "c_status": "natural unit = 1, graph mapping qualitative",
+  "G_status": "α^n form for α_G order, no exact derive",
+  "hbar_status": "spectral gap proxy, no exact derive",
+  "k_B_status": "entropy/energy ratio proxy",
+  "honest_result": "4 物理定数 derive: α は ◎、 他 3 は qualitative"
+}

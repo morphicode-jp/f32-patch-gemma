@@ -1,0 +1,61 @@
+{
+  "12V_K1": {
+    "Tr_A4": 1020,
+    "alpha_inv": 512
+  },
+  "24V_Cay_total": 165,
+  "24V_triangle_free": 48,
+  "24V_alpha_137_match": 0,
+  "24V_multipartite": {
+    "K_{4,4,4,4,4,4}": {
+      "Tr_A4": 161280,
+      "alpha_inv": 80642
+    },
+    "K_{6,6,6,6}": {
+      "Tr_A4": 108864,
+      "alpha_inv": 54434
+    }
+  },
+  "36V_samples": [
+    {
+      "gens": [
+        1,
+        5,
+        9
+      ],
+      "alpha_inv": 2090
+    },
+    {
+      "gens": [
+        1,
+        7,
+        11
+      ],
+      "alpha_inv": 1838
+    },
+    {
+      "gens": [
+        1,
+        4,
+        6
+      ],
+      "alpha_inv": 2054
+    },
+    {
+      "gens": [
+        1,
+        8,
+        17
+      ],
+      "alpha_inv": 2270
+    },
+    {
+      "gens": [
+        1,
+        6,
+        10
+      ],
+      "alpha_inv": 1766
+    }
+  ]
+}
