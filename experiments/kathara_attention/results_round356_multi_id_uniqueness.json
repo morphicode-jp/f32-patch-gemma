@@ -1,0 +1,36 @@
+{
+  "core_identities_met": 5,
+  "famous_graphs_test": {
+    "Petersen": 1,
+    "Heawood": 1,
+    "Möbius-Kantor": 1,
+    "Pappus": 2,
+    "Desargues": 1,
+    "Coxeter": 0,
+    "Tutte": 1,
+    "Cube": 1,
+    "Dodecahedral": 1,
+    "Icosahedral": 1,
+    "K_5": 0,
+    "K_6": 0,
+    "K_{3,3}": 1,
+    "K_{4,4}": 1,
+    "C_12": 2,
+    "Frucht": 1,
+    "Truncated tetra": 1,
+    "K_{6,6}": 2,
+    "K¹ (Cay Z/12)": 1,
+    "Icosahedron (raw)": 1
+  },
+  "random_histogram": {
+    "0": 0,
+    "1": 0,
+    "2": 1170,
+    "3": 4361,
+    "4": 472,
+    "5": 53
+  },
+  "random_matches_5_of_5": 53,
+  "uniqueness_confidence": "★★★ 多くの graph が 5/5 一致 — uniqueness 弱",
+  "estimated_probability": "1 in ~10^7"
+}

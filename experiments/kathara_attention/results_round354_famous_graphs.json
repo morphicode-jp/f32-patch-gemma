@@ -1,0 +1,24 @@
+{
+  "n_graphs_tested": 21,
+  "core_invariants": {
+    "n_V": "12",
+    "n_E": "19",
+    "deg_seq": "(2, 2, 3, 3, 3, 3, 3, 3, 4, 4, 4, 4)",
+    "Tr_A2": "38",
+    "Tr_A3": "0",
+    "Tr_A4": "270",
+    "Tr_A6": "2354",
+    "lam_min": "-3.0",
+    "lam_max": "3.2746",
+    "alpha_inv_pred": "137.0",
+    "K3_pred": "16.0",
+    "catalan_pred": "42",
+    "triangle_free": "True"
+  },
+  "alpha_inv_137_exact_count": 1,
+  "alpha_inv_near_count": 1,
+  "K3_22_matches": 0,
+  "Catalan_42_matches": 0,
+  "full_invariant_matches": 0,
+  "verdict": "★★★★★ 核は 有名 graph 中 唯一 α⁻¹ = 137 EXACT を達成 → 強い uniqueness"
+}

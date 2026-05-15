@@ -1,0 +1,20 @@
+{
+  "matches_270": [
+    "Pappus (18V)"
+  ],
+  "core_Tr_A4": 270,
+  "Pappus_Tr_A4": 270,
+  "Pappus_properties": {
+    "n_V": 18,
+    "n_E": 27,
+    "girth": 6,
+    "bipartite": true,
+    "association": "Pappus configuration / PGL(3,2)"
+  },
+  "revised_hypothesis": "Universe = class of graphs satisfying Tr(A^4) = 270",
+  "next_steps": [
+    "find all class members",
+    "characterize class mathematically",
+    "test if all members share K3=22, Catalan=42 etc."
+  ]
+}
