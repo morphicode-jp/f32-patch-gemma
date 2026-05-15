@@ -1,0 +1,21 @@
+{
+  "spectral_dim_t1": 1.756988502300541,
+  "core_degrees": [
+    2.0,
+    4.0,
+    3.0,
+    3.0,
+    4.0,
+    3.0,
+    3.0,
+    4.0,
+    3.0,
+    3.0,
+    4.0,
+    2.0
+  ],
+  "degree_var_over_mean": 0.14912280701754385,
+  "clustering_global": 0.0,
+  "M_theory_implied_n": 6.260712569033306,
+  "status": "continuum limit partial; spectral dim + scaling math derive ✓"
+}

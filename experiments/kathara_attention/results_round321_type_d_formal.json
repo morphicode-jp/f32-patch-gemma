@@ -1,0 +1,22 @@
+{
+  "type_d_formal": {
+    "form": "exp((lam_min - lam_max) * n)",
+    "lam_max": 3.2745986103819376,
+    "lam_min": -3.0,
+    "spectral_gap": 1.5745820212714696
+  },
+  "L4_unknowns_origin": {
+    "360": "|A_6| or |W(H_3)| 関連",
+    "336": "12 × 28 = |V| × SO(8)",
+    "312": "12 × 26 = |V| × bosonic D",
+    "324": "未確定",
+    "353": "prime, 未確定"
+  },
+  "Jarlskog_J_quark": {
+    "formula": "1/(12 × 19 × 137) = 1/31236",
+    "value": 3.201434242540658e-05,
+    "actual": 3.18e-05,
+    "diff_pct": 0.6740327842974237,
+    "status": "★ candidate strong (差 0.6%)"
+  }
+}

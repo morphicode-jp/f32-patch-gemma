@@ -1,0 +1,17 @@
+{
+  "graviton_mass": {
+    "core_pred": 0.00027624490545374663,
+    "current_limit": "1.2e-23 eV"
+  },
+  "gravitino_mass_hypothesis": "Lambda_SUSY = M_GUT/√α⁻¹ ≈ 10^15.5 GeV",
+  "Page_curve_F499": {
+    "ratio": 0.017241379310344827,
+    "formula": "|Aut|/(|V|·|E|+|Aut|)"
+  },
+  "GUP_beta": {
+    "value": 0.18698060941828254,
+    "formula": "a_4/(Tr A²)²"
+  },
+  "Lambda_eff_QG": "1.34e17 GeV (F330 既知)",
+  "BH_area_quantum": "4 G_N"
+}

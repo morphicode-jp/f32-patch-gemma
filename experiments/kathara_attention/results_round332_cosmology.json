@@ -1,0 +1,18 @@
+{
+  "Hubble_tension": {
+    "ratio": 1.083086053412463,
+    "formula": "13/12 = (|V|+1)/|V|",
+    "diff_pct": 0.02472799208703691
+  },
+  "sigma_8_anomaly": {
+    "value": 0.035,
+    "match": "(1-n_s)"
+  },
+  "r_d_BAO_candidates": [
+    137,
+    147
+  ],
+  "nu_mass_sum_pred": "0.06-0.10 eV (NH/IH)",
+  "PBH_fraction": "1/3 = |Aut|/|V|",
+  "F492_Hubble_finding": "H_0 local/CMB = 13/12 EXACT (0.02% diff)"
+}

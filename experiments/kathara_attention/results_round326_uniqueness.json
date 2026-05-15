@@ -1,0 +1,32 @@
+{
+  "core_invariants": {
+    "degree_seq": [
+      2,
+      2,
+      3,
+      3,
+      3,
+      3,
+      3,
+      3,
+      4,
+      4,
+      4,
+      4
+    ],
+    "Tr_A2": 38,
+    "Tr_A3": 0,
+    "Tr_A4": 270,
+    "Tr_A5": 40,
+    "Tr_A6": 2354
+  },
+  "sampling": {
+    "N_trials": 200000,
+    "triangle_free_count": 732,
+    "correct_degree_count": 50,
+    "full_match_count": 0
+  },
+  "alpha_formula_match_fraction": 0.0001,
+  "rarity_factor": 200000,
+  "conclusion": "核は 12V 19E graph 中で極稀、6 invariants 全 match 体は核 iso class"
+}

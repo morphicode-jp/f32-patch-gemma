@@ -1,0 +1,41 @@
+{
+  "renormalization_hypothesis": "Q_obs = Q_bare(core) × (1 + α loop + α² + ...)",
+  "examples": {
+    "alpha_inv": {
+      "bare": 137,
+      "obs": 137.036,
+      "delta": 0.036,
+      "order": "α/2π"
+    },
+    "mp_me": {
+      "bare": 1836,
+      "obs": 1836.15,
+      "delta": 0.15,
+      "order": "α²"
+    },
+    "higgs_VEV": {
+      "bare": 246,
+      "obs": 246.22,
+      "delta": 0.22,
+      "order": "α"
+    },
+    "higgs_mass": {
+      "bare": 125,
+      "obs": 125.1,
+      "delta": 0.1,
+      "order": "α"
+    }
+  },
+  "exact_constants": [
+    "CMB n_s",
+    "Catalan 42",
+    "E_8 240",
+    "M-theory 11",
+    "Hubble 13/12",
+    "dark δw 1/33",
+    "J_pmns 1/30",
+    "ν ratio 1/33"
+  ],
+  "F503_finding": "核 bare + QFT 補正 = 観測、order match QED loop",
+  "fixed_point_hypothesis": "核 = β-function UV fixed point (asymptotic safety candidate)"
+}

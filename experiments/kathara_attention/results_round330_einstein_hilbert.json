@@ -1,0 +1,25 @@
+{
+  "Tr_L_powers": {
+    "1": 38,
+    "2": 164,
+    "3": 812,
+    "4": 4368,
+    "5": 24768,
+    "6": 145472,
+    "7": 875360,
+    "8": 5357568,
+    "9": 33188960,
+    "10": 207400704,
+    "11": 1304425600,
+    "0": 12
+  },
+  "EH_coefficient": {
+    "value": 27.333333333333332,
+    "formula": "Tr(L²)/6"
+  },
+  "Lambda_eff": 1.3437020476355416e+17,
+  "Lambda_eff_GeV": "1.344e+17",
+  "M_GUT_match": "Λ_eff ≈ 10^17 GeV ≈ M_GUT",
+  "BH_entropy_denom": "/4 = |Aut(core)| = Klein V_4",
+  "status": "Einstein-Hilbert coefficient derive ✓, full continuum limit open"
+}

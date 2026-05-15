@@ -1,0 +1,22 @@
+{
+  "m_p_m_e": {
+    "formula": "36 × 51 = SO(9) × Nuclear shell 51",
+    "value": 1836,
+    "actual": 1836.15267
+  },
+  "muon_g2_leading": {
+    "formula": "α/(2π) = Schwinger",
+    "value": 0.0011614097335977778,
+    "actual": 0.00116592061
+  },
+  "dark_energy_dw": {
+    "formula": "1/33 = ν mass ratio",
+    "value": 0.030303030303030304,
+    "actual": 0.030000000000000027
+  },
+  "CMB_n_s_delta": {
+    "formula": "7/200",
+    "value": 0.035,
+    "actual": 0.03500000000000003
+  }
+}

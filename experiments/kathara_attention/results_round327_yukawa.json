@@ -1,0 +1,24 @@
+{
+  "yukawa_table": {
+    "y_t  (top)": 0.99,
+    "y_b  (bottom)": 0.0241,
+    "y_c  (charm)": 0.00731,
+    "y_tau (tau)": 0.0102,
+    "y_s  (strange)": 0.00054,
+    "y_mu (muon)": 0.000607,
+    "y_d  (down)": 2.74e-05,
+    "y_u  (up)": 1.24e-05,
+    "y_e  (electron)": 2.94e-06
+  },
+  "yt_over_yc": 135.43091655266758,
+  "yt_over_yc_eq_alpha_inv": "★ F487: y_t/y_c ≈ 137 = α⁻¹",
+  "Higgs_VEV": {
+    "v": 246,
+    "formula": "19 × 13 - 1 = |E|×13 - 1"
+  },
+  "Higgs_self_coupling": {
+    "lambda_H": 0.12930472932778106,
+    "core_match": "v=2m_H=250 hyp で 1/8 EXACT"
+  },
+  "3_sectors_3_fields": "Up/Down/Lepton ↔ Q(√5)/S_4/Q hypothesis"
+}

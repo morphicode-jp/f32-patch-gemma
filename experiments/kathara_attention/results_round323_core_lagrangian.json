@@ -1,0 +1,42 @@
+{
+  "lagrangian": {
+    "form": "L = (1/2)φ̇² - (1/2)φ^T L_G φ - (m²/2)φ² - V_int",
+    "equation_of_motion": "φ̈ = -L_G φ - m²φ - ∂V_int/∂φ"
+  },
+  "free_spectrum": {
+    "eigenvalues_L_G": [
+      6.453708453429702e-16,
+      1.2063955066651586,
+      1.2679491924311228,
+      2.0,
+      2.0000000000000004,
+      2.7159209561595876,
+      3.557536515835051,
+      3.999999999999994,
+      4.000000000000001,
+      4.732050807568877,
+      5.9999999999999964,
+      6.520147021340199
+    ],
+    "vacuum_energy": 9.882621902173499
+  },
+  "heat_kernel_coefficients": {
+    "a_0": 12,
+    "a_2": 19,
+    "a_3": 0,
+    "a_4": 270,
+    "a_5": 40,
+    "a_6": 2354,
+    "a_7": 1092,
+    "a_8": 22174,
+    "a_10": 216438
+  },
+  "physics_interpretation_hypothesis": {
+    "a_0_12": "cosmological constant, SM 12 fermions",
+    "a_2_19": "Einstein-Hilbert / Newton G",
+    "a_3_4": "Chern-Simons / triangles",
+    "Newton_G_proportional_to": "1/a_2 = 1/19",
+    "Lambda_cosmo_proportional_to": "a_0/a_2 = 12/19"
+  },
+  "status": "Lagrangian derive complete, continuum limit hypothesis"
+}

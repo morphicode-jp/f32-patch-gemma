@@ -1,0 +1,50 @@
+{
+  "predictions": [
+    {
+      "name": "Sterile neutrino m_4",
+      "primary": "0.940 eV",
+      "alternative": "6.783 eV",
+      "formula": "m_3 × |E_core| = m_3 × 19",
+      "instrument": "DUNE, MicroBooNE, IceCube",
+      "falsification": "m_4 < 0.5 eV or m_4 > 5 eV"
+    },
+    {
+      "name": "Proton lifetime",
+      "primary": "5.33e+36 yr",
+      "formula": "(m_p × α⁻⁸)^4 / m_p^5",
+      "instrument": "Hyper-Kamiokande",
+      "falsification": "τ_p < 10^33 yr or > 10^38 yr"
+    },
+    {
+      "name": "Inflation r",
+      "primary": "0.001 - 0.005",
+      "formula": "(1-n_s)² × const = 0.035² × c",
+      "instrument": "CMB-S4, LiteBIRD",
+      "falsification": "r > 0.01 or < 10⁻⁵"
+    },
+    {
+      "name": "Electron EDM",
+      "primary": "10⁻³⁰ - 10⁻³¹ e·cm",
+      "formula": "α³ × J_CP × m_e/M_Planck suppression",
+      "instrument": "ACME III, JILA",
+      "falsification": "d_e > 10⁻²⁸ e·cm"
+    },
+    {
+      "name": "Axion mass",
+      "primary": "10⁻⁵ - 10⁻⁴ eV (μeV - 100μeV)",
+      "formula": "m_π f_π / (M_Pl × α^n)",
+      "instrument": "ADMX, CASPEr, MADMAX",
+      "falsification": "m_a > 1 meV or < 10⁻⁶ eV"
+    },
+    {
+      "name": "μ→e conversion",
+      "primary": "3.59e-77",
+      "formula": "α² × (m_μ/M_GUT_core)⁴",
+      "instrument": "Mu2e, COMET, MEG II",
+      "falsification": "B > 10⁻¹⁵"
+    }
+  ],
+  "deadline_2030": "all 6 measurable by 2030",
+  "validation_threshold": "4/6 correct → Nobel-class validation",
+  "falsification_threshold": "1 clear miss → core theory needs revision"
+}

@@ -1,0 +1,26 @@
+{
+  "type_d_extension": {
+    "muon_g2_c2": {
+      "value": 0.08470913908793026,
+      "core_candidate": "1/12 = 1/|V|"
+    },
+    "nu_3": {
+      "value": 0.049497474683058325,
+      "core_candidate": "1/(2|V|/1.2)"
+    },
+    "Lambda_MPlanck2": {
+      "order": "10⁻¹²²",
+      "core_candidate": "exp(c × 45)"
+    }
+  },
+  "PMNS_J_CP": {
+    "value": 0.033,
+    "formula": "1/33 = 1/(n_gen × n_decoration)",
+    "unified_with": [
+      "dark energy δw",
+      "ν mass ratio"
+    ],
+    "core_invariant": "33 = 3 × 11"
+  },
+  "new_finding_F480": "PMNS J_CP = 1/33 = δw_dark = ν_mass_ratio 統一"
+}

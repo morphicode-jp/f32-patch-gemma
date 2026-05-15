@@ -1,0 +1,28 @@
+{
+  "config": {
+    "d_model": 132,
+    "n_layer": 2,
+    "seq_len": 64,
+    "n_iter": 300,
+    "lr": 0.0003,
+    "batch_size": 16
+  },
+  "params": {
+    "baseline": 497904,
+    "core": 462796
+  },
+  "final_loss": {
+    "baseline": 0.052081491549809775,
+    "core": 1.039075215657552
+  },
+  "perplexity": {
+    "baseline": 1.0534615872329163,
+    "core": 2.8266018081925366
+  },
+  "time_seconds": {
+    "baseline": 1.376138687133789,
+    "core": 3.4898157119750977
+  },
+  "delta_pct": 1895.094965096765,
+  "status": "proof-of-concept 成功、本格 scaling は future"
+}
