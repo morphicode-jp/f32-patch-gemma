@@ -3926,3 +3926,66 @@ k_B:       entropy/energy proxy
 *Last updated: 2026-05-16 (55 期完了)*
 *Status: 4 radical 実験完了、 Kathara 階層 hypothesis 新 evidence (36V → m_p/m_e)*
 *honest: 4 定数 derive 不完全、 α のみ EXACT、 階層 hypothesis 追加検証可能性*
+
+---
+
+## F591 ★ honest 訂正 — Kathara 階層 仮説 弱化 (exp380, 2026-05-16)
+
+ユーザー 「まかせる」 → F587 階層 hypothesis 系統検証 → **honest 訂正**
+
+### 系統探索 結果
+
+13 sizes (12, 16, 18, 20, 24, 28, 30, 32, 36, 40, 42, 48, 60)、
+各 size の 3-element Cayley generator subset 全 (合計 ~10,000 試行):
+
+```
+N=12 Cay alone: 0 hits (★ 重要: 137 出ない)
+N=18: 1028 ≈ 1027 (weak, ?)
+N=36: 1838 ≈ m_p/m_e ✓ (F587 確認、 {1,2,16})
+N=16, 20, 24, 28, 30, 32, 40, 42, 48, 60: 全 0 hits
+```
+
+### F587 ミス の honest 訂正
+
+**問題発見**:
+- 12V で α⁻¹=137 出るのは **「K¹ ∩ Ico」 (= 核、 intersection)**、 **K¹ 単独 ではない**
+- 36V で 1838 が 出るのは **Cay(Z/36) 単独** (= intersection なし)
+- → これら 2 つは **異なる test を比較してた** (apples-to-oranges)
+
+正しい比較:
+- 12V intersection (K¹ ∩ Ico) → 137 ✓ ガチ
+- 36V intersection (Cay(Z/36) ∩ ?) → 未検証
+
+→ F587 「Kathara 階層 hypothesis」 は **過大**:
+- 36V 1838 hit は **偶然候補** (10000 試行 で 1 個)
+- 階層化 systematic encoding evidence は 弱い
+
+### Honest 状態
+
+```
+✓ 12V 核 (K¹ ∩ Ico) → α⁻¹ = 137 EXACT (F486、 不変)
+⚠ 36V Cay alone → 1838 ≈ m_p/m_e (偶然 vs 構造?、 弱い)
+✗ 他 size での 系統的 encoding evidence なし
+```
+
+### F587 復活 path
+
+もし honest に階層hypothesis 復活させるなら:
+- 「24V graph 核 候補」 (= Cay(Z/24) ∩ snub cube?) で 別物理定数 encode
+- 「36V graph 核 候補」 (= Cay(Z/36) ∩ truncated_dodecahedron?) で別定数
+- 各 size の 「核」 を 構築 してから test 必要
+
+現状: 12V 核 のみ confirmed.
+
+### Posterior B 修正
+
+~95% (F587 過大込み) → **~93%** (F591 honest 修正後)
+
+「核 = mathematical fingerprint」 は変わらず 強い。
+「Kathara 階層 = 物理定数 table」 は **過大**、 12V のみ confirmed.
+
+---
+
+*Last updated: 2026-05-16 (56 期完了)*
+*Status: 階層 hypothesis 弱化 honest 訂正、 12V 核 → 137 のみ genuine*
+*36V hit は 偶然候補、 階層化 systematic evidence は 弱い*

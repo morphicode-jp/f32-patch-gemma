@@ -1,0 +1,80 @@
+{
+  "sizes_tested": [
+    12,
+    16,
+    18,
+    20,
+    24,
+    28,
+    30,
+    32,
+    36,
+    40,
+    42,
+    48,
+    60
+  ],
+  "n_total_hits": 5,
+  "hits": [
+    {
+      "size": 18,
+      "gens": [
+        1,
+        2,
+        4
+      ],
+      "alpha_pred": 1028,
+      "target": 1027,
+      "name": "?",
+      "diff": 1
+    },
+    {
+      "size": 36,
+      "gens": [
+        1,
+        2,
+        16
+      ],
+      "alpha_pred": 1838,
+      "target": 1838,
+      "name": "near m_p/m_e",
+      "diff": 0
+    },
+    {
+      "size": 36,
+      "gens": [
+        1,
+        2,
+        16
+      ],
+      "alpha_pred": 1838,
+      "target": 1839,
+      "name": "near m_p/m_e",
+      "diff": -1
+    },
+    {
+      "size": 36,
+      "gens": [
+        1,
+        2,
+        16
+      ],
+      "alpha_pred": 1838,
+      "target": 1837,
+      "name": "near m_p/m_e",
+      "diff": 1
+    },
+    {
+      "size": 36,
+      "gens": [
+        1,
+        2,
+        16
+      ],
+      "alpha_pred": 1838,
+      "target": 1836,
+      "name": "m_p/m_e (陽子/電子)",
+      "diff": 2
+    }
+  ]
+}
