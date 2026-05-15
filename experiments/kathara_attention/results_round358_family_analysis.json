@@ -1,0 +1,50 @@
+{
+  "core_invariants": {
+    "n_V": "12",
+    "n_E": "19",
+    "deg_seq": "(2, 2, 3, 3, 3, 3, 3, 3, 4, 4, 4, 4)",
+    "Tr_A^2": "38",
+    "Tr_A^3": "0",
+    "Tr_A^4": "270",
+    "Tr_A^5": "40",
+    "Tr_A^6": "2354",
+    "Tr_A^7": "1092",
+    "Tr_A^8": "22174",
+    "lam_min": "-3.0",
+    "lam_max": "3.2746",
+    "spec_short": "(-3.0, -2.62, -1.47, -0.62, -0.62, -0.38)",
+    "girth": "4",
+    "diameter": "3",
+    "aut_count": "4",
+    "C_4_count": "7",
+    "C_5_count": "4",
+    "connected": "True",
+    "bipartite": "False"
+  },
+  "n_siblings_collected": 111,
+  "higher_Tr_sample_test": {
+    "matches_core_higher": 0,
+    "differs": 30,
+    "sample_size": 30
+  },
+  "aut_distribution": {
+    "1": 40,
+    "2": 10
+  },
+  "C_4_distribution": {
+    "7": 50
+  },
+  "C_5_distribution": {
+    "6": 4,
+    "12": 2,
+    "9": 11,
+    "8": 14,
+    "7": 8,
+    "10": 7,
+    "11": 4
+  },
+  "core_unique_properties": [
+    "|Aut| = 4",
+    "C_5 = 4"
+  ]
+}

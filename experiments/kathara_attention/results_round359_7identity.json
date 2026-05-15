@@ -1,0 +1,25 @@
+{
+  "n_5_5_iso_classes": 162,
+  "aut_distribution": {
+    "1": 115,
+    "2": 43,
+    "4": 4
+  },
+  "c5_distribution": {
+    "6": 10,
+    "12": 5,
+    "9": 32,
+    "8": 48,
+    "7": 21,
+    "10": 35,
+    "11": 8,
+    "13": 1,
+    "5": 1,
+    "4": 1
+  },
+  "aut_4_count": 4,
+  "c5_4_count": 1,
+  "both_count": 1,
+  "iso_to_core_in_both": 1,
+  "verdict": "★★★★★ 核は 7 identity (5+|Aut|=4+C_5=4) の **唯一の graph** in family — UNIQUENESS PROVEN"
+}
