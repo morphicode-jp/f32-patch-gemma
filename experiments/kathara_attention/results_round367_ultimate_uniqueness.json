@@ -1,0 +1,44 @@
+{
+  "atlas_hits": {
+    "0": 814,
+    "1": 388,
+    "2": 39,
+    "3": 0,
+    "4": 0,
+    "5": 0,
+    "6": 0,
+    "7": 0
+  },
+  "famous_hits": {
+    "Petersen (10V)": 1,
+    "Heawood (14V)": 1,
+    "Möbius-Kantor (16V)": 1,
+    "Pappus (18V)": 2,
+    "Desargues (20V)": 1,
+    "Coxeter (28V)": 0,
+    "Tutte (46V)": 1,
+    "Cube (8V)": 1,
+    "Dodecahedral (20V)": 1,
+    "Icosahedral (12V)": 1,
+    "K_5": 0,
+    "K_6": 0,
+    "K_{3,3}": 1,
+    "K_{4,4}": 1,
+    "K_{6,6} (12V)": 2,
+    "C_12 (12V)": 2,
+    "Frucht (12V)": 1,
+    "Truncated tetra (12V)": 1,
+    "K¹ alone (12V)": 1,
+    "Ico alone (12V)": 1,
+    "核 (K¹∩Ico, 12V)": 7
+  },
+  "random_V_max_identities": {
+    "8": 3,
+    "10": 2,
+    "12": 3,
+    "14": 3,
+    "16": 3
+  },
+  "core_7_of_7": true,
+  "famous_best_other_than_core": null
+}
