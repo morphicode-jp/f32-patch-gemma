@@ -1,0 +1,17 @@
+{
+  "family_size": 162,
+  "bipartite": 0,
+  "non_bipartite": 162,
+  "connected": 162,
+  "disconnected": 0,
+  "girth_distribution": {
+    "4": 162
+  },
+  "C_4_distribution_sample": {
+    "7": 10
+  },
+  "P_2_distribution_sample": {
+    "44": 10
+  },
+  "hypothesis_162": "6 × 27 = 6 × cubic surface lines (E_6 connection?)"
+}

@@ -1,0 +1,12 @@
+{
+  "core_char_poly": "x*(x + 3)*(x**2 - x - 1)**2*(x**2 + 3*x + 1)*(x**4 - 4*x**3 + 9*x - 4)",
+  "S_4_quartic": "x⁴-4x³+9x-4 (Galois = S_4, |S_4|=24)",
+  "resolvent_cubic": "y³ - 20y - 17 = 0 (E(K¹)=20 + Wiener/6=17 connection)",
+  "pappus_char_poly": "x**4*(x - 3)*(x + 3)*(x**2 - 3)**6",
+  "three_number_fields": "Q ⊕ Q(√5) ⊕ K_S_4_quartic",
+  "physical_interpretation": {
+    "Q": "整数 charge / CPT",
+    "Q(√5)": "icosahedral / K3 Mathieu",
+    "S_4 quartic": "24 系 (Niemeier, K3 χ)"
+  }
+}
