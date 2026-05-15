@@ -1,0 +1,17 @@
+{
+  "F551_CDF_W": {
+    "anomaly": "m_W CDF = 80433 vs SM 80357 (7σ)",
+    "core_hyp": "SM + α/(2π) 補正 (核 繰り込み 1-loop)",
+    "pred_value": 80450.32740196271,
+    "match": "差 17 MeV vs CDF"
+  },
+  "F552_muon_g2": "qualitative hadron VP correction",
+  "F553_R_D": "core では small 偏差予測、leptoquark 必要",
+  "F554_ATOMKI_X17": {
+    "value_MeV": 17.50634887225,
+    "formula": "m_e × α⁻¹ / |Aut|",
+    "ATOMKI_exp": 17.0,
+    "diff_pct": 3
+  },
+  "F555_sterile_nu": "F501 再述"
+}

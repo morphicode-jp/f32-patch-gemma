@@ -1,0 +1,30 @@
+{
+  "F556_L4_resonances": [
+    312,
+    324,
+    336,
+    353,
+    360
+  ],
+  "F557_higgs_5n_ladder": {
+    "5^4": 625,
+    "5^5": 3125,
+    "5^6": 15625
+  },
+  "F558_Zp_candidates_GeV": {
+    "low": 228,
+    "mid": 2000,
+    "high": 31236
+  },
+  "F559_leptoquark_GeV": 2025,
+  "F560_dark_photon_MeV": {
+    "N=4_X17": 17.5,
+    "N=12": 5.8
+  },
+  "F561_ALP_MeV": {
+    "m_pi/137": 1.0184914987192526,
+    "m_pi/19": 7.34578947368421,
+    "m_pi/12": 11.630833333333333
+  },
+  "experiments": "all testable at LHC HL-LHC or future colliders"
+}
