@@ -1,0 +1,31 @@
+{
+  "benchmarks": [
+    {
+      "name": "Rastrigin (dim 5)",
+      "target": 0.0,
+      "zenron": 1.3632714458256316,
+      "random": 15.781386291329376
+    },
+    {
+      "name": "Rosenbrock (dim 5)",
+      "target": 0.0,
+      "zenron": 3.8694355771749676,
+      "random": 15.528958975778835
+    },
+    {
+      "name": "Sphere (dim 5)",
+      "target": 0.0,
+      "zenron": 0.007414171728481026,
+      "random": 1.7591252733137963
+    },
+    {
+      "name": "Schwefel (dim 5)",
+      "target": 0.0,
+      "zenron": 1062.9339300744753,
+      "random": 569.6188367573241
+    }
+  ],
+  "zenron_wins": 3,
+  "total_benchmarks": 4,
+  "verdict": "★★★★ Zenron 3/4 勝、 多くの problem で 優"
+}

@@ -1,0 +1,91 @@
+{
+  "seeds": [
+    42,
+    123,
+    7,
+    2024,
+    31415,
+    271828,
+    9999,
+    1,
+    100,
+    65535
+  ],
+  "n_reached_core": 1,
+  "total_seeds": 10,
+  "convergence_rate": 0.1,
+  "mean_steps_to_core": 50.0,
+  "verdict": "★★★ 1/10 到達 → attractor with caveats",
+  "details": [
+    {
+      "seed": 42,
+      "steps": 500,
+      "is_core": false,
+      "final": 5,
+      "time_s": 4.683987379074097
+    },
+    {
+      "seed": 123,
+      "steps": 500,
+      "is_core": false,
+      "final": 6,
+      "time_s": 4.9768455028533936
+    },
+    {
+      "seed": 7,
+      "steps": 500,
+      "is_core": false,
+      "final": 5,
+      "time_s": 4.8706066608428955
+    },
+    {
+      "seed": 2024,
+      "steps": 500,
+      "is_core": false,
+      "final": 5,
+      "time_s": 4.704280376434326
+    },
+    {
+      "seed": 31415,
+      "steps": 500,
+      "is_core": false,
+      "final": 6,
+      "time_s": 4.774621963500977
+    },
+    {
+      "seed": 271828,
+      "steps": 500,
+      "is_core": false,
+      "final": 5,
+      "time_s": 5.112539529800415
+    },
+    {
+      "seed": 9999,
+      "steps": 500,
+      "is_core": false,
+      "final": 5,
+      "time_s": 4.728255748748779
+    },
+    {
+      "seed": 1,
+      "steps": 500,
+      "is_core": false,
+      "final": 5,
+      "time_s": 4.9329445362091064
+    },
+    {
+      "seed": 100,
+      "steps": 50,
+      "is_core": true,
+      "final": 7,
+      "time_s": 0.43789029121398926
+    },
+    {
+      "seed": 65535,
+      "steps": 500,
+      "is_core": false,
+      "final": 5,
+      "time_s": 5.153237342834473
+    }
+  ]
+}
