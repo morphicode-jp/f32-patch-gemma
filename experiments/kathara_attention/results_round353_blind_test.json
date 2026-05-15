@@ -1,0 +1,94 @@
+{
+  "n_core_numbers": 1230,
+  "n_physical_constants": 48,
+  "core_hits_1pct": 28,
+  "core_hits_01pct": 11,
+  "random_avg_1pct": 24.67,
+  "random_std_1pct": 3.3318313282637826,
+  "random_max_1pct": 34,
+  "random_avg_01pct": 8.15,
+  "random_std_01pct": 1.7571283390805579,
+  "random_max_01pct": 13,
+  "z_score_1pct": 0.9994503538494733,
+  "z_score_01pct": 1.6219646206897456,
+  "verdict": "★★ 核は random よりやや多くヒット (1.6σ) → 弱い証拠",
+  "core_exact_hits": [
+    {
+      "constant": "α⁻¹",
+      "value": 137.035999,
+      "core_formula": "Tr(A^4)/2 + 2",
+      "core_value": 137.0,
+      "diff_pct": 0.026269739530270356
+    },
+    {
+      "constant": "sin²θ_12",
+      "value": 0.307,
+      "core_formula": "|E|*Tr(A^2)/Tr(A^6)",
+      "core_value": 0.30671197960917584,
+      "diff_pct": 0.09381771688083088
+    },
+    {
+      "constant": "sin²θ_23",
+      "value": 0.5,
+      "core_formula": "|E|/Tr(A^2)",
+      "core_value": 0.5,
+      "diff_pct": 0.0
+    },
+    {
+      "constant": "r_inflation",
+      "value": 0.003,
+      "core_formula": "lam_max_0/Tr(A^7)",
+      "core_value": 0.0029987166761739356,
+      "diff_pct": 0.0427774608688138
+    },
+    {
+      "constant": "m_p_in_Λ_QCD",
+      "value": 4.32,
+      "core_formula": "lam_max_1+lam_min_1",
+      "core_value": 4.318050577860362,
+      "diff_pct": 0.04512551249163326
+    },
+    {
+      "constant": "m_η'_in_m_π",
+      "value": 6.86,
+      "core_formula": "lam_min_1*lam_min_1",
+      "core_value": 6.854101966249678,
+      "diff_pct": 0.08597716837205127
+    },
+    {
+      "constant": "K3_lattice_rank",
+      "value": 22,
+      "core_formula": "|E|+lam_min_0",
+      "core_value": 22.0,
+      "diff_pct": 0.0
+    },
+    {
+      "constant": "Catalan_C5",
+      "value": 42,
+      "core_formula": "max_deg+Tr(A^2)",
+      "core_value": 42,
+      "diff_pct": 0.0
+    },
+    {
+      "constant": "SM_fermion",
+      "value": 12,
+      "core_formula": "|V|",
+      "core_value": 12,
+      "diff_pct": 0.0
+    },
+    {
+      "constant": "BH_entropy_4",
+      "value": 4,
+      "core_formula": "max_deg",
+      "core_value": 4,
+      "diff_pct": 0.0
+    },
+    {
+      "constant": "Niemeier",
+      "value": 24,
+      "core_formula": "|V|+|V|",
+      "core_value": 24,
+      "diff_pct": 0.0
+    }
+  ]
+}
