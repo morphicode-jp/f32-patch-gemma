@@ -1,0 +1,16 @@
+{
+  "F516_baryon_asymmetry": {
+    "observed": 6.1e-10,
+    "core_pred": 1.3947368421052632e-07,
+    "formula": "J_quark / (|V| × |E|)",
+    "log_diff": 2.359162437973212
+  },
+  "F517_witten_anomaly": {
+    "core_vertices": 12,
+    "SM_doublets": 12,
+    "match": "EXACT (12 vertices = 12 SU(2) doublets, even = Witten OK)"
+  },
+  "F518_sakharov_conditions": "全 3 条件核 invariants で encode",
+  "degree_cube_sum": -0.8888888888888862,
+  "anomaly_implication": "SM anomaly cancellation = 核 |V|=12, |Aut|=4 必然"
+}

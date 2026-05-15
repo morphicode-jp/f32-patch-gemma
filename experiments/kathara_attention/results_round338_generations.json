@@ -1,0 +1,14 @@
+{
+  "F510_generation_count": {
+    "value": 3,
+    "formula": "degree(Resolvent cubic of S_4 quartic factor)",
+    "math": "S_4 / V_4 = S_3 → 3 orbit"
+  },
+  "F511_12_fermion_structure": {
+    "decomposition": "12 = 3 × 4 = |V| / |Aut|",
+    "interpretation": "3 generations × (u,d,e,ν)"
+  },
+  "F512_no_4th_generation": "Resolvent cubic は degree 3、4 世代 fermion 存在せず",
+  "char_poly": "x(x+3)(x²-x-1)²(x²+3x+1)(x⁴-4x³+9x-4)",
+  "resolvent": "y³ - 20y - 17 = 0"
+}

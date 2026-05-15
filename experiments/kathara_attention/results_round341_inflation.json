@@ -1,0 +1,19 @@
+{
+  "F519_tensor_scalar_r": {
+    "prediction": "0.002-0.004 (Starobinsky-like N≈57)",
+    "formula": "12/N², N=400/7≈57",
+    "detection_LiteBIRD": "2028+"
+  },
+  "F520_fNL": {
+    "value": 0.035,
+    "formula": "= 1 - n_s = 0.035"
+  },
+  "F521_inflation_model": "Starobinsky R² with M_inflation = M_Pl/α⁻¹ ≈ M_GUT",
+  "N_e_folds": 57.142857142857146,
+  "all_inflation_params": {
+    "n_s": 0.965,
+    "r": "0.002-0.004",
+    "f_NL": 0.035,
+    "alpha_run": "<0.001"
+  }
+}

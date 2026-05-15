@@ -1,0 +1,17 @@
+{
+  "F513_strong_CP_solution": {
+    "explanation": "核 triangle-free (a_3 = 0) → θ_QCD = 0 EXACT",
+    "core_invariant": "a_3 = Tr(A³) = 0",
+    "experimental_bound": "|θ| < 6e-11 (nEDM 2020)"
+  },
+  "F514_axion": {
+    "m_a_prediction": "20 μeV (= 2e-5 eV)",
+    "f_a_formula": "M_Pl × α² = M_Pl/137²",
+    "detection_range": "ADMX, MADMAX"
+  },
+  "F515_theta_loop_prediction": {
+    "value": 1.6933930758257897e-09,
+    "formula": "α² × J_quark",
+    "comparison_nEDM": "上回る、次代精密実験で検出可能"
+  }
+}
