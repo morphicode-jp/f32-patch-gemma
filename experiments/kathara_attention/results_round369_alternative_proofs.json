@@ -1,0 +1,16 @@
+{
+  "number_theoretic": {
+    "24197_prime": true,
+    "270_factor": "2 × 3³ × 5 = 6 × 45",
+    "162_factor": "2 × 3⁴ = 6 × 27"
+  },
+  "spectral_bounds": {
+    "lambda_min_integer": -3,
+    "Hoffman_bound": 5.737418795273131,
+    "actual_independence": 5,
+    "Hoffman_saturated": false,
+    "algebraic_connectivity": 1.2063955066651586
+  },
+  "kolmogorov_estimate_bits": 25,
+  "convergent_evidence": "All paths suggest E_6 / cubic surface connection"
+}
