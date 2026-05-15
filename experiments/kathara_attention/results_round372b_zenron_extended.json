@@ -1,0 +1,8 @@
+{
+  "pop_size": 200,
+  "n_steps_max": 1500,
+  "n_steps_actual": 59,
+  "found_7_of_7": true,
+  "final_max_weak": 5,
+  "final_max_full_sample": 5
+}
