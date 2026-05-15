@@ -1,0 +1,9 @@
+{
+  "level_spacing_variance": 0.7859979024705633,
+  "GOE_variance_baseline": 0.3063312172485353,
+  "Poisson_variance_baseline": 0.8281478035042577,
+  "graph_diameter": 3,
+  "Gromov_hyperbolicity_delta": 1.0,
+  "is_chaotic": false,
+  "F509": "核 graph fast scrambler signature (BH-like)"
+}

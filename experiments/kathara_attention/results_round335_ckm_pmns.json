@@ -1,0 +1,41 @@
+{
+  "CKM": {
+    "lambda_Cabibbo": {
+      "obs": 0.2245,
+      "core": 0.225,
+      "formula": "9/40 or 1/√20"
+    },
+    "A_Wolfenstein": {
+      "obs": 0.8134880283331928,
+      "core": 0.8,
+      "formula": "|Aut|/K¹_degree"
+    },
+    "delta_CP_quark": {
+      "obs": 65,
+      "core": 65,
+      "formula": "5 × 13 (K¹_deg × (|V|+1))"
+    }
+  },
+  "PMNS": {
+    "sin2_theta_12": {
+      "obs": 0.307,
+      "core_formula": "1/ln(26) (F324既知)"
+    },
+    "sin2_theta_23": {
+      "obs": 0.5,
+      "core_formula": "1/2 maximal"
+    },
+    "sin2_theta_13": {
+      "obs": 0.022,
+      "core": 0.021892057721270744,
+      "formula": "3α = 3/137"
+    },
+    "delta_CP_lep_vs_quark_ratio": "−3"
+  },
+  "new_findings": [
+    "F504: λ=1/√20",
+    "F505: δ_CP=5×13",
+    "F506: sin²θ_13=3α",
+    "F507: lepton/quark CP=-3"
+  ]
+}

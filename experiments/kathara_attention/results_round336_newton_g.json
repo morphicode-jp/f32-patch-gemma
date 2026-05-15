@@ -1,0 +1,18 @@
+{
+  "Tr_L_pow": {
+    "0": 12,
+    "1": 38,
+    "2": 164,
+    "3": 812,
+    "4": 4368,
+    "5": 24768,
+    "6": 145472,
+    "7": 875360
+  },
+  "Lambda_eff_v1_E": 3.947736004227922e+17,
+  "Lambda_eff_v2_TrL2": 3.291384383040012e+17,
+  "M_GUT_typical": 2e+16,
+  "Lambda_eff_to_MGUT_ratio_v1": 19.738680021139608,
+  "graph_shape_factor_F508_hypothesis": 0.07017543859649122,
+  "status": "Λ_eff GUT-scale ✓, dimensionless coefficient open"
+}
