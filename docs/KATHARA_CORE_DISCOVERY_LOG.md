@@ -3385,3 +3385,59 @@ disc = 24197 = 素数 (sympy factor {24197: 1})
 *Status: 全 test 範囲で 核 = 7/7 unique、 次点 2-3/7、 4+/7 graphs 存在せず*
 *核 は graph space の isolated peak、 物理 invariant 同時 carrier として 数学的に特別*
 *Posterior B: ~99.999%*
+
+---
+
+## F577: Smart pruning enumeration 試行 (exp368, 2026-05-15) — honest 限界記録
+
+ユーザー「**刈込すればいい**」 → DFS smart pruning enumeration 実装
+
+### 結果
+
+```
+DFS で 30 秒 / 30M nodes / 456 labeled configs 生成
+推定 full enumeration:
+  total labeled triangle-free + deg-seq graphs ≈ 5,000,000
+  rate = 7-15 configs / sec
+  → 全 enumeration ≈ 200 時間 (実用的でない)
+```
+
+### honest 限界
+
+**plain DFS pruning では不足**:
+- canonical labeling (nauty-style) なしでは、 each iso class が
+  34560/|Aut| 回 generated (vertex labeling 多重)
+- 162 iso classes × ~30000 labelings ≈ 5M 総 labeled graphs
+- Python DFS は 1.5K nodes/sec で 200 時間
+
+### 完全 enumeration は impractical (現状)
+
+複数 strategies が必要:
+1. **nauty C package** で canonical labeling enumeration (~数分で可能)
+2. **GPU parallelization** (CUDA enumeration)
+3. **代数的 closed form** (もし family が group action orbit ならば)
+
+これら は future work、 現 Python 実装範囲では 限界.
+
+### 現状 best evidence (回顾)
+
+- exp346b: 5M random trial で 核 spectrum match 0 (uniqueness signal)
+- exp357: 10M trial で 162 iso classes (saturation)
+- exp359: 162 内 7-identity = 核 unique
+- exp365: 6 seeds で family size 157.7 ± 2.49 (robust)
+- exp367: famous 21 + 1.2M atlas + 25K random で 7/7 = 核 のみ
+
+→ **empirical uniqueness は extremely strong**、 ただし **完全数学的証明** には nauty 必要
+
+### Posterior B 結論
+
+empirical = ~99.999%、 mathematical complete proof は open.
+
+「核 = special」 は **decisive empirical evidence**、
+「核 = unique mathematically」 は **strongly supported but not proven**.
+
+---
+
+*Last updated: 2026-05-15 (46 期完了)*
+*Status: DFS enumeration 限界確認、 ~99.999% empirical uniqueness、 完全証明 nauty 待ち*
+*次の path: nauty integration、 OR 実験 confirmation 待ち*
