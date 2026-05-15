@@ -1,0 +1,11 @@
+{
+  "N_trials": 5000000,
+  "deg_match_count": 301842,
+  "triangle_free_count": 11409,
+  "inv_match_count": 0,
+  "spectrum_match_count": 0,
+  "iso_with_core": 0,
+  "non_core_iso_count": 0,
+  "verdict": "★ random sampling では核が見つからず、より多くの試行要",
+  "elapsed_seconds": 20.13356065750122
+}
