@@ -1,0 +1,8 @@
+{
+  "char_poly_full": "x*(x + 3)*(x**2 - x - 1)**2*(x**2 + 3*x + 1)*(x**4 - 4*x**3 + 9*x - 4)",
+  "is_strict_integral": false,
+  "is_algebraic_integer": true,
+  "honest_correction": "F579 「integral graph」主張は不正確、 algebraic integer graph が正確",
+  "true_special_property": "3-number-field char poly factorization (Q + Q(√5) + S_4 quartic)",
+  "schlafli_relation": "162 = 6 × 27 numerical, 直接 cover relation 未確認"
+}

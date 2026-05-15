@@ -1,0 +1,26 @@
+{
+  "schlafli_basic": {
+    "V": 27,
+    "E": 135,
+    "regular": 10,
+    "spectrum": "10, 1×20, -5×6",
+    "aut_order": 51840,
+    "aut_isomorphism": "PΣL(2,9):2 = W(E_6)"
+  },
+  "F581_numerical_match": {
+    "schlafli_edges": 135,
+    "core_alpha_inv_minus_2": 135,
+    "core_TrA4": 270,
+    "schlafli_2E": 270,
+    "interpretation": "Schläfli edges = α⁻¹ - 2 と 核 Tr(A⁴) = 2 × Schläfli edges"
+  },
+  "F582_family_162_hypothesis": {
+    "162": "6 × 27 = 6-decoration × 27 Schläfli vertices",
+    "status": "hypothesis, explicit construction open"
+  },
+  "F583_W_E_6_connection": {
+    "W_E_6_order": 51840,
+    "ratios_with_162": "51840 / 162 = 320",
+    "interpretation": "core family is W(E_6)-orbit candidate"
+  }
+}
