@@ -1,0 +1,19 @@
+{
+  "F543_confinement": "triangle-free → no free quark",
+  "F544_string_tension": {
+    "obs_MeV": 440,
+    "core_pred_MeV": 434,
+    "formula": "√σ = 2 Λ_QCD = √(|Aut|·Λ²)",
+    "diff_pct": 1.4
+  },
+  "F545_beta_function": {
+    "value": 0.5570423008216338,
+    "formula": "(33 - 12)/(12π)",
+    "interpretation": "33 = n_gen·n_decoration, 12 = |V|, 21 = 3·7"
+  },
+  "F546_glueball": {
+    "obs_MeV": 1700,
+    "core_pred_MeV": 1736,
+    "formula": "SO(8) × Λ_QCD"
+  }
+}

@@ -1,0 +1,20 @@
+{
+  "F539_M_R_majorana": {
+    "value": 4.4666666666666664e+16,
+    "formula": "M_GUT / 3 = M_GUT × |Aut|/|V|"
+  },
+  "F540_nu32_ratio": {
+    "obs": 5.757856314370984,
+    "pred_sqrt33": 5.744562646538029,
+    "formula": "√(世代×装飾辺) = √33",
+    "diff_pct": 0.2308787699299756
+  },
+  "F541_leptogenesis_eps": {
+    "order": 1e-08
+  },
+  "F542_m_bb_prediction": {
+    "value_meV": 1.08360157281865,
+    "formula": "m_ν_3 × sin²θ_13 (= m_ν_3 × 3α)",
+    "experiment": "KamLAND-Zen 2"
+  }
+}

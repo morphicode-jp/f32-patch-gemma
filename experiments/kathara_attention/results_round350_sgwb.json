@@ -1,0 +1,17 @@
+{
+  "F547_NANOGrav_origin": "SMBH merger (not inflation tensor)",
+  "F548_n_T": {
+    "value": -0.027521929824561406,
+    "formula": "-1/(|V|·|E|/c_TypeD)"
+  },
+  "F549_cosmic_string_Gmu": {
+    "core_pred": 2.802702872932456e-06,
+    "experimental_upper": 1e-11,
+    "status": "excluded if pred is right"
+  },
+  "F550_NANOGrav_amplitude": "inflation tensor cannot explain, SMBH origin (consistent with core hypothesis)",
+  "future_predictions": {
+    "LISA_Omega_GW_mHz": 2.59345852895958e-13,
+    "tensor_r": 0.003
+  }
+}
