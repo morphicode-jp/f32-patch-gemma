@@ -1,0 +1,24 @@
+{
+  "F533_proton_mass": {
+    "formula": "|Aut| × 13/12 × Λ_QCD",
+    "value": 940.3333333333333,
+    "match": "0.3%"
+  },
+  "F534_neutron_proton": {
+    "formula": "(m_d - m_u)/2",
+    "value": 1.255
+  },
+  "F535_pion_mass": {
+    "formula": "α⁻¹ MeV = 137 MeV",
+    "match": "1.9%"
+  },
+  "F536_Lambda_QCD": {
+    "formula": "m_e × α⁻¹ × π",
+    "value": 219.99126803296224,
+    "match": "1.5%"
+  },
+  "F537_eta_chain": {
+    "m_eta": "4 m_π",
+    "m_eta_prime": "7 m_π"
+  }
+}

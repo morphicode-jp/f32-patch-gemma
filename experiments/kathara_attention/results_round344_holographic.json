@@ -1,0 +1,11 @@
+{
+  "F529_central_charge": {
+    "value": 26,
+    "formula": "P_core(-2) = bosonic D"
+  },
+  "F530_19_EPR_pairs": "19 edges = 19 EPR entanglement bonds",
+  "F531_Bekenstein_saturation": "核 saturates Bekenstein bound candidate",
+  "F532_MERA_correspondence": "核 Cartesian = MERA tensor network = holographic dual",
+  "min_edge_cut_6v6": 5,
+  "S_BTZ_normalized": 13.079493222300913
+}

@@ -1,0 +1,19 @@
+{
+  "DM_5_species_mass": {
+    "DM1_heavy_WIMP_GeV": [
+      10,
+      100
+    ],
+    "DM2_light_WIMP_GeV": [
+      1,
+      10
+    ],
+    "DM3_sterile_nu_keV": 1,
+    "DM4_axion_muV": 20,
+    "DM5_fuzzy_eV": 1e-22
+  },
+  "F525_alpha_cascade": "mass ratio steps ~ α-power",
+  "F526_eigenvalue_mapping": "5 DM ↔ 5 eigenvalue clusters of core",
+  "F527_partition": "vertex degree distribution",
+  "F528_PBH_addition": "particle DM × 2/3 + PBH × 1/3"
+}
