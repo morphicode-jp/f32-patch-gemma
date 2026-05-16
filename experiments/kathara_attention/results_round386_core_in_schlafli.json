@@ -1,0 +1,9 @@
+{
+  "n_samples": 1000000,
+  "elapsed_seconds": 6.413164138793945,
+  "E_19_count": 11854,
+  "triangle_free_count": 4378,
+  "invariant_match_count": 0,
+  "iso_to_core_count": 0,
+  "core_subseteq_schlafli_induced": false
+}

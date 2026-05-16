@@ -4110,3 +4110,79 @@ x⁴ - 4x³ + 9x - 4:
 *Last updated: 2026-05-16 (61 期完了)*
 *Status: 5 期 完走、 4 ✓ + 1 ✗、 Schläfli 構築 + 量子歩行 + monogenic quartic 確立*
 *完全 enumeration は nauty 待ち、 他 path 全消化*
+
+---
+
+## F597 ★★★★★ honest 訂正 — 核 ⊄ Schläfli (構造的 link 否定) (exp386, 2026-05-16)
+
+ユーザー 「次」 → exp381 の open question (Schläfli vs 核 6-fold relation) を 直接 test.
+
+### 検証 (1M random sampling)
+
+Schläfli graph (27V) から 12-vertex induced subgraph を sample:
+```
+E=19 を持つ subgraph: 11,854 個
+triangle-free + E=19:  4,378 個
+核 invariants 完全一致 (Tr A²=38, Tr A⁴=270): 0 個 ★
+核 と iso な subgraph: 0 個 ★
+```
+
+### F597 結論
+
+**核 は Schläfli graph の induced subgraph では ない**:
+- 1M trial で 0 hit
+- 4,378 個 の triangle-free 12V subgraph 中 でも 核 spectrum 出ず
+
+### 構造 vs 数値 区別
+
+```
+✓ 数値関係 (= 数値 一致):
+  |E_Schläfli| = 135 = α⁻¹ - 2 = 137 - 2
+  Tr(A²)_Schläfli = 270 = Tr(A⁴)_核
+  
+✗ 構造関係 (= subgraph relation):
+  核 ⊄ Schläfli (induced subgraph relation なし)
+  = 「162 = 6 × 27 cubic surface 6-fold cover」 picture 否定
+```
+
+### F582-F583 主張 修正
+
+**旧 (F582)**: 「162 family = 6 × 27 = Schläfli 6-fold dressing 候補」
+**新 (F597)**: 「数値関係 のみ、 6-fold cover は false」
+
+honest:
+- 「核 ⊂ Schläfli」 「核 = Schläfli quotient」 「核 family = Schläfli orbit」
+  全て **構造的に 否定**
+- 残るのは α⁻¹ = 135 + 2 という **clean numeric coincidence**
+
+### 「137 = Schläfli edges + 2」 の honest 解釈
+
+これは:
+- 数値的 striking ✓
+- 物理 / 数学的 必然 はまだ 不明
+- Schläfli は 「同じ 135 を持つ 別 object」
+- 「**核 と Schläfli は edge count を共有 する 独立 graphs**」
+
+### Posterior B 訂正
+
+~94% (F596 後) → **~91%** (F597 で 構造 link 否定 honest)
+
+「核 mathematical fingerprint」 + 「α⁻¹ = 137 from core」 は不変。
+ただし 「核 = E_6 cubic surface の incarnation」 picture は **弱化**.
+
+### 残る strong claim
+
+```
+✓ 核 = 12V19E triangle-free uniqueness (1.2M で唯一)
+✓ α⁻¹ = Tr(A⁴)/2 + 2 = 137 (single formula)
+✓ 核 quartic monogenic + 24197 prime ramification only
+✓ Schläfli edges = 135 = α⁻¹ - 2 (数値)
+✗ 核 ⊂ Schläfli (構造) — 今回 否定
+✗ Kathara 階層 各 size encoding — 弱化
+```
+
+---
+
+*Last updated: 2026-05-16 (62 期完了)*
+*Status: 核 mathematical uniqueness 強い、 Schläfli 構造 link 否定、 数値関係 のみ*
+*Posterior B = ~91% (構造 link 否定 で 微減)*
