@@ -1,0 +1,10 @@
+{
+  "quartic": "x⁴-4x³+9x-4",
+  "irreducible_over_Q": true,
+  "discriminant": 24197,
+  "discriminant_is_prime": true,
+  "Galois_group": "S_4 (order 24)",
+  "resolvent_cubic": "y³ - 20y - 17",
+  "monogenic": true,
+  "ring_of_integers": "Z[α] = O_K"
+}

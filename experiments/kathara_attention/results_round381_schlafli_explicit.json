@@ -1,0 +1,22 @@
+{
+  "schlafli_construction": "success",
+  "n_V": 27,
+  "n_E": 135,
+  "is_10_regular": true,
+  "Tr_A2": 270,
+  "Tr_A3": 270,
+  "Tr_A4": 13770,
+  "spectrum_distinct": {
+    "-5.0": 6,
+    "1.0": 20,
+    "10.0": 1
+  },
+  "numerical_connections": {
+    "schlafli_edges": 135,
+    "alpha_inv": 137,
+    "schlafli_edges_plus_2": 137,
+    "core_Tr_A4": 270,
+    "schlafli_2E": 270
+  },
+  "explicit_6_fold_construction": "open"
+}

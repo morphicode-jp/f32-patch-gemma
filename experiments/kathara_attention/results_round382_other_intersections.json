@@ -1,0 +1,98 @@
+{
+  "n_partners": 11,
+  "n_physical_hits": 2,
+  "results": [
+    {
+      "partner": "Icosahedron (= 既知 核 母)",
+      "alpha_pred": 137,
+      "Tr_A4": 270,
+      "n_E": 19,
+      "triangle_free": true,
+      "hits": [
+        "137 (α⁻¹ (微細構造))"
+      ]
+    },
+    {
+      "partner": "Cuboctahedron",
+      "alpha_pred": 38,
+      "Tr_A4": 72,
+      "n_E": 12,
+      "triangle_free": true,
+      "hits": []
+    },
+    {
+      "partner": "Truncated tetra",
+      "alpha_pred": 40,
+      "Tr_A4": 76,
+      "n_E": 12,
+      "triangle_free": true,
+      "hits": [
+        "42 (Catalan C_5)"
+      ]
+    },
+    {
+      "partner": "Antiprism",
+      "alpha_pred": 38,
+      "Tr_A4": 72,
+      "n_E": 12,
+      "triangle_free": true,
+      "hits": []
+    },
+    {
+      "partner": "Hexagonal prism",
+      "alpha_pred": 8,
+      "Tr_A4": 12,
+      "n_E": 6,
+      "triangle_free": true,
+      "hits": []
+    },
+    {
+      "partner": "K_{6,6}",
+      "alpha_pred": 94,
+      "Tr_A4": 184,
+      "n_E": 16,
+      "triangle_free": true,
+      "hits": []
+    },
+    {
+      "partner": "C_12 (cycle)",
+      "alpha_pred": 38,
+      "Tr_A4": 72,
+      "n_E": 12,
+      "triangle_free": true,
+      "hits": []
+    },
+    {
+      "partner": "Frucht (12V cubic)",
+      "alpha_pred": 60,
+      "Tr_A4": 116,
+      "n_E": 14,
+      "triangle_free": true,
+      "hits": []
+    },
+    {
+      "partner": "Cay(Z/12,{1,5,6})",
+      "alpha_pred": 116,
+      "Tr_A4": 228,
+      "n_E": 18,
+      "triangle_free": true,
+      "hits": []
+    },
+    {
+      "partner": "Cay(Z/12,{2,3,6})",
+      "alpha_pred": 8,
+      "Tr_A4": 12,
+      "n_E": 6,
+      "triangle_free": true,
+      "hits": []
+    },
+    {
+      "partner": "Cay(Z/12,{1,3,6})",
+      "alpha_pred": 116,
+      "Tr_A4": 228,
+      "n_E": 18,
+      "triangle_free": true,
+      "hits": []
+    }
+  ]
+}

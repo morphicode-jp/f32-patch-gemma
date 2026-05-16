@@ -1,0 +1,9 @@
+{
+  "spectrum_min": -3.274598610381937,
+  "spectrum_max": 3.0000000000000004,
+  "band_width": 6.274598610381938,
+  "time_averaged_spread": 5.140262361170654,
+  "max_spread_step": 7.716187787509756,
+  "max_propagation_speed": 3.1491640425429397,
+  "interpretation": "tight-binding hopping model, 3 number-field modes"
+}
