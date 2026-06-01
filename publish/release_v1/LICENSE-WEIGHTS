@@ -1,0 +1,59 @@
+Model Weights License Notice
+============================
+
+Scope
+-----
+
+This notice covers the patched Gemma 4 31B-it GGUF files distributed in
+this release bundle, including:
+
+- `gemma-4-31B-it-L25x1.5-Q2_K.gguf`
+- `gemma-4-31B-it-L26x1.5-Q2_K.gguf`
+- `gemma-4-31B-it-L25L26x1.5-Q2_K.gguf`
+- `gemma-4-31B-it-L25L26x1.5-Q4_K_M.gguf`
+- `gemma-4-31B-it-tripleLOS27-PAN17-PAN43-x1.8-Q2_K.gguf`
+
+License Basis
+-------------
+
+As verified on 2026-05-31:
+
+- Google lists Gemma 4 under the Apache License 2.0.
+- The official `google/gemma-4-31B-it` Hugging Face model card lists
+  `License: apache-2.0`.
+- The older Gemma Terms page does not list Gemma 4 in its appendix and
+  links to a separate "Gemma 4 license" page containing Apache License 2.0.
+
+Reference URLs:
+
+- https://blog.google/innovation-and-ai/technology/developers-tools/gemma-4/
+- https://ai.google.dev/gemma/apache_2
+- https://huggingface.co/google/gemma-4-31B-it
+
+Modification Notice
+-------------------
+
+These GGUF files are modified derivatives of Google Gemma 4 31B-it. The
+modification is a small F32 scale patch applied to selected layer output
+scale tensors. The exact patch identity is encoded in each filename and
+documented in `README_paper_v5.md` and `HF_MODEL_CARD.md`.
+
+The patching method is reproducible from the scripts in this release
+bundle. The code for those scripts is covered by `LICENSE-CODE`; the
+resulting model weight files remain model-weight artifacts under the
+Gemma 4 Apache 2.0 license basis above.
+
+Upstream and Tooling Attribution
+--------------------------------
+
+- Base model: Google Gemma 4 31B-it.
+- GGUF conversion/quantization tooling: llama.cpp-compatible workflow.
+- Patch research and release notes: Akito Hirai (@morphicode_jp), 2026.
+
+Operational Rule
+----------------
+
+Before public upload, re-check the upstream model card and Google license
+page. If either source changes or a different upstream GGUF is used, update
+this file before switching the Hugging Face repository from private to
+public.

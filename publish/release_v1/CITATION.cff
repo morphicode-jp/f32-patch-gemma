@@ -1,0 +1,47 @@
+cff-version: 1.2.0
+title: >-
+  Adjacent-Layer Functional Specialization in Q2_K Quantized
+  Gemma 4 31B: A Single-Question Pilot of L25 (Compute) and
+  L26 (Meta-Verify)
+message: >-
+  If you use this software or patch in your research,
+  please cite it as below.
+type: software
+authors:
+  - given-names: Akito
+    family-names: Hirai
+    email: morphicode.jp@gmail.com
+    orcid: 'https://orcid.org/0009-0006-0161-3249'
+repository-code: 'https://github.com/morphicode-jp/f32-patch-gemma'
+url: 'https://huggingface.co/morphicode-jp/gemma-4-31B-it-L25L26x1.5-Q2_K'
+identifiers:
+  - type: doi
+    value: 10.5281/zenodo.20362821
+    description: Zenodo archive of paper, code, and reproduction artifacts
+abstract: >-
+  We report a single-question pilot observation that scaling
+  individual layer_output_scale tensors at layers 25 and 26 of
+  Gemma 4 31B-it (Q2_K quantization) produces distinct behavioral
+  phenotypes: L25-alone yields compute-confident answers with
+  minimal mid-stream verification, L26-alone produces
+  verification-dense but functional answers, and the joint scaling
+  (paper v1 patch, L25+L26 multiplied by 1.5, 8 bytes total) produces
+  explicit terminal-verification reflexes absent in either
+  single-layer condition. The n=32 follow-up (exp166) statistically
+  confirms an asymmetric auxiliary-explanation rate (L26-alone 56%
+  vs L25-alone 16%, p<0.01) while finding accuracy differences not
+  significant at n=32. This is a hypothesis-generating release; the
+  asymmetry framing is provisional pending fuller replication. The
+  paper v1 (L25+L26 mix, 8 bytes) GGUFs at Q1 (IQ1_M), Q2 (Q2_K),
+  and Q4 (Q4_K_M) are distributed; per-layer ablation GGUFs
+  (L25-alone, L26-alone, triple) are reproducible from the included
+  bake scripts.
+keywords:
+  - LLM
+  - quantization
+  - gemma-4
+  - per-layer-ablation
+  - mechanistic-interpretability
+  - hypothesis-generating-pilot
+license: Apache-2.0
+date-released: '2026-06-02'

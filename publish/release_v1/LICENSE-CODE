@@ -1,0 +1,35 @@
+Code License Notice
+===================
+
+Scope
+-----
+
+The following files are released under the Apache License, Version 2.0:
+
+- Python scripts in this release bundle, including patch bake/apply scripts.
+- Small configuration and reproduction helper files that are not model weights.
+- Original code snippets written for this release.
+
+The full Apache License 2.0 text is in `LICENSE`.
+
+Copyright
+---------
+
+Copyright 2026 Akito Hirai (@morphicode_jp)
+
+Unless required by applicable law or agreed to in writing, software
+distributed under the Apache License 2.0 is distributed on an "AS IS"
+BASIS, WITHOUT WARRANTIES OR CONDITIONS OF ANY KIND, either express or
+implied.
+
+Out of Scope
+------------
+
+This file does not license:
+
+- Google Gemma 4 base model weights.
+- Patched or quantized GGUF model weight files.
+- Paper text, Zenn articles, model cards, or other documentation.
+
+Those artifacts have separate notices. See `LICENSE-WEIGHTS` for patched
+GGUF/model-weight scope and the repository README for the paper/docs scope.

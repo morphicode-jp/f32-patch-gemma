@@ -1,0 +1,31 @@
+cff-version: 1.2.0
+title: >-
+  Why Some LLMs Have a Hidden Reasoning Knob:
+  Rare Full-Attention Bottlenecks in Hybrid Architectures
+  and a 44-byte Quantization Recovery
+message: >-
+  If you use this software or patch in your research,
+  please cite it as below.
+type: software
+authors:
+  - given-names: Akito
+    family-names: Hirai
+    email: morphicode.jp@gmail.com
+    orcid: ''
+repository-code: 'https://github.com/morphicode_jp/f32-patch-gemma'
+url: 'https://huggingface.co/morphicode_jp/gemma-4-31B-it-basin-b-Q2_K'
+abstract: >-
+  A training-free, calibration-free 44-byte F32 patch
+  applied to 11 layer_output_scale weights of Gemma 4 31B
+  yields +13.25pt HellaSwag accuracy improvement on the
+  Q2_K quantization. The mechanism — rare full-attention
+  bottleneck slack in hybrid LLMs — is validated across
+  4 model families.
+keywords:
+  - LLM
+  - quantization
+  - gemma
+  - hybrid-architecture
+  - mechanistic-interpretability
+license: Apache-2.0
+date-released: '2026-05-20'
