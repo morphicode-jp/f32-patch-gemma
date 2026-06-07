@@ -1,6 +1,6 @@
 # f32-patch-gemma
 
-**8-byte F32 patch on Gemma 4 31B. Q4_K_M beats the Q8 BF16 reference on HellaSwag, Winogrande, and ARC-Challenge; GSM8k should be cited from the Q2_K paper-grade n=500 re-measurement.**
+**8-byte F32 patch on Gemma 4 31B. Q4_K_M beats the Q8 BF16 reference on HellaSwag, Winogrande, and ARC-Challenge. For GSM8k patch effect, cite the Q2_K paper-grade n=500 same-quant re-measurement; Q4_K_M baseline-only n=500 is stronger at 95.80%.**
 
 [![License: Apache 2.0](https://img.shields.io/badge/License-Apache_2.0-blue.svg)](LICENSE)
 [![Zenodo DOI](https://img.shields.io/badge/Zenodo-10.5281%2Fzenodo.20362821-blue)](https://doi.org/10.5281/zenodo.20362821)
@@ -50,16 +50,17 @@ Gemma 4 31B-it, full validation:
 |---|---|---|---|
 | HellaSwag (Q4_K_M vs Q8_0 BF16) | 63.33% | **73.50%** | **+10.17pt** |
 | GSM8k (Q4 vs Q8 BF16, paper v1 short-budget legacy) | 70% | **87%** | **+17pt** (not n=500; mixes capability + token-budget) |
+| GSM8k (Q4_K_M baseline-only, n=500 ctx=16384) | **95.80%** | — | 479/500, Wilson CI [93.66, 97.24]; Q4 patched not re-run |
 | Winogrande (Q4 vs Q8 BF16) | 65.59% | **70.32%** | +4.73pt |
 | ARC-Challenge (Q4 vs Q8 BF16) | 44.38% | **48.76%** | +4.38pt |
 | HellaSwag (Q2_K vs same-quant baseline) | — | — | **+11.21pt** |
 | GSM8k (IQ1_M vs same-quant baseline) | 24% | **60%** | **+36pt** |
 
-→ 12/12 cells positive across 3 release quants × 4 benchmarks under their documented protocols. For Q4_K_M vs Q8_0, cite HellaSwag / Winogrande / ARC-Challenge first. For GSM8k, cite the Q2_K n=500 paper-grade result below.
+→ 12/12 cells positive across 3 release quants × 4 benchmarks under their documented protocols. For Q4_K_M vs Q8_0, cite HellaSwag / Winogrande / ARC-Challenge first. For GSM8k patch effect, cite the Q2_K n=500 paper-grade same-quant result below; do not claim Q2_K beats Q4_K_M on GSM8k.
 
 ### Note on Q2_K GSM +9pt (convergence vs. capability)
 
-The Q2_K GSM +9pt at `n_predict=1024` decomposes into two effects we separated via extended-context re-measurement. Re-running at `ctx=16384, n_predict=8192, n=500` yields baseline 87.80%, patched 93.20%, delta **+5.40pt** (McNemar two-sided **p=0.0007**, highly significant; paired breakdown 44/17 patch/baseline-only-correct out of 61 discordant pairs). Cap-hit verification at ctx=32768/n_predict=16384 on the 7 boundary cases (3 baseline + 4 patched cap-hits) shifts totals to baseline 88.00%/patched 93.40% with delta unchanged at +5.40pt (p=0.0009) — the +5.4pt is robust to token-budget concerns. The headline +9pt thus splits into approximately +3.6pt convergence-efficiency (the patched model finishes its chain-of-thought within budget more often) and **+5.4pt capability gain** (statistically established at p<0.001). The multi-choice benchmarks (HS/WG/ARC) are log-likelihood scored with no generation and are unaffected; those numbers stand. Q4_K_M and IQ1_M GSM were measured only at `n_predict=1024` and likely share a similar convergence component. Related prior art: [arXiv:2602.09805](https://arxiv.org/abs/2602.09805) (token efficiency decomposition), [arXiv:2605.07686](https://arxiv.org/abs/2605.07686) (coupling tax under shared token budget). See `HF_MODEL_CARD.md` §Methodology note for the full version.
+The Q2_K GSM +9pt at `n_predict=1024` decomposes into two effects we separated via extended-context re-measurement. Re-running at `ctx=16384, n_predict=8192, n=500` yields baseline 87.80%, patched 93.20%, delta **+5.40pt** (McNemar two-sided **p=0.0007**, highly significant; paired breakdown 44/17 patch/baseline-only-correct out of 61 discordant pairs). Cap-hit verification at ctx=32768/n_predict=16384 on the 7 boundary cases (3 baseline + 4 patched cap-hits) shifts totals to baseline 88.00%/patched 93.40% with delta unchanged at +5.40pt (p=0.0009) — the +5.4pt is robust to token-budget concerns. The headline +9pt thus splits into approximately +3.6pt convergence-efficiency (the patched model finishes its chain-of-thought within budget more often) and **+5.4pt capability gain** (statistically established at p<0.001). The multi-choice benchmarks (HS/WG/ARC) are log-likelihood scored with no generation and are unaffected; those numbers stand. Q4_K_M baseline-only has now been re-run under the same GSM8k n=500/ctx=16384 protocol and scores 95.80%, higher than Q2_K patched; Q4_K_M patched and IQ1_M GSM patch rows remain legacy n=100 short-budget results. Related prior art: [arXiv:2602.09805](https://arxiv.org/abs/2602.09805) (token efficiency decomposition), [arXiv:2605.07686](https://arxiv.org/abs/2605.07686) (coupling tax under shared token budget). See `HF_MODEL_CARD.md` §Methodology note for the full version.
 
 ## Paper v5 contribution — per-layer functional specialization (n=1 pilot)
 

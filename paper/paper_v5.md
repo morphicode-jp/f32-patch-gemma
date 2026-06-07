@@ -66,7 +66,7 @@ The paper v1 headline gain on GSM8k at Q2_K (baseline 67%, patched 76%, delta +9
 
 **Cap-hit verification (ctx=32768, n_predict=16384, n=7 boundary cases).** v4 at ctx=16384 had 7 token-cap hits (3 baseline + 4 patched, no overlap). Re-running those 7 at 4× the context budget: baseline +1 correct (i=255), patched +1 correct (i=298), 5 problems remained unresolved at 32k context (genuinely hard, not artifacts of the 8192 cap). Updated totals: baseline 88.00%, patched 93.40%, delta still **+5.40pt**, McNemar p=0.0009. The +5.40pt capability gain is robust to token-budget concerns.
 
-**Decomposition.** The paper v1 +9pt ≈ **+3.6pt convergence-efficiency + +5.4pt capability gain**. The capability component is statistically established at p<0.001. Q4_K_M and IQ1_M GSM were measured only at n_predict=1024 and likely share a similar convergence component; the pure capability portion was not separately measured at those quantization levels.
+**Decomposition.** The paper v1 +9pt ≈ **+3.6pt convergence-efficiency + +5.4pt capability gain**. The capability component is statistically established at p<0.001. Q4_K_M baseline-only GSM8k has now been re-run at ctx=16384, n_predict=8192, n=500 and scores 95.80% (479/500), higher than Q2_K patched. Q4_K_M patched and IQ1_M GSM patch rows remain legacy n_predict=1024 results; their pure capability portions were not separately measured at those quantization levels.
 
 **Scope of the confound.** Multiple-choice benchmarks ((HellaSwag +11.21pt at n=10,042, Winogrande +7.34pt at n=1,267, ARC-C +2.83pt at n=1,165)) are log-likelihood scored with no generation, so no token-budget confound applies; those numbers stand.
 
