@@ -13,7 +13,7 @@ What it does:
 Quant 対応: 全 Gemma 4 31B 量子化 (IQ1_M / Q2_K / Q4_K_M / Q5_K_M / Q8_0 等)
 - F32 layer_output_scale は量子化に依らず全 GGUF で同じ位置に存在
 
-Discovered via ODIN autonomous optimization engine (12 specialist parallel search).
+Discovered via an in-house multi-specialist parallel optimization engine (not released).
 Verified across HellaSwag (n=10042), GSM8k (n=100), Winogrande (full).
 Alignment preserved on AdvBench (n=50, 100% refusal rate).
 
@@ -29,7 +29,7 @@ import struct
 import sys
 from pathlib import Path
 
-# basin B (ODIN autonomous discovery, 11 layers × scale)
+# basin B (search-found 11-layer multiplicative scale set)
 BASIN_B_PATCH = {
     5:  1.440,
     18: 0.767,

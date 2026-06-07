@@ -59,7 +59,7 @@ Q8 patched model.
 
 We also present an honest negative result: an 11-layer 44-byte patch
 (\texttt{basin~B}) discovered by 7~hours of autonomous optimization
-(\texttt{morphi}/ODIN) targeting Q4 HellaSwag accuracy is
+(an in-house multi-specialist parallel optimizer, not released) targeting Q4 HellaSwag accuracy is
 \emph{outperformed by the simpler manual 2-layer L25+L26 patch} on every
 single one of the four Q4 benchmarks, including the search target itself.
 The over-parameterized search solution generalizes worse than the simple
@@ -107,7 +107,7 @@ quantizations.
     (\S\ref{sec:experiments}).
   \item Honest negative result: an 11-layer 44-byte patch
     (\texttt{basin~B}) discovered by a 7-hour autonomous optimization
-    (\texttt{morphi}/ODIN) targeting Q4 HellaSwag is
+    (in-house multi-specialist parallel optimizer, not released) targeting Q4 HellaSwag is
     \emph{outperformed by the simpler manual L25+L26 patch on every Q4
     benchmark, including the search objective itself}. Per-quant search with
     multi-benchmark objectives is left for follow-up
@@ -226,14 +226,14 @@ all evaluated Gemma~4 31B quantizations from IQ1\_M through Q8\_0 because
 \texttt{layer\_output\_scale} is preserved at F32 precision across the
 quantization codec.
 
-\subsection{An honest negative result: \texttt{morphi}/ODIN search}
+\subsection{An honest negative result: search-found basin underperforms simple manual baseline}
 \label{ssec:basinb_compare}
 
-Before settling on the simple L25+L26 patch, we ran an autonomous
-optimization engine we developed (\texttt{morphi}, built on a
-4-specialist ODIN council combining ablation-phase probing,
+Before settling on the simple L25+L26 patch, we ran an in-house
+multi-specialist parallel optimization engine (not released in this version)
+combining ablation-phase probing,
 structural-prior input, soft-fail history recovery, automatic range
-shrinking, and multi-fidelity escalation). Targeting \textbf{Q4\_K\_M
+shrinking, and multi-fidelity escalation. Targeting \textbf{Q4\_K\_M
 HellaSwag accuracy ($n{=}400$)} as the sole objective, with $\sim$7 hours
 of search on a single RTX~5090, the engine produced an 11-layer 44-byte
 multiplicative-scale set we call \texttt{basin~B}:
@@ -265,11 +265,11 @@ ARC-C~$n{=}1165$      & 48.50 & \textbf{48.76} (+0.26) \\
 
 \textbf{L25+L26 outperforms basin~B on every single benchmark, including
 the search target (Q4 HellaSwag) itself.} The over-parameterized solution
-that ODIN's narrow Q4 HellaSwag objective converged to generalizes
+that the optimizer's narrow Q4 HellaSwag objective converged to generalizes
 strictly worse than the simple 2-layer baseline.
 
 We interpret this as objective-overfitting: the 11-dimensional search
-space allowed basin~B to fit ODIN's narrow target marginally better at the
+space allowed basin~B to fit the narrow target marginally better at the
 cost of subtle degradations elsewhere, while the 2-dimensional L25+L26
 manifold cannot overfit and therefore generalizes better. A multi-benchmark
 joint objective (e.g., HellaSwag~+~GSM8k~+~ARC-C with per-quant weighting)
@@ -566,11 +566,11 @@ similarly admit post-hoc inference-time tuning via F32 scalar adjustment.
   MMLU, ARC, PIQA, and TruthfulQA evaluation deferred to a follow-up.
   \item Alignment evaluated via keyword-based refusal detection; LLM-as-judge
   or human evaluation on borderline outputs would tighten the safety claim.
-  \item The \texttt{morphi} optimization engine that discovered
+  \item The in-house optimization engine that discovered
   \texttt{basin~B} is described at a high level only; its detailed algorithm
-  is out of scope and will be released separately.
+  is out of scope and is not released with this version.
   \item \textbf{Search bias / objective overfitting.} \texttt{basin~B} was
-  discovered by ODIN with Q4\_K\_M HellaSwag accuracy as the sole objective.
+  discovered by the in-house optimizer with Q4\_K\_M HellaSwag accuracy as the sole objective.
   Direct comparison (\S\ref{ssec:basinb_compare}) shows L25+L26
   outperforms basin~B on every Q4 benchmark including the search target
   itself. Per-quant searches with multi-benchmark joint objectives
@@ -618,8 +618,8 @@ $\geq 93\%$ under the L25+L26 flagship. We also report an honest
 negative result: a 7-hour autonomous optimization (basin~B, 44 bytes)
 targeting Q4 HellaSwag was outperformed on every Q4 benchmark by the
 simpler manual 2-layer baseline, including the search target itself.
-We release three patched GGUFs (using L25+L26), the \texttt{morphi}
-basin~B values for reproducibility, and all experimental data.
+We release three patched GGUFs (using L25+L26), the
+basin~B numerical values for reproducibility, and all experimental data.
 
 This bridges quantization research with mechanistic interpretability,
 provides a concrete example of objective-overfitting in autonomous

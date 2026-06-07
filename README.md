@@ -1,125 +1,175 @@
 # f32-patch-gemma
 
-**An 8-byte F32 patch that improves Gemma 4 31B accuracy across all evaluated quantizations and benchmarks (12/12 cells positive) — no training, no calibration, no inference overhead.**
+**8-byte F32 patch on Gemma 4 31B that beats the Q8 BF16 baseline 4-for-4 at Q4, with a per-layer ablation that suggests L25 and L26 carry distinct behavioral roles.**
 
 [![License: Apache 2.0](https://img.shields.io/badge/License-Apache_2.0-blue.svg)](LICENSE)
-[![arXiv](https://img.shields.io/badge/arXiv-XXXX.XXXXX-red)](https://arxiv.org/abs/XXXX.XXXXX)
-[![Zenodo DOI](https://img.shields.io/badge/DOI-10.5281%2Fzenodo.20362821-blue)](https://doi.org/10.5281/zenodo.20362821)
-[![HuggingFace Q1](https://img.shields.io/badge/🤗-Q1_IQ1__M-yellow)](https://huggingface.co/morphicode-jp/gemma-4-31B-it-L25L26x1.5-IQ1_M)
-[![HuggingFace Q2](https://img.shields.io/badge/🤗-Q2_K-yellow)](https://huggingface.co/morphicode-jp/gemma-4-31B-it-L25L26x1.5-Q2_K)
-[![HuggingFace Q4](https://img.shields.io/badge/🤗-Q4_K__M-yellow)](https://huggingface.co/morphicode-jp/gemma-4-31B-it-L25L26x1.5-Q4_K_M)
+[![Zenodo DOI](https://img.shields.io/badge/Zenodo-10.5281%2Fzenodo.20362821-blue)](https://doi.org/10.5281/zenodo.20362821)
+[![HuggingFace Q1](https://img.shields.io/badge/🤗-Q1__IQ1__M-yellow)](https://huggingface.co/morphicode-jp/gemma-4-31B-it-L25L26x1.5-IQ1_M)
+[![HuggingFace Q2](https://img.shields.io/badge/🤗-Q2__K-yellow)](https://huggingface.co/morphicode-jp/gemma-4-31B-it-L25L26x1.5-Q2_K)
+[![HuggingFace Q4](https://img.shields.io/badge/🤗-Q4__K__M-yellow)](https://huggingface.co/morphicode-jp/gemma-4-31B-it-L25L26x1.5-Q4_K_M)
 
 ## What this is
 
-A single-file Python script (`apply_l25l26.py`, ~150 lines) that modifies **8 bytes** of any Gemma 4 31B GGUF file (across all quantizations: IQ1_M, Q2_K, Q4_K_M, Q5_K_M, Q8_0) and yields measurable benchmark improvements, without any retraining or fine-tuning.
+A small Python script that modifies **8 bytes** of any Gemma 4 31B GGUF file (two F32 scalars on `layer_output_scale` at layers 25 and 26, each multiplied by 1.5) and measurably improves benchmark accuracy across all standard llama.cpp quantizations (IQ1_M through Q8_0), without any retraining, calibration, or inference overhead.
 
-The patch: multiply `layer_output_scale` at layers 25 and 26 by 1.5. That's it. 8 bytes (2 × F32). ~3 seconds to apply.
-
-## Headline results (Gemma 4 31B-it)
-
-| quant | HellaSwag n=10,042 | Winogrande n=1,267 | GSM8k n=100 | ARC-C n=1,165 |
-|---|---|---|---|---|
-| **Q1** (IQ1_M, 9.5 GB) | 42.02 → 52.98 (**+10.95**) | 49.80 → 55.56 (+5.76) | 24 → **60** (**+36** ⭐) | 30.56 → 36.74 (+6.18) |
-| **Q2** (Q2_K, 12.6 GB) | 59.15 → **70.36** (**+11.21** ⭐) | 59.35 → 66.69 (+7.34) | 67 → 76 (+9.0) | 43.61 → 46.44 (+2.83) |
-| **Q4** (Q4_K_M, 19 GB) | 63.70 → **73.50** (**+9.80**) | 65.04 → 70.32 (+5.28) | 72 → **87** (**+15**) | 44.89 → 48.76 (+3.87) |
-| Q8 baseline (ref.)† | 63.33 | 65.59 | 70.00 | 44.38 |
-
-**Q4 patched beats Q8 baseline on all 4 benchmarks** (HellaSwag +10.17pt, GSM8k +17pt). HellaSwag Wilson 95% CIs do not overlap. See [paper](paper/main.pdf) for full details + alignment analysis.
-
-† Q8_0 reported only as a BF16-proxy baseline reference. We do not release a Q8 patched model.
+This repo also ships the bake scripts for the per-layer ablation experiments described in the paper: `bake_l25_l26_split.py` (L25-alone or L26-alone, 4 bytes each) and `bake_triple_patch.py` (a 12-byte triple-tensor control that is a documented Goodhart's Law instance).
 
 ## Quick start
 
 ```bash
 pip install gguf numpy
 
-# Dry-run first to see the plan
-python apply_l25l26.py /path/to/gemma-4-31b.gguf --dry-run
-
-# Apply (creates .backup automatically)
+# Apply the paper v1 patch (L25+L26 ×1.5, 8 bytes) to any Gemma 4 31B GGUF
 python apply_l25l26.py /path/to/gemma-4-31b.gguf
 
-# Undo
+# Optional: bake the per-layer ablation variants (L25-alone or L26-alone)
+python bake_l25_l26_split.py /path/to/gemma-4-31b-Q2_K.gguf --layer 25
+python bake_l25_l26_split.py /path/to/gemma-4-31b-Q2_K.gguf --layer 26
+
+# Undo (apply_l25l26.py creates .backup automatically)
 python apply_l25l26.py /path/to/gemma-4-31b.gguf --restore
 ```
 
 ## Pre-patched GGUF releases on HuggingFace
 
-| Quant | Size | Link |
+The paper v1 patch (L25+L26 ×1.5, 8 bytes) is distributed at three quantization levels:
+
+| Quant | Size | Notable result | HF link |
+|---|---|---|---|
+| **IQ1_M** (1-bit) | ~10 GB | GSM +36pt (chance-level → usable) | [morphicode-jp/gemma-4-31B-it-L25L26x1.5-IQ1_M](https://huggingface.co/morphicode-jp/gemma-4-31B-it-L25L26x1.5-IQ1_M) |
+| **Q2_K** (2-bit) | ~13 GB | HS +11.21pt (flagship for paper v5) | [morphicode-jp/gemma-4-31B-it-L25L26x1.5-Q2_K](https://huggingface.co/morphicode-jp/gemma-4-31B-it-L25L26x1.5-Q2_K) |
+| **Q4_K_M** (4-bit) | ~19 GB | Q4 patched beats Q8 BF16 baseline on all 4 benchmarks | [morphicode-jp/gemma-4-31B-it-L25L26x1.5-Q4_K_M](https://huggingface.co/morphicode-jp/gemma-4-31B-it-L25L26x1.5-Q4_K_M) |
+
+L25-alone, L26-alone, and the triple control GGUFs are **not** distributed as separate downloads — they are reproducible from the bake scripts in this repo. Distribution would invite users to mistake the diagnostic ablation patches for recommended deployment patches.
+
+## Results — paper v1 (publicly released 2026-05-27)
+
+Gemma 4 31B-it, full validation:
+
+| Benchmark | Baseline | Patched | Δ |
+|---|---|---|---|
+| HellaSwag (Q4_K_M vs Q8_0 BF16) | 63.33% | **73.50%** | **+10.17pt** |
+| GSM8k (Q4 vs Q8 BF16) | 70% | **87%** | **+17pt** |
+| Winogrande (Q4 vs Q8 BF16) | 65.59% | **70.32%** | +4.73pt |
+| ARC-Challenge (Q4 vs Q8 BF16) | 44.38% | **48.76%** | +4.38pt |
+| HellaSwag (Q2_K vs same-quant baseline) | — | — | **+11.21pt** |
+| GSM8k (IQ1_M vs same-quant baseline) | 24% | **60%** | **+36pt** |
+
+→ 12/12 cells positive across 3 release quants × 4 benchmarks. Q4 patched beating Q8 BF16 baseline 4-for-4 is the headline result.
+
+### Note on Q2_K GSM +9pt (convergence vs. capability)
+
+The Q2_K GSM +9pt at `n_predict=1024` decomposes into two effects we separated via extended-context re-measurement. Re-running at `ctx=16384, n_predict=8192, n=500` yields baseline 87.80%, patched 93.20%, delta **+5.40pt** (McNemar two-sided **p=0.0007**, highly significant; paired breakdown 44/17 patch/baseline-only-correct out of 61 discordant pairs). Cap-hit verification at ctx=32768/n_predict=16384 on the 7 boundary cases (3 baseline + 4 patched cap-hits) shifts totals to baseline 88.00%/patched 93.40% with delta unchanged at +5.40pt (p=0.0009) — the +5.4pt is robust to token-budget concerns. The headline +9pt thus splits into approximately +3.6pt convergence-efficiency (the patched model finishes its chain-of-thought within budget more often) and **+5.4pt capability gain** (statistically established at p<0.001). The multi-choice benchmarks (HS/WG/ARC) are log-likelihood scored with no generation and are unaffected; those numbers stand. Q4_K_M and IQ1_M GSM were measured only at `n_predict=1024` and likely share a similar convergence component. Related prior art: [arXiv:2602.09805](https://arxiv.org/abs/2602.09805) (token efficiency decomposition), [arXiv:2605.07686](https://arxiv.org/abs/2605.07686) (coupling tax under shared token budget). See `HF_MODEL_CARD.md` §Methodology note for the full version.
+
+## Paper v5 contribution — per-layer functional specialization (n=1 pilot)
+
+Splitting the same 8-byte patch into single-layer ablations on a recurrence-relation prompt (n=1 pilot, hypothesis-generating only):
+
+| Patch | mid-stream "Wait" | tail reflex | aux explanation | Coin Q correct |
+|---|---|---|---|---|
+| baseline (no patch) | 8.25 | 16% | 22% | 91% |
+| L25-alone ×1.5 (4 byte) | 5.56 | 3% | 16% | 100% |
+| L26-alone ×1.5 (4 byte) | 7.41 | 9% | 56% | 97% |
+| **L25+L26 mix (paper v1, 8 byte)** | 5.81 | 6% | 28% | **94%** |
+| triple LOS27+PAN17+PAN43 ×1.8 (12 byte) | 9.25 | 31% | 12% | **12.5%** ⚠ |
+
+The n=32 follow-up (exp166) statistically confirms an **asymmetric auxiliary-explanation rate** (L26-alone 56% vs L25-alone 16%, Fisher p<0.01) while finding accuracy differences not statistically significant at n=32.
+
+**Speculative hypothesis (B+, pilot-only)**: L25 ≈ compute-confidence specialist, L26 ≈ verify-proposal specialist; the L25+L26 mix appears to produce an explicit terminal-verification reflex absent in either single-layer condition. Confirmation requires logit-lens / activation-patching at L24–L27.
+
+## Practical Use Note — Goodhart's Law instance (triple patch)
+
+exp169 (triple × 4 prompts × 32 seeds, interactive T=0.7, max_tokens=6144) found the triple patch solves a coin probability prompt only **4/32 (12.5%)** vs paper v1 mix **30/32 (93.8%)** (Fisher exact p < 0.0001). The triple emits the most verification markers (mid_wait 9.25, tail reflex 31%) yet has the **lowest** interactive accuracy — silent_slip rate 89.3%.
+
+The triple's high GSM8K benchmark score under T=0.0 / max_tokens=1024 / regex extraction is explained by the benchmark setting short-circuiting the "doubt loop" that fires under interactive conditions. **Use the L25+L26 mix at Q2_K for interactive deployment**; the triple is documented here only to motivate the Goodhart's Law caution.
+
+## Cross-architecture validation (paper v1)
+
+| Model | Architecture | Best Δ |
 |---|---|---|
-| IQ1_M (1-bit) | 9.5 GB | [`morphicode-jp/gemma-4-31B-it-L25L26x1.5-IQ1_M`](https://huggingface.co/morphicode-jp/gemma-4-31B-it-L25L26x1.5-IQ1_M) |
-| Q2_K (2-bit) | 12.6 GB | [`morphicode-jp/gemma-4-31B-it-L25L26x1.5-Q2_K`](https://huggingface.co/morphicode-jp/gemma-4-31B-it-L25L26x1.5-Q2_K) |
-| Q4_K_M (4-bit) | 19 GB | [`morphicode-jp/gemma-4-31B-it-L25L26x1.5-Q4_K_M`](https://huggingface.co/morphicode-jp/gemma-4-31B-it-L25L26x1.5-Q4_K_M) |
+| **Gemma 4 31B** | hybrid (5:1 full:SWA) | **+10pt mean across 4 benches** ⭐ |
+| Qwen 3.6 27B | hybrid (1:3 full:SWA) | +2.5pt |
+| Phi-4 14B BF16 | pure dense | null |
+| Llama 3.1 / Mistral 7B | pure dense | null |
 
-All three use the identical 8-byte L25+L26 ×1.5 patch.
+→ The F32 patch effect is concentrated on hybrid LLMs. Pure dense transformers do not benefit. The earlier "rare full-attention layer slack" framing has been revised: structural GGUF analysis shows the working L25/L26 sites are sliding-window (not full-attention) layers. The current accurate description: `layer_output_scale` is a per-layer F32 scalar that gates how strongly each block's normalized output is written back to the residual stream, and we amplify L25/L26's gates by 1.5×. *Why* this specific layer pair works on this specific architecture family remains an open question — see paper §6 for the discussion.
 
-## How it works (one sentence)
+## Reproducibility
 
-Gemma 4 is a hybrid LLM (5:1 full-attention to sliding-window-attention ratio). The patch unlocks "slack" in the rare full-attention layers' RMSNorm scales — a hidden post-hoc tuning knob that the conservative training process leaves on the table.
+```bash
+# 1. Get any Gemma 4 31B GGUF (any quantization)
+hf download bartowski/google_gemma-4-31b-it-Q2_K \
+    --local-dir ./models
 
-Cross-architecture validation:
-- 🟢 Gemma 4 31B (5:1 hybrid): +13.25pt
-- 🟢 Qwen 3.6 27B (1:3 SSM hybrid): +3.5pt
-- 🔴 Phi-4 14B BF16 (pure dense): null/destructive
-- 🔴 Llama / Mistral (pure dense): null
+# 2. Apply paper v1 patch (8 bytes)
+python apply_l25l26.py ./models/google_gemma-4-31b-it-Q2_K.gguf
 
-The Phi-4 BF16 result (no quantization, null effect) rules out "quantization recovery" — the effect is structural to hybrid LLMs.
-
-## Honest negative result: ODIN search
-
-Before settling on the simple 2-layer L25+L26 patch, we ran an autonomous optimization engine (`morphi`, 12-specialist parallel search, 7 hours on RTX 5090) targeting Q4 HellaSwag. It found an 11-layer 44-byte patch we call `basin B` (see `apply_basin_b.py` for the values, kept for transparency).
-
-When benchmarked on Q4 across all 4 release benchmarks, **L25+L26 outperforms basin B on every single one — including the search target itself**:
-
-| bench | basin B (44 B) | L25+L26 (8 B) |
-|---|---|---|
-| Q4 HellaSwag | 72.82 | **73.50** (+0.68) |
-| Q4 Winogrande | 69.61 | **70.32** (+0.71) |
-| Q4 GSM8k | 84.00 | **87.00** (+3.00) |
-| Q4 ARC-C | 48.50 | **48.76** (+0.26) |
-
-7 hours of high-dimensional search lost to a 2-layer manual baseline. The over-parameterized solution generalizes strictly worse than the simple one — an instance of objective-overfitting. The basin B script is included here for reproducibility but **L25+L26 is the recommended flagship**.
-
-## Repository contents
-
+# 3. Evaluate (requires llama.cpp)
+~/llm/llama.cpp/llama-perplexity \
+    -m ./models/google_gemma-4-31b-it-Q2_K.gguf \
+    -f ~/llm/benchmarks/hellaswag_val.txt \
+    -ngl 99 --hellaswag --hellaswag-tasks 10042 \
+    -c 512
 ```
-.
-├── README.md               this file
-├── apply_l25l26.py        ★ flagship patch script (8 bytes, recommended)
-├── apply_basin_b.py        legacy / ODIN-discovered patch script (44 bytes, kept for transparency)
-├── requirements.txt        pip dependencies
-├── CITATION.cff            BibTeX-compatible citation file
-├── REPRODUCE.md            full reproduction instructions
-├── LICENSE                 Apache 2.0
-└── paper/                  paper source + compiled PDF
-    ├── main.tex
-    ├── main.pdf
-    ├── refs.bib
-    └── figures/
-```
+
+Expected on Q2_K HellaSwag (n=10042): baseline approximately 60%, patched approximately +9–11pt.
+
+## Files
+
+- [`apply_l25l26.py`](apply_l25l26.py) — paper v1 L25+L26 ×1.5 patcher (single file, 8 bytes)
+- [`bake_l25_l26_split.py`](bake_l25_l26_split.py) — per-layer ablation baker (L25-alone or L26-alone, 4 bytes each)
+- [`bake_triple_patch.py`](bake_triple_patch.py) — triple control baker (LOS27+PAN17+PAN43 ×1.8, 12 bytes; not recommended for deployment)
+- [`LICENSE`](LICENSE) — Apache 2.0 base text
+- [`LICENSE-CODE`](LICENSE-CODE) — code/tooling scope (Apache 2.0)
+- [`LICENSE-WEIGHTS`](LICENSE-WEIGHTS) — patched GGUF/model-weight scope (Gemma 4 Apache 2.0 basis, verified 2026-05-31)
+- [`CITATION.cff`](CITATION.cff) — citation metadata
+- [`REPRODUCE.md`](REPRODUCE.md) — step-by-step reproduction guide
+- [`ROLLBACK_PLAYBOOK.md`](ROLLBACK_PLAYBOOK.md) — release rollback playbook
+- `README.md` — this file
+
+No dependencies beyond `gguf` and `numpy`. No conda env. No build step.
+
+## Background
+
+This work was developed independently by a researcher in Japan on nights and weekends. The 8-byte patch (L25+L26 ×1.5) was identified after a wider exploration that produced an 11-layer 44-byte solution (basin B) via an in-house multi-specialist parallel optimization engine; the simpler 2-layer baseline beat that solution on every release benchmark and is what we ship here. The internal optimization engine itself is not included in this release. Basin B numerical values are kept in the paper appendix for transparency only.
+
+## Releases planned
+
+- **v1.0** (paper v1, 2026-05-27): 8-byte L25+L26 patch + 3 HF GGUFs (Q1/Q2/Q4)
+- **v1.1** (paper v5, this release, 2026-06-07): per-layer ablation (L25/L26 alone, triple) + exp166 statistical confirmation + Goodhart's Law instance (triple) documentation
+- **v1.2** (planned within ~2 weeks): exp166 full 512-run statistics integrated; cross-model replication (Qwen 3.6 / Phi-4)
+- **v2.0** (future): logit-lens / activation-patching at L24–L27 for direct mechanism verification
 
 ## Citation
 
 ```bibtex
-@misc{hirai2026f32patch,
-  title  = {Why Some LLMs Have a Hidden Reasoning Knob:
-            Rare Full-Attention Bottlenecks in Hybrid Architectures
-            and an 8-byte Quantization Recovery},
+@misc{hirai2026-l25l26-functional-asymmetry,
+  title  = {Adjacent-Layer Functional Specialization in Q2_K Quantized
+            Gemma 4 31B: A Single-Question Pilot of L25 (Compute) and
+            L26 (Meta-Verify)},
   author = {Hirai, Akito},
   year   = {2026},
+  month  = {June},
   doi    = {10.5281/zenodo.20362821},
-  url    = {https://arxiv.org/abs/XXXX.XXXXX}
+  url    = {https://doi.org/10.5281/zenodo.20362821}
 }
 ```
 
 ## License
 
-Apache 2.0 for the patch tooling and paper. Gemma 4 weights subject to [Google's Gemma Terms](https://ai.google.dev/gemma/terms).
+This release keeps three scopes separate:
+
+1. Code/tooling: Apache 2.0. See `LICENSE-CODE`.
+2. Patched Gemma 4 GGUF weights: Gemma 4 Apache 2.0 basis as listed by Google and Hugging Face (verified 2026-05-31; Gemma 4 was moved off the older Gemma Terms of Use to Apache 2.0). See `LICENSE-WEIGHTS`.
+3. Paper/docs: CC-BY-4.0, archived on Zenodo (DOI 10.5281/zenodo.20362821).
+
+Before redistributing patched GGUF files, re-check the upstream Gemma 4 model card and Google license page because model licensing is an external dependency.
 
 ## Contact
 
 - X (Twitter): [@morphicode_jp](https://x.com/morphicode_jp)
-- ORCID: TBD
+- HF: [huggingface.co/morphicode-jp](https://huggingface.co/morphicode-jp)
+- Zenodo: [doi.org/10.5281/zenodo.20362821](https://doi.org/10.5281/zenodo.20362821)
 - Email: morphicode.jp@gmail.com
 
-Independent researcher in Tokyo, Japan. Built on nights & weekends while working a day job in oil pump engineering. DMs open for research collaboration.
+DMs open for research collaboration and questions. Feedback / reproductions / refutations welcome.

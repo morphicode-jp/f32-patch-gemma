@@ -1,8 +1,8 @@
 cff-version: 1.2.0
 title: >-
-  Why Some LLMs Have a Hidden Reasoning Knob:
-  Rare Full-Attention Bottlenecks in Hybrid Architectures
-  and a 44-byte Quantization Recovery
+  Adjacent-Layer Functional Specialization in Q2_K Quantized
+  Gemma 4 31B: A Single-Question Pilot of L25 (Compute) and
+  L26 (Meta-Verify)
 message: >-
   If you use this software or patch in your research,
   please cite it as below.
@@ -11,21 +11,46 @@ authors:
   - given-names: Akito
     family-names: Hirai
     email: morphicode.jp@gmail.com
-    orcid: ''
-repository-code: 'https://github.com/morphicode_jp/f32-patch-gemma'
-url: 'https://huggingface.co/morphicode_jp/gemma-4-31B-it-basin-b-Q2_K'
+    orcid: 'https://orcid.org/0009-0006-0161-3249'
+repository-code: 'https://github.com/morphicode-jp/f32-patch-gemma'
+url: 'https://huggingface.co/morphicode-jp/gemma-4-31B-it-L25L26x1.5-Q2_K'
+identifiers:
+  - type: doi
+    value: 10.5281/zenodo.20362821
+    description: Zenodo archive of paper, code, and reproduction artifacts
 abstract: >-
-  A training-free, calibration-free 44-byte F32 patch
-  applied to 11 layer_output_scale weights of Gemma 4 31B
-  yields +13.25pt HellaSwag accuracy improvement on the
-  Q2_K quantization. The mechanism — rare full-attention
-  bottleneck slack in hybrid LLMs — is validated across
-  4 model families.
+  We report a single-question pilot observation that scaling
+  individual layer_output_scale tensors at layers 25 and 26 of
+  Gemma 4 31B-it (Q2_K quantization) produces distinct behavioral
+  phenotypes: L25-alone yields compute-confident answers with
+  minimal mid-stream verification, L26-alone produces
+  verification-dense but functional answers, and the joint scaling
+  (paper v1 patch, L25+L26 multiplied by 1.5, 8 bytes total) produces
+  explicit terminal-verification reflexes absent in either
+  single-layer condition. The n=32 follow-up (exp166) statistically
+  confirms an asymmetric auxiliary-explanation rate (L26-alone 56%
+  vs L25-alone 16%, p<0.01) while finding accuracy differences not
+  significant at n=32. This is a hypothesis-generating release; the
+  asymmetry framing is provisional pending fuller replication. The
+  paper v1 (L25+L26 mix, 8 bytes) GGUFs at Q1 (IQ1_M), Q2 (Q2_K),
+  and Q4 (Q4_K_M) are distributed; per-layer ablation GGUFs
+  (L25-alone, L26-alone, triple) are reproducible from the included
+  bake scripts.
 keywords:
   - LLM
   - quantization
-  - gemma
-  - hybrid-architecture
+  - gemma-4
+  - per-layer-ablation
   - mechanistic-interpretability
+  - hypothesis-generating-pilot
 license: Apache-2.0
-date-released: '2026-05-20'
+license-url: 'https://www.apache.org/licenses/LICENSE-2.0'
+date-released: '2026-06-07'
+# License scope notes:
+#   - Apache-2.0 applies to: patch script (apply_l25l26.py), bake scripts,
+#     reproduction code, and patched-GGUF derivatives (Gemma 4 base weights
+#     re-licensed by Google to Apache-2.0 on 2026-05-31).
+#   - Paper text (paper_v1.pdf, paper_v5.pdf) is distributed under
+#     CC-BY-4.0; redistribution and adaptation permitted with attribution.
+#   - See LICENSE (Apache 2.0 full text), LICENSE-CODE, LICENSE-WEIGHTS
+#     in the GitHub repository for the canonical scope statements.
