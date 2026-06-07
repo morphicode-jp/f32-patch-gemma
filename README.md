@@ -1,6 +1,6 @@
 # f32-patch-gemma
 
-**8-byte F32 patch on Gemma 4 31B that beats the Q8 BF16 baseline 4-for-4 at Q4, with a per-layer ablation that suggests L25 and L26 carry distinct behavioral roles.**
+**8-byte F32 patch on Gemma 4 31B. Q4_K_M beats the Q8 BF16 reference on HellaSwag, Winogrande, and ARC-Challenge; GSM8k should be cited from the Q2_K paper-grade n=500 re-measurement.**
 
 [![License: Apache 2.0](https://img.shields.io/badge/License-Apache_2.0-blue.svg)](LICENSE)
 [![Zenodo DOI](https://img.shields.io/badge/Zenodo-10.5281%2Fzenodo.20362821-blue)](https://doi.org/10.5281/zenodo.20362821)
@@ -38,7 +38,7 @@ The paper v1 patch (L25+L26 ×1.5, 8 bytes) is distributed at three quantization
 |---|---|---|---|
 | **IQ1_M** (1-bit) | ~10 GB | GSM +36pt (chance-level → usable) | [morphicode-jp/gemma-4-31B-it-L25L26x1.5-IQ1_M](https://huggingface.co/morphicode-jp/gemma-4-31B-it-L25L26x1.5-IQ1_M) |
 | **Q2_K** (2-bit) | ~13 GB | HS +11.21pt (flagship for paper v5) | [morphicode-jp/gemma-4-31B-it-L25L26x1.5-Q2_K](https://huggingface.co/morphicode-jp/gemma-4-31B-it-L25L26x1.5-Q2_K) |
-| **Q4_K_M** (4-bit) | ~19 GB | Q4 patched beats Q8 BF16 baseline on all 4 benchmarks | [morphicode-jp/gemma-4-31B-it-L25L26x1.5-Q4_K_M](https://huggingface.co/morphicode-jp/gemma-4-31B-it-L25L26x1.5-Q4_K_M) |
+| **Q4_K_M** (4-bit) | ~19 GB | Q4 patched beats Q8 BF16 baseline on HS/WG/ARC; GSM8k caveat in results | [morphicode-jp/gemma-4-31B-it-L25L26x1.5-Q4_K_M](https://huggingface.co/morphicode-jp/gemma-4-31B-it-L25L26x1.5-Q4_K_M) |
 
 L25-alone, L26-alone, and the triple control GGUFs are **not** distributed as separate downloads — they are reproducible from the bake scripts in this repo. Distribution would invite users to mistake the diagnostic ablation patches for recommended deployment patches.
 
@@ -49,13 +49,13 @@ Gemma 4 31B-it, full validation:
 | Benchmark | Baseline | Patched | Δ |
 |---|---|---|---|
 | HellaSwag (Q4_K_M vs Q8_0 BF16) | 63.33% | **73.50%** | **+10.17pt** |
-| GSM8k (Q4 vs Q8 BF16) | 70% | **87%** | **+17pt** |
+| GSM8k (Q4 vs Q8 BF16, paper v1 short-budget legacy) | 70% | **87%** | **+17pt** (not n=500; mixes capability + token-budget) |
 | Winogrande (Q4 vs Q8 BF16) | 65.59% | **70.32%** | +4.73pt |
 | ARC-Challenge (Q4 vs Q8 BF16) | 44.38% | **48.76%** | +4.38pt |
 | HellaSwag (Q2_K vs same-quant baseline) | — | — | **+11.21pt** |
 | GSM8k (IQ1_M vs same-quant baseline) | 24% | **60%** | **+36pt** |
 
-→ 12/12 cells positive across 3 release quants × 4 benchmarks. Q4 patched beating Q8 BF16 baseline 4-for-4 is the headline result.
+→ 12/12 cells positive across 3 release quants × 4 benchmarks under their documented protocols. For Q4_K_M vs Q8_0, cite HellaSwag / Winogrande / ARC-Challenge first. For GSM8k, cite the Q2_K n=500 paper-grade result below.
 
 ### Note on Q2_K GSM +9pt (convergence vs. capability)
 
