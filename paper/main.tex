@@ -22,7 +22,7 @@
 }
 
 \title{Why Some LLMs Have a Hidden Reasoning Knob: \\
-Rare Full-Attention Bottlenecks in Hybrid Architectures \\
+Per-Layer Output-Gate Slack in Hybrid Architectures \\
 and an 8-byte Quantization Recovery}
 
 \author{
@@ -67,13 +67,12 @@ baseline---an instance of objective-overfitting that motivates retaining
 L25+L26 as the flagship for all release quantizations.
 
 To investigate mechanism, we apply per-layer F32 scaling to four architectures:
-Gemma~4~31B (hybrid 5:1 full-attention:SWA), Qwen~3.6~27B (hybrid 1:3
+Gemma~4~31B (hybrid 1:5 full-attention:SWA), Qwen~3.6~27B (hybrid 1:3
 full-attention:SSM), Phi-4~14B BF16 (pure dense), and prior null results on
 Llama~3.1~8B and Mistral~7B (pure dense). \textbf{Hybrid models yield positive
 $\Delta$; pure-dense models yield null or destructive $\Delta$.} Phi-4 BF16
 (no quantization) yielding null falsifies a quantization-recovery hypothesis;
-the effect is structurally rooted in hybrid architectures' rare full-attention
-layers.
+the effect is empirically specific to hybrid architectures; the structural mechanism remains open (the patched layers L25/L26 are sliding-window, not full-attention, layers, and the patch acts on per-layer F32 output gates, \texttt{layer\_output\_scale}).
 
 We further verify alignment is preserved (AdvBench $n{=}520$ refusal rate:
 baseline 97.31\% [95.53, 98.39] vs basin~B 97.12\% [95.30, 98.24], CIs fully
@@ -113,8 +112,7 @@ quantizations.
     multi-benchmark objectives is left for follow-up
     (\S\ref{ssec:basinb_compare}).
   \item Cross-architecture validation across 4 model families confirms the
-    effect is \emph{hybrid-architecture specific}, supporting a \emph{rare
-    full-attention bottleneck slack} hypothesis (\S\ref{sec:cross_arch}).
+    effect is \emph{hybrid-architecture specific}, supporting a \emph{per-layer output-gate slack} hypothesis (\S\ref{sec:cross_arch}).
   \item RLHF alignment is statistically preserved on AdvBench $n{=}520$
     (Wilson 95\% CIs overlapping baseline, \S\ref{sec:safety}).
   \item Full reproducibility: three patched GGUFs published on HuggingFace
@@ -161,17 +159,14 @@ single patch set.
 
 \paragraph{Hybrid LLM architectures.}
 Mamba and state-space hybrids~\cite{mamba,mamba2hybrid} integrate SSM layers
-with attention. Gemma~4~\cite{gemma4} adopts a 5:1 full-attention to
-sliding-window-attention ratio. Qwen~3.6~\cite{qwen36} mixes attention with
+with attention. Gemma~4~\cite{gemma4} adopts a 1:5 full-attention to sliding-window-attention ratio (one full-attention layer every sixth block). Qwen~3.6~\cite{qwen36} mixes attention with
 SSM at 1:3 ratio. The ``Achilles' Heel of Mamba''~\cite{achillesmamba}
 identifies failure modes of pure Mamba on copy/recall tasks. Csord\'as et
 al.~\cite{understandingmambatransformer} analyze sequential vs.\ parallel
 SSM-attention integration.
 
 To our knowledge, we are the first to demonstrate that per-layer F32 scaling
-exposes a \emph{structural} per-architecture property: rare full-attention
-layers in hybrid LLMs contain post-deployment performance slack absent in
-pure-dense architectures.
+exposes a \emph{structural} per-architecture property: F32 per-layer output gates in hybrid LLMs contain post-deployment performance slack absent in pure-dense architectures.
 
 \paragraph{Mechanistic interpretability.}
 ROME~\cite{rome} performs activation editing for factual association.
@@ -532,9 +527,7 @@ Q4 alignment testing under L25+L26 is left for follow-up.
 
 We propose:
 \begin{quote}
-\textbf{Rare full-attention bottleneck slack.} In hybrid LLMs that mix
-full-attention layers with alternative layer types (sliding window or SSM),
-the rare full-attention layers form reasoning bottlenecks whose output
+\textbf{Per-layer output-gate slack.} In hybrid LLMs that mix full-attention layers with alternative layer types (sliding window or SSM), certain layers (empirically L25/L26 in Gemma~4, both sliding-window) form reasoning bottlenecks whose output
 amplitudes are conservatively calibrated during training. Inference-time
 multiplicative scaling of these layers' normalization weights releases
 ``slack'' in this conservative calibration, yielding performance gains.
@@ -542,7 +535,7 @@ multiplicative scaling of these layers' normalization weights releases
 
 Empirical support:
 \begin{itemize}[leftmargin=*,itemsep=0pt]
-  \item \textbf{Positive in hybrid}: Gemma~4~31B (5:1, $+13.25$~pt
+  \item \textbf{Positive in hybrid}: Gemma~4~31B (1:5 full-attention:SWA, $+13.25$~pt
   coordinated 11-layer patch) and Qwen~3.6~27B (1:3 SSM, $+2.50$~pt
   single-layer patch on L55).
   \item \textbf{Null/destructive in pure-dense}: Phi-4~14B BF16
@@ -611,8 +604,7 @@ all three release quantizations and four benchmarks (12/12 cells
 positive, up to $+36$~pt at Q1 GSM8k and $+15$~pt at Q4 GSM8k, beating
 the Q8 baseline by $+17$~pt), without training, calibration data, or
 inference overhead.
-Cross-architecture experiments isolate the effect to hybrid LLMs' rare
-full-attention layers, ruling out quantization as the underlying cause.
+Cross-architecture experiments isolate the effect to hybrid LLMs' F32 per-layer output gates, ruling out quantization as the underlying cause.
 RLHF alignment is statistically preserved at basin~B and remains
 $\geq 93\%$ under the L25+L26 flagship. We also report an honest
 negative result: a 7-hour autonomous optimization (basin~B, 44 bytes)

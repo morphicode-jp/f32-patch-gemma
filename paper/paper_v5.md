@@ -287,7 +287,7 @@ Other GGUF files in the repository ((`*-IQ1_M`, `*-UD-IQ2_XXS`)) are from separa
 ## 11. Future Work
 
 - exp166 ((4 patch × 4 prompt × 32 seeds = 512 runs, pre-registered, **completed**)) — verify-pattern asymmetry confirmed: L26-alone aux 56% vs L25-alone 16%, Fisher p<0.01. Coin accuracy at n=32 not statistically significant; n=500 GSM extended-context follow-up ((§5.3)) confirms +5.40pt capability gain at p=0.0007.
-- Cross-model replication ((Qwen 3.6 / Phi-4 / Mistral-Nemo)) — note that prior internal F32 patch work suggests hybrid-LLM rare full-attention layers are key; cross-model patterns may differ
+- Cross-model replication ((Qwen 3.6 / Phi-4 / Mistral-Nemo)) — note that prior internal F32 patch work shows model-dependent responsiveness ((Gemma 4 strong, Qwen 3.6 +2.5pt, Phi-4 null)) with no confirmed architectural predictor ((the earlier rare-full-attention-layer hypothesis was disproved: L25/L26 are SWA layers in Gemma 4 31B)); cross-model patterns may differ
 - Logit-lens / activation-patching probe of L24-L27 for "Wait" / "Let me" token logit trajectories — direct mechanism observation
 - Per-layer adaptive multiplier search ((L25 vs L26 scale asymmetry suggested by paper v2 internal work)) — re-interpret existing per-layer findings under the asymmetry hypothesis
 - Cross-benchmark evaluation ((MMLU / BBH / ARC-Challenge — none of these measured in the current exp162 reference run))

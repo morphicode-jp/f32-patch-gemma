@@ -88,7 +88,7 @@ The triple's high GSM8K benchmark score under T=0.0 / max_tokens=1024 / regex ex
 
 | Model | Architecture | Best Δ |
 |---|---|---|
-| **Gemma 4 31B** | hybrid (5:1 full:SWA) | **+10pt mean across 4 benches** ⭐ |
+| **Gemma 4 31B** | hybrid (1:5 full:SWA) | **+10pt mean across 4 benches** ⭐ |
 | Qwen 3.6 27B | hybrid (1:3 full:SWA) | +2.5pt |
 | Phi-4 14B BF16 | pure dense | null |
 | Llama 3.1 / Mistral 7B | pure dense | null |
