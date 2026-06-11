@@ -1,4 +1,4 @@
-cff-version: 1.2.0
+﻿cff-version: 1.2.0
 title: >-
   Adjacent-Layer Functional Specialization in Q2_K Quantized
   Gemma 4 31B: A Single-Question Pilot of L25 (Compute) and
@@ -16,7 +16,7 @@ repository-code: 'https://github.com/morphicode-jp/f32-patch-gemma'
 url: 'https://huggingface.co/morphicode-jp/gemma-4-31B-it-L25L26x1.5-Q2_K'
 identifiers:
   - type: doi
-    value: 10.5281/zenodo.20362821
+    value: 10.5281/zenodo.20362820
     description: Zenodo archive of paper, code, and reproduction artifacts
 abstract: >-
   We report a single-question pilot observation that scaling

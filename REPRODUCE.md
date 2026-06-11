@@ -1,4 +1,4 @@
-# Reproduction Guide — Paper v5 (L25+L26 mix, 8 bytes)
+﻿# Reproduction Guide — Paper v5 (L25+L26 mix, 8 bytes)
 
 Step-by-step instructions to reproduce the paper v1 patch (L25+L26 ×1.5, 8 bytes) on Gemma 4 31B Q2_K. Expected effect: HellaSwag improvement of approximately +9 to +11pt depending on the eval setting (Wilson CI varies with N; full N=10042 numbers are in the paper). For the per-layer ablation experiments described in paper v5 (L25-alone, L26-alone, triple), see Section 9 below.
 
@@ -100,7 +100,7 @@ python f32-patch-gemma/apply_l25l26.py \
 - Apply to Q4_K_M (19 GB): expected baseline ~63% Q8 BF16 reference, patched ~73.5% on HellaSwag — Q4 patched beats Q8 baseline 4-for-4 on the public release benchmarks
 - Apply to Q8_0 (33 GB): expected baseline ~78%, patched ~89% (smaller absolute gap because Q8 is already strong)
 
-(Full cross-quant table in the Zenodo archive paper, DOI 10.5281/zenodo.20362821.)
+(Full cross-quant table in the Zenodo archive paper, DOI 10.5281/zenodo.20362820.)
 
 ## 9. Paper v5 per-layer ablation (optional, advanced)
 

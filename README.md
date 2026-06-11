@@ -1,9 +1,9 @@
-# f32-patch-gemma
+﻿# f32-patch-gemma
 
 **8-byte F32 patch on Gemma 4 31B. Q4_K_M beats the Q8 BF16 reference on HellaSwag, Winogrande, and ARC-Challenge. For GSM8k patch effect, cite the Q2_K paper-grade n=500 same-quant re-measurement; Q4_K_M baseline-only n=500 is stronger at 95.80%.**
 
 [![License: Apache 2.0](https://img.shields.io/badge/License-Apache_2.0-blue.svg)](LICENSE)
-[![Zenodo DOI](https://img.shields.io/badge/Zenodo-10.5281%2Fzenodo.20362821-blue)](https://doi.org/10.5281/zenodo.20362821)
+[![Zenodo DOI](https://img.shields.io/badge/Zenodo-10.5281%2Fzenodo.20362820-blue)](https://doi.org/10.5281/zenodo.20362820)
 [![HuggingFace Q1](https://img.shields.io/badge/🤗-Q1__IQ1__M-yellow)](https://huggingface.co/morphicode-jp/gemma-4-31B-it-L25L26x1.5-IQ1_M)
 [![HuggingFace Q2](https://img.shields.io/badge/🤗-Q2__K-yellow)](https://huggingface.co/morphicode-jp/gemma-4-31B-it-L25L26x1.5-Q2_K)
 [![HuggingFace Q4](https://img.shields.io/badge/🤗-Q4__K__M-yellow)](https://huggingface.co/morphicode-jp/gemma-4-31B-it-L25L26x1.5-Q4_K_M)
@@ -151,8 +151,8 @@ This work was developed independently by a researcher in Japan on nights and wee
   author = {Hirai, Akito},
   year   = {2026},
   month  = {June},
-  doi    = {10.5281/zenodo.20362821},
-  url    = {https://doi.org/10.5281/zenodo.20362821}
+  doi    = {10.5281/zenodo.20362820},
+  url    = {https://doi.org/10.5281/zenodo.20362820}
 }
 ```
 
@@ -162,7 +162,7 @@ This release keeps three scopes separate:
 
 1. Code/tooling: Apache 2.0. See `LICENSE-CODE`.
 2. Patched Gemma 4 GGUF weights: Gemma 4 Apache 2.0 basis as listed by Google and Hugging Face (verified 2026-05-31; Gemma 4 was moved off the older Gemma Terms of Use to Apache 2.0). See `LICENSE-WEIGHTS`.
-3. Paper/docs: CC-BY-4.0, archived on Zenodo (DOI 10.5281/zenodo.20362821).
+3. Paper/docs: CC-BY-4.0, archived on Zenodo (DOI 10.5281/zenodo.20362820).
 
 Before redistributing patched GGUF files, re-check the upstream Gemma 4 model card and Google license page because model licensing is an external dependency.
 
@@ -170,7 +170,7 @@ Before redistributing patched GGUF files, re-check the upstream Gemma 4 model ca
 
 - X (Twitter): [@morphicode_jp](https://x.com/morphicode_jp)
 - HF: [huggingface.co/morphicode-jp](https://huggingface.co/morphicode-jp)
-- Zenodo: [doi.org/10.5281/zenodo.20362821](https://doi.org/10.5281/zenodo.20362821)
+- Zenodo: [doi.org/10.5281/zenodo.20362820](https://doi.org/10.5281/zenodo.20362820)
 - Email: morphicode.jp@gmail.com
 
 DMs open for research collaboration and questions. Feedback / reproductions / refutations welcome.

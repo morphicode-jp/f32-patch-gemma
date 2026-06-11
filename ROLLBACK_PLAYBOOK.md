@@ -1,4 +1,4 @@
-# Paper v5 Release Rollback Playbook
+﻿# Paper v5 Release Rollback Playbook
 
 Purpose: reduce public damage from a bad launch state without deleting
 evidence or improvising under pressure.
@@ -109,7 +109,7 @@ git diff -- publish/release_v1 docs/PAPER_V5_DRAFT_2026-05-30.md
 
 Patch only the affected files. Stage by explicit file path only.
 
-## Zenodo (paper archive, DOI 10.5281/zenodo.20362821)
+## Zenodo (paper archive, DOI 10.5281/zenodo.20362820)
 
 ### Triggers
 
