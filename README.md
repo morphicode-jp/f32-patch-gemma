@@ -7,6 +7,7 @@
 [![HuggingFace Q1](https://img.shields.io/badge/🤗-Q1__IQ1__M-yellow)](https://huggingface.co/morphicode-jp/gemma-4-31B-it-L25L26x1.5-IQ1_M)
 [![HuggingFace Q2](https://img.shields.io/badge/🤗-Q2__K-yellow)](https://huggingface.co/morphicode-jp/gemma-4-31B-it-L25L26x1.5-Q2_K)
 [![HuggingFace Q4](https://img.shields.io/badge/🤗-Q4__K__M-yellow)](https://huggingface.co/morphicode-jp/gemma-4-31B-it-L25L26x1.5-Q4_K_M)
+[![HuggingFace TSUBO-4](https://img.shields.io/badge/HF-TSUBO--4-yellow)](https://huggingface.co/morphicode-jp/gemma-4-12b-Q2-tsubo4)
 
 ## What this is
 
@@ -41,6 +42,130 @@ The paper v1 patch (L25+L26 ×1.5, 8 bytes) is distributed at three quantization
 | **Q4_K_M** (4-bit) | ~19 GB | Q4 patched beats Q8 BF16 baseline on HS/WG/ARC; GSM8k caveat in results | [morphicode-jp/gemma-4-31B-it-L25L26x1.5-Q4_K_M](https://huggingface.co/morphicode-jp/gemma-4-31B-it-L25L26x1.5-Q4_K_M) |
 
 L25-alone, L26-alone, and the triple control GGUFs are **not** distributed as separate downloads — they are reproducible from the bake scripts in this repo. Distribution would invite users to mistake the diagnostic ablation patches for recommended deployment patches.
+
+## TSUBO-4 — second model shipped: Gemma 4 12B Q2_K (NEW, 2026-06-11)
+
+**A 4-byte F32 patch on Gemma 4 12B-it Q2_K: HellaSwag +8.32pt (n=10,042, z≈12), ARC-Challenge +6.18pt, Winogrande and GSM8K non-regressive. One scalar, layer 10, ×1.65.**
+
+TSUBO-4 is the second patched model in this family and the first outside the 31B. It changes exactly **4 bytes** of `bartowski/gemma-4-12b-it-GGUF` (file `gemma-4-12B-it-Q2_K.gguf`): the F32 `layer_output_scale` of layer 10 goes from 0.104004 to 0.171606 (×1.65) at byte offset 1812031584. No training, no calibration data, no inference overhead — the same recipe as the published 31B patch (TSUBO-8, for context: Q2_K HellaSwag +11.21pt at n=10,042; GSM8K +5.40pt at n=500, p=0.0007), found the same way: exhaustive per-layer screening + fine-grained scale search. The patched model passed the pre-registered ship gate on 2026-06-11 and passed an interactive spot check (5 prompts, T=0.7, no degeneration observed).
+
+### Ship-gate results (patched vs Q2_K baseline)
+
+| Benchmark | n | Q2_K baseline | TSUBO-4 | Δ |
+|---|---|---|---|---|
+| HellaSwag | 10,042 | 38.70% | **47.01%** | **+8.32pt** (z≈12) |
+| Winogrande (full) | 1,267 | 52.80% | 53.59% | +0.79 |
+| ARC-Challenge | 1,165 | 25.84% | **32.02%** | **+6.18** |
+| GSM8K (paired) | 50 | 32% | 40% | +8.0pt (McNemar p=0.34, **not significant**) |
+
+→ The GSM8K claim is strictly **non-regressive**: the +8.0pt point estimate does not reach significance at n=50 and we do not claim it as an improvement. The three multiple-choice benchmarks are log-likelihood scored (no generation).
+
+### TSUBO-4 (Q2_K, 4.84 GB) vs unpatched Q4_K_M (6.79 GB)
+
+| Benchmark | Q2_K baseline | **TSUBO-4** (Q2_K) | Q4_K_M baseline |
+|---|---|---|---|
+| HellaSwag | 38.70% | 47.01% | 49.75% |
+| Winogrande | 52.80% | 53.59% | 54.06% |
+| ARC-Challenge | 25.84% | **32.02%** | 31.16% |
+| GSM8K | 32% | 40% | 54% |
+
+→ TSUBO-4 closes ~75% of the Q2→Q4 HellaSwag gap, reaches parity on Winogrande, and **exceeds the Q4_K_M baseline on ARC-Challenge (+0.86)** — in a file 29% smaller. Q4_K_M keeps a clear edge on GSM8K generation (-14pt): if math generation is your workload, stay on Q4.
+
+### Benchmark methodology
+
+HellaSwag / Winogrande / ARC-C are log-likelihood ranked (zero generation, no thinking mode —
+the standard definition). GSM8K is generative with a step-by-step prompt and Gemma 4's native
+thinking mode active. All claims are paired deltas under identical settings.
+
+### The scale is byte-exact — do not round
+
+The survival points are isolated. n=50-confirmed alive: **×1.62 and ×1.65** (both GSM8K 32%→40%, +8.0pt). Dead at n=10–20 resolution: ×1.63, ×1.64, ×1.70; ×1.75 is established broken (0/20 pooled, p<0.01). Extreme scales collapse outright (×16.5 → HellaSwag 25.5%, 4-way chance; ×21.62 → 20.0%, below chance) — absolute amplification governs, and the fractional digits carry no magic. Meanwhile the HellaSwag response is flat (+8.5 to +10.2 at n=1000) across ×1.60–1.70 while generation flickers — a "two-layer" structure: the log-likelihood gain is robust, the generation behavior is needle-width. Practical consequence: apply patch values byte-exact; ±0.01 is unsafe.
+
+### Naming: TSUBO
+
+We call the technique **TSUBO**, after the Japanese term for acupressure points: isolated loci where a minimal, precisely-placed intervention produces a system-wide response. The metaphor is structural, not medical — the points are located by exhaustive per-layer screening and byte-exact scale search, and their effects are measured on standard benchmarks. The formal term is **needle-point gate patching**; TSUBO is the family name, suffixed by byte count. Retroactively, the paper-v1 8-byte patch (31B L25+L26 ×1.5, published 2026-06-07) is **TSUBO-8**, the 44-byte 11-layer basin-B patch is **TSUBO-44**, and the present 12B release is **TSUBO-4**.
+
+### Apply it yourself
+
+`apply_tsubo4.py` locates the tensor **by name** via the `gguf` library — no hardcoded offsets — and flips the 4 bytes in place. The checked-in script includes backup and `--restore`; the snippet below is the minimal core:
+
+```python
+#!/usr/bin/env python3
+"""apply_tsubo4.py — TSUBO-4: 4-byte F32 patch for Gemma 4 12B-it Q2_K.
+
+Multiplies blk.10 layer_output_scale (per-layer F32 output gate) by exactly 1.65.
+On bartowski/gemma-4-12b-it-GGUF Q2_K you should see 0.104004 -> 0.171606.
+Patch values are byte-exact: +/-0.01 is unsafe (x1.63 / x1.64 / x1.70 fail).
+
+Usage:  pip install gguf numpy
+        python apply_tsubo4.py /path/to/gemma-4-12B-it-Q2_K.gguf
+"""
+import struct
+import sys
+
+import numpy as np
+from gguf import GGUFReader
+
+TARGET_NAME = "blk.10.layer_output_scale.weight"
+SCALE = np.float32(1.65)
+
+
+def find_offset(gguf_path: str) -> int:
+    """Locate the target tensor by NAME (works across quantizations)."""
+    reader = GGUFReader(gguf_path)
+    offset = None
+    for t in reader.tensors:
+        if str(t.name) == TARGET_NAME:
+            if t.tensor_type.name != "F32" or int(t.n_elements) != 1:
+                sys.exit(f"[error] {TARGET_NAME} is not a 1-element F32 tensor")
+            offset = int(t.data_offset)
+            break
+    del reader  # release the memory map before reopening for write
+    if offset is None:
+        sys.exit(f"[error] {TARGET_NAME} not found — is this a Gemma 4 12B GGUF?")
+    return offset
+
+
+def main() -> None:
+    if len(sys.argv) != 2:
+        sys.exit("usage: python apply_tsubo4.py <gemma-4-12B-it-Q2_K.gguf>")
+    path = sys.argv[1]
+    offset = find_offset(path)
+    with open(path, "r+b") as f:
+        f.seek(offset)
+        before = np.float32(struct.unpack("<f", f.read(4))[0])
+        after = np.float32(before * SCALE)  # multiply in float32, never float64
+        f.seek(offset)
+        f.write(struct.pack("<f", float(after)))
+    print(f"[TSUBO-4] {TARGET_NAME} @ byte offset {offset}")
+    print(f"[TSUBO-4] before = {before:.6f}  ->  after = {after:.6f}  (x{SCALE})")
+    print("[TSUBO-4] 4 bytes written in place.")
+
+
+if __name__ == "__main__":
+    main()
+```
+
+Verify (requires llama.cpp; n=1000 subset, a few minutes on GPU):
+
+```bash
+llama-perplexity -m gemma-4-12B-it-Q2_K.gguf -f hellaswag_val.txt -ngl 99 --hellaswag --hellaswag-tasks 1000 -c 512
+```
+
+Expected at n=1000: roughly **+9.3pt** over your unpatched baseline on the same 1000-task subset. (Full-set n=10,042: 47.01% vs 38.70%.)
+
+### Mechanism note (hypothesis-generating)
+
+`layer_output_scale` is a per-layer F32 scalar that gates how strongly each block's normalized output is written back to the residual stream. A plausible reading is that amplifying layer 10's gate compensates attenuation introduced by Q2_K quantization — but the mechanism is **not confirmed**. The earlier "rare full-attention layer" framing is disproved: L10, like the 31B L25/L26 sites, is a sliding-window attention layer.
+
+### Base weights & license (TSUBO-4)
+
+- Base model: Google **Gemma 4 12B-it**; GGUF quantization by [bartowski](https://huggingface.co/bartowski/gemma-4-12b-it-GGUF) (file `gemma-4-12B-it-Q2_K.gguf`)
+- Gemma 4 base weights are licensed under [Apache 2.0](https://ai.google.dev/gemma/docs/gemma_4_license) (verified 2026-05-31; Gemma 4 was moved off the older Gemma Terms of Use)
+- This patched variant is research output, distributed under the same base-weight license scope; patch tooling remains Apache 2.0
+- The 4-byte modification does not alter model identity (still Gemma 4 12B-it) — it changes a single per-layer F32 scale value.
+
+Before redistributing patched GGUF files, re-check the upstream Gemma 4 model card and Google license page because model licensing is an external dependency.
 
 ## Results — paper v1 (publicly released 2026-05-27)
 

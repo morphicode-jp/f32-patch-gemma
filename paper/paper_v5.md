@@ -137,6 +137,81 @@ triple の GSM benchmark 高 score ((85% > paper v1 76%、 exp168)) は GSM 採 
 
 ---
 
+### 5.7 Cross-quantization replication on Gemma 4 12B: a needle-width recovery window
+
+We attempted to replicate the paper-v1 recovery on Gemma 4 12B (48 layers) across Q2_K and
+Q4_K_M: a HellaSwag-first exhaustive screen (48 layers × {1.3, 1.5, 1.75, 2.0} × n=200 per
+quant), n=1000 confirmation, a 0.05-step scale sweep on the winning layer, and a ship gate of
+HS Δ≥+5pt at z≥5 on n=10,042, Winogrande/ARC-C non-regressive, and paired GSM Δ≥-2pt (n=50).
+
+**Layer indices do not transfer; one layer recurs across the conditions screened.** The 31B
+indices (L25/L26) do not work on 12B, and their position-proportional analogue L19/L20 ×1.5 is
+catastrophic (GSM 50%→10%, Δ-40pt, paired n=30, McNemar p=0.0005). The Q4_K_M screen's nominal
+top (L22 ×1.3, +8.0 at n=200) collapsed at n=1000 (+2.9) — a small-n mirage among 192 cells —
+while L10, a sliding-window layer like the 31B winners, survived confirmation in both quants
+(Q4: +7.2 at n=1000; Q2: +9.5). In BF16 only L10 itself was spot-checked (+3.7 at n=1000, n.s.);
+no BF16 layer screen exists.
+
+**Q4_K_M: real but sub-threshold.** L10 ×1.5 yields HS +4.01pt (n=10,042, z=5.7, unpaired
+two-proportion — conservative for paired data), Winogrande +2.53 (n.s.), ARC-C +3.69 (marginal),
+GSM -4.0pt (paired n=50, McNemar p=0.75, no silent-slip increase). It fails two gate letters
+(HS +5pt; GSM ≥-2pt — we read the latter as statistically null, but it does not pass as
+pre-registered). The scale response is a plateau: no generation cliff was detected at n=10
+resolution across ×1.2–1.7, with ×1.5 confirmed flat at n=50.
+
+**Q2_K: a needle-width window separates recovery from benchmark-gaming.** At most scales,
+ranking gains decouple from generation: L10 ×1.75 yields HS +8.44pt (n=10,042, z=12.1) and
+ARC-C +5.32 with Winogrande -0.08 (null), while paired GSM collapsed 3/10 → 0/10 (early-exit
+at 10 of 50 items under the Δ≤-10pt rule; pooled with the sweep probe, 0/20 vs 32%, p<0.01).
+A 0.05-step sweep over ×1.05–1.80 (HS at 16 points; patched-only GSM n=10 at 15 points — ×1.05
+was not generation-tested) shows ranking gains from ×1.10 upward (+5.9 to +9.5) while patched
+GSM scored 0–4/10, median 1/10. The single best probe point, ×1.65 (4/10, HS +9.3 at n=1000),
+was adjudicated at paired n=50: GSM 32% → 40% (Δ+8.0pt, McNemar p=0.34 — non-regressive; we
+claim no improvement). **×1.65 then passed the full ship gate: HS 38.70% → 47.01% (Δ+8.32pt,
+z≈12), Winogrande +0.79, ARC-C +6.18, GSM +8.0.** The confirmed survival window is a single
+point with width at most 0.1: ×1.75 is established broken (p<0.01), while ×1.60 (3/10) and
+×1.70 (1/10) remain undetermined at n=10, and ×1.0–1.10 is generation-untested. Outside this
+needle, the §5.5 Goodhart pattern extends from a 3-layer patch on 31B to a single-layer patch
+on 12B: log-likelihood benchmarks and generative competence respond to the same 4-byte
+intervention with opposite signs. Notably, an n=10 screening probe would have rejected ×1.65;
+the needle survived only because the best probe point was re-adjudicated at n=50.
+
+**Scale-response structure (two layers).** A 0.01-step scan over ×1.60–1.70 (HS n=1000; paired
+GSM n=20, with n=50 at two points) separates the response into two regimes. Macroscopically,
+ranking benchmarks follow a smooth hump: insufficient amplification (×1.05, +2.8) → plateau
+(×1.15–1.80, +7 to +10) → decline (Q4 ×2.0 ≈ 0), with extreme scales collapsing to chance or
+below (×16.5: 25.5%; ×21.62: 20.0% on 4-way HellaSwag) — absolute amplification governs, with
+no periodicity. Microscopically, generation flickers: on a fixed 20-problem set at temperature
+0 (deterministic), GSM survival alternates non-monotonically (alive at 1.60/1.62/1.65/1.67–1.69,
+dead at 1.63/1.64/1.70), consistent with chaotic sensitivity of greedy decoding to small logit
+perturbations rather than sampling noise. Two survival points are n=50-confirmed (×1.62 and
+×1.65, both 32%→40%, Δ+8.0pt); the points between them are dead. Practically, patch values must
+be pinned byte-exactly — ±0.01 perturbations are not safe — which the GGUF byte-patch
+distribution format already guarantees.
+
+**Failure mode (single-problem observation).** On the one problem inspected in depth, errors
+across several settings were chain-intermediate values (9, 13 where the answer is 18), a pattern
+also present in the unpatched baseline; other problems' errors do not fit this pattern, and a
+systematic classification of all paired-run errors is pending. We note it as consistent with —
+not evidence for — an early-commitment account of the output-gate boost.
+
+**Interpretation (hypothesis).** Across the conditions measured, the generation-safe scale
+window narrows with quantization depth without (at least here) closing: BF16 shows no detected
+GSM change at ×1.5 (n=50); Q4 shows no cliff at n=10 resolution across ×1.2–1.7 (×1.5 confirmed
+flat at n=50); Q2's confirmed window is a single point at ×1.65, width ≤0.1. Comparing 31B Q2_K
+(wide window: ×1.5 ships with generation intact) with 12B Q2_K (needle), window width may also
+shrink with model size — but with two sizes tested we cannot separate size from architecture or
+checkpoint effects. **We ship the 12B Q2_K L10 ×1.65 patch (4 bytes)**; Q4_K_M remains unshipped
+(HS +4.01 < +5pt bar). Caveats before deployment: the §5.5 lesson that T=0 benchmark gates do
+not guarantee interactive quality argues for a chat-level spot check before any public upload;
+and the window's edges (×1.60, ×1.70) should be adjudicated at n≥50 if scale tolerance matters
+downstream. Whether intermediate (27B) or larger (70B+) sizes interpolate between the wide 31B
+window and the 12B needle is future work.
+
+**Naming.** We call the technique **TSUBO**, after the Japanese term for acupressure points: isolated loci where a minimal, precisely-placed intervention produces a system-wide response. The metaphor is structural, not medical — the points are located by exhaustive screening and byte-exact scale search, and their effects are measured on standard benchmarks. The formal term is needle-point gate patching. Retroactively, the paper-v1 8-byte patch (L25+L26 ×1.5) is TSUBO-8, the 44-byte basin-B patch is TSUBO-44, and the present 12B patch is TSUBO-4.
+
+---
+
 ## 6. Hypothesis B+ ((formal))
 
 ### Statement ((speculative))
